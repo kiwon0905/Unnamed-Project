@@ -37,6 +37,9 @@ class Packer
 public:
 	Packer();
 
+	const void * getData();
+	std::size_t getDataSize();
+
 	template<int minInt, int maxInt, int res>
 	void pack(float value)
 	{
@@ -66,19 +69,17 @@ public:
 		const int bits = BitsRequired<min, max>::result;
 		pack32(value, bits);
 	}
-	void pack(const std::string & s);
+
+	void pack(const std::string & data);
 	void pack(const void * data, std::size_t size);
-
-
-	const std::uint8_t * getData();
-	std::size_t getDataSize();
 
 private:
 	void align();
-	void pack32(std::uint32_t value, unsigned bits);
-	void pack8(std::uint8_t value, unsigned bits);
+	void pack8(std::uint8_t data, std::size_t bits);
+	void pack32(std::uint32_t data, std::size_t bits);
+	void check(std::size_t size, std::size_t bits);
 	std::vector<std::uint8_t> m_data;
-	std::size_t m_bitPos = 0;
+	std::size_t m_bitPos;
 };
 
 class Unpacker
@@ -115,17 +116,17 @@ public:
 		data = unpack32(bits);
 	}
 
-	void unpack(std::string & s);
+	void unpack(std::string & data);
 	void unpack(void * data, std::size_t size);
 
 private:
 	void align();
-	void unpack8(std::uint8_t & data, unsigned bits);
-	void unpack32(std::uint32_t & data, unsigned bits);
-
-	std::size_t m_totalBitsRead = 0; // total amount of bits read
-	std::size_t m_bitPos = 0; //bits read at the current byte
-	std::size_t m_byteIndex = 0;
+	void unpack8(std::uint8_t & data, std::size_t bits);
+	void unpack32(std::uint32_t & data, std::size_t bits);
+	void check(std::size_t bits);
 	const std::uint8_t * m_data;
 	std::size_t m_size;
+	std::size_t m_byteIndex;
+	std::size_t m_bitsRead;
+	std::size_t m_bitPos;
 };
