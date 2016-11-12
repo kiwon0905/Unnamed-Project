@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{af85faf5-4bfc-4124-a3a1-c0c9cdd7eea8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{2dfcaa87-5011-4830-bcf7-43b2953f5d4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Client">
+      <UniqueIdentifier>{6bac7709-2d99-42f0-8bfc-793892c77432}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Client">
+      <UniqueIdentifier>{32769ca0-93bf-40a0-910f-35c3b1a8329d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Core\Aabb.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ENetUtility.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Logger.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Parser.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Protocol.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Client\Client.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Client\Gui.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Client\JobExecutor.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Client\LobbyScreen.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Client\Network.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Client\PlayingScreen.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Client\Renderer.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Client\ResourceManager.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Client\Screen.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Client\ScreenStack.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Packet.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Client\Input.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Client\GameWorld.h">
+      <Filter>Game\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Snapshot.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Client\Entity.h">
+      <Filter>Game\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Packer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Core\ENetUtility.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Logger.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Parser.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\Client.cpp">
+      <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\ClientMain.cpp">
+      <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\Gui.cpp">
+      <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\JobExecutor.cpp">
+      <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\LobbyScreen.cpp">
+      <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\Network.cpp">
+      <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\PlayingScreen.cpp">
+      <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\Renderer.cpp">
+      <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\ResourceManager.cpp">
+      <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\ScreenStack.cpp">
+      <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Packet.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\Input.cpp">
+      <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Client\GameWorld.cpp">
+      <Filter>Game\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Client\Entity.cpp">
+      <Filter>Game\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Packer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

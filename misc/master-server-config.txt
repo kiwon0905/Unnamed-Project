@@ -1,0 +1,3 @@
+#master server needs 2 reachable address
+gameServerAddr = 0.0.0.0:12345
+clientAddr = 0.0.0.0:12344
