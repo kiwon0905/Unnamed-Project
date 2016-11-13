@@ -61,6 +61,9 @@
     <ClCompile Include="src\Game\Client\Entity.cpp" />
     <ClCompile Include="src\Game\Client\GameWorld.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Core\Packer.inl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5DDD92AD-CE61-418B-81AC-5FF52409B491}</ProjectGuid>
     <RootNamespace>Client</RootNamespace>

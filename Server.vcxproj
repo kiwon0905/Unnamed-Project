@@ -44,6 +44,9 @@
     <ClCompile Include="src\Game\Server\GameWorld.cpp" />
     <ClCompile Include="src\Game\Server\Player.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Core\Packer.inl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EEE7F1E6-9ADD-42AD-A9ED-8F490263E0F8}</ProjectGuid>
     <RootNamespace>Server</RootNamespace>

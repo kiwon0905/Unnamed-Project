@@ -135,4 +135,9 @@
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Core\Packer.inl">
+      <Filter>Core</Filter>
+    </None>
+  </ItemGroup>
 </Project>

@@ -20,44 +20,18 @@ int main()
 #endif
 
 	Packer writer;
-	for (int i = 0; i < 100; ++i)
-	{
-		writer.pack<0, 100>(i);
-	}
+	writer.pack(std::int8_t(1));
+	writer.pack(std::uint16_t(2));
+	writer.pack(std::int32_t(1));
+	writer.p();
 
-	writer.pack("Hello!");
-	writer.pack("wtf");
-	writer.pack("Ayy");
-
-	for (int i = -8; i <= 8; i += 2)
-	{
-		writer.pack<-10, 10, 2>(float(i) + i / 100.f);
-	}
-
-
-	std::cout << "Total size: " << writer.getDataSize() << "\n";
 	Unpacker reader(writer.getData(), writer.getDataSize());
-	for (int i = 0; i < 100; ++i)
-	{
-		int32_t val;
-		reader.unpack<0, 100>(val);
-		std::cout << val << "\n";
-	}
-
-	std::string out;
-	reader.unpack(out);
-	std::cout << out << "\n";
-	reader.unpack(out);
-	std::cout << out << "\n";
-	reader.unpack(out);
-	std::cout << out << "\n";
-
-	for (int i = -8; i <= 8; i += 2)
-	{
-		float val;
-		reader.unpack<-10, 10, 2>(val);
-		std::cout << val << "\n";
-	}
-
+	std::int8_t a;
+	std::uint16_t b;
+	std::int32_t c;
+	reader.unpack(a);
+	reader.unpack(b);
+	reader.unpack(c);
+	std::cout << (int)a << " " << (int)b << " " << (int)c << "\n";
 	std::cin.get();
 }

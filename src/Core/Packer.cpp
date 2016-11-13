@@ -44,7 +44,7 @@ void Packer::align()
 
 void Packer::pack8(std::uint8_t data, std::size_t bits)
 {
-	check(8, bits);
+	assert(bits <= 8);
 	
 	if (bits == 0)
 		return;
@@ -73,9 +73,10 @@ void Packer::pack8(std::uint8_t data, std::size_t bits)
 	}
 }
 
-void Packer::pack32(std::uint32_t data, std::size_t bits)
+void Packer::pack16(std::uint16_t data, std::size_t bits)
 {
-	check(32, 8);
+	assert(bits <= 16);
+
 	if (bits == 0)
 		return;
 
@@ -89,10 +90,20 @@ void Packer::pack32(std::uint32_t data, std::size_t bits)
 	pack8(*p, bits);
 }
 
-void Packer::check(std::size_t size, std::size_t bits)
+void Packer::pack32(std::uint32_t data, std::size_t bits)
 {
-	assert(bits >= 0);
-	assert(bits <= size);
+	assert(bits <= 32);
+	if (bits == 0)
+		return;
+
+	std::uint8_t * p = reinterpret_cast<std::uint8_t*>(&data);
+	while (bits >= 8)
+	{
+		pack8(*p, 8);
+		p++;
+		bits -= 8;
+	}
+	pack8(*p, bits);
 }
 
 Unpacker::Unpacker(const void * data, std::size_t size) :
@@ -160,6 +171,28 @@ void Unpacker::unpack8(std::uint8_t & data, std::size_t bits)
 		secondVal >>= (8 - bits);
 		data |= secondVal;
 	}
+}
+
+void Unpacker::unpack16(std::uint16_t & data, std::size_t bits)
+{
+	check(bits);
+	if (bits == 0)
+		return;
+
+	std::uint16_t value = 0;
+	std::uint8_t * p = reinterpret_cast<std::uint8_t*>(&value);
+	while (bits >= 8)
+	{
+		std::uint8_t val;
+		unpack8(val, 8);
+		*p |= val;
+		p++;
+		bits -= 8;
+	}
+	std::uint8_t val = 0;
+	unpack8(val, bits);
+	*p |= val;
+	data = value;
 }
 
 void Unpacker::unpack32(std::uint32_t & data, std::size_t bits)

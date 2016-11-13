@@ -38,6 +38,9 @@
     <ClCompile Include="src\Core\Packet.cpp" />
     <ClCompile Include="src\Core\Parser.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Core\Packer.inl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5D5011CC-4DB9-4D47-B5C3-CBC701952B9A}</ProjectGuid>
     <RootNamespace>MasterServer</RootNamespace>
