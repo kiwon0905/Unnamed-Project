@@ -23,6 +23,7 @@ int main()
 	writer.pack(std::int8_t(1));
 	writer.pack(std::uint16_t(2));
 	writer.pack(std::int32_t(1));
+	writer.pack(false);
 	writer.p();
 
 	Unpacker reader(writer.getData(), writer.getDataSize());
@@ -32,6 +33,9 @@ int main()
 	reader.unpack(a);
 	reader.unpack(b);
 	reader.unpack(c);
+	bool bo;
+	reader.unpack(bo);
 	std::cout << (int)a << " " << (int)b << " " << (int)c << "\n";
+	std::cout << bo << "\n";
 	std::cin.get();
 }

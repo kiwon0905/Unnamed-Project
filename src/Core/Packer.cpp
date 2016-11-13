@@ -20,9 +20,14 @@ std::size_t Packer::getDataSize()
 	return m_data.size();
 }
 
+void Packer::pack(bool data)
+{
+	pack8(static_cast<std::uint8_t>(data), 1);
+}
+
 void Packer::pack(const std::string & data)
 {
-	uint32_t length = static_cast<uint32_t>(data.size());
+	std::uint32_t length = static_cast<std::uint32_t>(data.size());
 	pack32(length, 32);
 	if (length)
 		pack(data.data(), length);
@@ -107,7 +112,7 @@ void Packer::pack32(std::uint32_t data, std::size_t bits)
 }
 
 Unpacker::Unpacker(const void * data, std::size_t size) :
-	m_data(static_cast<const uint8_t*>(data)),
+	m_data(static_cast<const std::uint8_t*>(data)),
 	m_size(size),
 	m_byteIndex(0),
 	m_bitsRead(0),
@@ -115,13 +120,20 @@ Unpacker::Unpacker(const void * data, std::size_t size) :
 {
 }
 
+void Unpacker::unpack(bool & data)
+{
+	std::uint8_t val;
+	unpack8(val, 1);
+	data = (val != 0);
+}
+
 void Unpacker::unpack(std::string & data)
 {
-	uint32_t length;
+	std::uint32_t length;
 	unpack32(length, 32);
 	data.clear();
 	data.resize(length);
-	unpack(reinterpret_cast<uint8_t*>(&data[0]), length);
+	unpack(reinterpret_cast<std::uint8_t*>(&data[0]), length);
 }
 
 void Unpacker::unpack(void * data, std::size_t size)

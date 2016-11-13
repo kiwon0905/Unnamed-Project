@@ -40,7 +40,7 @@ public:
 
 	const void * getData();
 	std::size_t getDataSize();
-
+	void pack(bool data);
 	template <std::int8_t min = std::numeric_limits<std::int8_t>::min(), std::int8_t max = std::numeric_limits<std::int8_t>::max()>
 	void pack(std::int8_t data);
 	template <std::uint8_t min = std::numeric_limits<std::uint8_t>::min(), std::uint8_t max = std::numeric_limits<std::uint8_t>::max()>
@@ -78,6 +78,7 @@ class Unpacker
 public:
 	Unpacker(const void * data, std::size_t size);
 
+	void unpack(bool & data);
 	template <std::int8_t min = std::numeric_limits<std::int8_t>::min(), std::int8_t max = std::numeric_limits<std::int8_t>::max()>
 	void unpack(std::int8_t & data);
 	template <std::uint8_t min = std::numeric_limits<std::uint8_t>::min(), std::uint8_t max = std::numeric_limits<std::uint8_t>::max()>
