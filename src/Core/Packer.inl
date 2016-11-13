@@ -1,3 +1,4 @@
+#include "Packer.h"
 template <std::int8_t min, std::int8_t max>
 void Packer::pack(std::int8_t data)
 {
@@ -70,6 +71,13 @@ void Packer::pack(float data)
 	pack<min, max>(intValue);
 }
 
+template<typename T>
+inline std::enable_if_t<std::is_enum<T>::value> Packer::pack(T data)
+{
+	const int bits = BitsRequired<0, static_cast<std::uint64_t>(T::LAST)>::result;
+	pack32(static_cast<std::uint32_t>(data), bits);
+}
+
 template <std::int8_t min, std::int8_t max>
 void Unpacker::unpack(std::int8_t & data)
 {
@@ -135,4 +143,12 @@ void Unpacker::unpack(float & data)
 	int32_t intVal;
 	unpack<min, max>(intVal);
 	data = (float)intVal / Power<10, res>::value;
+}
+
+template<typename T>
+inline std::enable_if_t<std::is_enum<T>::value> Unpacker::unpack(T & data)
+{
+	std::uint32_t intEnum;
+	unpack<0, static_cast<std::uint32_t>(T::LAST)>(intEnum);
+	data = static_cast<T>(intEnum);
 }

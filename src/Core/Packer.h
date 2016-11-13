@@ -38,26 +38,29 @@ class Packer
 public:
 	Packer();
 
-	const void * getData();
-	std::size_t getDataSize();
+	const void * getData() const;
+	std::size_t getDataSize() const;
 	void pack(bool data);
-	template <std::int8_t min = std::numeric_limits<std::int8_t>::min(), std::int8_t max = std::numeric_limits<std::int8_t>::max()>
+	template <std::int8_t min = (std::numeric_limits<std::int8_t>::min)(), std::int8_t max = (std::numeric_limits<std::int8_t>::max)()>
 	void pack(std::int8_t data);
-	template <std::uint8_t min = std::numeric_limits<std::uint8_t>::min(), std::uint8_t max = std::numeric_limits<std::uint8_t>::max()>
+	template <std::uint8_t min = (std::numeric_limits<std::uint8_t>::min)(), std::uint8_t max = (std::numeric_limits<std::uint8_t>::max)()>
 	void pack(std::uint8_t data);
-	template <std::int16_t min = std::numeric_limits<std::int16_t>::min(), std::int16_t max = std::numeric_limits<std::int16_t>::max()>
+	template <std::int16_t min = (std::numeric_limits<std::int16_t>::min)(), std::int16_t max = (std::numeric_limits<std::int16_t>::max)()>
 	void pack(std::int16_t data);
-	template <std::uint16_t min = std::numeric_limits<std::uint16_t>::min(), std::uint16_t max = std::numeric_limits<std::uint16_t>::max()>
+	template <std::uint16_t min = (std::numeric_limits<std::uint16_t>::min)(), std::uint16_t max = (std::numeric_limits<std::uint16_t>::max)()>
 	void pack(std::uint16_t data);
-	template <std::int32_t min = std::numeric_limits<std::int32_t>::min(), std::int32_t max = std::numeric_limits<std::int32_t>::max()>
+	template <std::int32_t min = (std::numeric_limits<std::int32_t>::min)(), std::int32_t max = (std::numeric_limits<std::int32_t>::max)()>
 	void pack(std::int32_t data);
-	template <std::uint32_t min = std::numeric_limits<std::uint32_t>::min(), std::uint32_t max = std::numeric_limits<std::uint32_t>::max()>
+	template <std::uint32_t min = (std::numeric_limits<std::uint32_t>::min)(), std::uint32_t max = (std::numeric_limits<std::uint32_t>::max)()>
 	void pack(std::uint32_t data);
 	template<int minInt, int maxInt, int res>
 	void pack(float data);
 	void pack(const std::string & data);
 	void pack(const void * data, std::size_t size);
 
+	//works for enum types that have LAST as its last value.
+	template <typename T>
+	std::enable_if_t<std::is_enum<T>::value> pack(T data);
 	void p()
 	{
 		for (char c : m_data)
@@ -77,25 +80,29 @@ class Unpacker
 {
 public:
 	Unpacker(const void * data, std::size_t size);
+	Unpacker();
+	void setData(const void * data, std::size_t size);
 
 	void unpack(bool & data);
-	template <std::int8_t min = std::numeric_limits<std::int8_t>::min(), std::int8_t max = std::numeric_limits<std::int8_t>::max()>
+	template <std::int8_t min = (std::numeric_limits<std::int8_t>::min)(), std::int8_t max = (std::numeric_limits<std::int8_t>::max)()>
 	void unpack(std::int8_t & data);
-	template <std::uint8_t min = std::numeric_limits<std::uint8_t>::min(), std::uint8_t max = std::numeric_limits<std::uint8_t>::max()>
+	template <std::uint8_t min = (std::numeric_limits<std::uint8_t>::min)(), std::uint8_t max = (std::numeric_limits<std::uint8_t>::max)()>
 	void unpack(std::uint8_t & data);
-	template <std::int16_t min = std::numeric_limits<std::int16_t>::min(), std::int16_t max = std::numeric_limits<std::int16_t>::max()>
+	template <std::int16_t min = (std::numeric_limits<std::int16_t>::min)(), std::int16_t max = (std::numeric_limits<std::int16_t>::max)()>
 	void unpack(std::int16_t & data);
-	template <std::uint16_t min = std::numeric_limits<std::uint16_t>::min(), std::uint16_t max = std::numeric_limits<std::uint16_t>::max()>
+	template <std::uint16_t min = (std::numeric_limits<std::uint16_t>::min)(), std::uint16_t max = (std::numeric_limits<std::uint16_t>::max)()>
 	void unpack(std::uint16_t & data);
-	template <std::int32_t min = std::numeric_limits<std::int32_t>::min(), std::int32_t max = std::numeric_limits<std::int32_t>::max()>
+	template <std::int32_t min = (std::numeric_limits<std::int32_t>::min)(), std::int32_t max = (std::numeric_limits<std::int32_t>::max)()>
 	void unpack(std::int32_t & data);
-	template <std::uint32_t min = std::numeric_limits<std::uint32_t>::min(), std::uint32_t max = std::numeric_limits<std::uint32_t>::max()>
+	template <std::uint32_t min = (std::numeric_limits<std::uint32_t>::min)(), std::uint32_t max = (std::numeric_limits<std::uint32_t>::max)()>
 	void unpack(std::uint32_t & data);
 	template<int minInt, int maxInt, int res>
 	void unpack(float & data);
 	void unpack(std::string & data);
 	void unpack(void * data, std::size_t size);
 
+	template <typename T>
+	std::enable_if_t<std::is_enum<T>::value> unpack(T & data);
 private:
 	void align();
 	void unpack8(std::uint8_t & data, std::size_t bits);

@@ -8,14 +8,14 @@ Packer::Packer():
 {
 }
 
-const void * Packer::getData()
+const void * Packer::getData() const
 {
 	if (m_data.empty())
 		return nullptr;
 	return m_data.data();
 }
 
-std::size_t Packer::getDataSize()
+std::size_t Packer::getDataSize() const
 {
 	return m_data.size();
 }
@@ -118,6 +118,20 @@ Unpacker::Unpacker(const void * data, std::size_t size) :
 	m_bitsRead(0),
 	m_bitPos(0)
 {
+}
+
+Unpacker::Unpacker():
+	Unpacker(nullptr, 0)
+{
+}
+
+void Unpacker::setData(const void * data, std::size_t size)
+{
+	m_data = static_cast<const std::uint8_t*>(data);
+	m_size = size;
+	m_byteIndex = 0;
+	m_bitsRead = 0;
+	m_bitPos = 0;
 }
 
 void Unpacker::unpack(bool & data)

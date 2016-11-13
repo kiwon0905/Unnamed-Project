@@ -59,4 +59,33 @@ namespace enutil
 			packet.write(buffer.data, receivedLength);
 		return receivedLength;
 	}
+
+	int send(const Packer & packer, ENetPeer * peer, bool reliable)
+	{
+		ENetPacket * p = enet_packet_create(packer.getData(), packer.getDataSize(), reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED);
+		return enet_peer_send(peer, 0, p) == 0;
+	}
+	int receive(Unpacker & unpacker, ENetPacket * p)
+	{
+		unpacker.setData(p->data, p->dataLength);
+		return p->dataLength;
+	}
+	int send(const Packer & packer, const ENetAddress & addr, ENetSocket socket)
+	{
+		ENetBuffer buf;
+		buf.data = const_cast<void*>(packer.getData());
+		buf.dataLength = packer.getDataSize();
+		return enet_socket_send(socket, &addr, &buf, 1);
+	}
+	int receive(Unpacker & unpacker, ENetAddress & addr, ENetSocket socket)
+	{
+		static char buf[ENET_PROTOCOL_MAXIMUM_MTU];
+		ENetBuffer buffer;
+		buffer.data = buf;
+		buffer.dataLength = ENET_PROTOCOL_MAXIMUM_MTU;
+		int receivedLength = enet_socket_receive(socket, &addr, &buffer, 1);
+		if (receivedLength > 0)
+			unpacker.setData(buffer.data, receivedLength);
+		return receivedLength;
+	}
 }

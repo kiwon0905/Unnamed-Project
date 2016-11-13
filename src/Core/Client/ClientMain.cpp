@@ -13,6 +13,11 @@
 
 #include "Core/Packer.h"
 
+enum A
+{
+	First,a, b, c, d, LAST
+};
+
 int main()
 {
 #ifdef _DEBUG
@@ -20,22 +25,11 @@ int main()
 #endif
 
 	Packer writer;
-	writer.pack(std::int8_t(1));
-	writer.pack(std::uint16_t(2));
-	writer.pack(std::int32_t(1));
-	writer.pack(false);
-	writer.p();
+	writer.pack(A::c);
 
 	Unpacker reader(writer.getData(), writer.getDataSize());
-	std::int8_t a;
-	std::uint16_t b;
-	std::int32_t c;
+	A a;
 	reader.unpack(a);
-	reader.unpack(b);
-	reader.unpack(c);
-	bool bo;
-	reader.unpack(bo);
-	std::cout << (int)a << " " << (int)b << " " << (int)c << "\n";
-	std::cout << bo << "\n";
+	std::cout << (int)a << "\n";
 	std::cin.get();
 }
