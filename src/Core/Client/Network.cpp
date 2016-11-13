@@ -65,35 +65,35 @@ void Network::disconnect()
 	}
 }
 
-bool Network::send(const Packet & packet, bool reliable)
+bool Network::send(const Packer & packer, bool reliable)
 {
-	return enutil::send(m_server, packet, reliable) == 0;
-}
-
-bool Network::pollNetEvent(NetEvent & event)
-{
-	std::lock_guard<std::mutex> lock(m_queueMutex);
-	if (m_events.size() == 0)
-		return false;
-
-	event.type = m_events.front().type;
-	event.packet.reset(m_events.front().packet.release());
-	m_events.pop_front();
-	return true;
+	return enutil::send(packer, m_server, reliable) == 0;
 }
 
 NetEvent * Network::peekEvent()
 {
 	if(m_events.size() == 0)
 		return nullptr;
-	return &m_events.front();
+	return m_events.front().get();
 }
 
 void Network::popEvent()
 {
 	std::lock_guard<std::mutex> lock(m_queueMutex);
 	if (m_events.size())
+	{
 		m_events.pop_front();
+	}
+}
+
+bool Network::send(Packer & packer, ENetAddress & addr)
+{
+	return enutil::send(packer, addr, m_socket) == 0;
+}
+
+bool Network::receive(Unpacker & unpacker, ENetAddress & addr)
+{
+	return enutil::receive(unpacker, addr, m_socket) > 0;
 }
 
 void Network::hostService()
@@ -105,46 +105,53 @@ void Network::hostService()
 		std::lock_guard<std::mutex> queuelock(m_queueMutex);
 		while (enet_host_service(m_client, &event, 0) > 0)
 		{
-			NetEvent ev;
+			std::unique_ptr<NetEvent> ev(new NetEvent);
 			if (event.type == ENET_EVENT_TYPE_CONNECT)
 			{
-				ev.type = NetEvent::Connected;
+				ev->type = NetEvent::Connected;
 				enet_peer_timeout(event.peer, ENET_PEER_TIMEOUT_LIMIT, 500, 1000);
 				m_connecting = false;
 			}
 			else if (event.type == ENET_EVENT_TYPE_DISCONNECT)
 			{
-				ev.type = NetEvent::Disconnected;
+				ev->type = NetEvent::Disconnected;
 			}
 			else if (event.type == ENET_EVENT_TYPE_RECEIVE)
 			{
-				ev.type = NetEvent::Received;
-				ev.packet = std::make_unique<Packet>();
-				ev.packet->write(event.packet->data, event.packet->dataLength);
-				enet_packet_destroy(event.packet);
+				ev->type = NetEvent::Received;
+				ev->packet = event.packet;
+				std::cout << "receivedlengthn: " << event.packet->dataLength << "\n";
 			}
+		
 			m_events.push_back(std::move(ev));
 		}
 		//Check if we are connecting
 		if (m_connecting && m_timeout.getElapsedTime() > sf::seconds(5.f))
 		{
-			NetEvent ev;
-			ev.type = NetEvent::TimedOut;
+			std::unique_ptr<NetEvent> ev(new NetEvent);
+			ev->type = NetEvent::TimedOut;
 			m_events.push_back(std::move(ev));
 			m_connecting = false;
 			enet_peer_reset(m_server);
 		}
 		std::this_thread::yield();
+
+	/*	for (auto & ev : m_events)
+		{
+			if (ev.packet)
+				std::cout << ev.packet->dataLength << ", ";
+		}
+		std::cout << "\n";*/
 	}
 }
 
-NetEvent::NetEvent():
-	type(None)
+NetEvent::NetEvent() :
+	type(None),
+	packet(nullptr)
 {
 }
 
-NetEvent::NetEvent(NetEvent && netEvent):
-	type(std::move(netEvent.type)),
-	packet(std::move(netEvent.packet))
+NetEvent::~NetEvent()
 {
+	enet_packet_destroy(packet);
 }

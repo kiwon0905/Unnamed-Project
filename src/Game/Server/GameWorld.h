@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Packet.h"
+#include "Core/Packer.h"
 #include "Game/Server/Player.h"
 #include "Entity.h"
 
@@ -15,7 +15,7 @@ class GameWorld
 {
 public:
 	void onDisconnect(ENetPeer * peer);
-	void handlePacket(Packet & packet, ENetPeer * peer);
+	void handlePacket(Unpacker & unpacker, ENetPeer * peer);
 	void tick(float dt);
 	void sync();
 	void reset();

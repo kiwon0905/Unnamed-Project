@@ -2,7 +2,7 @@
 #include "Client.h"
 #include "PlayingScreen.h"
 #include "Core/Logger.h"
-#include "Core/Packet.h"
+#include "Core/Packer.h"
 #include "Core/Protocol.h"
 #include "Core/ENetUtility.h"
 
@@ -33,8 +33,10 @@ void LobbyScreen::handleNetEvent(NetEvent & netEv, Client & client)
 {
 	if (netEv.type == NetEvent::Received)
 	{
+		Unpacker unpacker(netEv.packet->data, netEv.packet->dataLength);
+		std::cout << "length: " << netEv.packet->dataLength << "\n";
 		Msg msg;
-		*netEv.packet >> msg;
+		unpacker.unpack(msg);
 		if (msg == Msg::SV_ACCEPT_JOIN)
 		{
 			std::cout << "joined game\n";
@@ -48,10 +50,10 @@ void LobbyScreen::handleNetEvent(NetEvent & netEv, Client & client)
 	}
 	else if (netEv.type == NetEvent::Connected)
 	{
-		std::cout << "conencted to game\n";
-		Packet packet;
-		packet << Msg::CL_REQUEST_JOIN_GAME;
-		client.getNetwork()->send(packet, true);
+		std::cout << "conencted to game server\n";
+		Packer packer;
+		packer.pack(Msg::CL_REQUEST_JOIN_GAME);
+		client.getNetwork()->send(packer, true);
 	}
 	else if (netEv.type == NetEvent::Disconnected)
 	{
@@ -63,30 +65,33 @@ void LobbyScreen::handleNetEvent(NetEvent & netEv, Client & client)
 	}
 }
 
-void LobbyScreen::handlePacket(Packet & packet, const ENetAddress & addr, Client & client)
+void LobbyScreen::handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client)
 {
 	Msg msg;
-	packet >> msg;
+	unpacker.unpack(msg);
 
 	if (msg == Msg::MSV_INTERNET_SERVER_LIST)
 	{
 		m_internetGameServers.clear();
-		sf::Uint32 size;
-		packet >> size;
+		std::uint32_t size;
+		unpacker.unpack(size);
 		std::cout << size << " servers\n";
 		for (std::size_t i = 0; i < size; ++i)
 		{
 			ServerInfo info;
-			packet >> info.address.host >> info.address.port >> info.id >> info.name;
+			unpacker.unpack(info.address.host);
+			unpacker.unpack(info.address.port);
+			unpacker.unpack(info.id);
+			unpacker.unpack(info.name);
 			m_internetGameServers.push_back(info);
 		}
 	}
 	else if (msg == Msg::SV_LAN_GAME_LIST)
 	{
-		ServerInfo info;
-		packet >> info.address.port >> info.name;
-		info.address.host = addr.host;
-		std::cout << "Lan game discovered: " << enutil::toString(addr) << "\n";
+		//ServerInfo info;
+		//packet >> info.address.port >> info.name;
+		//info.address.host = addr.host;
+		//std::cout << "Lan game discovered: " << enutil::toString(addr) << "\n";
 	}
 	turnPage(0, client);
 }
@@ -205,9 +210,9 @@ void LobbyScreen::refresh(Client & client)
 		client.getContext()->parser.get("masterAddr", addr);
 		ENetAddress address = enutil::toENetAddress(addr);
 
-		Packet packet;
-		packet << Msg::CL_REQUEST_INTERNET_SERVER_LIST;
-		enutil::send(client.getNetwork()->getSocket(), address, packet);
+		Packer packer;
+		packer.pack(Msg::CL_REQUEST_INTERNET_SERVER_LIST);
+		client.getNetwork()->send(packer, address);
 		std::cout << "refreshed!\n";
 
 	}

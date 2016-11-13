@@ -1,7 +1,7 @@
 #pragma once
 
 #include "IdPool.h"
-#include "Core/Packet.h"
+#include "Core/Packer.h"
 #include "Core/Protocol.h"
 #include "Core/Logger.h"
 
@@ -22,8 +22,8 @@ private:
 	bool initialize();
 	void finalize();
 
-	void handlePacket(Msg msg, Packet & packet, ENetPeer * peer);
-	void handlePacket(Msg msg, Packet & packet, const ENetAddress & addr);
+	void handlePacket(Unpacker & unpacker, ENetPeer * peer);
+	void handlePacket(Unpacker & unpacker, const ENetAddress & addr);
 	void parseCommands();
 private:
 	struct GameInfo

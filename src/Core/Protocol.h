@@ -30,7 +30,8 @@ enum class Msg : sf::Uint8
 	//master -> client
 	MSV_INTERNET_SERVER_LIST,
 
-	INVALID
+	INVALID,
+	LAST
 };
 
 //Master server 

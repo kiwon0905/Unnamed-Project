@@ -1,6 +1,6 @@
 #include "Server.h"
 #include "Core/Logger.h"
-#include "Core/Packet.h"
+#include "Core/Packer.h"
 #include "Core/Protocol.h"
 #include "Core/ENetUtility.h"
 
@@ -101,10 +101,11 @@ bool Server::initialize()
 			return false;
 		}
 		//Register game
-		Packet msg;
-		std::string serverName = "Fun";
-		msg << Msg::SV_REGISTER_SERVER << serverName;
-		send(msg, m_masterServer, true);
+		Packer packer;
+		packer.pack(Msg::SV_REGISTER_SERVER);
+		packer.pack(std::string("Fun"));
+
+		enutil::send(packer, m_masterServer, true);
 	}
 
 	m_running = true;
@@ -139,10 +140,10 @@ void Server::run()
 				}
 				else if (event.type == ENET_EVENT_TYPE_RECEIVE)
 				{
-					Packet packet;
-					packet.write(event.packet->data, event.packet->dataLength);
+					Unpacker unpacker;
+					enutil::receive(unpacker, event.packet);
+					m_gameWorld.handlePacket(unpacker, event.peer);
 					enet_packet_destroy(event.packet);
-					m_gameWorld.handlePacket(packet, event.peer);
 					break;
 				}
 				else if (event.type == ENET_EVENT_TYPE_DISCONNECT)
@@ -156,15 +157,12 @@ void Server::run()
 				}
 			}
 
-			Packet packet;
+			Unpacker unpacker;
 			ENetAddress addr;
-			while (enutil::receive(m_socket, addr, packet) > 0)
+			while (enutil::receive(unpacker, addr, m_socket) > 0)
 			{
-				Msg msg;
-				packet >> msg;
-				handlePacket(msg, packet, addr);
+				handlePacket(unpacker, addr);
 			}
-
 
 			while (elapsedTick >= tickInterval)
 			{
@@ -209,19 +207,18 @@ void Server::parseCommands()
 
 }
 
-bool Server::send(const Packet & packet, ENetPeer * peer, bool reliable)
+void Server::handlePacket(Unpacker & unpacker, const ENetAddress & addr)
 {
-	ENetPacket * p = enet_packet_create(packet.getData(), packet.getDataSize(), reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED);
-	return enet_peer_send(peer, 0, p) == 0;
-}
-
-void Server::handlePacket(Msg msg, Packet & packet, const ENetAddress & addr)
-{
+	Msg msg;
+	unpacker.unpack(msg);
+	
 	if (msg == Msg::CL_REVEAL_LAN_SERVER)
 	{
 		std::cout << "replying lan game server list\n";
-		Packet reply;
-		reply << Msg::SV_LAN_GAME_LIST << m_gameServer->address.port << "Fun";
-		enutil::send(m_socket, addr, reply);
+		Packer packer;
+		packer.pack(Msg::SV_LAN_GAME_LIST);
+		packer.pack(m_gameServer->address.port);
+		packer.pack("FUN");
+		enutil::send(packer, addr, m_socket);
 	}
 }

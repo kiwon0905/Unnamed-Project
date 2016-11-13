@@ -20,11 +20,8 @@ void MasterServer::run()
 				}
 				else if(event.type == ENET_EVENT_TYPE_RECEIVE)
 				{
-					Packet packet;
-					packet.write(event.packet->data, event.packet->dataLength);
-					Msg msg;
-					packet >> msg;
-					handlePacket(msg, packet, event.peer);
+					Unpacker unpacker(event.packet->data, event.packet->dataLength);
+					handlePacket(unpacker, event.peer);
 					enet_packet_destroy(event.packet);
 					break;
 				}
@@ -36,13 +33,11 @@ void MasterServer::run()
 					m_games.erase(event.peer);
 				}
 			}
-			Packet packet;
+			Unpacker unpacker;
 			ENetAddress addr;
-			while (enutil::receive(m_socket, addr, packet) > 0)
+			while (enutil::receive(unpacker, addr, m_socket) > 0)
 			{
-				Msg msg;
-				packet >> msg;
-				handlePacket(msg, packet, addr);
+				handlePacket(unpacker, addr);
 			}
 		}
 		std::this_thread::yield();
@@ -129,14 +124,16 @@ void MasterServer::finalize()
 	enet_deinitialize();
 }
 
-void MasterServer::handlePacket(Msg msg, Packet & packet, ENetPeer * peer)
+void MasterServer::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 {
+	Msg msg;
+	unpacker.unpack(msg);
 	switch (msg)
 	{
 	case Msg::SV_REGISTER_SERVER:
 	{
 		std::string serverName;
-		packet >> serverName;
+		unpacker.unpack(serverName);
 
 		ENetAddress addr = peer->address;
 
@@ -161,21 +158,27 @@ void MasterServer::handlePacket(Msg msg, Packet & packet, ENetPeer * peer)
 	}
 }
 
-void MasterServer::handlePacket(Msg msg, Packet & packet, const ENetAddress & addr)
+void MasterServer::handlePacket(Unpacker & unpacker, const ENetAddress & addr)
 {
+	Msg msg;
+	unpacker.unpack(msg);
 	if (msg == Msg::CL_REQUEST_INTERNET_SERVER_LIST)
 	{
 
 		std::cout << "Request lobby info\n";
 
-		Packet packet2;
-		packet2 << Msg::MSV_INTERNET_SERVER_LIST << sf::Uint32(m_games.size());
+		Packer packer;
+		packer.pack(Msg::MSV_INTERNET_SERVER_LIST);
+		packer.pack(std::uint32_t(m_games.size()));
 
 		for (const auto & game : m_games)
 		{
-			packet2 << game.first->address.host << game.first->address.port << sf::Uint32(game.second.id) << game.second.name;
+			packer.pack(game.first->address.host);
+			packer.pack(game.first->address.port);
+			packer.pack(game.second.id);
+			packer.pack(game.second.name);
 		}
-		enutil::send(m_socket, addr, packet2);
+		enutil::send(packer, addr, m_socket);
 	}
 }
 

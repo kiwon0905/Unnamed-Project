@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Parser.h"
-#include "Core/Packet.h"
+#include "Core/Packer.h"
 
 #include "Game/Server/GameWorld.h"
 
@@ -18,10 +18,9 @@ public:
 	void run();
 	void finalize();
 private:
-	bool send(const Packet & packet, ENetPeer * peer, bool reliable);
 	void parseCommands();
 
-	void handlePacket(Msg msg, Packet & packet, const ENetAddress & addr);
+	void handlePacket(Unpacker & unpacker, const ENetAddress & addr);
 private:
 	std::unique_ptr<std::thread> m_parsingThread;
 	std::atomic<bool> m_running = false;

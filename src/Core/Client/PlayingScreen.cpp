@@ -3,10 +3,10 @@
 
 void PlayingScreen::onEnter(Client & client)
 {
-	Packet packet;
-	packet << Msg::CL_READY;
-	client.getNetwork()->send(packet, true);
-	std::cout << "Ready!\n";
+	//Packet packet;
+	//packet << Msg::CL_READY;
+	//client.getNetwork()->send(packet, true);
+	//std::cout << "Ready!\n";
 }
 
 void PlayingScreen::handleEvent(const sf::Event & ev, Client & client)
@@ -17,7 +17,8 @@ void PlayingScreen::handleNetEvent(NetEvent & netEv, Client & client)
 {
 	if (netEv.type == NetEvent::Received)
 	{
-		m_gameWorld.handlePacket(*netEv.packet);
+		Unpacker unpacker(netEv.packet->data, netEv.packet->dataLength);
+		m_gameWorld.handlePacket(unpacker);
 	}
 	else if (netEv.type == NetEvent::Connected)
 	{
@@ -33,7 +34,7 @@ void PlayingScreen::handleNetEvent(NetEvent & netEv, Client & client)
 	}
 }
 
-void PlayingScreen::handlePacket(Packet & packet, const ENetAddress & addr, Client & client)
+void PlayingScreen::handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client)
 {
 
 }

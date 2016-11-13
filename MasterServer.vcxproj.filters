@@ -30,9 +30,6 @@
     <ClInclude Include="src\Core\MasterServer\MasterServer.h">
       <Filter>Core\MasterServer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Packet.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\Packer.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -52,9 +49,6 @@
     </ClCompile>
     <ClCompile Include="src\Core\MasterServer\MasterServerMain.cpp">
       <Filter>Core\MasterServer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Packet.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Packer.cpp">
       <Filter>Core</Filter>

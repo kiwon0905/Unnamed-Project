@@ -12,7 +12,7 @@ public:
 	void onEnter(Client & client);
 	void handleEvent(const sf::Event & ev, Client & client);
 	void handleNetEvent(NetEvent & netEv, Client & client);
-	void handlePacket(Packet & packet, const ENetAddress & addr, Client & client);
+	void handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client);
 	void update(float dt, Client & client);
 	void render(Client & client);
 	void onExit(Client & client);

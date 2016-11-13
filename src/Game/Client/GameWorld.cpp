@@ -4,23 +4,23 @@
 
 void GameWorld::update(float dt, Client & client)
 {
-	Packet packet;
-	packet << Msg::CL_INPUT << client.getInput()->getBits();
-	client.getNetwork()->send(packet, false);
+	//Packet packet;
+	//packet << Msg::CL_INPUT << client.getInput()->getBits();
+	//client.getNetwork()->send(packet, false);
 }
 
 void GameWorld::render(Client & client)
 {
 }
 
-void GameWorld::handlePacket(Packet & packet)
+void GameWorld::handlePacket(Unpacker & unpacker)
 {
-	Msg msg;
-	packet >> msg;
-	if (msg == Msg::SV_SNAPSHOT)
-	{
-		Snapshot ss;
-		packet >> ss;
-		std::cout << "entity count: " << ss.entityCount << "";
-	}
+	//Msg msg;
+	//packet >> msg;
+	//if (msg == Msg::SV_SNAPSHOT)
+	//{
+	//	Snapshot ss;
+	//	packet >> ss;
+	//	std::cout << "entity count: " << ss.entityCount << "";
+	//}
 }

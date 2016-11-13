@@ -24,12 +24,7 @@ int main()
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	Packer writer;
-	writer.pack(A::c);
+	Client client;
+	client.run();
 
-	Unpacker reader(writer.getData(), writer.getDataSize());
-	A a;
-	reader.unpack(a);
-	std::cout << (int)a << "\n";
-	std::cin.get();
 }

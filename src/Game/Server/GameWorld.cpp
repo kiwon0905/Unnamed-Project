@@ -17,17 +17,17 @@ void GameWorld::onDisconnect(ENetPeer * peer)
 	m_entities.erase(std::remove_if(m_entities.begin(), m_entities.end(), [playerEntity](const std::unique_ptr<Entity> & e) {return e.get() == playerEntity; }), m_entities.end());
 }
 
-void GameWorld::handlePacket(Packet & packet, ENetPeer * peer)
+void GameWorld::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 {
 	Msg msg;
-	packet >> msg;
+	unpacker.unpack(msg);
 
 	if (msg == Msg::CL_REQUEST_JOIN_GAME)
 	{
-		Packet replyPacket;
+		Packer packer;
 		if (m_players.size() < 3)
 		{
-			replyPacket << Msg::SV_ACCEPT_JOIN;
+			packer.pack(Msg::SV_ACCEPT_JOIN);
 	
 			Player player(peer);
 			m_players.push_back(player);
@@ -35,9 +35,9 @@ void GameWorld::handlePacket(Packet & packet, ENetPeer * peer)
 		}
 		else
 		{
-			replyPacket << Msg::SV_REJECT_JOIN;
+			packer.pack(Msg::SV_REJECT_JOIN);
 		}
-		enutil::send(peer, replyPacket, true);
+		enutil::send(packer, peer, true);
 	}
 	else if (msg == Msg::CL_READY)
 	{
@@ -46,10 +46,7 @@ void GameWorld::handlePacket(Packet & packet, ENetPeer * peer)
 	}
 	else if (msg == Msg::CL_INPUT)
 	{
-		sf::Uint8 bits;
-		packet >> bits;
-		if (m_peerPlayers.count(peer))
-			m_peerPlayers[peer]->setInput(bits);
+
 	}
 }
 
@@ -59,20 +56,20 @@ void GameWorld::tick(float dt)
 
 void GameWorld::sync()
 {
-	Snapshot ss;
-	ss.seq = m_nextSnapshotSeq++;
-	ss.entityCount = m_entities.size();
-	Packet packet;
-	packet << Msg::SV_SNAPSHOT << ss;
-	for (int i = 0; i < 100; ++i)
-	{
-		int x = rand() % 100 + 1;
-		int y = rand() % 100 + 1;
-		int c = rand() % 100 + 1;
-		packet << x << y << sf::Uint8(c);
-	}
-	for (auto & player : m_players)
-		enutil::send(player.getPeer(), packet, false);
+	//Snapshot ss;
+	//ss.seq = m_nextSnapshotSeq++;
+	//ss.entityCount = m_entities.size();
+	//Packet packet;
+	//packet << Msg::SV_SNAPSHOT << ss;
+	//for (int i = 0; i < 100; ++i)
+	//{
+	//	int x = rand() % 100 + 1;
+	//	int y = rand() % 100 + 1;
+	//	int c = rand() % 100 + 1;
+	//	packet << x << y << sf::Uint8(c);
+	//}
+	//for (auto & player : m_players)
+	//	enutil::send(player.getPeer(), packet, false);
 }
 
 void GameWorld::reset()

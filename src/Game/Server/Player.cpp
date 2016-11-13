@@ -20,7 +20,3 @@ void Player::setEntity(Entity * entity)
 	m_entity = entity;
 }
 
-void Player::setInput(sf::Uint8 input)
-{
-	m_input = input;
-}

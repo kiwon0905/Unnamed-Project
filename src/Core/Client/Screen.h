@@ -13,7 +13,7 @@ public:
 	virtual void onEnter(Client & client) = 0;
 	virtual void handleEvent(const sf::Event & ev, Client & client) = 0;
 	virtual void handleNetEvent(NetEvent & netEv, Client & client) = 0;
-	virtual void handlePacket(Packet & packet, const ENetAddress & addr, Client & client) = 0;
+	virtual void handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client) = 0;
 	virtual void update(float dt, Client & client) = 0;
 	virtual void render(Client & client) = 0;
 	virtual void onExit(Client & client) = 0;

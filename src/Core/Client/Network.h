@@ -1,8 +1,8 @@
 #pragma once
 
 
-#include "Core/Packet.h" 
-
+#include "Core/Packer.h" 
+#include <SFML/System.hpp>
 #include <deque>
 #include <enet/enet.h>
 #include <thread>
@@ -23,9 +23,9 @@ struct NetEvent
 		Received,
 		None
 	} type;
-	std::unique_ptr<Packet> packet;
+	ENetPacket * packet;
 	NetEvent();
-	NetEvent(NetEvent && netEvent);
+	~NetEvent();
 };
 
 class Network
@@ -36,12 +36,12 @@ public:
 
 	bool connect(const ENetAddress & addr);
 	void disconnect();
-	bool send(const Packet & packet, bool reliable);
-	bool pollNetEvent(NetEvent & event);
+	bool send(const Packer & packer, bool reliable);
 
 	NetEvent * peekEvent();
 	void popEvent();
-	ENetSocket getSocket() { return m_socket; }
+	bool send(Packer & packer, ENetAddress & addr);
+	bool receive(Unpacker & unpacker, ENetAddress & addr);
 private:
 	void hostService();
 private:
@@ -52,7 +52,7 @@ private:
 	ENetHost * m_client = nullptr;
 	ENetSocket m_socket;
 	ENetPeer * m_server = nullptr;
-	std::deque<NetEvent> m_events;
+	std::deque<std::unique_ptr<NetEvent>> m_events;
 	sf::Clock m_timeout;
 	bool m_connecting = false;
 };

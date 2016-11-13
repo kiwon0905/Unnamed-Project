@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Packet.h"
+#include "Core/Packer.h"
 #include <enet/enet.h>
 class Entity;
 
@@ -11,9 +11,9 @@ public:
 	ENetPeer * getPeer();
 	Entity * getEntity();
 	void setEntity(Entity * entity);
-	void setInput(sf::Uint8 input);
+	//void setInput(sf::Uint8 input);
 private:
 	Entity * m_entity;
 	ENetPeer * m_peer;
-	sf::Uint8 m_input;
+	//sf::Uint8 m_input;
 };

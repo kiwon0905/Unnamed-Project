@@ -25,7 +25,7 @@ public:
 	
 	void handleEvent(const sf::Event & ev, Client & client);
 	void handleNetEvent(NetEvent & netEv, Client & client);
-	void handlePacket(Packet & packet, const ENetAddress & addr, Client & client);
+	void handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client);
 	void applyChanges(Client & client);
 private:
 	struct Change

@@ -74,10 +74,10 @@ void Client::run()
 					m_network->popEvent();
 				}
 
-				Packet packet;
+				Unpacker unpacker;
 				ENetAddress addr;
-				while (enutil::receive(getNetwork()->getSocket(), addr, packet) > 0)
-					m_screenStack->handlePacket(packet, addr, *this);
+				while (m_network->receive(unpacker, addr) > 0)
+					m_screenStack->handlePacket(unpacker, addr, *this);
 
 
 				m_input->update();
