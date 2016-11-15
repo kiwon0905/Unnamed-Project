@@ -164,8 +164,7 @@ void MasterServer::handlePacket(Unpacker & unpacker, const ENetAddress & addr)
 	unpacker.unpack(msg);
 	if (msg == Msg::CL_REQUEST_INTERNET_SERVER_LIST)
 	{
-
-		std::cout << "Request lobby info\n";
+		Logger::getInstance().info("Received request for internet server list from: " + enutil::toString(addr));
 
 		Packer packer;
 		packer.pack(Msg::MSV_INTERNET_SERVER_LIST);

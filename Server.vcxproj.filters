@@ -48,6 +48,9 @@
     <ClInclude Include="src\Core\Packer.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\Control.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\ENetUtility.cpp">

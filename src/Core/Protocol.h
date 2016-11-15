@@ -1,8 +1,6 @@
 #pragma once
 
-#include <SFML/System.hpp>
-
-enum class Msg : sf::Uint8
+enum class Msg
 {
 	//client -> masterserver 
 	CL_REQUEST_INTERNET_SERVER_LIST,

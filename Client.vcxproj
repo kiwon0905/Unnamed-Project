@@ -38,6 +38,7 @@
     <ClInclude Include="src\Core\Protocol.h" />
     <ClInclude Include="src\Game\Client\Entity.h" />
     <ClInclude Include="src\Game\Client\GameWorld.h" />
+    <ClInclude Include="src\Game\Control.h" />
     <ClInclude Include="src\Game\Snapshot.h" />
   </ItemGroup>
   <ItemGroup>

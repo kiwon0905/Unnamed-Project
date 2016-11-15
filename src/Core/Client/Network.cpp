@@ -120,7 +120,6 @@ void Network::hostService()
 			{
 				ev->type = NetEvent::Received;
 				ev->packet = event.packet;
-				std::cout << "receivedlengthn: " << event.packet->dataLength << "\n";
 			}
 		
 			m_events.push_back(std::move(ev));

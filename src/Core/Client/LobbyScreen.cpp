@@ -12,7 +12,6 @@ constexpr unsigned GAMES_PER_PAGE = 4;
 
 void LobbyScreen::onEnter(Client & client)
 {
-	Logger::getInstance().info("client entered");
 	loadUi(client);
 
 	/*auto requestJob = [&client]()
@@ -34,12 +33,11 @@ void LobbyScreen::handleNetEvent(NetEvent & netEv, Client & client)
 	if (netEv.type == NetEvent::Received)
 	{
 		Unpacker unpacker(netEv.packet->data, netEv.packet->dataLength);
-		std::cout << "length: " << netEv.packet->dataLength << "\n";
 		Msg msg;
 		unpacker.unpack(msg);
 		if (msg == Msg::SV_ACCEPT_JOIN)
 		{
-			std::cout << "joined game\n";
+			Logger::getInstance().info("Joined game");
 			client.getScreenStack()->push(new PlayingScreen);
 		}
 		else if (msg == Msg::SV_REJECT_JOIN)
@@ -50,18 +48,18 @@ void LobbyScreen::handleNetEvent(NetEvent & netEv, Client & client)
 	}
 	else if (netEv.type == NetEvent::Connected)
 	{
-		std::cout << "conencted to game server\n";
+		Logger::getInstance().info("Connected to game server");
 		Packer packer;
 		packer.pack(Msg::CL_REQUEST_JOIN_GAME);
 		client.getNetwork()->send(packer, true);
 	}
 	else if (netEv.type == NetEvent::Disconnected)
 	{
-		std::cout << "disconnected\n";
+		Logger::getInstance().info("Disconnected from game server");
 	}
 	else if (netEv.type == NetEvent::TimedOut)
 	{
-		std::cout << "timed out\n";
+		Logger::getInstance().info("Timed out");
 	}
 }
 
@@ -75,7 +73,7 @@ void LobbyScreen::handlePacket(Unpacker & unpacker, const ENetAddress & addr, Cl
 		m_internetGameServers.clear();
 		std::uint32_t size;
 		unpacker.unpack(size);
-		std::cout << size << " servers\n";
+		Logger::getInstance().debug(std::to_string(size) + " servers");
 		for (std::size_t i = 0; i < size; ++i)
 		{
 			ServerInfo info;
@@ -213,8 +211,6 @@ void LobbyScreen::refresh(Client & client)
 		Packer packer;
 		packer.pack(Msg::CL_REQUEST_INTERNET_SERVER_LIST);
 		client.getNetwork()->send(packer, address);
-		std::cout << "refreshed!\n";
-
 	}
 	else
 	{

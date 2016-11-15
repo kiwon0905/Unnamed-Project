@@ -11,7 +11,7 @@ void Gui::finalize(Client & client)
 {
 }
 
-void Gui::tick(float dt, Client & client)
+void Gui::update(float dt, Client & client)
 {
 	m_desktop.Update(dt);
 }

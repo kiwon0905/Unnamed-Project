@@ -12,7 +12,7 @@ void ScreenStack::finalize(Client & client)
 {
 }
 
-void ScreenStack::tick(float dt, Client & client)
+void ScreenStack::update(float dt, Client & client)
 {
 	m_screens.top()->update(dt, client);
 }

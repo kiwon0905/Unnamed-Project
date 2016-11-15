@@ -46,7 +46,9 @@ void GameWorld::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 	}
 	else if (msg == Msg::CL_INPUT)
 	{
-
+		std::uint8_t bits;
+		unpacker.unpack(bits);
+		std::cout << std::bitset<8>(bits) << "\n";
 	}
 }
 
@@ -56,20 +58,8 @@ void GameWorld::tick(float dt)
 
 void GameWorld::sync()
 {
-	//Snapshot ss;
-	//ss.seq = m_nextSnapshotSeq++;
-	//ss.entityCount = m_entities.size();
-	//Packet packet;
-	//packet << Msg::SV_SNAPSHOT << ss;
-	//for (int i = 0; i < 100; ++i)
-	//{
-	//	int x = rand() % 100 + 1;
-	//	int y = rand() % 100 + 1;
-	//	int c = rand() % 100 + 1;
-	//	packet << x << y << sf::Uint8(c);
-	//}
-	//for (auto & player : m_players)
-	//	enutil::send(player.getPeer(), packet, false);
+
+
 }
 
 void GameWorld::reset()

@@ -35,7 +35,7 @@ bool Client::initialize()
 	m_input = std::make_unique<Input>();
 	if (!m_input->initialize(*this))
 		return false;
-	std::cout << "init success\n";
+	Logger::getInstance().info("Initialization successful");
 	return true;
 }
 
@@ -76,13 +76,13 @@ void Client::run()
 
 				Unpacker unpacker;
 				ENetAddress addr;
-				while (m_network->receive(unpacker, addr) > 0)
+				while (m_network->receive(unpacker, addr))
 					m_screenStack->handlePacket(unpacker, addr, *this);
 
 
 				m_input->update();
-				m_gui->tick(TIME_STEP.asSeconds(), *this);
-				m_screenStack->tick(TIME_STEP.asSeconds(), *this);
+				m_gui->update(TIME_STEP.asSeconds(), *this);
+				m_screenStack->update(TIME_STEP.asSeconds(), *this);
 
 			}
 			m_context->window.clear(sf::Color::Cyan);

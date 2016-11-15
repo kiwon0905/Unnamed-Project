@@ -33,11 +33,17 @@ template<uint64_t min, uint64_t max> struct BitsRequired
 {
 	static const uint32_t result = Log2<max - min>::result + 1;
 };
+
+template <int res>
+std::uint32_t bitsRequired(float min, float max)
+{
+	return static_cast<std::uint32_t>(std::log2(max * Power<10, res>::value - min * Power<10, res>::value)) + 1;
+}
 class Packer
 {
 public:
 	Packer();
-
+	
 	const void * getData() const;
 	std::size_t getDataSize() const;
 	void pack(bool data);
@@ -55,6 +61,8 @@ public:
 	void pack(std::uint32_t data);
 	template<int minInt, int maxInt, int res>
 	void pack(float data);
+	template<int res>
+	void pack(float min, float max, float data);
 	void pack(const std::string & data);
 	void pack(const void * data, std::size_t size);
 
@@ -98,6 +106,8 @@ public:
 	void unpack(std::uint32_t & data);
 	template<int minInt, int maxInt, int res>
 	void unpack(float & data);
+	template<int res>
+	void unpack(float min, float max, float & data);
 	void unpack(std::string & data);
 	void unpack(void * data, std::size_t size);
 

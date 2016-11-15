@@ -10,7 +10,7 @@ class Gui
 public:
 	bool initialize(Client & client);
 	void finalize(Client & client);
-	void tick(float dt, Client & client);
+	void update(float dt, Client & client);
 	void render(Client & client);
 
 	void handleEvent(const sf::Event & event);

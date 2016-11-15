@@ -52,8 +52,6 @@ bool Server::initialize()
 		return false;
 	}
 
-	Logger::getInstance().info("Opened game server at: " + enutil::toString(m_gameServer->address));
-
 	if (mode == "lan")
 	{
 		m_socket = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM);
@@ -134,7 +132,7 @@ void Server::run()
 			{
 				if (event.type == ENET_EVENT_TYPE_CONNECT)
 				{
-					std::cout << "peer connected\n";
+					Logger::getInstance().info(enutil::toString(event.peer->address) + " connected");
 					enet_peer_timeout(event.peer, ENET_PEER_TIMEOUT_LIMIT, 500, 1000);
 					break;
 				}
@@ -148,11 +146,15 @@ void Server::run()
 				}
 				else if (event.type == ENET_EVENT_TYPE_DISCONNECT)
 				{
-					Logger::getInstance().info("DisconnectedWTR");
 					if (event.peer == m_masterServer)
-						std::cout << " from master server\n";
+					{
+						Logger::getInstance().info("Disconnectd from master server");
+					}
 					else
+					{ 
+						Logger::getInstance().info(enutil::toString(event.peer->address) + " disconnected");
 						m_gameWorld.onDisconnect(event.peer);
+					}
 					break;
 				}
 			}
