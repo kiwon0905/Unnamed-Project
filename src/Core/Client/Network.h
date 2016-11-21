@@ -17,11 +17,11 @@ struct NetEvent
 {
 	enum Type
 	{
-		Connected,
-		Disconnected,
-		TimedOut,
-		Received,
-		None
+		CONNECTED,
+		DISCONNECTED,
+		TIMED_OUT,
+		RECEIVED,
+		NONE
 	} type;
 	ENetPacket * packet;
 	NetEvent();

@@ -3,7 +3,7 @@
 
 bool Gui::initialize(Client & client)
 {
-	client.getContext()->window.resetGLStates();
+	client.getContext().window.resetGLStates();
 	return true;
 }
 
@@ -18,7 +18,8 @@ void Gui::update(float dt, Client & client)
 
 void Gui::render(Client & client)
 {
-	m_gui.Display(client.getContext()->window);
+	//client.getContext()->window.setView(sf::View(sf::FloatRect(0, 0, 1000, 1000)));
+	m_gui.Display(client.getContext().window);
 }
 
 void Gui::handleEvent(const sf::Event & event)

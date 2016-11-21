@@ -30,7 +30,7 @@ void LobbyScreen::handleEvent(const sf::Event & ev, Client & client)
 
 void LobbyScreen::handleNetEvent(NetEvent & netEv, Client & client)
 {
-	if (netEv.type == NetEvent::Received)
+	if (netEv.type == NetEvent::RECEIVED)
 	{
 		Unpacker unpacker(netEv.packet->data, netEv.packet->dataLength);
 		Msg msg;
@@ -38,26 +38,26 @@ void LobbyScreen::handleNetEvent(NetEvent & netEv, Client & client)
 		if (msg == Msg::SV_ACCEPT_JOIN)
 		{
 			Logger::getInstance().info("Joined game");
-			client.getScreenStack()->push(new PlayingScreen);
+			client.getScreenStack().push(new PlayingScreen);
 		}
 		else if (msg == Msg::SV_REJECT_JOIN)
 		{
 			std::cout << "rejected from joining game\n";
-			client.getNetwork()->disconnect();
+			client.getNetwork().disconnect();
 		}
 	}
-	else if (netEv.type == NetEvent::Connected)
+	else if (netEv.type == NetEvent::CONNECTED)
 	{
 		Logger::getInstance().info("Connected to game server");
 		Packer packer;
 		packer.pack(Msg::CL_REQUEST_JOIN_GAME);
-		client.getNetwork()->send(packer, true);
+		client.getNetwork().send(packer, true);
 	}
-	else if (netEv.type == NetEvent::Disconnected)
+	else if (netEv.type == NetEvent::DISCONNECTED)
 	{
 		Logger::getInstance().info("Disconnected from game server");
 	}
-	else if (netEv.type == NetEvent::TimedOut)
+	else if (netEv.type == NetEvent::TIMED_OUT)
 	{
 		Logger::getInstance().info("Timed out");
 	}
@@ -130,14 +130,14 @@ void LobbyScreen::onReveal(Client & client)
 
 void LobbyScreen::loadUi(Client & client)
 {
-	sf::RenderWindow & window = client.getContext()->window;
+	sf::RenderWindow & window = client.getContext().window;
 	int width = sf::VideoMode::getDesktopMode().width * 4 / 7;
 	int height = width * 9 / 16;
 	window.create(sf::VideoMode(width, height), "");
 	window.resetGLStates();
 	window.setFramerateLimit(60);
 	
-	auto & desktop = client.getGui()->getDesktop();
+	auto & desktop = client.getGui().getDesktop();
 
 	auto prevButton = sfg::Button::Create("Prev");
 	auto onPrev = [this, &client]()
@@ -205,12 +205,12 @@ void LobbyScreen::refresh(Client & client)
 	if (m_notebook->GetNthPage(m_notebook->GetCurrentPage()) == m_internetTable)
 	{
 		std::string addr;
-		client.getContext()->parser.get("masterAddr", addr);
+		client.getContext().parser.get("masterAddr", addr);
 		ENetAddress address = enutil::toENetAddress(addr);
 
 		Packer packer;
 		packer.pack(Msg::CL_REQUEST_INTERNET_SERVER_LIST);
-		client.getNetwork()->send(packer, address);
+		client.getNetwork().send(packer, address);
 	}
 	else
 	{
@@ -246,7 +246,7 @@ void LobbyScreen::turnPage(int page, Client & client)
 
 				auto onClick = [&client, &serverInfo]()
 				{
-					client.getNetwork()->connect(serverInfo.address);
+					client.getNetwork().connect(serverInfo.address);
 				};
 				std::static_pointer_cast<sfg::Button>(child)->GetSignal(sfg::Button::OnLeftClick).Connect(onClick);
 

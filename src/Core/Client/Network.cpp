@@ -108,17 +108,17 @@ void Network::hostService()
 			std::unique_ptr<NetEvent> ev(new NetEvent);
 			if (event.type == ENET_EVENT_TYPE_CONNECT)
 			{
-				ev->type = NetEvent::Connected;
+				ev->type = NetEvent::CONNECTED;
 				enet_peer_timeout(event.peer, ENET_PEER_TIMEOUT_LIMIT, 500, 1000);
 				m_connecting = false;
 			}
 			else if (event.type == ENET_EVENT_TYPE_DISCONNECT)
 			{
-				ev->type = NetEvent::Disconnected;
+				ev->type = NetEvent::DISCONNECTED;
 			}
 			else if (event.type == ENET_EVENT_TYPE_RECEIVE)
 			{
-				ev->type = NetEvent::Received;
+				ev->type = NetEvent::RECEIVED;
 				ev->packet = event.packet;
 			}
 		
@@ -128,7 +128,7 @@ void Network::hostService()
 		if (m_connecting && m_timeout.getElapsedTime() > sf::seconds(5.f))
 		{
 			std::unique_ptr<NetEvent> ev(new NetEvent);
-			ev->type = NetEvent::TimedOut;
+			ev->type = NetEvent::TIMED_OUT;
 			m_events.push_back(std::move(ev));
 			m_connecting = false;
 			enet_peer_reset(m_server);
@@ -145,7 +145,7 @@ void Network::hostService()
 }
 
 NetEvent::NetEvent() :
-	type(None),
+	type(NONE),
 	packet(nullptr)
 {
 }

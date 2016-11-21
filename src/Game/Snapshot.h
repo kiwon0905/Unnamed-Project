@@ -5,6 +5,6 @@
 
 struct Snapshot
 {
-	sf::Uint32 seq;
-	sf::Uint32 entityCount;
+	unsigned seq;
+	unsigned entityCount;
 };

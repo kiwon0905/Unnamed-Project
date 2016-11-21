@@ -82,7 +82,7 @@ inline void Packer::pack(float min, float max, float data)
 template<typename T>
 inline std::enable_if_t<std::is_enum<T>::value> Packer::pack(T data)
 {
-	const int bits = BitsRequired<0, static_cast<std::uint64_t>(T::LAST)>::result;
+	const int bits = BitsRequired<0, static_cast<std::uint64_t>(T::COUNT)>::result;
 	pack32(static_cast<std::uint32_t>(data), bits);
 }
 
@@ -166,6 +166,6 @@ template<typename T>
 inline std::enable_if_t<std::is_enum<T>::value> Unpacker::unpack(T & data)
 {
 	std::uint32_t intEnum;
-	unpack<0, static_cast<std::uint32_t>(T::LAST)>(intEnum);
+	unpack<0, static_cast<std::uint32_t>(T::COUNT)>(intEnum);
 	data = static_cast<T>(intEnum);
 }

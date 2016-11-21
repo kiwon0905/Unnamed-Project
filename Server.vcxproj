@@ -27,6 +27,8 @@
     <ClInclude Include="src\Core\Protocol.h" />
     <ClInclude Include="src\Core\Server\Server.h" />
     <ClInclude Include="src\Game\Control.h" />
+    <ClInclude Include="src\Game\GameCore.h" />
+    <ClInclude Include="src\Game\Server\Human.h" />
     <ClInclude Include="src\Game\Server\Entity.h" />
     <ClInclude Include="src\Game\Server\GameWorld.h" />
     <ClInclude Include="src\Game\Server\Player.h" />
@@ -39,6 +41,7 @@
     <ClCompile Include="src\Core\Parser.cpp" />
     <ClCompile Include="src\Core\Server\Server.cpp" />
     <ClCompile Include="src\Core\Server\ServerMain.cpp" />
+    <ClCompile Include="src\Game\Server\Human.cpp" />
     <ClCompile Include="src\Game\Server\Entity.cpp" />
     <ClCompile Include="src\Game\Server\GameWorld.cpp" />
     <ClCompile Include="src\Game\Server\Player.cpp" />

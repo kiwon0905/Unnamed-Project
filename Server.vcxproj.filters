@@ -51,6 +51,12 @@
     <ClInclude Include="src\Game\Control.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\GameCore.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Server\Human.h">
+      <Filter>Game\Server</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\ENetUtility.cpp">
@@ -79,6 +85,9 @@
     </ClCompile>
     <ClCompile Include="src\Core\Packer.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Server\Human.cpp">
+      <Filter>Game\Server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

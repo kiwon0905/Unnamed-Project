@@ -2,7 +2,8 @@
 
 #include "Core/Packer.h"
 #include "Game/Server/Player.h"
-#include "Entity.h"
+#include "Game/GameCore.h"
+#include "Human.h"
 
 #include <enet/enet.h>
 #include <vector>
@@ -14,18 +15,26 @@ class Server;
 class GameWorld
 {
 public:
+	enum State
+	{
+		PRE,
+		PER,
+		POST
+	};
+
 	void onDisconnect(ENetPeer * peer);
 	void handlePacket(Unpacker & unpacker, ENetPeer * peer);
-	void tick(float dt);
+	void update(float dt);
 	void sync();
 	void reset();
 
-	Entity * createEntity(Player * player);
+	Player * getPlayer(ENetPeer * peer);
+	Human * createCharacter(Player * player);
 private:
+	State m_state = PRE;
 	std::vector<Player> m_players;
-	std::unordered_map<ENetPeer *, Player *> m_peerPlayers;	//map peer -> player
 	bool m_reset = false;
 	std::vector<std::unique_ptr<Entity>> m_entities;
-	sf::Uint32 m_nextEntityId = 0;
-	sf::Uint32 m_nextSnapshotSeq = 0;
+	unsigned m_nextEntityId = ENTITY_ID_MIN;
+	unsigned m_nextSnapshotSeq = SNAPSHOT_SEQ_MIN;
 };

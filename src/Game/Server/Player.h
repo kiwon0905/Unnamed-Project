@@ -8,12 +8,14 @@ class Player
 {
 public:
 	Player(ENetPeer * peer);
-	ENetPeer * getPeer();
-	Entity * getEntity();
+	ENetPeer * getPeer() const;
+	Entity * getEntity() const;
 	void setEntity(Entity * entity);
-	//void setInput(sf::Uint8 input);
+
+	bool isReady() const;
+	void setReady(bool ready);
 private:
 	Entity * m_entity;
 	ENetPeer * m_peer;
-	//sf::Uint8 m_input;
+	bool m_ready = false;
 };

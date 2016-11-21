@@ -29,7 +29,7 @@ enum class Msg
 	MSV_INTERNET_SERVER_LIST,
 
 	INVALID,
-	LAST
+	COUNT
 };
 
 //Master server 

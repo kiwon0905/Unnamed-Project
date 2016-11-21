@@ -168,7 +168,7 @@ void Server::run()
 
 			while (elapsedTick >= tickInterval)
 			{
-				m_gameWorld.tick(tickInterval.asSeconds());
+				m_gameWorld.update(tickInterval.asSeconds());
 				elapsedTick -= tickInterval;
 			}
 

@@ -36,9 +36,11 @@
     <ClInclude Include="src\Core\Packer.h" />
     <ClInclude Include="src\Core\Parser.h" />
     <ClInclude Include="src\Core\Protocol.h" />
+    <ClInclude Include="src\Game\Client\Human.h" />
     <ClInclude Include="src\Game\Client\Entity.h" />
     <ClInclude Include="src\Game\Client\GameWorld.h" />
     <ClInclude Include="src\Game\Control.h" />
+    <ClInclude Include="src\Game\GameCore.h" />
     <ClInclude Include="src\Game\Snapshot.h" />
   </ItemGroup>
   <ItemGroup>
@@ -59,6 +61,7 @@
     <ClCompile Include="src\Core\Parser.cpp" />
     <ClCompile Include="src\Game\Client\Entity.cpp" />
     <ClCompile Include="src\Game\Client\GameWorld.cpp" />
+    <ClCompile Include="src\Game\Client\Human.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Core\Packer.inl" />

@@ -26,21 +26,21 @@ public:
 
 	void run();
 
-	Context * getContext() {return m_context.get();}
-	Network * getNetwork() { return m_network.get(); }
-	ScreenStack * getScreenStack() { return m_screenStack.get(); }
-	Renderer * getRenderer() { return m_renderer.get(); }
-	Gui * getGui() { return m_gui.get(); }
-	Input * getInput() { return m_input.get(); }
+	Context & getContext() {return m_context;}
+	Network & getNetwork() { return m_network; }
+	ScreenStack & getScreenStack() { return m_screenStack; }
+	Renderer & getRenderer() { return m_renderer; }
+	Gui & getGui() { return m_gui; }
+	Input & getInput() { return m_input; }
 
 private:
 	bool initialize();
 	void finalize();
 private:
-	std::unique_ptr<Context> m_context;
-	std::unique_ptr<Network> m_network;
-	std::unique_ptr<Gui> m_gui;
-	std::unique_ptr<ScreenStack> m_screenStack;
-	std::unique_ptr<Renderer> m_renderer;
-	std::unique_ptr<Input> m_input;
+	Context m_context;
+	Network m_network;
+	Gui m_gui;
+	ScreenStack m_screenStack;
+	Renderer m_renderer;
+	Input m_input;
 };

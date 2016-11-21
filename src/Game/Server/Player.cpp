@@ -5,18 +5,28 @@ Player::Player(ENetPeer * peer) :
 {
 }
 
-ENetPeer * Player::getPeer()
+ENetPeer * Player::getPeer() const
 {
 	return m_peer;
 }
 
-Entity * Player::getEntity()
+Entity * Player::getEntity() const
 {
 	return m_entity;
 }
 
-void Player::setEntity(Entity * entity)
+void Player::setEntity(Entity * character)
 {
-	m_entity = entity;
+	m_entity = character;
+}
+
+bool Player::isReady() const
+{
+	return m_ready;
+}
+
+void Player::setReady(bool ready)
+{
+	m_ready = ready;
 }
 

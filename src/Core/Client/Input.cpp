@@ -18,21 +18,15 @@ void Input::finalize(Client & client)
 void Input::update()
 {
 	m_bits = 0;
-	int direction = 0;
 
 	if (sf::Keyboard::isKeyPressed(m_binds[Control::MOVE_LEFT]))
-		direction--;
+		m_bits |= Control::MOVE_LEFT;
 
 	if (sf::Keyboard::isKeyPressed(m_binds[Control::MOVE_RIGHT]))
-		direction++;
+		m_bits |= Control::MOVE_RIGHT;
 
 	if (sf::Keyboard::isKeyPressed(m_binds[Control::JUMP]))
-		m_bits |= 1 << Control::JUMP;
-
-	if (direction == -1)
-		m_bits |= 1 << Control::MOVE_LEFT;
-	else if (direction == 1)
-		m_bits |= 1 << Control::MOVE_RIGHT;
+		m_bits |= Control::JUMP;
 }
 
 std::uint8_t Input::getBits()
