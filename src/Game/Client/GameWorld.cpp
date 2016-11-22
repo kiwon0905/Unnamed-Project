@@ -6,12 +6,19 @@
 
 void GameWorld::update(float dt, Client & client)
 {
+	//send input to server
+	m_lastInput = client.getInput().getBits();
 	Packer packer;
 	packer.pack(Msg::CL_INPUT);
-	packer.pack(client.getInput().getBits());
+	packer.pack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(m_inputSeq++);
+	packer.pack(m_lastInput);
 	client.getNetwork().send(packer, false);
-	if (m_snapshots.size())
-		std::cout << "seq: " << m_snapshots.back().seq << "\n";
+
+	auto isDead = [](std::unique_ptr<Entity> & e)
+	{
+		return e->isDead();
+	};
+	m_entities.erase(std::remove_if(m_entities.begin(), m_entities.end(), isDead), m_entities.end());
 
 	for (auto & e : m_entities)
 		e->update(dt, *this);
@@ -23,18 +30,29 @@ void GameWorld::render(Client & client)
 		e->render(client.getRenderer());
 }
 
-void GameWorld::handlePacket(Unpacker & unpacker)
+void GameWorld::handlePacket(Unpacker & unpacker, Client & client)
 {
 	Msg msg;
 	unpacker.unpack(msg);
-	if (msg == Msg::SV_SNAPSHOT)
+	
+	if (msg == Msg::SV_WORLD_INFO)
 	{
-		//discard if outdated,
+		unpacker.unpack<ENTITY_ID_MIN, ENTITY_ID_MAX>(m_playerEntityId);
+		std::cout << "my id is: " << m_playerEntityId << "\n";
+		Packer packer;
+		packer.pack(Msg::CL_READY);
+		client.getNetwork().send(packer, true);
+
+	}	
+	else if (msg == Msg::SV_SNAPSHOT)
+	{
 		Snapshot snapshot;
 		unpacker.unpack<SNAPSHOT_SEQ_MIN,SNAPSHOT_SEQ_MAX>(snapshot.seq);
+		unpacker.unpack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(m_ackedInputSeq);
 		unsigned entityCount;
 		unpacker.unpack<ENTITY_ID_MIN, ENTITY_ID_MAX + 1>(entityCount);
 
+		//discard if outdated,
 		if (m_snapshots.size() == 0 || snapshot.seq > m_snapshots.back().seq)
 		{
 			for (std::size_t i = 0; i < entityCount; ++i)
@@ -53,6 +71,7 @@ void GameWorld::handlePacket(Unpacker & unpacker)
 			processDelta();
 		}
 	}
+	
 }
 
 void GameWorld::processDelta()
@@ -63,10 +82,13 @@ void GameWorld::processDelta()
 		//everything is created
 		for (const auto & pair : s1.entityInfo)
 		{
+
 			std::cout << pair.first << " got created!\n";
 			if (pair.second.type == EntityType::HUMAN)
 			{
-				createHuman(pair.first);
+				Human * h = createHuman(pair.first);
+				if (pair.first == m_playerEntityId)
+					h->setPrediction(true);
 			}
 		}
 	}
@@ -88,25 +110,27 @@ void GameWorld::processDelta()
 				}
 			}
 		}
-		//look for entities that were deleted
-		for (const auto & pair : s0.entityInfo)
-		{
-			unsigned id = pair.first;
-			if (s1.entityInfo.count(id) == 0)
-			{
-				Entity * e = getEntity(id);
-				if (e)
-					e->die();
-				std::cout << id << " got destroyed\n";
-			}
-		}
-
 	}
 }
 
 const std::deque<GameWorld::Snapshot> & GameWorld::getSnapshots()
 {
 	return m_snapshots;
+}
+
+unsigned GameWorld::getInputSeq()
+{
+	return m_inputSeq;
+}
+
+unsigned GameWorld::getLastInput()
+{
+	return m_lastInput;
+}
+
+unsigned GameWorld::getAckedInputSeq()
+{
+	return m_ackedInputSeq;
 }
 
 Entity * GameWorld::getEntity(unsigned id)

@@ -20,6 +20,17 @@ void Player::setEntity(Entity * character)
 	m_entity = character;
 }
 
+void Player::setInputSeq(unsigned seq)
+{
+	if(seq > m_inputSeq)
+		m_inputSeq = seq;
+}
+
+unsigned Player::getInputSeq()
+{
+	return m_inputSeq;
+}
+
 bool Player::isReady() const
 {
 	return m_ready;

@@ -25,3 +25,8 @@ bool Entity::isDead() const
 {
 	return !m_alive;
 }
+
+void Entity::setPrediction(bool predict)
+{
+	m_predicted = predict;
+}

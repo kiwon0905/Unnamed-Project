@@ -33,6 +33,8 @@ void GameWorld::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 	
 			Player player(peer);
 			m_players.push_back(player);
+			Human * c = createCharacter(&m_players.back());
+			m_players.back().setEntity(c);
 		}
 		else
 		{
@@ -47,19 +49,28 @@ void GameWorld::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 		if (!player)
 			return;
 
-		if (msg == Msg::CL_READY)
+		if (msg == Msg::CL_REQUEST_WORLD_INFO)
+		{
+			Packer packer;
+			packer.pack(Msg::SV_WORLD_INFO);
+			packer.pack<ENTITY_ID_MIN, ENTITY_ID_MAX>(player->getEntity()->getId());
+			enutil::send(packer, peer, true);
+			std::cout << "cl_request_world\n";
+		}
+		else if (msg == Msg::CL_READY)
 		{
 			Logger::getInstance().info("Player is ready: " + enutil::toString(peer->address));
 		
-			Human * c = createCharacter(player);
-			player->setEntity(c);
 			player->setReady(true);
 		}
 		else if (msg == Msg::CL_INPUT)
 		{
+			unsigned seq;
 			std::uint8_t bits;
+			unpacker.unpack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(seq);
 			unpacker.unpack(bits);
 			player->getEntity()->onInput(bits);
+			player->setInputSeq(seq);
 		}
 	}
 }
@@ -81,10 +92,10 @@ void GameWorld::update(float dt)
 		if (ready)
 		{
 			std::cout << "started game!\n";
-			m_state = PER;
+			m_state = IN_PROGRESS;
 		}
 	}
-	if (m_state == PER)
+	if (m_state == IN_PROGRESS)
 	{
 		for (const auto & entity : m_entities)
 			entity->update(dt, *this);
@@ -93,21 +104,23 @@ void GameWorld::update(float dt)
 
 void GameWorld::sync()
 {
-	if (m_state == PER)
+	if (m_state == IN_PROGRESS)
 	{
-		Packer packer;
-		packer.pack(Msg::SV_SNAPSHOT);
-		packer.pack<SNAPSHOT_SEQ_MIN,SNAPSHOT_SEQ_MAX>(m_nextSnapshotSeq);
-		packer.pack<ENTITY_ID_MIN, ENTITY_ID_MAX + 1>(m_entities.size());
-		for (std::size_t i = 0; i < m_entities.size(); ++i)
-			m_entities[i]->snap(packer);
 		for (Player & player : m_players)
-			enutil::send(packer, player.getPeer(), false);
+		{
+			Packer packer;
+			packer.pack(Msg::SV_SNAPSHOT);
+			packer.pack<SNAPSHOT_SEQ_MIN,SNAPSHOT_SEQ_MAX>(m_nextSnapshotSeq);
+			packer.pack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(player.getInputSeq());
+			packer.pack<ENTITY_ID_MIN, ENTITY_ID_MAX + 1>(m_entities.size());
+			for (std::size_t i = 0; i < m_entities.size(); ++i)
+				m_entities[i]->snap(packer);
+			for (Player & player : m_players)
+				enutil::send(packer, player.getPeer(), false);
 
+		}
 		m_nextSnapshotSeq++;
-
 	}
-
 }
 
 void GameWorld::reset()

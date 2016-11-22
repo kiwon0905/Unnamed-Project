@@ -17,8 +17,8 @@ class GameWorld
 public:
 	enum State
 	{
-		PRE,
-		PER,
+		PRE,			//Entities are created and players can move around, but the game has not started
+		IN_PROGRESS,	//Time clock ticks
 		POST
 	};
 
@@ -35,6 +35,6 @@ private:
 	std::vector<Player> m_players;
 	bool m_reset = false;
 	std::vector<std::unique_ptr<Entity>> m_entities;
-	unsigned m_nextEntityId = ENTITY_ID_MIN;
+	unsigned m_nextEntityId = ENTITY_ID_MIN + 1;
 	unsigned m_nextSnapshotSeq = SNAPSHOT_SEQ_MIN;
 };

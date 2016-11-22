@@ -24,9 +24,12 @@ public:
 
 	void update(float dt, Client & client);
 	void render(Client & client);
-	void handlePacket(Unpacker & unpacker);
+	void handlePacket(Unpacker & unpacker, Client & client);
 	const std::deque<Snapshot> & getSnapshots();
-
+	
+	unsigned getInputSeq();
+	unsigned getLastInput();
+	unsigned getAckedInputSeq();
 private:
 
 	void processDelta();
@@ -36,4 +39,8 @@ private:
 
 	std::deque<Snapshot> m_snapshots;
 	std::vector<std::unique_ptr<Entity>> m_entities;
+	unsigned m_playerEntityId = 0;
+	unsigned m_inputSeq = 1;
+	unsigned m_ackedInputSeq = 0;
+	unsigned m_lastInput;
 };

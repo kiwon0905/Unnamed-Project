@@ -10,6 +10,7 @@ enum class Msg
 	//client -> server
 	CL_REQUEST_JOIN_GAME,
 	CL_READY,
+	CL_REQUEST_WORLD_INFO,
 	CL_INPUT,
 
 
@@ -23,6 +24,7 @@ enum class Msg
 	//server -> client
 	SV_ACCEPT_JOIN,
 	SV_REJECT_JOIN,
+	SV_WORLD_INFO,
 	SV_SNAPSHOT,
 
 	//master -> client

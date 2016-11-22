@@ -6,7 +6,10 @@
 void PlayingScreen::onEnter(Client & client)
 {
 	Packer packer;
-	packer.pack(Msg::CL_READY);
+	packer.pack(Msg::CL_REQUEST_WORLD_INFO);
+
+//	Packer packer;
+//	packer.pack(Msg::CL_READY);
 	client.getNetwork().send(packer, true);
 }
 
@@ -19,7 +22,7 @@ void PlayingScreen::handleNetEvent(NetEvent & netEv, Client & client)
 	if (netEv.type == NetEvent::RECEIVED)
 	{
 		Unpacker unpacker(netEv.packet->data, netEv.packet->dataLength);
-		m_gameWorld.handlePacket(unpacker);
+		m_gameWorld.handlePacket(unpacker, client);
 	}
 	else if (netEv.type == NetEvent::CONNECTED)
 	{

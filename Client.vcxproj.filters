@@ -84,6 +84,9 @@
     <ClInclude Include="src\Game\Client\Human.h">
       <Filter>Game\Client</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\MathUtility.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\ENetUtility.cpp">

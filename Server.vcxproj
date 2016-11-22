@@ -22,6 +22,7 @@
     <ClInclude Include="src\Core\Aabb.h" />
     <ClInclude Include="src\Core\ENetUtility.h" />
     <ClInclude Include="src\Core\Logger.h" />
+    <ClInclude Include="src\Core\MathUtility.h" />
     <ClInclude Include="src\Core\Packer.h" />
     <ClInclude Include="src\Core\Parser.h" />
     <ClInclude Include="src\Core\Protocol.h" />
