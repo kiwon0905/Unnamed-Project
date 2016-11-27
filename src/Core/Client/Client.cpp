@@ -61,6 +61,7 @@ void Client::run()
 					m_screenStack.handleEvent(event, *this);
 				}
 
+				m_network.update();
 				NetEvent * netEvent;
 				while (netEvent = m_network.peekEvent())
 				{
@@ -79,7 +80,7 @@ void Client::run()
 				m_screenStack.update(TIME_STEP.asSeconds(), *this);
 
 			}
-			m_context.window.clear(sf::Color::Cyan);
+			m_context.window.clear();
 				m_screenStack.render(*this);
 				m_gui.render(*this);
 			m_context.window.display();

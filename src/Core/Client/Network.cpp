@@ -20,23 +20,53 @@ bool Network::initialize(Client & client)
 		return false;
 	if (enet_socket_set_option(m_socket, ENET_SOCKOPT_BROADCAST, 1) < 0)
 		return false;
-
-	m_running = true;
-	m_serviceThread.reset(new std::thread(&Network::hostService, this));
 	return true;
 }
 
 void Network::finalize(Client & client)
 {
-	m_running = false;
 	if(m_server)
 		enet_peer_disconnect_now(m_server, 0);
-	if(m_serviceThread)
-		m_serviceThread->join();
 	if(m_client)
 		enet_host_destroy(m_client);
 	enet_socket_destroy(m_socket);
 	enet_deinitialize();
+}
+
+void Network::update()
+{
+	ENetEvent event;
+
+		while (enet_host_service(m_client, &event, 0) > 0)
+		{
+			std::unique_ptr<NetEvent> ev(new NetEvent);
+			if (event.type == ENET_EVENT_TYPE_CONNECT)
+			{
+				ev->type = NetEvent::CONNECTED;
+				enet_peer_timeout(event.peer, ENET_PEER_TIMEOUT_LIMIT, 500, 1000);
+				m_connecting = false;
+			}
+			else if (event.type == ENET_EVENT_TYPE_DISCONNECT)
+			{
+				ev->type = NetEvent::DISCONNECTED;
+			}
+			else if (event.type == ENET_EVENT_TYPE_RECEIVE)
+			{
+				ev->type = NetEvent::RECEIVED;
+				ev->packet = event.packet;
+			}
+
+			m_events.push_back(std::move(ev));
+		}
+		//Check if we are connecting
+		if (m_connecting && m_timeout.getElapsedTime() > sf::seconds(5.f))
+		{
+			std::unique_ptr<NetEvent> ev(new NetEvent);
+			ev->type = NetEvent::TIMED_OUT;
+			m_events.push_back(std::move(ev));
+			m_connecting = false;
+			enet_peer_reset(m_server);
+		}
 }
 
 //Connect to a server
@@ -45,7 +75,6 @@ bool Network::connect(const ENetAddress & addr)
 	if (m_connecting)
 		return false;
 	disconnect();
-	std::lock_guard<std::mutex> lock(m_clientMutex);	//protect m_client
 
 	m_server = enet_host_connect(m_client, &addr, 2, 0);
 	if (!m_server)
@@ -79,7 +108,6 @@ NetEvent * Network::peekEvent()
 
 void Network::popEvent()
 {
-	std::lock_guard<std::mutex> lock(m_queueMutex);
 	if (m_events.size())
 	{
 		m_events.pop_front();
@@ -94,54 +122,6 @@ bool Network::send(Packer & packer, ENetAddress & addr)
 bool Network::receive(Unpacker & unpacker, ENetAddress & addr)
 {
 	return enutil::receive(unpacker, addr, m_socket) > 0;
-}
-
-void Network::hostService()
-{
-	ENetEvent event;
-	while (m_running && m_client)
-	{
-		std::lock_guard<std::mutex> clientlock(m_clientMutex);
-		std::lock_guard<std::mutex> queuelock(m_queueMutex);
-		while (enet_host_service(m_client, &event, 0) > 0)
-		{
-			std::unique_ptr<NetEvent> ev(new NetEvent);
-			if (event.type == ENET_EVENT_TYPE_CONNECT)
-			{
-				ev->type = NetEvent::CONNECTED;
-				enet_peer_timeout(event.peer, ENET_PEER_TIMEOUT_LIMIT, 500, 1000);
-				m_connecting = false;
-			}
-			else if (event.type == ENET_EVENT_TYPE_DISCONNECT)
-			{
-				ev->type = NetEvent::DISCONNECTED;
-			}
-			else if (event.type == ENET_EVENT_TYPE_RECEIVE)
-			{
-				ev->type = NetEvent::RECEIVED;
-				ev->packet = event.packet;
-			}
-		
-			m_events.push_back(std::move(ev));
-		}
-		//Check if we are connecting
-		if (m_connecting && m_timeout.getElapsedTime() > sf::seconds(5.f))
-		{
-			std::unique_ptr<NetEvent> ev(new NetEvent);
-			ev->type = NetEvent::TIMED_OUT;
-			m_events.push_back(std::move(ev));
-			m_connecting = false;
-			enet_peer_reset(m_server);
-		}
-		std::this_thread::yield();
-
-	/*	for (auto & ev : m_events)
-		{
-			if (ev.packet)
-				std::cout << ev.packet->dataLength << ", ";
-		}
-		std::cout << "\n";*/
-	}
 }
 
 NetEvent::NetEvent() :

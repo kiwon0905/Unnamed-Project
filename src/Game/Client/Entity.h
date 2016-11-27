@@ -16,22 +16,18 @@ public:
 	void die();
 	bool isDead() const;
 	void setPrediction(bool predict);
+	void setPosition(sf::Vector2f v);
+	sf::Vector2f getPosition();
+	void setInput(unsigned bits) { m_input = bits; }
 	virtual void update(float dt, GameWorld & world) = 0;
 	virtual void render(Renderer & renderer) = 0;
 protected:
-	struct PastMove
-	{
-		sf::Vector2f dv;
-		unsigned seq;
-	};
-
-
 	bool m_predicted = false;
-	std::deque<PastMove> m_pastMoveBuffer;
 	unsigned m_id;
 	EntityType m_type;
 	bool m_alive = true;
 	EntityState m_state;
+	unsigned m_input;
 	sf::Vector2f m_position;
 	sf::Vector2f m_velocity;
 };

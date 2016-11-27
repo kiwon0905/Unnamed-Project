@@ -34,6 +34,7 @@ public:
 	bool initialize(Client & client);
 	void finalize(Client & client);
 
+	void update();
 	bool connect(const ENetAddress & addr);
 	void disconnect();
 	bool send(const Packer & packer, bool reliable);
@@ -43,12 +44,6 @@ public:
 	bool send(Packer & packer, ENetAddress & addr);
 	bool receive(Unpacker & unpacker, ENetAddress & addr);
 private:
-	void hostService();
-private:
-	std::atomic<bool> m_running;
-	std::unique_ptr<std::thread> m_serviceThread;
-	std::mutex m_queueMutex;
-	std::mutex m_clientMutex;
 	ENetHost * m_client = nullptr;
 	ENetSocket m_socket;
 	ENetPeer * m_server = nullptr;

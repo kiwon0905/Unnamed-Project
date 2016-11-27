@@ -120,12 +120,10 @@ void Server::run()
 		sf::Clock tickClock, syncClock;
 		sf::Time elapsedTick = sf::Time::Zero, elapsedSync = sf::Time::Zero;
 		const sf::Time tickInterval = sf::seconds(1 / 60.f);
-		const sf::Time syncInterval = sf::seconds(1 / 20.f);
 
 		while (m_running)
 		{
 			elapsedTick += tickClock.restart();
-			elapsedSync += syncClock.restart();
 
 			ENetEvent event;
 			while (enet_host_service(m_gameServer, &event, 0) > 0)
@@ -171,13 +169,6 @@ void Server::run()
 				m_gameWorld.update(tickInterval.asSeconds());
 				elapsedTick -= tickInterval;
 			}
-
-			while (elapsedSync >= syncInterval)
-			{
-				m_gameWorld.sync();
-				elapsedSync -= syncInterval;
-			}
-			std::this_thread::yield();
 		}
 	}
 

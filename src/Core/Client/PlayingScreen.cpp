@@ -8,13 +8,12 @@ void PlayingScreen::onEnter(Client & client)
 	Packer packer;
 	packer.pack(Msg::CL_REQUEST_WORLD_INFO);
 
-//	Packer packer;
-//	packer.pack(Msg::CL_READY);
 	client.getNetwork().send(packer, true);
 }
 
 void PlayingScreen::handleEvent(const sf::Event & ev, Client & client)
 {
+
 }
 
 void PlayingScreen::handleNetEvent(NetEvent & netEv, Client & client)

@@ -20,15 +20,34 @@ void Player::setEntity(Entity * character)
 	m_entity = character;
 }
 
-void Player::setInputSeq(unsigned seq)
+void Player::onInput(unsigned bits, unsigned seq)
 {
-	if(seq > m_inputSeq)
-		m_inputSeq = seq;
+	if (seq > m_lastProcessedInputSeq)
+	{
+		Input input;
+		input.bits = bits;
+		input.seq = seq;
+		m_inputs.push_back(input);
+
+	}
 }
 
-unsigned Player::getInputSeq()
+Input * Player::peekInput()
 {
-	return m_inputSeq;
+	if(m_inputs.empty())
+		return nullptr;
+	return &m_inputs.front();
+}
+
+void Player::popInput()
+{
+	m_lastProcessedInputSeq = m_inputs.front().seq;
+	m_inputs.pop_front();
+}
+
+unsigned Player::getLastProcessedInputSeq()
+{
+	return m_lastProcessedInputSeq;
 }
 
 bool Player::isReady() const

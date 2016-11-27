@@ -31,6 +31,7 @@ public:
 	Player * getPlayer(ENetPeer * peer);
 	Human * createCharacter(Player * player);
 private:
+	unsigned m_syncCounter = 0;
 	State m_state = PRE;
 	std::vector<Player> m_players;
 	bool m_reset = false;

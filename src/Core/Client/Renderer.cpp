@@ -14,7 +14,7 @@ void Renderer::finalize(Client & client)
 void Renderer::renderHuman(float x, float y)
 {
 	sf::RectangleShape r;
-	r.setSize({ 50.f, 50.f });
+	r.setSize({ 100.f, 100.f });
 	r.setFillColor(sf::Color::Yellow);
 	r.setPosition({ x,y });
 	m_window->draw(r);

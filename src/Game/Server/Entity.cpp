@@ -8,24 +8,6 @@ Entity::Entity(unsigned id, EntityType type, Player * player):
 {
 }
 
-void Entity::onInput(unsigned inputBits)
-{
-	Input input;
-	if (inputBits & Control::MOVE_LEFT)
-	{
-		input.direction--;
-	}
-	if (inputBits & Control::MOVE_RIGHT)
-	{
-		input.direction++;
-	}
-	if (inputBits & Control::JUMP)
-	{
-		input.jump = true;
-	}
-	m_inputs.push(input);
-}
-
 unsigned Entity::getId()
 {
 	return m_id;
@@ -44,4 +26,9 @@ void Entity::die()
 bool Entity::isDead()
 {
 	return !m_alive;
+}
+
+sf::Vector2f Entity::getPosition()
+{
+	return m_position;
 }
