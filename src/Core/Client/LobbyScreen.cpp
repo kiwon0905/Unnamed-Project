@@ -82,16 +82,10 @@ void LobbyScreen::handlePacket(Unpacker & unpacker, const ENetAddress & addr, Cl
 			unpacker.unpack(info.id);
 			unpacker.unpack(info.name);
 			m_internetGameServers.push_back(info);
+			Logger::getInstance().info(enutil::toString(info.address));
 		}
+		turnPage(0, client);
 	}
-	else if (msg == Msg::SV_LAN_GAME_LIST)
-	{
-		//ServerInfo info;
-		//packet >> info.address.port >> info.name;
-		//info.address.host = addr.host;
-		//std::cout << "Lan game discovered: " << enutil::toString(addr) << "\n";
-	}
-	turnPage(0, client);
 }
 
 void LobbyScreen::update(float dt, Client & client)
@@ -101,7 +95,6 @@ void LobbyScreen::update(float dt, Client & client)
 
 void LobbyScreen::render(Client & client)
 {
-//	Logger::getInstance().info() << client.getNetworkManager().getIncomingBandwidth() << " down " << client.getNetworkManager().getOutgoingBandwidth() << " up\n";
 }
 
 
@@ -117,16 +110,19 @@ void LobbyScreen::onObscure(Client & client)
 
 void LobbyScreen::onReveal(Client & client)
 {
-	loadUi(client);
+	m_window->Show(true);
 }
 
 
 //Window
 //	Box2
-//		Notebox
+//		Notebook
+//			Box(
 //			InternetTable
-//			LanTable
-//		Box(Prev, Next, Refresh)
+//			Box(Prev, Next, Refresh)
+//			)
+//			Private
+//
 
 void LobbyScreen::loadUi(Client & client)
 {
@@ -135,9 +131,6 @@ void LobbyScreen::loadUi(Client & client)
 	int height = width * 9 / 16;
 	window.create(sf::VideoMode(width, height), "");
 	window.resetGLStates();
-	window.setFramerateLimit(60);
-	
-	auto & desktop = client.getGui().getDesktop();
 
 	auto prevButton = sfg::Button::Create("Prev");
 	auto onPrev = [this, &client]()
@@ -145,42 +138,53 @@ void LobbyScreen::loadUi(Client & client)
 		turnPage(-1, client);
 	};
 	prevButton->GetSignal(sfg::Button::OnLeftClick).Connect(onPrev);
-
 	auto nextButton = sfg::Button::Create("Next");
 	auto onNext = [this, &client]()
 	{
 		turnPage(1, client);
 	};
 	nextButton->GetSignal(sfg::Button::OnLeftClick).Connect(onNext);
-
-
 	auto refreshButton = sfg::Button::Create("Refresh");
 	refreshButton->GetSignal(sfg::Button::OnLeftClick).Connect(std::bind(&LobbyScreen::refresh, this, std::ref(client)));
-	auto box = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL);
+	auto buttonBox = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL);
+	buttonBox->Pack(prevButton);
+	buttonBox->Pack(nextButton);
+	buttonBox->Pack(refreshButton);
+
+
 	m_internetTable = sfg::Table::Create();
 	for (std::size_t i = 0; i < GAMES_PER_PAGE / 2; ++i)
 		for (std::size_t j = 0; j < 2; ++j)
 			m_internetTable->Attach(sfg::Button::Create(), { j, i, 1, 1 });
 
-	m_lanTable = sfg::Table::Create();
-	for (std::size_t i = 0; i < GAMES_PER_PAGE / 2; ++i)
-		for (std::size_t j = 0; j < 2; ++j)
-			m_lanTable->Attach(sfg::Button::Create(), { j, i, 1, 1 });
+	sfg::Box::Ptr box = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
+	box->Pack(m_internetTable);
+	box->Pack(buttonBox);
 
 	m_notebook = sfg::Notebook::Create();
-	auto box2 = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
+	m_notebook->AppendPage(box, sfg::Label::Create("Internet"));
+	
+
+	sfg::Box::Ptr box2 = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL);
+	sfg::Entry::Ptr entry = sfg::Entry::Create();
+	box2->Pack(entry);
+	sfg::Button::Ptr joinButton = sfg::Button::Create("Join");
+	auto joinPrivate = [&client, entry]()
+	{
+		ENetAddress addr = enutil::toENetAddress(entry->GetText().toAnsiString());
+
+		client.getNetwork().connect(addr);
+	};
+	joinButton->GetSignal(sfg::Button::OnLeftClick).Connect(joinPrivate);
+	box2->Pack(joinButton);
+	m_notebook->AppendPage(box2, sfg::Label::Create("Private"));
+
+
 	m_window = sfg::Window::Create();
-	//m_window->SetRequisition(sf::Vector2f(static_cast<float>(width), static_cast<float>(height)));
-	m_window->Add(box2);
-	box2->Pack(m_notebook);
+	m_window->Add(m_notebook);
 
-	m_notebook->AppendPage(m_internetTable, sfg::Label::Create("Internet"));
-	m_notebook->AppendPage(m_lanTable, sfg::Label::Create("LAN"));
 
-	box2->Pack(box, false, true);
-	box->Pack(prevButton, false, false);
-	box->Pack(nextButton, false, false);
-	box->Pack(refreshButton, false, false);
+	auto & desktop = client.getGui().getDesktop();
 	desktop.Add(m_window);
 }
 
@@ -192,75 +196,52 @@ void LobbyScreen::hideUi(Client & client)
 void LobbyScreen::refresh(Client & client)
 {
 	m_internetGameServers.clear();
-	m_lanGameServers.clear();
 	for (auto & child : m_internetTable->GetChildren())
 	{
 		std::static_pointer_cast<sfg::Button>(child)->SetLabel("");
 	}
-	for (auto & child : m_lanTable->GetChildren())
-	{
-		std::static_pointer_cast<sfg::Button>(child)->SetLabel("");
-	}
-
-	if (m_notebook->GetNthPage(m_notebook->GetCurrentPage()) == m_internetTable)
-	{
-		std::string addr;
-		client.getContext().parser.get("masterAddr", addr);
-		ENetAddress address = enutil::toENetAddress(addr);
-
-		Packer packer;
-		packer.pack(Msg::CL_REQUEST_INTERNET_SERVER_LIST);
-		client.getNetwork().send(packer, address);
-	}
-	else
-	{
 
 
-	}
+	std::string addr;
+	client.getContext().parser.get("masterAddr", addr);
+	ENetAddress address = enutil::toENetAddress(addr);
+	
+	Packer packer;
+	packer.pack(Msg::CL_REQUEST_INTERNET_SERVER_LIST);
+	client.getNetwork().send(packer, address);
 }
 
 void LobbyScreen::turnPage(int page, Client & client)
 {
-	if (m_notebook->GetNthPage(m_notebook->GetCurrentPage()) == m_internetTable)
+	for (auto & child : m_internetTable->GetChildren())
 	{
-		for (auto & child : m_internetTable->GetChildren())
-		{
-			std::static_pointer_cast<sfg::Button>(child)->SetLabel("");
-		}
+		std::static_pointer_cast<sfg::Button>(child)->SetLabel("");
+	}
 
-		m_currentPage += page;
-		m_currentPage = std::max(1, m_currentPage);
-		int maxPage = m_internetGameServers.size() / GAMES_PER_PAGE;
-		if (m_internetGameServers.size() % GAMES_PER_PAGE > 0)
-			maxPage += 1;
-		m_currentPage = std::min(m_currentPage, maxPage);
+	m_currentPage += page;
+	m_currentPage = std::max(1, m_currentPage);
+	int maxPage = m_internetGameServers.size() / GAMES_PER_PAGE;
+	if (m_internetGameServers.size() % GAMES_PER_PAGE > 0)
+		maxPage += 1;
+	m_currentPage = std::min(m_currentPage, maxPage);
 
-		std::size_t index = (m_currentPage - 1) * GAMES_PER_PAGE;
+	std::size_t index = (m_currentPage - 1) * GAMES_PER_PAGE;
 		
-		for (auto & child : m_internetTable->GetChildren())
-		{
-			if (index < m_internetGameServers.size())
-			{
-				const ServerInfo & serverInfo = m_internetGameServers[index];
-				std::static_pointer_cast<sfg::Button>(child)->SetLabel(serverInfo.name);
-
-				auto onClick = [&client, &serverInfo]()
-				{
-					client.getNetwork().connect(serverInfo.address);
-				};
-				std::static_pointer_cast<sfg::Button>(child)->GetSignal(sfg::Button::OnLeftClick).Connect(onClick);
-
-			}
-			//	std::cout << "i: " << i << "j: " << j << "\n";
-			index++;
-		}
-
-
-	}
-	else
+	for (auto & child : m_internetTable->GetChildren())
 	{
+		if (index < m_internetGameServers.size())
+		{
+			const ServerInfo & serverInfo = m_internetGameServers[index];
+			std::static_pointer_cast<sfg::Button>(child)->SetLabel(serverInfo.name);
 
+			auto onClick = [&client, &serverInfo]()
+			{
+				client.getNetwork().connect(serverInfo.address);
+			};
+			std::static_pointer_cast<sfg::Button>(child)->GetSignal(sfg::Button::OnLeftClick).Connect(onClick);
 
+		}
+		//	std::cout << "i: " << i << "j: " << j << "\n";
+		index++;
 	}
-
 }

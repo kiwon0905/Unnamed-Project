@@ -1,2 +1,3 @@
 mode = internet
-masterIp = localhost
+masterAddr = localhost:12345
+gameServerAddr = localhost:0

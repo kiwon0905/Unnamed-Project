@@ -23,7 +23,7 @@ bool Server::initialize()
 	}
 
 
-	//lan or internet?
+	//lan,internet,private?
 	std::string mode;
 	if (!m_parser.get("mode", mode))
 	{
@@ -52,26 +52,7 @@ bool Server::initialize()
 		return false;
 	}
 
-	if (mode == "lan")
-	{
-		m_socket = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM);
-		if (m_socket < 0)
-		{
-			Logger::getInstance().error("Failed to create socket");
-			return false;
-		}
-		if (enet_socket_set_option(m_socket, ENET_SOCKOPT_NONBLOCK, 1) < 0)
-		{
-			Logger::getInstance().error("Failed to set socket option");
-			return false;
-		}
-		if(enet_socket_bind(m_socket, &enutil::toENetAddress("0.0.0.0", 12347)))
-		{
-			Logger::getInstance().error("Failed to bind socket");
-			return false;
-		}
-	}
-	else if (mode == "internet")
+	if (mode == "internet")
 	{
 		std::string masterAddr;
 		m_parser.get("masterAddr", masterAddr);
@@ -106,6 +87,7 @@ bool Server::initialize()
 		enutil::send(packer, m_masterServer, true);
 	}
 
+	Logger::getInstance().info("Succesfully initialized server at " + enutil::toString(m_gameServer->address));
 	m_running = true;
 	m_parsingThread.reset(new std::thread(&Server::parseCommands, this));
 	return true;
@@ -157,13 +139,6 @@ void Server::run()
 				}
 			}
 
-			Unpacker unpacker;
-			ENetAddress addr;
-			while (enutil::receive(unpacker, addr, m_socket) > 0)
-			{
-				handlePacket(unpacker, addr);
-			}
-
 			while (elapsedTick >= tickInterval)
 			{
 				m_gameWorld.update(tickInterval.asSeconds());
@@ -184,7 +159,6 @@ void Server::finalize()
 		m_parsingThread->join();
 	if (m_gameServer)
 		enet_host_destroy(m_gameServer);
-	enet_socket_destroy(m_socket);
 	enet_deinitialize();
 }
 
@@ -198,20 +172,4 @@ void Server::parseCommands()
 			m_running = false;
 	}
 
-}
-
-void Server::handlePacket(Unpacker & unpacker, const ENetAddress & addr)
-{
-	Msg msg;
-	unpacker.unpack(msg);
-	
-	if (msg == Msg::CL_REVEAL_LAN_SERVER)
-	{
-		std::cout << "replying lan game server list\n";
-		Packer packer;
-		packer.pack(Msg::SV_LAN_GAME_LIST);
-		packer.pack(m_gameServer->address.port);
-		packer.pack("FUN");
-		enutil::send(packer, addr, m_socket);
-	}
 }

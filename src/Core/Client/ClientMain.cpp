@@ -19,6 +19,7 @@ enum A
 };
 
 
+
 int main()
 {
 #ifdef _DEBUG
@@ -30,7 +31,9 @@ int main()
 
 }
 
+
 /*
+
 #include <SFML/Graphics.hpp>
 
 int main()
@@ -67,4 +70,6 @@ int main()
 	}
 
 	return 0;
-}*/
+}
+
+*/

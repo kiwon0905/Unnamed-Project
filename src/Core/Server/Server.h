@@ -20,13 +20,11 @@ public:
 private:
 	void parseCommands();
 
-	void handlePacket(Unpacker & unpacker, const ENetAddress & addr);
 private:
 	std::unique_ptr<std::thread> m_parsingThread;
 	std::atomic<bool> m_running = false;
 	std::mutex m_queueMutex;
 	ENetHost * m_gameServer = nullptr;
-	ENetSocket m_socket;
 	ENetPeer * m_masterServer = nullptr;
 	Parser m_parser;
 	GameWorld m_gameWorld;

@@ -33,11 +33,9 @@ private:
 	};
 	JobExecutor m_jobScheduler;
 	std::vector<ServerInfo> m_internetGameServers;
-	std::vector<ServerInfo> m_lanGameServers;
 	sfg::Window::Ptr m_window;
 	sfg::Notebook::Ptr m_notebook;
 	sfg::Table::Ptr m_internetTable;
-	sfg::Table::Ptr m_lanTable;
 	int m_currentPage = 1;
 	bool m_connecting = false;
 };
