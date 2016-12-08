@@ -32,10 +32,11 @@ public:
 	Human * createCharacter(Player * player);
 private:
 	unsigned m_syncCounter = 0;
+	float m_time = 0.f;
 	State m_state = PRE;
 	std::vector<Player> m_players;
 	bool m_reset = false;
 	std::vector<std::unique_ptr<Entity>> m_entities;
-	unsigned m_nextEntityId = ENTITY_ID_MIN + 1;
-	unsigned m_nextSnapshotSeq = SNAPSHOT_SEQ_MIN;
+	int m_nextEntityId = ENTITY_ID_MIN;
+	int m_nextSnapshotSeq = SNAPSHOT_SEQ_MIN;
 };

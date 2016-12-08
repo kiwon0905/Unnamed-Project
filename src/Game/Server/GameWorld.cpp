@@ -64,7 +64,7 @@ void GameWorld::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 		}
 		else if (msg == Msg::CL_INPUT)
 		{
-			unsigned seq;
+			int seq;
 			std::uint8_t bits;
 			unpacker.unpack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(seq);
 			unpacker.unpack(bits);
@@ -87,7 +87,7 @@ void GameWorld::update(float dt)
 	
 	m_syncCounter++;
 	
-
+	m_time += dt;
 }
 
 void GameWorld::sync()
@@ -97,6 +97,7 @@ void GameWorld::sync()
 		Packer packer;
 		packer.pack(Msg::SV_SNAPSHOT);
 		packer.pack<SNAPSHOT_SEQ_MIN,SNAPSHOT_SEQ_MAX>(m_nextSnapshotSeq);
+		packer.pack<2>(GAME_TIME_MIN, GAME_TIME_MAX, m_time);
 		packer.pack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(player.getLastProcessedInputSeq());
 		packer.pack<ENTITY_ID_MIN, ENTITY_ID_MAX + 1>(m_entities.size());
 		for (std::size_t i = 0; i < m_entities.size(); ++i)

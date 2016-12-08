@@ -9,7 +9,6 @@
 
 bool Server::initialize()
 {
-	srand(time(NULL));
 	if (enet_initialize() != 0)
 	{
 		Logger::getInstance().error("Failed to initialize enet");
@@ -144,6 +143,7 @@ void Server::run()
 				m_gameWorld.update(tickInterval.asSeconds());
 				elapsedTick -= tickInterval;
 			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
 	}
 

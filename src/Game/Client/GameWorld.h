@@ -12,8 +12,8 @@ class GameWorld
 public:
 	struct Snapshot
 	{
-		unsigned seq;
-		unsigned inputSeq;
+		int seq;
+		int inputSeq;
 		float time;
 		struct EntityInfo
 		{
@@ -24,7 +24,7 @@ public:
 	};
 	struct Input
 	{
-		unsigned seq;
+		int seq;
 		unsigned bits;
 	};
 	
@@ -35,7 +35,7 @@ public:
 	const std::deque<Snapshot> & getSnapshots();
 	const std::deque<Input> & getInputs();
 private:
-	void interpolate();
+	void interpolate(float delay);
 	void processEntities(int prev, int current);	//create or destroy new entities
 	void processDelta();
 	void predict();
@@ -46,8 +46,9 @@ private:
 	std::deque<Snapshot> m_snapshots;
 	std::vector<std::unique_ptr<Entity>> m_entities;
 	bool m_ready = false;
-	unsigned m_playerEntityId = 0;
-	unsigned m_inputSeq = 1;
-	float m_time;
+	float m_time = 0.f;
+	int m_playerEntityId = -1;
+	int m_inputSeq = 0;
 	int m_prevS0 = -1;
+	int m_lastSnapshotSeq = -1;
 };

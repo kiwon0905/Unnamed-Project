@@ -20,7 +20,7 @@ void Player::setEntity(Entity * character)
 	m_entity = character;
 }
 
-void Player::onInput(unsigned bits, unsigned seq)
+void Player::onInput(unsigned bits, int seq)
 {
 	if (seq > m_lastProcessedInputSeq)
 	{

@@ -14,7 +14,15 @@ namespace enutil
 		std::size_t pos = addr.find(":");
 		std::string ip = addr.substr(0, pos);
 		std::string port = addr.substr(pos + 1);
-		return toENetAddress(ip, std::stoi(port));
+		unsigned uport = 0;
+		try
+		{
+			uport = std::stoi(port);
+		}
+		catch (...)
+		{
+		}
+		return toENetAddress(ip, uport);
 	}
 
 	ENetAddress toENetAddress(const std::string & ip, unsigned port)

@@ -42,9 +42,6 @@ void Human::update(float dt, GameWorld & world)
 			m_player->popInput();
 		}
 		m_position += m_velocity * dt;
-		std::cout << "input: " << m_player->getLastProcessedInputSeq() << " pos: " << m_position.x << "\n";
-
-
 	}
 }
 

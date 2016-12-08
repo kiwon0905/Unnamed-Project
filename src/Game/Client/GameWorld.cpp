@@ -3,6 +3,7 @@
 #include "Game/GameCore.h"
 #include "Core/Client/Client.h"
 #include "Core/MathUtility.h"
+#include "Core/Logger.h"
 
 void GameWorld::update(float dt, Client & client)
 {
@@ -22,7 +23,7 @@ void GameWorld::update(float dt, Client & client)
 			Packer packer;
 			packer.pack(Msg::CL_INPUT);
 			packer.pack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(m_inputSeq);
-			packer.pack(inputBits);
+			packer.pack(std::uint8_t(inputBits));
 			client.getNetwork().send(packer, false);
 			m_inputSeq++;
 
@@ -44,7 +45,7 @@ void GameWorld::update(float dt, Client & client)
 		}
 		Entity * e = getEntity(m_playerEntityId);
 		//std::cout << m_inputSeq - 1 << ": " << e->getPosition().x << "\n";
-		//interpolate();
+		interpolate(.1f);
 
 		m_time += dt;
 	}
@@ -72,19 +73,26 @@ void GameWorld::handlePacket(Unpacker & unpacker, Client & client)
 	}	
 	else if (msg == Msg::SV_SNAPSHOT)
 	{
-		m_ready = true;
 		Snapshot snapshot;
-		snapshot.time = m_time;
 		unpacker.unpack<SNAPSHOT_SEQ_MIN,SNAPSHOT_SEQ_MAX>(snapshot.seq);
-		unpacker.unpack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(snapshot.inputSeq);
-		unsigned entityCount;
-		unpacker.unpack<ENTITY_ID_MIN, ENTITY_ID_MAX + 1>(entityCount);
-		
-		if (m_snapshots.size() == 0)
-			m_time = 0.f;
-		//Don't process outdated snapshots,
-		if (m_snapshots.size() == 0 || snapshot.seq > m_snapshots.back().seq)
+
+		//only continue process if this snapshot is the latest snapshot
+		if (snapshot.seq > m_lastSnapshotSeq)
 		{
+			if (m_lastSnapshotSeq == -1)
+			{
+				m_ready = true;
+				m_time = snapshot.time;
+			}
+
+			m_lastSnapshotSeq = snapshot.seq;
+			unpacker.unpack<2>(GAME_TIME_MIN, GAME_TIME_MAX, snapshot.time);
+			unpacker.unpack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(snapshot.inputSeq);
+			unsigned entityCount;
+			unpacker.unpack<ENTITY_ID_MIN, ENTITY_ID_MAX + 1>(entityCount);
+			
+
+
 			for (std::size_t i = 0; i < entityCount; ++i)
 			{
 				Snapshot::EntityInfo entityInfo;
@@ -101,25 +109,46 @@ void GameWorld::handlePacket(Unpacker & unpacker, Client & client)
 			processDelta();
 			predict();
 		}
+
 	}
 	
 }
 
-void GameWorld::interpolate()
+void GameWorld::interpolate(float delay)
 {
-	int s0 = 0;
-	int s1 = -1;
+	int s0 = m_snapshots.size() - 1;
 	const float delayedTime = m_time - .1f;
-	for (int i = m_snapshots.size() - 1; i >= 0; --i)
+	
+	while(s0 > 0)
 	{
-		if (delayedTime > m_snapshots[i].time)
-		{
-			s0 = i;
-			if (i != m_snapshots.size() - 1)
-				s1 = i + 1;
+		if (delayedTime > m_snapshots[s0].time)
 			break;
-		}
+		s0--;
 	}
+
+	if (m_prevS0 != m_snapshots[s0].seq)
+	{
+		while (m_snapshots.front().seq < m_snapshots[s0].seq)
+			m_snapshots.pop_front();
+		std::cout << "transitioning from " << m_prevS0 << " -> " << m_snapshots[s0].seq << "\n";
+	}
+
+	int s1 = s0 + 1;
+
+	//can interpolate
+	if (s1 < static_cast<int>(m_snapshots.size()))
+	{
+		std::cout << m_snapshots[s0].seq << "-" << m_snapshots[s1].seq << "\n";
+	}
+
+	//can't interpolate
+	else
+	{
+		std::cout << m_snapshots[s0].seq << "\n";
+	}
+
+
+
 
 	//create necessary entities
 //	processEntities(m_prevS0, s0);
@@ -149,7 +178,9 @@ void GameWorld::interpolate()
 			}
 		}
 	}*/
-	m_prevS0 = s0;
+
+
+	m_prevS0 = m_snapshots[s0].seq;
 }
 
 void GameWorld::processEntities(int prev, int current)
@@ -213,7 +244,6 @@ void GameWorld::processDelta()
 					h->setPrediction(true);
 			}
 		}
-		m_ready = true;
 	}
 	else if (m_snapshots.size() > 1)
 	{

@@ -8,7 +8,7 @@ class Entity;
 struct Input
 {
 	unsigned bits;
-	unsigned seq;
+	int seq;
 };
 class Player
 {
@@ -18,7 +18,7 @@ public:
 	Entity * getEntity() const;
 	void setEntity(Entity * entity);
 
-	void onInput(unsigned bits, unsigned seq);
+	void onInput(unsigned bits, int seq);
 	Input * peekInput();
 	void popInput();
 	unsigned getLastProcessedInputSeq();
@@ -30,5 +30,5 @@ private:
 	ENetPeer * m_peer;
 	bool m_ready = false;
 	std::deque<Input> m_inputs;
-	unsigned m_lastProcessedInputSeq = 0;
+	int m_lastProcessedInputSeq = 0;
 };

@@ -51,9 +51,6 @@
     <ClInclude Include="src\Core\Client\Renderer.h">
       <Filter>Core\Client</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Client\ResourceManager.h">
-      <Filter>Core\Client</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\Client\Screen.h">
       <Filter>Core\Client</Filter>
     </ClInclude>
@@ -83,6 +80,9 @@
     </ClInclude>
     <ClInclude Include="src\Core\MathUtility.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Client\AssetManager.h">
+      <Filter>Core\Client</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -119,9 +119,6 @@
     <ClCompile Include="src\Core\Client\Renderer.cpp">
       <Filter>Core\Client</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Client\ResourceManager.cpp">
-      <Filter>Core\Client</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Client\ScreenStack.cpp">
       <Filter>Core\Client</Filter>
     </ClCompile>
@@ -139,6 +136,9 @@
     </ClCompile>
     <ClCompile Include="src\Game\Client\Human.cpp">
       <Filter>Game\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\AssetManager.cpp">
+      <Filter>Core\Client</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -44,6 +44,7 @@ void Client::run()
 
 		sf::Clock fpsClock;
 		int frames = 0;
+		int fps = 0;
 		while (!m_screenStack.isEmpty())
 		{
 			elapsed += clock.restart();
@@ -53,6 +54,7 @@ void Client::run()
 
 				//handle input event
 				sf::Event event;
+
 				while (m_context.window.pollEvent(event))
 				{
 					if (event.type == sf::Event::Closed)
@@ -60,7 +62,6 @@ void Client::run()
 					m_gui.handleEvent(event);
 					m_screenStack.handleEvent(event, *this);
 				}
-
 				m_network.update();
 				NetEvent * netEvent;
 				while (netEvent = m_network.peekEvent())
@@ -80,13 +81,22 @@ void Client::run()
 				m_screenStack.update(TIME_STEP.asSeconds(), *this);
 
 			}
+			frames++;
+
+			if (fpsClock.getElapsedTime() > sf::seconds(1.f))
+			{
+				fps = frames * 1;
+				frames = 0;
+				fpsClock.restart();
+			}
 			m_context.window.clear();
-				m_screenStack.render(*this);
-				m_gui.render(*this);
+			m_screenStack.render(*this);
+			m_gui.render(*this);
+			m_renderer.renderText("FPS: " + std::to_string(fps), 0.f, 0.f);
 			m_context.window.display();
 		
 			m_screenStack.applyChanges(*this);
-
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
 		}
 	}
 	finalize();

@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <functional>
 
-class ResourceManager
+class AssetManager
 {
 public:
 	template <class T>
@@ -27,7 +27,7 @@ private:
 };
 
 template <typename T>
-T * ResourceManager::get(const std::string & id)
+T * AssetManager::get(const std::string & id)
 {
 	//if resource has never been loaded
 	if (m_resources.count(id) == 0)
@@ -44,7 +44,7 @@ T * ResourceManager::get(const std::string & id)
 }
 
 template <typename T>
-ResourceManager::ErasedPtr::ErasedPtr(T * t)
+AssetManager::ErasedPtr::ErasedPtr(T * t)
 {
 	data = t;
 	deleter = [this]()

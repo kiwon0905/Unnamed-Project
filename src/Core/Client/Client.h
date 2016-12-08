@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "ResourceManager.h"
+#include "AssetManager.h"
 #include "Network.h"
 #include "Gui.h"
 #include "ScreenStack.h"
@@ -21,7 +21,7 @@ public:
 	{
 		sf::RenderWindow window;
 		Parser parser;
-		ResourceManager resourceManager;
+		AssetManager assetManager;
 	};
 
 	void run();
