@@ -28,9 +28,9 @@ void LobbyScreen::handleEvent(const sf::Event & ev, Client & client)
 {
 }
 
-void LobbyScreen::handleNetEvent(NetEvent & netEv, Client & client)
+void LobbyScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 {
-	if (netEv.type == NetEvent::RECEIVED)
+	if (netEv.type == ENET_EVENT_TYPE_RECEIVE)
 	{
 		Unpacker unpacker(netEv.packet->data, netEv.packet->dataLength);
 		Msg msg;
@@ -46,21 +46,26 @@ void LobbyScreen::handleNetEvent(NetEvent & netEv, Client & client)
 			client.getNetwork().disconnect();
 		}
 	}
-	else if (netEv.type == NetEvent::CONNECTED)
+	else if (netEv.type == ENET_EVENT_TYPE_CONNECT)
 	{
 		Logger::getInstance().info("Connected to game server");
 		Packer packer;
 		packer.pack(Msg::CL_REQUEST_JOIN_GAME);
 		client.getNetwork().send(packer, true);
+		m_connected = true;
 	}
-	else if (netEv.type == NetEvent::DISCONNECTED)
+	else if (netEv.type == ENET_EVENT_TYPE_DISCONNECT)
 	{
-		Logger::getInstance().info("Disconnected from game server");
+		if (m_connected)
+		{
+			Logger::getInstance().info("Disconnected from game server");
+			m_connected = false;
+		}
+		else
+			Logger::getInstance().info("Failed to connecet to game server");
+
 	}
-	else if (netEv.type == NetEvent::TIMED_OUT)
-	{
-		Logger::getInstance().info("Timed out");
-	}
+
 }
 
 void LobbyScreen::handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client)
@@ -173,7 +178,8 @@ void LobbyScreen::loadUi(Client & client)
 	{
 		ENetAddress addr = enutil::toENetAddress(entry->GetText().toAnsiString());
 
-		client.getNetwork().connect(addr);
+		if (!client.getNetwork().connect(addr))
+			Logger::getInstance().info("Already connecting");
 	};
 	joinButton->GetSignal(sfg::Button::OnLeftClick).Connect(joinPrivate);
 	box2->Pack(joinButton);

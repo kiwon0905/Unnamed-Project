@@ -63,7 +63,7 @@ void Client::run()
 					m_screenStack.handleEvent(event, *this);
 				}
 				m_network.update();
-				NetEvent * netEvent;
+				ENetEvent * netEvent;
 				while (netEvent = m_network.peekEvent())
 				{
 					m_screenStack.handleNetEvent(*netEvent, *this);

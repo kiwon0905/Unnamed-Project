@@ -47,7 +47,7 @@ void ScreenStack::handleEvent(const sf::Event & ev, Client & client)
 	m_screens.top()->handleEvent(ev, client);
 }
 
-void ScreenStack::handleNetEvent(NetEvent & netEv, Client & client)
+void ScreenStack::handleNetEvent(ENetEvent & netEv, Client & client)
 {
 	m_screens.top()->handleNetEvent(netEv, client);
 }

@@ -5,6 +5,11 @@
 #include "Core/MathUtility.h"
 #include "Core/Logger.h"
 
+void GameWorld::onDisconnect()
+{
+	m_ready = false;
+}
+
 void GameWorld::update(float dt, Client & client)
 {
 	if (m_ready)

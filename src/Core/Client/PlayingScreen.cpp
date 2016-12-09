@@ -16,24 +16,20 @@ void PlayingScreen::handleEvent(const sf::Event & ev, Client & client)
 
 }
 
-void PlayingScreen::handleNetEvent(NetEvent & netEv, Client & client)
+void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 {
-	if (netEv.type == NetEvent::RECEIVED)
+	if (netEv.type == ENET_EVENT_TYPE_RECEIVE)
 	{
 		Unpacker unpacker(netEv.packet->data, netEv.packet->dataLength);
 		m_gameWorld.handlePacket(unpacker, client);
 	}
-	else if (netEv.type == NetEvent::CONNECTED)
+	else if (netEv.type == ENET_EVENT_TYPE_CONNECT)
 	{
 
 	}
-	else if (netEv.type == NetEvent::DISCONNECTED)
+	else if (netEv.type == ENET_EVENT_TYPE_DISCONNECT)
 	{
-		std::cout << "disconnected\n";
-	}
-	else if (netEv.type == NetEvent::TIMED_OUT)
-	{
-		std::cout << "timed out\n";
+		m_gameWorld.onDisconnect();
 	}
 }
 

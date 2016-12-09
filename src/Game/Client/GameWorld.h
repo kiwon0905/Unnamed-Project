@@ -28,6 +28,7 @@ public:
 		unsigned bits;
 	};
 	
+	void onDisconnect();
 	void update(float dt, Client & client);
 	void render(Client & client);
 	void handlePacket(Unpacker & unpacker, Client & client);

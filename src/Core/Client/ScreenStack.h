@@ -24,7 +24,7 @@ public:
 	bool isEmpty();
 	
 	void handleEvent(const sf::Event & ev, Client & client);
-	void handleNetEvent(NetEvent & netEv, Client & client);
+	void handleNetEvent(ENetEvent & netEv, Client & client);
 	void handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client);
 	void applyChanges(Client & client);
 private:

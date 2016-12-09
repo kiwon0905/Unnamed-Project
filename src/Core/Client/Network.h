@@ -13,20 +13,6 @@
 constexpr unsigned MASTER_PORT = 12345;
 
 class Client;
-struct NetEvent
-{
-	enum Type
-	{
-		CONNECTED,
-		DISCONNECTED,
-		TIMED_OUT,
-		RECEIVED,
-		NONE
-	} type;
-	ENetPacket * packet;
-	NetEvent();
-	~NetEvent();
-};
 
 class Network
 {
@@ -39,7 +25,7 @@ public:
 	void disconnect();
 	bool send(const Packer & packer, bool reliable);
 
-	NetEvent * peekEvent();
+	ENetEvent * peekEvent();
 	void popEvent();
 	bool send(Packer & packer, ENetAddress & addr);
 	bool receive(Unpacker & unpacker, ENetAddress & addr);
@@ -47,7 +33,6 @@ private:
 	ENetHost * m_client = nullptr;
 	ENetSocket m_socket;
 	ENetPeer * m_server = nullptr;
-	std::deque<std::unique_ptr<NetEvent>> m_events;
-	sf::Clock m_timeout;
+	std::deque<ENetEvent> m_events;
 	bool m_connecting = false;
 };

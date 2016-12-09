@@ -11,7 +11,7 @@ class LobbyScreen : public Screen
 public:
 	void onEnter(Client & client);
 	void handleEvent(const sf::Event & ev, Client & client);
-	void handleNetEvent(NetEvent & netEv, Client & client);
+	void handleNetEvent(ENetEvent & netEv, Client & client);
 	void handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client);
 	void update(float dt, Client & client);
 	void render(Client & client);
@@ -37,5 +37,5 @@ private:
 	sfg::Notebook::Ptr m_notebook;
 	sfg::Table::Ptr m_internetTable;
 	int m_currentPage = 1;
-	bool m_connecting = false;
+	bool m_connected = false;
 };

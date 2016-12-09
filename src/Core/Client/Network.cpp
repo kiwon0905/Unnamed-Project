@@ -37,36 +37,18 @@ void Network::update()
 {
 	ENetEvent event;
 
-		while (enet_host_service(m_client, &event, 0) > 0)
+	while (enet_host_service(m_client, &event, 0) > 0)
+	{
+		if (event.type != ENET_EVENT_TYPE_NONE)
+			m_events.push_back(event);
+		if (event.type == ENET_EVENT_TYPE_DISCONNECT)
 		{
-			std::unique_ptr<NetEvent> ev(new NetEvent);
-			if (event.type == ENET_EVENT_TYPE_CONNECT)
-			{
-				ev->type = NetEvent::CONNECTED;
-				enet_peer_timeout(event.peer, ENET_PEER_TIMEOUT_LIMIT, 500, 1000);
-				m_connecting = false;
-			}
-			else if (event.type == ENET_EVENT_TYPE_DISCONNECT)
-			{
-				ev->type = NetEvent::DISCONNECTED;
-			}
-			else if (event.type == ENET_EVENT_TYPE_RECEIVE)
-			{
-				ev->type = NetEvent::RECEIVED;
-				ev->packet = event.packet;
-			}
-
-			m_events.push_back(std::move(ev));
-		}
-		//Check if we are connecting
-		if (m_connecting && m_timeout.getElapsedTime() > sf::seconds(5.f))
-		{
-			std::unique_ptr<NetEvent> ev(new NetEvent);
-			ev->type = NetEvent::TIMED_OUT;
-			m_events.push_back(std::move(ev));
+			enet_peer_reset(event.peer);
 			m_connecting = false;
-			enet_peer_reset(m_server);
 		}
+		if (event.type == ENET_EVENT_TYPE_CONNECT)
+			m_connecting = false;
+	}
 }
 
 //Connect to a server
@@ -77,11 +59,11 @@ bool Network::connect(const ENetAddress & addr)
 	disconnect();
 
 	m_server = enet_host_connect(m_client, &addr, 2, 0);
+
 	if (!m_server)
 		return false;
-	
+	enet_peer_timeout(m_server, ENET_PEER_TIMEOUT_LIMIT, 500, 1000);
 	m_connecting = true;
-	m_timeout.restart();
 	return true;
 }
 
@@ -99,17 +81,18 @@ bool Network::send(const Packer & packer, bool reliable)
 	return enutil::send(packer, m_server, reliable) == 0;
 }
 
-NetEvent * Network::peekEvent()
+ENetEvent * Network::peekEvent()
 {
 	if(m_events.size() == 0)
 		return nullptr;
-	return m_events.front().get();
+	return &m_events.front();
 }
 
 void Network::popEvent()
 {
 	if (m_events.size())
 	{
+		enet_packet_destroy(m_events.front().packet);
 		m_events.pop_front();
 	}
 }
@@ -122,15 +105,4 @@ bool Network::send(Packer & packer, ENetAddress & addr)
 bool Network::receive(Unpacker & unpacker, ENetAddress & addr)
 {
 	return enutil::receive(unpacker, addr, m_socket) > 0;
-}
-
-NetEvent::NetEvent() :
-	type(NONE),
-	packet(nullptr)
-{
-}
-
-NetEvent::~NetEvent()
-{
-	enet_packet_destroy(packet);
 }
