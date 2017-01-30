@@ -9,9 +9,9 @@ namespace enutil
 	ENetAddress toENetAddress(const std::string & addr);
 	ENetAddress toENetAddress(const std::string & ip, unsigned port);
 
-	int send(const Packer & packer, ENetPeer * peer, bool reliable);
-	int receive(Unpacker & unpacker, ENetPacket * p);
-	int send(const Packer & packer, const ENetAddress & addr, ENetSocket socket);
-	int receive(Unpacker & packer, ENetAddress & addr, ENetSocket socket);
+	bool send(const Packer & packer, ENetPeer * peer, bool reliable);
+	bool receive(Unpacker & unpacker, ENetPacket * p);
+	bool send(const Packer & packer, const ENetAddress & addr, ENetSocket socket);
+	bool receive(Unpacker & packer, ENetAddress & addr, ENetSocket socket);
 }
 

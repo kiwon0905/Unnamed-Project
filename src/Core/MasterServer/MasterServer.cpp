@@ -35,10 +35,8 @@ void MasterServer::run()
 			}
 			Unpacker unpacker;
 			ENetAddress addr;
-			while (enutil::receive(unpacker, addr, m_socket) > 0)
-			{
+			while (enutil::receive(unpacker, addr, m_socket))
 				handlePacket(unpacker, addr);
-			}
 		}
 		std::this_thread::yield();
 	}

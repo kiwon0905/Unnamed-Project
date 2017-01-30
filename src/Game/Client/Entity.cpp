@@ -6,7 +6,7 @@ Entity::Entity(unsigned id, EntityType type):
 {
 }
 
-unsigned Entity::getId() const
+int Entity::getId() const
 {
 	return m_id;
 }
@@ -21,14 +21,9 @@ void Entity::die()
 	m_alive = false;
 }
 
-bool Entity::isDead() const
+bool Entity::isAlive() const
 {
 	return !m_alive;
-}
-
-void Entity::setPrediction(bool predict)
-{
-	m_predicted = predict;
 }
 
 void Entity::setPosition(sf::Vector2f v)

@@ -1,6 +1,6 @@
 #include "LobbyScreen.h"
 #include "Client.h"
-#include "PlayingScreen.h"
+#include "RoomScreen.h"
 #include "Core/Logger.h"
 #include "Core/Packer.h"
 #include "Core/Protocol.h"
@@ -38,7 +38,7 @@ void LobbyScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		if (msg == Msg::SV_ACCEPT_JOIN)
 		{
 			Logger::getInstance().info("Joined game");
-			client.getScreenStack().push(new PlayingScreen);
+			client.getScreenStack().push(new RoomScreen);
 		}
 		else if (msg == Msg::SV_REJECT_JOIN)
 		{

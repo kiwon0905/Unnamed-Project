@@ -4,7 +4,7 @@
 class Human : public Entity
 {
 public:
-	Human(unsigned id, Player * player);
+	Human(int id, Peer * player);
 
 	void update(float dt, GameWorld & world);
 	void snap(Packer & packer);

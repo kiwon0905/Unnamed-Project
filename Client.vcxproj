@@ -29,6 +29,7 @@
     <ClInclude Include="src\Core\Client\PlayingScreen.h" />
     <ClInclude Include="src\Core\Client\Renderer.h" />
     <ClInclude Include="src\Core\Client\AssetManager.h" />
+    <ClInclude Include="src\Core\Client\RoomScreen.h" />
     <ClInclude Include="src\Core\Client\Screen.h" />
     <ClInclude Include="src\Core\Client\ScreenStack.h" />
     <ClInclude Include="src\Core\ENetUtility.h" />
@@ -41,6 +42,7 @@
     <ClInclude Include="src\Game\Client\Entity.h" />
     <ClInclude Include="src\Game\Client\GameWorld.h" />
     <ClInclude Include="src\Game\Control.h" />
+    <ClInclude Include="src\Game\CharacterPhysics.h" />
     <ClInclude Include="src\Game\GameCore.h" />
   </ItemGroup>
   <ItemGroup>
@@ -54,6 +56,7 @@
     <ClCompile Include="src\Core\Client\PlayingScreen.cpp" />
     <ClCompile Include="src\Core\Client\Renderer.cpp" />
     <ClCompile Include="src\Core\Client\AssetManager.cpp" />
+    <ClCompile Include="src\Core\Client\RoomScreen.cpp" />
     <ClCompile Include="src\Core\Client\ScreenStack.cpp" />
     <ClCompile Include="src\Core\ENetUtility.cpp" />
     <ClCompile Include="src\Core\Logger.cpp" />
@@ -62,6 +65,7 @@
     <ClCompile Include="src\Game\Client\Entity.cpp" />
     <ClCompile Include="src\Game\Client\GameWorld.cpp" />
     <ClCompile Include="src\Game\Client\Human.cpp" />
+    <ClCompile Include="src\Game\CharacterPhysics.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Core\Packer.inl" />

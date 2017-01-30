@@ -24,13 +24,13 @@
     <ClInclude Include="src\Core\Protocol.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\MasterServer\IdPool.h">
-      <Filter>Core\MasterServer</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\MasterServer\MasterServer.h">
       <Filter>Core\MasterServer</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Packer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\IdPool.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

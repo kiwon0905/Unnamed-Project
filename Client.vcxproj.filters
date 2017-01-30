@@ -84,6 +84,12 @@
     <ClInclude Include="src\Core\Client\AssetManager.h">
       <Filter>Core\Client</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\Client\RoomScreen.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\CharacterPhysics.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\ENetUtility.cpp">
@@ -139,6 +145,12 @@
     </ClCompile>
     <ClCompile Include="src\Core\Client\AssetManager.cpp">
       <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\RoomScreen.cpp">
+      <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\CharacterPhysics.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

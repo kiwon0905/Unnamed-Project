@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IdPool.h"
+#include "Core/IdPool.h"
 #include "Core/Packer.h"
 #include "Core/Protocol.h"
 #include "Core/Logger.h"
@@ -28,7 +28,7 @@ private:
 private:
 	struct GameInfo
 	{
-		unsigned id;
+		int id;
 		std::string name;
 	};
 	ENetHost * m_server;		//maintain connection with game servers
@@ -37,5 +37,5 @@ private:
 	std::unordered_map<ENetPeer *, GameInfo> m_games;
 
 	std::atomic<bool> m_running = false;
-	IdPool<sf::Int16> m_idPool;
+	IdPool<std::int32_t> m_idPool;
 };

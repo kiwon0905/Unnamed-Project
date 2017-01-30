@@ -76,7 +76,6 @@ void ScreenStack::applyChanges(Client & client)
 				m_screens.pop();
 				if (m_screens.size() > 0)
 					m_screens.top()->onReveal(client);
-				break;
 			}
 		}
 		else if (change.action == 0)

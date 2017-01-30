@@ -9,36 +9,49 @@
 
 bool Server::initialize()
 {
+	Parser parser;
 	if (enet_initialize() != 0)
 	{
 		Logger::getInstance().error("Failed to initialize enet");
 		return false;
 	}
-
-	if (!m_parser.loadFromFile("game-server-config.txt"))
+	
+	if (!parser.loadFromFile("game-server-config.txt"))
 	{
 		Logger::getInstance().error("Failed to load config.txt");
 		return false;
 	}
 
-
 	//lan,internet,private?
-	std::string mode;
-	if (!m_parser.get("mode", mode))
+	if (!parser.get("mode", m_config.mode))
 	{
 		Logger::getInstance().error("Failed to read mode");
 		return false;
 	}
-	std::string gameServerAddr;
-	if (!m_parser.get("gameServerAddr", gameServerAddr))
+
+
+	if (m_config.mode == "internet")
+	{
+		std::string addr;
+		if (!parser.get("masterAddr", addr))
+		{
+			Logger::getInstance().error("Failed to read masterAddr");
+			return false;
+		}
+		m_config.masterAddress = enutil::toENetAddress(addr);
+	}
+
+	std::string addr;
+	if (!parser.get("gameServerAddr", addr))
 	{
 		Logger::getInstance().error("Failed to read gameServerAddr");
 		return false;
 	}
+	m_config.address = enutil::toENetAddress(addr);
 
-	ENetAddress addr = enutil::toENetAddress(gameServerAddr);
-	m_gameServer = enet_host_create(&addr, 32, 1, 0, 0);
 
+
+	m_gameServer = enet_host_create(&m_config.address, 32, 1, 0, 0);
 	if (!m_gameServer)
 	{
 		Logger::getInstance().error("Failed to create server");
@@ -51,20 +64,16 @@ bool Server::initialize()
 		return false;
 	}
 
-	if (mode == "internet")
+
+	if (m_config.mode == "internet")
 	{
-		std::string masterAddr;
-		m_parser.get("masterAddr", masterAddr);
-		ENetAddress address = enutil::toENetAddress(masterAddr);
-
-
-		m_masterServer = enet_host_connect(m_gameServer, &address, 1, 1);
+		m_masterServer = enet_host_connect(m_gameServer, &m_config.masterAddress, 1, 1);
 		if (!m_masterServer)
 		{
 			Logger::getInstance().error("Failed to connect to master server");
 			return false;
 		}
-
+		Logger::getInstance().info("Connecting to master server...");
 		//wait up to 5 seconds to connect with master server
 		ENetEvent event;
 		if (enet_host_service(m_gameServer, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT)
@@ -90,21 +99,18 @@ bool Server::initialize()
 	m_running = true;
 	m_parsingThread.reset(new std::thread(&Server::parseCommands, this));
 	return true;
-	//enet_host_compress_with_range_coder(m_gameServer);
-
 }
 
 void Server::run()
 {
 	if (initialize())
 	{
-		sf::Clock tickClock, syncClock;
-		sf::Time elapsedTick = sf::Time::Zero, elapsedSync = sf::Time::Zero;
+		sf::Clock clock;
+		sf::Time elapsed = sf::Time::Zero;
 		const sf::Time tickInterval = sf::seconds(1 / 60.f);
 
 		while (m_running)
 		{
-			elapsedTick += tickClock.restart();
 
 			ENetEvent event;
 			while (enet_host_service(m_gameServer, &event, 0) > 0)
@@ -119,7 +125,9 @@ void Server::run()
 				{
 					Unpacker unpacker;
 					enutil::receive(unpacker, event.packet);
-					m_gameWorld.handlePacket(unpacker, event.peer);
+					Msg msg;
+					unpacker.unpack(msg);
+					handlePacket(msg, unpacker, event.peer);
 					enet_packet_destroy(event.packet);
 					break;
 				}
@@ -132,16 +140,37 @@ void Server::run()
 					else
 					{ 
 						Logger::getInstance().info(enutil::toString(event.peer->address) + " disconnected");
-						m_gameWorld.onDisconnect(event.peer);
+						Peer * peer = getPeer(event.peer);
+						m_gameWorld.onDisconnect(*peer);
 					}
 					break;
 				}
 			}
-
-			while (elapsedTick >= tickInterval)
+			
+			if (m_state < ENTERING)
 			{
-				m_gameWorld.update(tickInterval.asSeconds());
-				elapsedTick -= tickInterval;
+				if (ensurePlayers(State::ENTERING))
+				{
+					m_state = ENTERING;
+					Logger::getInstance().info("Everyone has loaded");
+					clock.restart();
+				}
+
+			}
+			else
+			{
+				if (m_state == ENTERING)
+				{
+
+				}
+			
+				elapsed += clock.restart();
+
+				while (elapsed >= tickInterval)
+				{
+					m_gameWorld.update(tickInterval.asSeconds(), m_players);
+					elapsed -= tickInterval;
+				}
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
@@ -170,6 +199,79 @@ void Server::parseCommands()
 		std::getline(std::cin, line);
 		if (line == "quit")
 			m_running = false;
+		else if (line == "start_dev")
+		{
+			if (m_players.size() > 0)
+			{
+				m_gameWorld.prepare(m_players);
+				m_state = LOADING;
+			}
+		}
 	}
 
+}
+
+void Server::handlePacket(Msg msg, Unpacker unpacker, ENetPeer * peer)
+{
+	if (msg == Msg::CL_REQUEST_JOIN_GAME)
+	{
+		Packer packer;
+		if (m_state == PRE_GAME)
+		{
+			packer.pack(Msg::SV_ACCEPT_JOIN);
+			
+			Peer * p = new Peer(m_nextPeerId++, peer);
+			m_players.emplace_back(p);
+		}
+		else
+		{
+			packer.pack(Msg::SV_REJECT_JOIN);
+		}
+		enutil::send(packer, peer, true);
+		return;
+	}
+
+	Peer * p = getPeer(peer);
+	if (!p)
+		return;
+
+
+	if (msg == Msg::CL_REQUEST_ROOM_INFO)
+	{
+
+	}
+	else if (msg == Msg::CL_REQUEST_WORLD_INFO)
+	{
+		p->setState(Peer::LOADING);
+		m_gameWorld.onRequestInfo(*p);
+	}
+	else if (msg == Msg::CL_LOAD_COMPLETE)
+	{
+		p->setState(Peer::ENTERING);
+		Logger::getInstance().info(std::to_string(p->getId()) + " has loaded");
+	}
+
+}
+
+Peer * Server::getPeer(const ENetPeer * peer)
+{
+	for (auto & p : m_players)
+		if (p->getENetPeer() == peer)
+			return p.get();
+	for (auto & p : m_spectators)
+		if (p->getENetPeer() == peer)
+			return p.get();
+	return nullptr;
+}
+
+bool Server::ensurePlayers(State state)
+{
+	if (m_players.empty())
+		return false;
+	for (auto & p : m_players)
+	{
+		if (p->getState() != state)
+			return false;
+	}
+	return true;
 }

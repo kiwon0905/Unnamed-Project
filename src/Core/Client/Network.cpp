@@ -99,10 +99,10 @@ void Network::popEvent()
 
 bool Network::send(Packer & packer, ENetAddress & addr)
 {
-	return enutil::send(packer, addr, m_socket) == 0;
+	return enutil::send(packer, addr, m_socket);
 }
 
 bool Network::receive(Unpacker & unpacker, ENetAddress & addr)
 {
-	return enutil::receive(unpacker, addr, m_socket) > 0;
+	return enutil::receive(unpacker, addr, m_socket);
 }
