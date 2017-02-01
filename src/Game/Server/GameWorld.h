@@ -30,9 +30,9 @@ private:
 
 	unsigned m_syncCounter = 0;
 	int m_tick = 0;
-	float m_time = 0.f;
 	bool m_reset = false;
+	bool m_started = false;
 	int m_nextEntityId = ENTITY_ID_MIN;
 
-	std::vector < std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
+	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 };

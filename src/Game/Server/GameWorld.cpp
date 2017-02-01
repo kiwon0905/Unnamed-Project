@@ -23,6 +23,7 @@ void GameWorld::prepare(std::vector<std::unique_ptr<Peer>> & players)
 	for (auto & p : players)
 	{
 		Human * h = new Human(m_nextEntityId++, p.get());
+		addEntity(h);
 		p->setEntity(h);
 		Packer packer;
 		packer.pack(Msg::SV_LOAD_GAME);
@@ -35,12 +36,11 @@ void GameWorld::prepare(std::vector<std::unique_ptr<Peer>> & players)
 void GameWorld::start()
 {
 	Logger::getInstance().info("The game has started.");
+	m_started = true;
 }
 
 void GameWorld::update(float dt, std::vector<std::unique_ptr<Peer>> & players)
 {
-
-	m_time += dt;
 
 	m_tick++;
 	if (m_tick % 3 == 0)
@@ -56,6 +56,7 @@ void GameWorld::sync(Peer & peer)
 	packer.pack(Msg::SV_SNAPSHOT);
 	packer.pack<TICK_MIN, TICK_MAX>(m_tick);
 	peer.send(packer, false);
+	
 }
 
 void GameWorld::reset()

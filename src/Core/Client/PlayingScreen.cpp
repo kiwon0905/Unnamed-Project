@@ -34,7 +34,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		}
 		else if (msg == Msg::SV_SNAPSHOT)
 		{
-			m_gameWorld.onSnapshot(unpacker);
+			m_gameWorld.onSnapshot(unpacker, client);
 		}
 	}
 	else if (netEv.type == ENET_EVENT_TYPE_CONNECT)

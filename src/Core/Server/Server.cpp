@@ -105,7 +105,6 @@ void Server::run()
 {
 	if (initialize())
 	{
-		sf::Clock clock;
 		sf::Time elapsed = sf::Time::Zero;
 		const sf::Time tickInterval = sf::seconds(1 / 60.f);
 
@@ -147,24 +146,11 @@ void Server::run()
 				}
 			}
 			
-			if (m_state < ENTERING)
+			if(m_state > LOADING)
 			{
-				if (ensurePlayers(State::ENTERING))
-				{
-					m_state = ENTERING;
-					Logger::getInstance().info("Everyone has loaded");
-					clock.restart();
-				}
+				elapsed += m_clock.restart();
 
-			}
-			else
-			{
-				if (m_state == ENTERING)
-				{
-
-				}
 			
-				elapsed += clock.restart();
 
 				while (elapsed >= tickInterval)
 				{
@@ -242,13 +228,33 @@ void Server::handlePacket(Msg msg, Unpacker unpacker, ENetPeer * peer)
 	}
 	else if (msg == Msg::CL_REQUEST_WORLD_INFO)
 	{
-		p->setState(Peer::LOADING);
-		m_gameWorld.onRequestInfo(*p);
+		if (m_state == LOADING)
+		{
+			p->setState(Peer::LOADING);
+			m_gameWorld.onRequestInfo(*p);
+		}
 	}
 	else if (msg == Msg::CL_LOAD_COMPLETE)
 	{
-		p->setState(Peer::ENTERING);
-		Logger::getInstance().info(std::to_string(p->getId()) + " has loaded");
+		if (m_state == LOADING)
+		{
+			p->setState(Peer::ENTERING);
+			Logger::getInstance().info(std::to_string(p->getId()) + " has loaded");
+			if (ensurePlayers(Peer::ENTERING))
+			{
+				m_state = State::ENTERING;
+				m_clock.restart();
+				Logger::getInstance().info("Everyone has loaded");
+			}
+
+		}
+	}
+	else if (msg == Msg::CL_READY)
+	{
+		p->setState(Peer::PLAYING);
+		Logger::getInstance().info(std::to_string(p->getId()) + " has entered the game");
+		if (ensurePlayers(Peer::PLAYING))
+			m_gameWorld.start();
 	}
 
 }
@@ -264,7 +270,7 @@ Peer * Server::getPeer(const ENetPeer * peer)
 	return nullptr;
 }
 
-bool Server::ensurePlayers(State state)
+bool Server::ensurePlayers(Peer::State state)
 {
 	if (m_players.empty())
 		return false;

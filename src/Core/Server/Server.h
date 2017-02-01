@@ -39,7 +39,7 @@ private:
 	void parseCommands();
 	void handlePacket(Msg msg, Unpacker unpacker, ENetPeer * peer);
 	Peer * getPeer(const ENetPeer * peer);
-	bool ensurePlayers(State state);
+	bool ensurePlayers(Peer::State state);
 
 	std::unique_ptr<std::thread> m_parsingThread;
 	std::atomic<bool> m_running = false;
@@ -52,4 +52,5 @@ private:
 	std::vector<std::unique_ptr<Peer>> m_players;
 	std::vector<std::unique_ptr<Peer>> m_spectators;
 	GameWorld m_gameWorld;
+	sf::Clock m_clock;
 };

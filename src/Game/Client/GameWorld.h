@@ -28,16 +28,19 @@ public:
 
 	void load();
 	void onWorldInfo(Unpacker & unpacker, Client & client);
-	void onSnapshot(Unpacker & unpacker);
+	void onSnapshot(Unpacker & unpacker, Client & client);
 
 	const std::deque<Snapshot> & getSnapshots();
 	const std::deque<Input> & getInputs();
 private:
+	void addEntity(Entity * e);
+
 	std::deque<Input> m_inputs;
 	std::deque<Snapshot> m_snapshots;
+	std::vector<std::unique_ptr<Entity>> m_entities;
 	bool m_ready = false;
+	bool m_loaded = false;
 	float m_delay = 3.f;
-	float m_time = 0.f;
 	int m_playerEntityId = -1;
-
+	sf::Clock m_lastSnapshot;
 };
