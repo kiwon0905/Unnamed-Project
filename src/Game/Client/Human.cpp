@@ -2,7 +2,7 @@
 #include "Game/Client/GameWorld.h"
 #include "Core/MathUtility.h"
 
-Human::Human(unsigned id):
+Human::Human(int id):
 	Entity(id, EntityType::HUMAN)
 {
 

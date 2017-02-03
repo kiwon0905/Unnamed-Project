@@ -5,7 +5,7 @@
 class Human : public Entity
 {
 public:
-	Human(unsigned id);
+	Human(int id);
 	void update(float dt, GameWorld & world);
 	void render(Renderer & render);
 	

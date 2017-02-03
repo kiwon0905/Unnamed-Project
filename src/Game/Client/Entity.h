@@ -9,11 +9,11 @@ class GameWorld;
 class Entity
 {
 public:
-	Entity(unsigned id, EntityType type);
+	Entity(int id, EntityType type);
 
 	int getId() const;
 	EntityType getType() const;
-	void die();
+	void setAlive(bool alive);
 	bool isAlive() const;
 	sf::Vector2f getPosition();
 	void setPosition(sf::Vector2f v);

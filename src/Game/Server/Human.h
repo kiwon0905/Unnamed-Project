@@ -7,6 +7,6 @@ public:
 	Human(int id, Peer * player);
 
 	void update(float dt, GameWorld & world);
-	void snap(Packer & packer);
+	void sync(Packer & packer);
 private:
 };

@@ -63,7 +63,7 @@
     <ClInclude Include="src\Core\IdPool.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\CharacterPhysics.h">
+    <ClInclude Include="src\Game\CharacterCore.h">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
@@ -98,7 +98,7 @@
     <ClCompile Include="src\Core\Server\Peer.cpp">
       <Filter>Core\Server</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\CharacterPhysics.cpp">
+    <ClCompile Include="src\Game\CharacterCore.cpp">
       <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>

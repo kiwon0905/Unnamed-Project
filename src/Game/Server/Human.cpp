@@ -13,7 +13,7 @@ void Human::update(float dt, GameWorld & world)
 
 }
 
-void Human::snap(Packer & packer)
+void Human::sync(Packer & packer)
 {
 	//id,type,pos
 	packer.pack<ENTITY_ID_MIN, ENTITY_ID_MAX>(m_id);

@@ -19,7 +19,6 @@ enum A
 };
 
 
-
 int main()
 {
 #ifdef _DEBUG
@@ -32,44 +31,3 @@ int main()
 }
 
 
-/*
-
-#include <SFML/Graphics.hpp>
-
-int main()
-{
-	sf::RenderWindow window(sf::VideoMode(1000, 800), "SFML works!");
-	sf::CircleShape shape(100.f);
-	shape.setFillColor(sf::Color::Green);
-	
-	sf::Clock clock;
-	sf::Time elapsed = sf::Time::Zero;
-	sf::Vector2f pos;
-	while (window.isOpen())
-	{
-		elapsed += clock.restart();
-		while (elapsed >= sf::seconds(1 / 60.f))
-		{
-			elapsed -= sf::seconds(1 / 60.f);
-			sf::Event event;
-			while (window.pollEvent(event))
-			{
-				if (event.type == sf::Event::Closed)
-					window.close();
-			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-				pos.x -= 5.f;
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-				pos.x += 5.f;
-		}
-
-		window.clear();
-		shape.setPosition(pos);
-		window.draw(shape);
-		window.display();
-	}
-
-	return 0;
-}
-
-*/

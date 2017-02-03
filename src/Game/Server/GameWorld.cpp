@@ -22,8 +22,7 @@ void GameWorld::prepare(std::vector<std::unique_ptr<Peer>> & players)
 {
 	for (auto & p : players)
 	{
-		Human * h = new Human(m_nextEntityId++, p.get());
-		addEntity(h);
+		Human * h = static_cast<Human*>(createEntity(EntityType::HUMAN, p.get()));
 		p->setEntity(h);
 		Packer packer;
 		packer.pack(Msg::SV_LOAD_GAME);
@@ -55,6 +54,18 @@ void GameWorld::sync(Peer & peer)
 	Packer packer;
 	packer.pack(Msg::SV_SNAPSHOT);
 	packer.pack<TICK_MIN, TICK_MAX>(m_tick);
+
+	for (auto & v : m_entitiesByType)
+	{
+		packer.pack<ENTITY_ID_MIN, ENTITY_ID_MAX>(v.size());
+		for (auto & e : v)
+		{
+			packer.pack<ENTITY_ID_MIN, ENTITY_ID_MAX>(e->getId());
+		}
+	}
+
+
+
 	peer.send(packer, false);
 	
 }
@@ -72,9 +83,20 @@ void GameWorld::onRequestInfo(Peer & peer)
 	peer.send(packer, true);
 }
 
-void GameWorld::addEntity(Entity * e)
+Entity * GameWorld::createEntity(EntityType type, Peer * p)
 {
-	int index = e->getType();
-	m_entitiesByType[index].emplace_back(e);
+	Entity * e;
+	if (type == EntityType::HUMAN)
+		e = new Human(m_nextEntityId++, p);
+		
+	m_entitiesByType[type].emplace_back(e);
+	return e;
 }
 
+Entity * GameWorld::getEntity(int id, EntityType type)
+{
+	for (auto & e : m_entitiesByType[type])
+		if (e->getId() == id)
+			return e.get();
+	return nullptr;
+}

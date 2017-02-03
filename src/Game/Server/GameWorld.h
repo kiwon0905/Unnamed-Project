@@ -24,7 +24,8 @@ public:
 
 	void onRequestInfo(Peer & peer);
 private:
-	void addEntity(Entity * e);
+	Entity * createEntity(EntityType type, Peer * p);
+	Entity * getEntity(int id, EntityType type);
 
 	void sync(Peer & peer);
 
