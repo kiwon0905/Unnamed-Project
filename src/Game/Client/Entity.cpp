@@ -25,13 +25,3 @@ bool Entity::isAlive() const
 {
 	return !m_alive;
 }
-
-void Entity::setPosition(sf::Vector2f v)
-{
-	m_position = v;
-}
-
-sf::Vector2f Entity::getPosition()
-{
-	return m_position;
-}

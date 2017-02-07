@@ -131,11 +131,6 @@ void LobbyScreen::onReveal(Client & client)
 
 void LobbyScreen::loadUi(Client & client)
 {
-	sf::RenderWindow & window = client.getContext().window;
-	int width = sf::VideoMode::getDesktopMode().width * 4 / 7;
-	int height = width * 9 / 16;
-	window.create(sf::VideoMode(width, height), "");
-	window.resetGLStates();
 
 	auto prevButton = sfg::Button::Create("Prev");
 	auto onPrev = [this, &client]()

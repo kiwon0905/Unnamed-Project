@@ -44,6 +44,7 @@
     <ClInclude Include="src\Game\Control.h" />
     <ClInclude Include="src\Game\CharacterCore.h" />
     <ClInclude Include="src\Game\GameCore.h" />
+    <ClInclude Include="src\Game\NetObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Client\Client.cpp" />
@@ -66,6 +67,7 @@
     <ClCompile Include="src\Game\Client\GameWorld.cpp" />
     <ClCompile Include="src\Game\Client\Human.cpp" />
     <ClCompile Include="src\Game\CharacterCore.cpp" />
+    <ClCompile Include="src\Game\NetObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Core\Packer.inl" />

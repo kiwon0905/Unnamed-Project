@@ -54,17 +54,21 @@ void GameWorld::sync(Peer & peer)
 	Packer packer;
 	packer.pack(Msg::SV_SNAPSHOT);
 	packer.pack<TICK_MIN, TICK_MAX>(m_tick);
+	packer.pack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(peer.getInput().seq);
+	std::size_t count = 0;
+	for (auto & v : m_entitiesByType)
+		count += v.size();
 
+	packer.pack<ENTITY_ID_MIN, ENTITY_ID_MAX>(count);
 	for (auto & v : m_entitiesByType)
 	{
-		packer.pack<ENTITY_ID_MIN, ENTITY_ID_MAX>(v.size());
 		for (auto & e : v)
 		{
 			packer.pack<ENTITY_ID_MIN, ENTITY_ID_MAX>(e->getId());
+			packer.pack(e->getType());
+			e->sync(packer);
 		}
 	}
-
-
 
 	peer.send(packer, false);
 	
@@ -80,6 +84,7 @@ void GameWorld::onRequestInfo(Peer & peer)
 	Packer packer;
 	packer.pack(Msg::SV_WORLD_INFO);
 	packer.pack<ENTITY_ID_MIN, ENTITY_ID_MAX>(peer.getEntity()->getId());
+	packer.pack(peer.getEntity()->getType());
 	peer.send(packer, true);
 }
 

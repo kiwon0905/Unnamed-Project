@@ -14,8 +14,8 @@ public:
 	bool initialize(Client & client);
 	void finalize(Client & client);
 	void update();
-	std::uint8_t getBits();
+	unsigned getBits();
 private:
 	std::unordered_map<Control, sf::Keyboard::Key> m_binds;
-	std::uint8_t m_bits;
+	unsigned m_bits;
 };

@@ -1,7 +1,9 @@
 #include "Human.h"
 #include "Game/GameCore.h"
 #include "Game/Control.h"
+#include "Game/NetObject.h"
 #include "Core/MathUtility.h"
+#include "Core/Server/Peer.h"
 
 Human::Human(int id, Peer * player):
 	Entity(id, EntityType::HUMAN, player)
@@ -10,14 +12,15 @@ Human::Human(int id, Peer * player):
 
 void Human::update(float dt, GameWorld & world)
 {
-
+	m_core.update(dt, m_player->getInput().bits);
 }
 
 void Human::sync(Packer & packer)
 {
 	//id,type,pos
-	packer.pack<ENTITY_ID_MIN, ENTITY_ID_MAX>(m_id);
-	packer.pack(m_type);
-	packer.pack<2>(0.f, 5000.f, m_position.x);
-	packer.pack<2>(0.f, 5000.f, m_position.y);
+
+
+	NetHuman human;
+	human.position = m_position;
+	human.pack(packer);
 }

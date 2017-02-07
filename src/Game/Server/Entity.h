@@ -2,6 +2,7 @@
 #include <SFML/System.hpp>
 #include "Core/Packer.h"
 #include "Game/GameCore.h"
+
 class GameWorld;
 class Peer;
 

@@ -29,7 +29,6 @@ private:
 
 	void sync(Peer & peer);
 
-	unsigned m_syncCounter = 0;
 	int m_tick = 0;
 	bool m_reset = false;
 	bool m_started = false;

@@ -30,6 +30,12 @@ bool Client::initialize()
 	if (!m_input.initialize(*this))
 		return false;
 	Logger::getInstance().info("Initialization successful");
+
+	sf::RenderWindow & window = getContext().window;
+	int width = sf::VideoMode::getDesktopMode().width * 4 / 7;
+	int height = width * 9 / 16;
+	window.create(sf::VideoMode(width, height), "");
+	window.resetGLStates();
 	return true;
 }
 

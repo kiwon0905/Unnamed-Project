@@ -90,6 +90,9 @@
     <ClInclude Include="src\Game\CharacterCore.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\NetObject.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\ENetUtility.cpp">
@@ -150,6 +153,9 @@
       <Filter>Core\Client</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\CharacterCore.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\NetObject.cpp">
       <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>

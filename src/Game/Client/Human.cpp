@@ -10,10 +10,15 @@ Human::Human(int id):
 
 void Human::update(float dt, GameWorld & world)
 {
-
 }
 
-void Human::render(Renderer & renderer)
+void Human::renderPast(Renderer & renderer, const NetEntity * from, const NetEntity * to)
 {
-	renderer.renderHuman(m_position.x, m_position.y);
+	std::cout << "render past: " << m_id << "\n";
 }
+
+void Human::renderFuture(Renderer & renderer, const CharacterCore & core)
+{
+	renderer.renderHuman(core.getPosition().x, core.getPosition().y);
+}
+

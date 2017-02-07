@@ -256,6 +256,14 @@ void Server::handlePacket(Msg msg, Unpacker unpacker, ENetPeer * peer)
 		if (ensurePlayers(Peer::PLAYING))
 			m_gameWorld.start();
 	}
+	else if (msg == Msg::CL_INPUT)
+	{
+		std::uint8_t bits;
+		int seq;
+		unpacker.unpack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(seq);
+		unpacker.unpack(bits);
+		p->onInput(bits, seq);
+	}
 
 }
 

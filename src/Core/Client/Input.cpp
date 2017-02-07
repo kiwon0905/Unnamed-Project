@@ -29,7 +29,7 @@ void Input::update()
 		m_bits |= Control::JUMP;
 }
 
-std::uint8_t Input::getBits()
+unsigned Input::getBits()
 {
 	return m_bits;
 }

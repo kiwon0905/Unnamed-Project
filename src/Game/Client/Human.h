@@ -1,13 +1,15 @@
 #pragma once
 
 #include "Entity.h"
+#include "Game/CharacterCore.h"
 
 class Human : public Entity
 {
 public:
 	Human(int id);
 	void update(float dt, GameWorld & world);
-	void render(Renderer & render);
+	void renderPast(Renderer & renderer, const NetEntity * from, const NetEntity * to);
+	void renderFuture(Renderer & renderer, const CharacterCore & core);
 	
-private:
+
 };
