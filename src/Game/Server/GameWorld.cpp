@@ -40,8 +40,11 @@ void GameWorld::start()
 
 void GameWorld::update(float dt, std::vector<std::unique_ptr<Peer>> & players)
 {
-
 	m_tick++;
+	for (auto & v : m_entitiesByType)
+		for (auto & e : v)
+			e->update(dt, *this);
+
 	if (m_tick % 3 == 0)
 	{
 		for (auto & peer : players)

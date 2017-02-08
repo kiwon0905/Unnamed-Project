@@ -54,7 +54,7 @@ void GameWorld::render(Client & client)
 {
 
 	float renderTime = m_snapshots.back().tick / static_cast<float>(SERVER_TICK_RATE) + m_lastSnapshot.getElapsedTime().asSeconds() - m_delay;
-
+	float t = 0.f;
 	int fromIndex = m_snapshots.size() - 1;
 	int toIndex = -1;
 	for (int i = m_snapshots.size() - 1; i >= 0; --i)
@@ -70,6 +70,12 @@ void GameWorld::render(Client & client)
 		}
 	}
 
+	if (toIndex != -1)
+	{
+		float t0 = m_snapshots[fromIndex].tick / static_cast<float>(SERVER_TICK_RATE);
+		float t1 = m_snapshots[toIndex].tick / static_cast<float>(SERVER_TICK_RATE);
+		t = (renderTime - t0) / (t1 - t0);
+	}
 
 	for (auto & v : m_entitiesByType)
 		for (auto & e : v)
@@ -89,7 +95,7 @@ void GameWorld::render(Client & client)
 			toEntity = m_snapshots[toIndex].m_entities[p.first].get();
 		
 		if (p.first != m_playerEntityId)
-			e->renderPast(client.getRenderer(), fromEntity, toEntity);
+			e->renderPast(client.getRenderer(), fromEntity, toEntity, t);
 	}
 	Entity * playerEntity = getEntity(m_playerEntityId, m_playerEntityType);
 	if (playerEntity)

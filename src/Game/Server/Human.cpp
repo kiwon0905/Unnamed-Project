@@ -13,6 +13,7 @@ Human::Human(int id, Peer * player):
 void Human::update(float dt, GameWorld & world)
 {
 	m_core.update(dt, m_player->getInput().bits);
+	m_position = m_core.getPosition();
 }
 
 void Human::sync(Packer & packer)
