@@ -17,7 +17,7 @@ void HumanCore::update(float dt, unsigned input)
 	int direction = 0;
 	if (input & Control::MOVE_LEFT)
 		direction--;
-	else if (input & Control::MOVE_RIGHT)
+	if (input & Control::MOVE_RIGHT)
 		direction++;
 	
 	if (direction > 0)
@@ -27,6 +27,14 @@ void HumanCore::update(float dt, unsigned input)
 	else
 		m_velocity.x = 0.f;
 
+
+
 	
 	m_position += m_velocity * dt;
+}
+
+void HumanCore::rollback(const NetEntity * ne)
+{
+	const NetHuman * nh = static_cast<const NetHuman *>(ne);
+	m_position = nh->position;
 }

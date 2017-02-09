@@ -16,7 +16,6 @@ void Human::renderPast(Renderer & renderer, const NetEntity * from, const NetEnt
 {
 	const NetHuman * h0 = static_cast<const NetHuman*>(from);
 	const NetHuman * h1 = static_cast<const NetHuman*>(to);
-	std::cout << "render past: " << m_id <<"t: " <<t<<"\n";
 	sf::Vector2f pos = h0->position;
 
 	if(to)

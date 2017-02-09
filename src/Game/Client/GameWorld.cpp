@@ -42,10 +42,18 @@ void GameWorld::update(float dt, Client & client)
 		m_inputs.push_back(input);
 		m_nextInputSeq++;
 		
+		while (!m_inputs.empty() && m_inputs.front().seq <= m_lastAckedInpnutSeq)
+			m_inputs.pop_front();
+
+
 		Entity * e = getEntity(m_playerEntityId, m_playerEntityType);
+		
+		
 		if (m_playerCore && e)
 		{
-			m_playerCore->update(dt, inputBits);
+			m_playerCore->rollback(m_snapshots.back().m_entities[m_playerEntityId].get());
+			for(const auto & i : m_inputs)
+				m_playerCore->update(dt, i.bits);
 		}
 	}
 }
