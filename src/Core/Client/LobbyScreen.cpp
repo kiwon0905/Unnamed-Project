@@ -98,7 +98,7 @@ void LobbyScreen::update(float dt, Client & client)
 	m_jobScheduler.update(dt);
 }
 
-void LobbyScreen::render(Client & client)
+void LobbyScreen::render(float t, Client & client)
 {
 }
 

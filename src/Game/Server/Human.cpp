@@ -12,7 +12,8 @@ Human::Human(int id, Peer * player):
 
 void Human::update(float dt, GameWorld & world)
 {
-	m_core.update(dt, m_player->getInput().bits);
+	Input input = m_player->popInput();
+	m_core.update(dt, input.bits);
 	m_position = m_core.getPosition();
 }
 

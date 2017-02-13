@@ -40,7 +40,6 @@ void GameWorld::start()
 
 void GameWorld::update(float dt, std::vector<std::unique_ptr<Peer>> & players)
 {
-	m_tick++;
 	for (auto & v : m_entitiesByType)
 		for (auto & e : v)
 			e->update(dt, *this);
@@ -50,6 +49,7 @@ void GameWorld::update(float dt, std::vector<std::unique_ptr<Peer>> & players)
 		for (auto & peer : players)
 			sync(*peer);
 	}
+	m_tick++;
 }
 
 void GameWorld::sync(Peer & peer)
@@ -57,7 +57,7 @@ void GameWorld::sync(Peer & peer)
 	Packer packer;
 	packer.pack(Msg::SV_SNAPSHOT);
 	packer.pack<TICK_MIN, TICK_MAX>(m_tick);
-	packer.pack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(peer.getInput().seq);
+	packer.pack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(peer.getLastUsedInputSeq());
 	std::size_t count = 0;
 	for (auto & v : m_entitiesByType)
 		count += v.size();

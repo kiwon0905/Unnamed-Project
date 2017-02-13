@@ -15,7 +15,8 @@ void Input::finalize(Client & client)
 {
 }
 
-void Input::update()
+
+unsigned Input::getBits()
 {
 	m_bits = 0;
 
@@ -27,9 +28,6 @@ void Input::update()
 
 	if (sf::Keyboard::isKeyPressed(m_binds[Control::JUMP]))
 		m_bits |= Control::JUMP;
-}
 
-unsigned Input::getBits()
-{
 	return m_bits;
 }

@@ -57,9 +57,9 @@ void PlayingScreen::update(float dt, Client & client)
 	m_gameWorld.update(dt, client);
 }
 
-void PlayingScreen::render(Client & client)
+void PlayingScreen::render(float t, Client & client)
 {
-	m_gameWorld.render(client);
+	m_gameWorld.render(t, client);
 }
 
 void PlayingScreen::onExit(Client & client)

@@ -39,7 +39,7 @@ void RoomScreen::update(float dt, Client & client)
 {
 }
 
-void RoomScreen::render(Client & client)
+void RoomScreen::render(float t, Client & client)
 {
 }
 

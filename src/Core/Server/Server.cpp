@@ -106,12 +106,14 @@ void Server::run()
 	if (initialize())
 	{
 		sf::Time elapsed = sf::Time::Zero;
-		const sf::Time tickInterval = sf::seconds(1 / 60.f);
+		const sf::Time tickRate = sf::seconds(1.f / TICK_RATE);
 
 		while (m_running)
 		{
 
 			ENetEvent event;
+			int i = 0;
+
 			while (enet_host_service(m_gameServer, &event, 0) > 0)
 			{
 				if (event.type == ENET_EVENT_TYPE_CONNECT)
@@ -122,6 +124,7 @@ void Server::run()
 				}
 				else if (event.type == ENET_EVENT_TYPE_RECEIVE)
 				{
+					++i;
 					Unpacker unpacker;
 					enutil::receive(unpacker, event.packet);
 					Msg msg;
@@ -145,20 +148,17 @@ void Server::run()
 					break;
 				}
 			}
-			
+
 			if(m_state > LOADING)
 			{
 				elapsed += m_clock.restart();
-
-			
-
-				while (elapsed >= tickInterval)
+				while (elapsed >= tickRate)
 				{
-					m_gameWorld.update(tickInterval.asSeconds(), m_players);
-					elapsed -= tickInterval;
+					m_gameWorld.update(tickRate.asSeconds(), m_players);
+					elapsed -= tickRate;
 				}
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			std::this_thread::sleep_for(std::chrono::nanoseconds(1));
 		}
 	}
 

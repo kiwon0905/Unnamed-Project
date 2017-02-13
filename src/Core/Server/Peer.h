@@ -3,12 +3,21 @@
 #include "Core/Packer.h"
 #include <enet/enet.h>
 #include <deque>
+#include <queue>
 class Entity;
 
 struct Input
 {
 	unsigned bits;
 	int seq;
+};
+
+struct InputComparator
+{
+	bool operator()(const Input & i, const Input & j)
+	{
+		return i.seq > j.seq;
+	}
 };
 
 class Peer
@@ -31,11 +40,13 @@ public:
 	State getState() const;
 	void setState(State state);
 	void onInput(unsigned bits, int seq);
-	const Input & getInput() const;
+	Input popInput();
+	int getLastUsedInputSeq();
 private:
 	int m_id;
 	ENetPeer * m_peer;
 	Entity * m_entity = nullptr;
 	State m_state = PRE_GAME;
-	Input m_input;
+	Input m_lastInput;
+	std::priority_queue<Input, std::vector<Input>, InputComparator> m_inputs;
 };

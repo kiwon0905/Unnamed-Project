@@ -16,7 +16,6 @@
 class Client
 {
 public:
-	const static sf::Time TIME_STEP;
 	struct Context
 	{
 		sf::RenderWindow window;
@@ -33,6 +32,7 @@ public:
 	Gui & getGui() { return m_gui; }
 	Input & getInput() { return m_input; }
 
+	float t;
 private:
 	bool initialize();
 	void finalize();

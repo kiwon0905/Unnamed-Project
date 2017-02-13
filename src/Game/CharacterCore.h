@@ -10,7 +10,9 @@ public:
 	const sf::Vector2f & getPosition() const;
 	void setPosition(const sf::Vector2f & v);
 
-	virtual void rollback(const NetEntity * ne) = 0;
+	virtual void rollback(const NetEntity * ne, const CharacterCore * core) = 0;
+
+	virtual CharacterCore * clone() = 0;
 protected:
 	sf::Vector2f m_position;
 	sf::Vector2f m_velocity;
@@ -20,5 +22,7 @@ class HumanCore : public CharacterCore
 {
 public:
 	void update(float dt, unsigned input);
-	void rollback(const NetEntity * ne);
+	void rollback(const NetEntity * ne, const CharacterCore * core);
+	CharacterCore * clone();
+
 };

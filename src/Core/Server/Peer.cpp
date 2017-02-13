@@ -5,8 +5,8 @@ Peer::Peer(int id, ENetPeer * peer) :
 	m_id(id),
 	m_peer(peer)
 {
-	m_input.seq = -1;
-	m_input.bits = 0;
+	m_lastInput.bits = 0;
+	m_lastInput.seq = -1;
 }
 
 int Peer::getId()
@@ -46,15 +46,27 @@ void Peer::setState(State state)
 
 void Peer::onInput(unsigned bits, int seq)
 {
-	if (seq > m_input.bits)
-	{
-		m_input.bits = bits;
-		m_input.seq = seq;
-	}
+	if (!m_inputs.empty() && m_lastInput.seq > seq)
+		return;
+	Input input;
+	input.bits = bits;
+	input.seq = seq;
+	m_inputs.push(input);
 }
 
-const Input & Peer::getInput() const
+Input Peer::popInput()
 {
-	return m_input;
+	if (!m_inputs.empty())
+	{
+		m_lastInput = m_inputs.top();
+		m_inputs.pop();
+	}
+
+	return m_lastInput;
+}
+
+int Peer::getLastUsedInputSeq()
+{
+	return m_lastInput.seq;
 }
 

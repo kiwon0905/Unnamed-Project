@@ -1,10 +1,11 @@
 #include "Client.h"
 #include "LobbyScreen.h"
+#include "Game/GameCore.h"
 #include "Core/Logger.h"
 #include "Core/ENetUtility.h"
 
+
 #include <thread>
-const sf::Time Client::TIME_STEP = sf::seconds(1 / 60.f);
 
 bool Client::initialize()
 {
@@ -51,44 +52,46 @@ void Client::run()
 		sf::Clock fpsClock;
 		int frames = 0;
 		int fps = 0;
+		const sf::Time tickRate = sf::seconds(1.f / TICK_RATE);
 		while (!m_screenStack.isEmpty())
 		{
-			elapsed += clock.restart();
-			while (elapsed >= TIME_STEP)
+			sf::Time dt = clock.restart();
+			elapsed += dt;
+			while (elapsed >= sf::seconds(1/TICK_RATE))
 			{
-				elapsed -= TIME_STEP;
-
+				elapsed -= tickRate;
 				//handle input event
-				sf::Event event;
-
-				while (m_context.window.pollEvent(event))
-				{
-					if (event.type == sf::Event::Closed)
-						m_screenStack.clear();
-					m_gui.handleEvent(event);
-					m_screenStack.handleEvent(event, *this);
-				}
-				m_network.update();
-				ENetEvent * netEvent;
-				while (netEvent = m_network.peekEvent())
-				{
-					m_screenStack.handleNetEvent(*netEvent, *this);
-					m_network.popEvent();
-				}
-
-				Unpacker unpacker;
-				ENetAddress addr;
-				while (m_network.receive(unpacker, addr))
-					m_screenStack.handlePacket(unpacker, addr, *this);
-
-
-				m_input.update();
-				m_gui.update(TIME_STEP.asSeconds(), *this);
-				m_screenStack.update(TIME_STEP.asSeconds(), *this);
-
+				m_gui.update(tickRate.asSeconds(), *this);
+				m_screenStack.update(tickRate.asSeconds(), *this);
 			}
-			frames++;
+			
 
+			t = elapsed.asSeconds() / tickRate.asSeconds();
+			
+			sf::Event event;
+			while (m_context.window.pollEvent(event))
+			{
+				if (event.type == sf::Event::Closed)
+					m_screenStack.clear();
+				m_gui.handleEvent(event);
+				m_screenStack.handleEvent(event, *this);
+			}
+			m_network.update();
+			ENetEvent * netEvent;
+			while (netEvent = m_network.peekEvent())
+			{
+				m_screenStack.handleNetEvent(*netEvent, *this);
+				m_network.popEvent();
+			}
+
+		/*	Unpacker unpacker;
+			ENetAddress addr;
+			while (m_network.receive(unpacker, addr))
+				m_screenStack.handlePacket(unpacker, addr, *this);*/
+
+
+
+			frames++;
 			if (fpsClock.getElapsedTime() > sf::seconds(1.f))
 			{
 				fps = frames * 1;
@@ -96,13 +99,15 @@ void Client::run()
 				fpsClock.restart();
 			}
 			m_context.window.clear();
-			m_screenStack.render(*this);
+			m_screenStack.render(t, *this);
 			m_gui.render(*this);
 			m_renderer.renderText("FPS: " + std::to_string(fps), 0.f, 0.f);
 			m_context.window.display();
 		
 			m_screenStack.applyChanges(*this);
+
 			std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+
 		}
 	}
 	finalize();

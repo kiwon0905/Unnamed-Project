@@ -14,7 +14,7 @@ public:
 	void handleNetEvent(ENetEvent & netEv, Client & client);
 	void handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client);
 	void update(float dt, Client & client);
-	void render(Client & client);
+	void render(float t, Client & client);
 	void onExit(Client & client);
 	void onObscure(Client & client);
 	void onReveal(Client & client);

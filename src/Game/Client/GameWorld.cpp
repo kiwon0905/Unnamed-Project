@@ -22,73 +22,88 @@ void GameWorld::onDisconnect()
 
 void GameWorld::update(float dt, Client & client)
 {
+
 	if (m_ready)
 	{
-		unsigned inputBits = 0;
-
+		Input input;
+		input.bits = 0;
 		if (client.getContext().window.hasFocus())
-			inputBits = client.getInput().getBits();
+			input.bits = client.getInput().getBits();
+		input.seq = m_nextInputSeq;
 
 		Packer packer;
 		packer.pack(Msg::CL_INPUT);
-		packer.pack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(m_nextInputSeq);
-		packer.pack(std::uint8_t(inputBits));
+		packer.pack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(input.seq);
+		packer.pack(std::uint8_t(input.bits));
 		client.getNetwork().send(packer, false);
-
-		Input input;
-		input.bits = inputBits;
-		input.seq = m_nextInputSeq;
-
-		m_inputs.push_back(input);
-		m_nextInputSeq++;
-		
-		while (!m_inputs.empty() && m_inputs.front().seq <= m_lastAckedInpnutSeq)
-			m_inputs.pop_front();
+	
 
 
 		Entity * e = getEntity(m_playerEntityId, m_playerEntityType);
-		
-		
 		if (m_playerCore && e)
 		{
-			m_playerCore->rollback(m_snapshots.back().m_entities[m_playerEntityId].get());
-			for(const auto & i : m_inputs)
+			m_inputs.push_back(input);
+			while (m_inputs.front().seq <= m_lastAckedInputSeq)
+				m_inputs.pop_front();
+
+			CharacterCore * predictedCore = nullptr;
+			for (auto & h : m_history)
+			{
+				if (h.first == m_lastAckedInputSeq)
+					predictedCore = h.second.get();
+			}
+
+
+		/*	m_playerCore->rollback(m_snapshots.back().m_entities[m_playerEntityId].get(), predictedCore);
+			
+			for(auto & i : m_inputs)
+			{ 
+				m_oldPos = m_playerCore->getPosition();
 				m_playerCore->update(dt, i.bits);
+			}*/
+
+			m_oldPos = m_playerCore->getPosition();
+			m_playerCore->update(dt, input.bits);
+			m_history.emplace_back(input.seq, m_playerCore->clone());
+			while (!m_history.empty() && m_history.front().first < m_lastAckedInputSeq)
+				m_history.pop_front();
 		}
+		m_nextInputSeq++;
+		m_tickSinceLastSnapshot++;
+
 	}
 }
 
-void GameWorld::render(Client & client)
+void GameWorld::render(float t, Client & client)
 {
-
-	float renderTime = m_snapshots.back().tick / static_cast<float>(SERVER_TICK_RATE) + m_lastSnapshot.getElapsedTime().asSeconds() - m_delay;
-	float t = 0.f;
+	float renderTime = (m_snapshots.back().tick + m_tickSinceLastSnapshot + t - 1) / static_cast<float>(TICK_RATE) - m_delay;
+	
 	int fromIndex = m_snapshots.size() - 1;
 	int toIndex = -1;
 	for (int i = m_snapshots.size() - 1; i >= 0; --i)
 	{
-		float time = m_snapshots[i].tick / static_cast<float>(SERVER_TICK_RATE);
+		float time = m_snapshots[i].tick / static_cast<float>(TICK_RATE);
 		if (time < renderTime)
 		{
 			fromIndex = i;
 			if (i + 1 < static_cast<int>(m_snapshots.size()))
 				toIndex = i + 1;
-
 			break;
 		}
 	}
 
+	float interp = 0.f;
 	if (toIndex != -1)
 	{
-		float t0 = m_snapshots[fromIndex].tick / static_cast<float>(SERVER_TICK_RATE);
-		float t1 = m_snapshots[toIndex].tick / static_cast<float>(SERVER_TICK_RATE);
-		t = (renderTime - t0) / (t1 - t0);
+		float t0 = m_snapshots[fromIndex].tick / static_cast<float>(TICK_RATE);
+		float t1 = m_snapshots[toIndex].tick / static_cast<float>(TICK_RATE);
+		interp = static_cast<float>(renderTime - t0) / static_cast<float>(t1 - t0);
 	}
 
+	//draw other entities
 	for (auto & v : m_entitiesByType)
 		for (auto & e : v)
 			e->setAlive(false);
-
 	for (auto & p : m_snapshots[fromIndex].m_entities)
 	{
 		Entity * e = getEntity(p.first, p.second->getType());
@@ -103,12 +118,20 @@ void GameWorld::render(Client & client)
 			toEntity = m_snapshots[toIndex].m_entities[p.first].get();
 		
 		if (p.first != m_playerEntityId)
-			e->renderPast(client.getRenderer(), fromEntity, toEntity, t);
+			e->renderPast(client.getRenderer(), fromEntity, toEntity, interp);
 	}
+
+	//draw me
 	Entity * playerEntity = getEntity(m_playerEntityId, m_playerEntityType);
 	if (playerEntity)
-		playerEntity->renderFuture(client.getRenderer(), *m_playerCore);
-
+	{
+		sf::Vector2f pos = lerp(m_oldPos, m_playerCore->getPosition(), t);
+		sf::RectangleShape r;
+		r.setSize({ 100.f, 100.f });
+		r.setFillColor(sf::Color::Yellow);
+		r.setPosition(pos);
+		client.getContext().window.draw(r);
+	}
 }
 
 void GameWorld::load()
@@ -138,11 +161,13 @@ void GameWorld::onSnapshot(Unpacker & unpacker, Client & client)
 	if (!m_snapshots.empty() && m_snapshots.back().tick > tick)
 		return;
 
+	m_tickSinceLastSnapshot = 0;
+
 	m_snapshots.emplace_back();
 	Snapshot & s = m_snapshots.back();
 	s.tick = tick;
 
-	unpacker.unpack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(m_lastAckedInpnutSeq);
+	unpacker.unpack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(m_lastAckedInputSeq);
 
 
 	std::size_t count;
@@ -166,8 +191,8 @@ void GameWorld::onSnapshot(Unpacker & unpacker, Client & client)
 
 	if (!m_ready)
 	{
-		float renderTime = m_snapshots.back().tick / static_cast<float>(SERVER_TICK_RATE) - m_delay;
-		float firstTime = m_snapshots.front().tick / static_cast<float>(SERVER_TICK_RATE);
+		float renderTime = m_snapshots.back().tick / static_cast<float>(TICK_RATE) - m_delay;
+		float firstTime = m_snapshots.front().tick / static_cast<float>(TICK_RATE);
 		if (firstTime < renderTime)
 		{
 			Logger::getInstance().info("Entered game");
@@ -177,10 +202,6 @@ void GameWorld::onSnapshot(Unpacker & unpacker, Client & client)
 			client.getNetwork().send(packer, true);
 		}
 	}
-
-	//std::cout << "received snapshot for tick: " << s.tick << "\n";
-	//std::cout << "0: " << m_snapshots.front().m_entities.size() << "\n";
-	m_lastSnapshot.restart();
 }
 
 const std::deque<GameWorld::Snapshot> & GameWorld::getSnapshots()

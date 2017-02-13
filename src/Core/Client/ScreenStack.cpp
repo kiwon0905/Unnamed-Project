@@ -17,9 +17,9 @@ void ScreenStack::update(float dt, Client & client)
 	m_screens.top()->update(dt, client);
 }
 
-void ScreenStack::render(Client & client)
+void ScreenStack::render(float t, Client & client)
 {
-	m_screens.top()->render(client);
+	m_screens.top()->render(t, client);
 }
 
 void ScreenStack::pop()

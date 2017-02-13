@@ -1,6 +1,6 @@
 #include "CharacterCore.h"
 #include "Control.h"
-
+#include "Core/MathUtility.h"
 #include <iostream>
 const sf::Vector2f & CharacterCore::getPosition() const
 {
@@ -33,8 +33,23 @@ void HumanCore::update(float dt, unsigned input)
 	m_position += m_velocity * dt;
 }
 
-void HumanCore::rollback(const NetEntity * ne)
+void HumanCore::rollback(const NetEntity * ne, const CharacterCore * core)
 {
 	const NetHuman * nh = static_cast<const NetHuman *>(ne);
-	m_position = nh->position;
+	const HumanCore * hc = static_cast<const HumanCore*>(core);
+
+	if (hc)
+	{
+		m_position = lerp(hc->m_position, nh->position, .1);
+	//	std::cout << "predictd:" << hc->getPosition().x << " server: " << nh->position.x << "\n";
+	}
+	else
+		m_position = nh->position;
+}
+
+CharacterCore * HumanCore::clone()
+{
+	HumanCore * h = new HumanCore();
+	h->m_position = m_position;
+	return h;
 }
