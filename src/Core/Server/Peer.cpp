@@ -46,7 +46,7 @@ void Peer::setState(State state)
 
 void Peer::onInput(unsigned bits, int seq)
 {
-	if (!m_inputs.empty() && m_lastInput.seq > seq)
+	if (!m_inputs.empty() && m_lastInput.seq >= seq)
 		return;
 	Input input;
 	input.bits = bits;
@@ -60,6 +60,11 @@ Input Peer::popInput()
 	{
 		m_lastInput = m_inputs.top();
 		m_inputs.pop();
+	}
+	else
+	{
+		m_lastInput.seq++;
+		std::cout << "skipping input!";
 	}
 
 	return m_lastInput;

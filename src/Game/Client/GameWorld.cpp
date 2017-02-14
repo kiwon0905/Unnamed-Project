@@ -22,7 +22,6 @@ void GameWorld::onDisconnect()
 
 void GameWorld::update(float dt, Client & client)
 {
-
 	if (m_ready)
 	{
 		Input input;
@@ -43,7 +42,7 @@ void GameWorld::update(float dt, Client & client)
 		if (m_playerCore && e)
 		{
 			m_inputs.push_back(input);
-			while (m_inputs.front().seq <= m_lastAckedInputSeq)
+			while (!m_inputs.empty() && m_inputs.front().seq <= m_lastAckedInputSeq)
 				m_inputs.pop_front();
 
 			CharacterCore * predictedCore = nullptr;
@@ -54,29 +53,26 @@ void GameWorld::update(float dt, Client & client)
 			}
 
 
-		/*	m_playerCore->rollback(m_snapshots.back().m_entities[m_playerEntityId].get(), predictedCore);
+			m_playerCore->rollback(m_snapshots.back().m_entities[m_playerEntityId].get(), predictedCore);
 			
 			for(auto & i : m_inputs)
 			{ 
 				m_oldPos = m_playerCore->getPosition();
 				m_playerCore->update(dt, i.bits);
-			}*/
+			}
 
-			m_oldPos = m_playerCore->getPosition();
-			m_playerCore->update(dt, input.bits);
+
 			m_history.emplace_back(input.seq, m_playerCore->clone());
 			while (!m_history.empty() && m_history.front().first < m_lastAckedInputSeq)
 				m_history.pop_front();
 		}
 		m_nextInputSeq++;
-		m_tickSinceLastSnapshot++;
-
 	}
 }
 
 void GameWorld::render(float t, Client & client)
 {
-	float renderTime = (m_snapshots.back().tick + m_tickSinceLastSnapshot + t - 1) / static_cast<float>(TICK_RATE) - m_delay;
+	float renderTime = (m_snapshots.back().tick) / static_cast<float>(TICK_RATE) + m_lastSnapshot.getElapsedTime().asSeconds() - m_delay;
 	
 	int fromIndex = m_snapshots.size() - 1;
 	int toIndex = -1;
@@ -156,20 +152,25 @@ void GameWorld::onSnapshot(Unpacker & unpacker, Client & client)
 {
 	int tick;
 	unpacker.unpack<TICK_MIN, TICK_MAX>(tick);
-	
+
 	//only process if the snapshot is new
 	if (!m_snapshots.empty() && m_snapshots.back().tick > tick)
 		return;
 
-	m_tickSinceLastSnapshot = 0;
+	m_lastSnapshot.restart();
 
 	m_snapshots.emplace_back();
 	Snapshot & s = m_snapshots.back();
 	s.tick = tick;
 
-	unpacker.unpack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(m_lastAckedInputSeq);
-
-
+	int ackedInputSeq;
+	unpacker.unpack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(ackedInputSeq);
+	if (ackedInputSeq - m_lastAckedInputSeq > 3)
+	{
+		m_nextInputSeq += 1;
+		std::cout << "diff is higher than 3\n";
+	}
+	m_lastAckedInputSeq = ackedInputSeq;
 	std::size_t count;
 	unpacker.unpack<ENTITY_ID_MIN, ENTITY_ID_MAX>(count);
 

@@ -50,7 +50,7 @@ private:
 	std::deque<Input> m_inputs;
 	std::deque<std::pair<int, std::unique_ptr<CharacterCore>>> m_history;
 	std::deque<Snapshot> m_snapshots;
-	int m_tickSinceLastSnapshot = 0;
+	sf::Clock m_lastSnapshot;
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 	int m_playerEntityId = -1;
 	EntityType m_playerEntityType = EntityType::NONE;

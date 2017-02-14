@@ -27,7 +27,18 @@ void HumanCore::update(float dt, unsigned input)
 	else
 		m_velocity.x = 0.f;
 
+	direction = 0;
+	if (input & Control::MOVE_DOWN)
+		direction--;
+	if (input & Control::MOVE_UP)
+		direction++;
 
+	if (direction > 0)
+		m_velocity.y = -300.f;
+	else if (direction < 0)
+		m_velocity.y = 300.f;
+	else
+		m_velocity.y = 0.f;
 
 	
 	m_position += m_velocity * dt;
