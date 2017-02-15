@@ -9,14 +9,14 @@ class Entity;
 struct Input
 {
 	unsigned bits;
-	int seq;
+	int tick;
 };
 
 struct InputComparator
 {
 	bool operator()(const Input & i, const Input & j)
 	{
-		return i.seq > j.seq;
+		return i.tick > j.tick;
 	}
 };
 

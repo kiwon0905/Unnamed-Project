@@ -19,7 +19,7 @@ public:
 	};
 	struct Input
 	{
-		int seq;
+		int tick;
 		unsigned bits;
 	};
 	
@@ -27,7 +27,7 @@ public:
 
 	void onDisconnect();
 	void update(float dt, Client & client);
-	void render(float t, Client & client);
+	void render(Client & client);
 
 	void load();
 	void onWorldInfo(Unpacker & unpacker, Client & client);
@@ -44,13 +44,13 @@ private:
 	bool m_loaded = false;
 	float m_delay = .1f;
 
-	int m_nextInputSeq = 0;
-	int m_lastAckedInputSeq = -1;
+	int m_lastAckedInputTick = -1;
 
 	std::deque<Input> m_inputs;
 	std::deque<std::pair<int, std::unique_ptr<CharacterCore>>> m_history;
 	std::deque<Snapshot> m_snapshots;
-	sf::Clock m_lastSnapshot;
+	float m_lastSnapshotTick;
+	int m_tick;
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 	int m_playerEntityId = -1;
 	EntityType m_playerEntityType = EntityType::NONE;

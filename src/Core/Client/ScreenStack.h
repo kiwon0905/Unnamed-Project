@@ -15,7 +15,7 @@ public:
 	bool initialize(Client & client);
 	void finalize(Client & client);
 	void update(float dt, Client & client);
-	void render(float t, Client & client);
+	void render(Client & client);
 
 
 	void pop();

@@ -28,11 +28,11 @@ void GameWorld::update(float dt, Client & client)
 		input.bits = 0;
 		if (client.getContext().window.hasFocus())
 			input.bits = client.getInput().getBits();
-		input.seq = m_nextInputSeq;
+		input.tick = m_tick;
 
 		Packer packer;
 		packer.pack(Msg::CL_INPUT);
-		packer.pack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(input.seq);
+		packer.pack<TICK_MIN, TICK_MAX>(input.tick);
 		packer.pack(std::uint8_t(input.bits));
 		client.getNetwork().send(packer, false);
 	
@@ -42,13 +42,13 @@ void GameWorld::update(float dt, Client & client)
 		if (m_playerCore && e)
 		{
 			m_inputs.push_back(input);
-			while (!m_inputs.empty() && m_inputs.front().seq <= m_lastAckedInputSeq)
+			while (!m_inputs.empty() && m_inputs.front().tick <= m_lastAckedInputTick)
 				m_inputs.pop_front();
 
 			CharacterCore * predictedCore = nullptr;
 			for (auto & h : m_history)
 			{
-				if (h.first == m_lastAckedInputSeq)
+				if (h.first == m_lastAckedInputTick)
 					predictedCore = h.second.get();
 			}
 
@@ -62,18 +62,33 @@ void GameWorld::update(float dt, Client & client)
 			}
 
 
-			m_history.emplace_back(input.seq, m_playerCore->clone());
-			while (!m_history.empty() && m_history.front().first < m_lastAckedInputSeq)
+			m_history.emplace_back(input.tick, m_playerCore->clone());
+			while (!m_history.empty() && m_history.front().first < m_lastAckedInputTick)
 				m_history.pop_front();
 		}
-		m_nextInputSeq++;
 	}
+	m_tick++;
 }
 
-void GameWorld::render(float t, Client & client)
+void GameWorld::render(Client & client)
 {
-	float renderTime = (m_snapshots.back().tick) / static_cast<float>(TICK_RATE) + m_lastSnapshot.getElapsedTime().asSeconds() - m_delay;
-	
+	float renderTime = (m_snapshots.back().tick + m_tick + client.getFrameProgress() - m_lastSnapshotTick) / static_cast<float>(TICK_RATE) - m_delay;
+
+	if (!m_snapshots.empty() && !m_ready)
+	{
+		float firstTime = m_snapshots.front().tick / static_cast<float>(TICK_RATE);
+		if (firstTime < renderTime)
+		{
+			Logger::getInstance().info("Entered game");
+			m_ready = true;
+			Packer packer;
+			packer.pack(Msg::CL_READY);
+			client.getNetwork().send(packer, true);
+		}
+		else
+			return;
+	}
+
 	int fromIndex = m_snapshots.size() - 1;
 	int toIndex = -1;
 	for (int i = m_snapshots.size() - 1; i >= 0; --i)
@@ -94,6 +109,10 @@ void GameWorld::render(float t, Client & client)
 		float t0 = m_snapshots[fromIndex].tick / static_cast<float>(TICK_RATE);
 		float t1 = m_snapshots[toIndex].tick / static_cast<float>(TICK_RATE);
 		interp = static_cast<float>(renderTime - t0) / static_cast<float>(t1 - t0);
+	}
+	else
+	{
+		std::cout << "!";
 	}
 
 	//draw other entities
@@ -121,7 +140,7 @@ void GameWorld::render(float t, Client & client)
 	Entity * playerEntity = getEntity(m_playerEntityId, m_playerEntityType);
 	if (playerEntity)
 	{
-		sf::Vector2f pos = lerp(m_oldPos, m_playerCore->getPosition(), t);
+		sf::Vector2f pos = lerp(m_oldPos, m_playerCore->getPosition(), client.getFrameProgress());
 		sf::RectangleShape r;
 		r.setSize({ 100.f, 100.f });
 		r.setFillColor(sf::Color::Yellow);
@@ -157,20 +176,16 @@ void GameWorld::onSnapshot(Unpacker & unpacker, Client & client)
 	if (!m_snapshots.empty() && m_snapshots.back().tick > tick)
 		return;
 
-	m_lastSnapshot.restart();
-
 	m_snapshots.emplace_back();
 	Snapshot & s = m_snapshots.back();
 	s.tick = tick;
 
+	m_lastSnapshotTick = m_tick + client.getFrameProgress();
+
 	int ackedInputSeq;
-	unpacker.unpack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(ackedInputSeq);
-	if (ackedInputSeq - m_lastAckedInputSeq > 3)
-	{
-		m_nextInputSeq += 1;
-		std::cout << "diff is higher than 3\n";
-	}
-	m_lastAckedInputSeq = ackedInputSeq;
+	unpacker.unpack<TICK_MIN, TICK_MAX>(ackedInputSeq);
+
+	m_lastAckedInputTick = ackedInputSeq;
 	std::size_t count;
 	unpacker.unpack<ENTITY_ID_MIN, ENTITY_ID_MAX>(count);
 
@@ -187,21 +202,6 @@ void GameWorld::onSnapshot(Unpacker & unpacker, Client & client)
 		}
 		entity->unpack(unpacker);
 		s.m_entities[id].reset(entity);
-
-	}
-
-	if (!m_ready)
-	{
-		float renderTime = m_snapshots.back().tick / static_cast<float>(TICK_RATE) - m_delay;
-		float firstTime = m_snapshots.front().tick / static_cast<float>(TICK_RATE);
-		if (firstTime < renderTime)
-		{
-			Logger::getInstance().info("Entered game");
-			m_ready = true;
-			Packer packer;
-			packer.pack(Msg::CL_READY);
-			client.getNetwork().send(packer, true);
-		}
 	}
 }
 

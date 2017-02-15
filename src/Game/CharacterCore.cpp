@@ -51,7 +51,7 @@ void HumanCore::rollback(const NetEntity * ne, const CharacterCore * core)
 
 	if (hc)
 	{
-		m_position = lerp(hc->m_position, nh->position, .1);
+		m_position = lerp(hc->m_position, nh->position, .1f);
 	//	std::cout << "predictd:" << hc->getPosition().x << " server: " << nh->position.x << "\n";
 	}
 	else

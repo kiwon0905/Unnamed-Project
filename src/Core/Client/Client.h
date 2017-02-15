@@ -31,8 +31,7 @@ public:
 	Renderer & getRenderer() { return m_renderer; }
 	Gui & getGui() { return m_gui; }
 	Input & getInput() { return m_input; }
-
-	float t;
+	float getFrameProgress() { return m_frameProgress; }
 private:
 	bool initialize();
 	void finalize();
@@ -43,4 +42,5 @@ private:
 	ScreenStack m_screenStack;
 	Renderer m_renderer;
 	Input m_input;
+	float m_frameProgress;
 };

@@ -260,7 +260,7 @@ void Server::handlePacket(Msg msg, Unpacker unpacker, ENetPeer * peer)
 	{
 		std::uint8_t bits;
 		int seq;
-		unpacker.unpack<INPUT_SEQ_MIN, INPUT_SEQ_MAX>(seq);
+		unpacker.unpack<TICK_MIN, TICK_MAX>(seq);
 		unpacker.unpack(bits);
 		p->onInput(bits, seq);
 	}

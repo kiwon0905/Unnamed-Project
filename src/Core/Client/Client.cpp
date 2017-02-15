@@ -57,7 +57,7 @@ void Client::run()
 		{
 			sf::Time dt = clock.restart();
 			elapsed += dt;
-			while (elapsed >= sf::seconds(1/TICK_RATE))
+			while (elapsed >= sf::seconds(1.f /TICK_RATE))
 			{
 				elapsed -= tickRate;
 				//handle input event
@@ -65,9 +65,7 @@ void Client::run()
 				m_screenStack.update(tickRate.asSeconds(), *this);
 			}
 			
-
-			t = elapsed.asSeconds() / tickRate.asSeconds();
-			
+			m_frameProgress = static_cast<float>(elapsed.asMicroseconds()) / tickRate.asMicroseconds();
 			sf::Event event;
 			while (m_context.window.pollEvent(event))
 			{
@@ -99,11 +97,10 @@ void Client::run()
 				fpsClock.restart();
 			}
 			m_context.window.clear();
-			m_screenStack.render(t, *this);
+			m_screenStack.render(*this);
 			m_gui.render(*this);
 			m_renderer.renderText("FPS: " + std::to_string(fps), 0.f, 0.f);
 			m_context.window.display();
-		
 			m_screenStack.applyChanges(*this);
 
 			std::this_thread::sleep_for(std::chrono::nanoseconds(1));
