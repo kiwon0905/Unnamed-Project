@@ -19,7 +19,7 @@ public:
 	bool isAlive() const;
 	virtual void update(float dt, GameWorld & world) = 0;
 	virtual void renderPast(Renderer & renderer, const NetEntity * from, const NetEntity * to, float t) = 0;
-	virtual void renderFuture(Renderer & render, const CharacterCore & core) = 0;
+	virtual void renderFuture(Renderer & renderer, const CharacterCore & prevCore, const CharacterCore & prevCurrent, float t) = 0;
 protected:
 	int m_id;
 	EntityType m_type;

@@ -22,7 +22,7 @@ void IdPool<T>::checkIn(T id)
 template <typename T>
 T IdPool<T>::checkOut()
 {
-	if (m_pool.size() > 0)
+	if (!m_pool.empty())
 	{
 		T id = m_pool.back();
 		m_pool.pop_back();

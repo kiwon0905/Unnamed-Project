@@ -4,6 +4,7 @@
 #include "Core/Packer.h"
 #include "Core/Server/Peer.h"
 #include "Core/Protocol.h"
+#include "Core/IdPool.h"
 
 #include "Game/Server/GameWorld.h"
 
@@ -50,7 +51,6 @@ private:
 
 	int m_nextPeerId = 0;
 	std::vector<std::unique_ptr<Peer>> m_players;
-	std::vector<std::unique_ptr<Peer>> m_spectators;
 	GameWorld m_gameWorld;
 	sf::Clock m_clock;
 };

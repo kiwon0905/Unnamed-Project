@@ -272,9 +272,6 @@ Peer * Server::getPeer(const ENetPeer * peer)
 	for (auto & p : m_players)
 		if (p->getENetPeer() == peer)
 			return p.get();
-	for (auto & p : m_spectators)
-		if (p->getENetPeer() == peer)
-			return p.get();
 	return nullptr;
 }
 

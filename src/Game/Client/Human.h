@@ -9,7 +9,7 @@ public:
 	Human(int id);
 	void update(float dt, GameWorld & world);
 	void renderPast(Renderer & renderer, const NetEntity * from, const NetEntity * to, float t);
-	void renderFuture(Renderer & renderer, const CharacterCore & core);
+	void renderFuture(Renderer & renderer, const CharacterCore & prevCore, const CharacterCore & prevCurrent, float t);
 	
 
 };

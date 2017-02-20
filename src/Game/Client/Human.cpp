@@ -24,8 +24,9 @@ void Human::renderPast(Renderer & renderer, const NetEntity * from, const NetEnt
 	renderer.renderHuman(pos.x, pos.y);
 }
 
-void Human::renderFuture(Renderer & renderer, const CharacterCore & core)
+void Human::renderFuture(Renderer & renderer, const CharacterCore & prevCore, const CharacterCore & prevCurrent, float t)
 {
-	renderer.renderHuman(core.getPosition().x, core.getPosition().y);
+	sf::Vector2f pos = lerp(prevCore.getPosition(), prevCurrent.getPosition(), t);
+	renderer.renderHuman(pos.x, pos.y);
 }
 

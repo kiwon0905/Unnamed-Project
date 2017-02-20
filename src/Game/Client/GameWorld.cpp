@@ -38,9 +38,10 @@ void GameWorld::update(float dt, Client & client)
 	
 
 
-		Entity * e = getEntity(m_playerEntityId, m_playerEntityType);
-		if (m_playerCore && e)
+		Entity * e = getEntity(m_player.id, m_player.type);
+		if (e)
 		{
+			//TODO: only repredict when a new snapshot is received from the server
 			m_inputs.push_back(input);
 			while (!m_inputs.empty() && m_inputs.front().tick <= m_lastAckedInputTick)
 				m_inputs.pop_front();
@@ -51,18 +52,16 @@ void GameWorld::update(float dt, Client & client)
 				if (h.first == m_lastAckedInputTick)
 					predictedCore = h.second.get();
 			}
-
-
-			m_playerCore->rollback(m_snapshots.back().m_entities[m_playerEntityId].get(), predictedCore);
+			m_player.m_currentCore->rollback(m_snapshots.back().m_entities[m_player.id].get(), predictedCore);
 			
 			for(auto & i : m_inputs)
 			{ 
-				m_oldPos = m_playerCore->getPosition();
-				m_playerCore->update(dt, i.bits);
+				m_player.m_prevCore.reset(m_player.m_currentCore->clone());
+				m_player.m_currentCore->update(dt, i.bits);
 			}
 
 
-			m_history.emplace_back(input.tick, m_playerCore->clone());
+			m_history.emplace_back(input.tick, m_player.m_currentCore->clone());
 			while (!m_history.empty() && m_history.front().first < m_lastAckedInputTick)
 				m_history.pop_front();
 		}
@@ -89,6 +88,7 @@ void GameWorld::render(Client & client)
 			return;
 	}
 
+	//find snapshots to interpolate between
 	int fromIndex = m_snapshots.size() - 1;
 	int toIndex = -1;
 	for (int i = m_snapshots.size() - 1; i >= 0; --i)
@@ -102,17 +102,12 @@ void GameWorld::render(Client & client)
 			break;
 		}
 	}
-
 	float interp = 0.f;
 	if (toIndex != -1)
 	{
 		float t0 = m_snapshots[fromIndex].tick / static_cast<float>(TICK_RATE);
 		float t1 = m_snapshots[toIndex].tick / static_cast<float>(TICK_RATE);
 		interp = static_cast<float>(renderTime - t0) / static_cast<float>(t1 - t0);
-	}
-	else
-	{
-		std::cout << "!";
 	}
 
 	//draw other entities
@@ -132,21 +127,14 @@ void GameWorld::render(Client & client)
 		if (toIndex != -1 && m_snapshots[toIndex].m_entities.count(p.first))
 			toEntity = m_snapshots[toIndex].m_entities[p.first].get();
 		
-		if (p.first != m_playerEntityId)
+		if (p.first != m_player.id)
 			e->renderPast(client.getRenderer(), fromEntity, toEntity, interp);
 	}
 
 	//draw me
-	Entity * playerEntity = getEntity(m_playerEntityId, m_playerEntityType);
+	Entity * playerEntity = getEntity(m_player.id, m_player.type);
 	if (playerEntity)
-	{
-		sf::Vector2f pos = lerp(m_oldPos, m_playerCore->getPosition(), client.getFrameProgress());
-		sf::RectangleShape r;
-		r.setSize({ 100.f, 100.f });
-		r.setFillColor(sf::Color::Yellow);
-		r.setPosition(pos);
-		client.getContext().window.draw(r);
-	}
+		playerEntity->renderFuture(client.getRenderer(), *m_player.m_prevCore, *m_player.m_currentCore, client.getFrameProgress());
 }
 
 void GameWorld::load()
@@ -155,16 +143,16 @@ void GameWorld::load()
 
 void GameWorld::onWorldInfo(Unpacker & unpacker, Client & client)
 {
-	unpacker.unpack<ENTITY_ID_MIN, ENTITY_ID_MAX>(m_playerEntityId);
-	unpacker.unpack(m_playerEntityType);
-	Logger::getInstance().debug("My id is" + std::to_string(m_playerEntityId));
-	Logger::getInstance().debug("My type is" + m_playerEntityType);
-	m_playerCore.reset(createCharacterCore(m_playerEntityType));
+	unpacker.unpack<ENTITY_ID_MIN, ENTITY_ID_MAX>(m_player.id);
+	unpacker.unpack(m_player.type);
+	m_player.m_currentCore.reset(createCharacterCore(m_player.type));
+	m_player.m_prevCore.reset(createCharacterCore(m_player.type));
+
 	Packer packer;
 	packer.pack(Msg::CL_LOAD_COMPLETE);
 	client.getNetwork().send(packer, true);
 	Logger::getInstance().info("Loading complete. Entering game...");
-	m_loaded = true;
+
 }
 
 void GameWorld::onSnapshot(Unpacker & unpacker, Client & client)
