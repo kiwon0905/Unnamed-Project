@@ -37,6 +37,7 @@ bool Client::initialize()
 	int height = width * 9 / 16;
 	window.create(sf::VideoMode(width, height), "");
 	window.resetGLStates();
+	window.setFramerateLimit(300);
 	return true;
 }
 
@@ -103,7 +104,7 @@ void Client::run()
 			m_context.window.display();
 			m_screenStack.applyChanges(*this);
 
-			std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+			std::this_thread::sleep_for(std::chrono::microseconds(100));
 
 		}
 	}

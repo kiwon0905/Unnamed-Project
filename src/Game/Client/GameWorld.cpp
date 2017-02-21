@@ -12,7 +12,7 @@ GameWorld::GameWorld()
 	m_entitiesByType.resize(EntityType::COUNT);
 	m_snapshots.emplace_back();
 	m_snapshots.back().tick = -1;
-	std::cout << "entity size: " << m_snapshots.back().m_entities.size() << "\n";
+	std::cout << "entity size: " << m_snapshots.back().entities.size() << "\n";
 }
 
 void GameWorld::onDisconnect()
@@ -52,7 +52,7 @@ void GameWorld::update(float dt, Client & client)
 				if (h.first == m_lastAckedInputTick)
 					predictedCore = h.second.get();
 			}
-			m_player.m_currentCore->rollback(m_snapshots.back().m_entities[m_player.id].get(), predictedCore);
+			m_player.m_currentCore->rollback(m_snapshots.back().entities[m_player.id].get(), predictedCore);
 			
 			for(auto & i : m_inputs)
 			{ 
@@ -71,8 +71,9 @@ void GameWorld::update(float dt, Client & client)
 
 void GameWorld::render(Client & client)
 {
-	float renderTime = (m_snapshots.back().tick + m_tick + client.getFrameProgress() - m_lastSnapshotTick) / static_cast<float>(TICK_RATE) - m_delay;
-
+	float renderTick = m_snapshots.back().tick + m_tick + client.getFrameProgress() - m_lastSnapshotLocalTick;
+	float renderTime = renderTick / static_cast<float>(TICK_RATE) - m_delay;
+		
 	if (!m_snapshots.empty() && !m_ready)
 	{
 		float firstTime = m_snapshots.front().tick / static_cast<float>(TICK_RATE);
@@ -102,6 +103,7 @@ void GameWorld::render(Client & client)
 			break;
 		}
 	}
+	
 	float interp = 0.f;
 	if (toIndex != -1)
 	{
@@ -110,22 +112,49 @@ void GameWorld::render(Client & client)
 		interp = static_cast<float>(renderTime - t0) / static_cast<float>(t1 - t0);
 	}
 
+	//we need to make delete/create entities
+	if (m_lastSnapshotTick < m_snapshots[fromIndex].tick)
+	{
+		//find last snapshot
+		Snapshot * s = nullptr;
+		for (int i = 0; i < fromIndex; ++i)
+		{
+			if (m_snapshots[i].tick == m_lastSnapshotTick)
+			{
+				s = &m_snapshots[i];
+				break;
+			}
+		}
+		//process created entities
+		for (auto & p : m_snapshots[fromIndex].entities)
+		{
+			if (!s->entities.count(p.first))
+			{
+				createEntity(p.first, p.second->getType());
+			}
+		}
+
+		for (auto & p : s->entities)
+		{
+			if (!m_snapshots[fromIndex].entities.count(p.first))
+			{
+				getEntity(p.first, p.second->getType())->setAlive(false);
+			}
+		}
+		m_lastSnapshotTick = m_snapshots[fromIndex].tick;
+	}
+
+
+
 	//draw other entities
-	for (auto & v : m_entitiesByType)
-		for (auto & e : v)
-			e->setAlive(false);
-	for (auto & p : m_snapshots[fromIndex].m_entities)
+
+	for (auto & p : m_snapshots[fromIndex].entities)
 	{
 		Entity * e = getEntity(p.first, p.second->getType());
-		if (!e)
-			e = createEntity(p.first, p.second->getType());
-		
-		e->setAlive(true);
-
-		NetEntity * fromEntity = m_snapshots[fromIndex].m_entities[p.first].get();
+		NetEntity * fromEntity = m_snapshots[fromIndex].entities[p.first].get();
 		NetEntity * toEntity = nullptr;
-		if (toIndex != -1 && m_snapshots[toIndex].m_entities.count(p.first))
-			toEntity = m_snapshots[toIndex].m_entities[p.first].get();
+		if (toIndex != -1 && m_snapshots[toIndex].entities.count(p.first))
+			toEntity = m_snapshots[toIndex].entities[p.first].get();
 		
 		if (p.first != m_player.id)
 			e->renderPast(client.getRenderer(), fromEntity, toEntity, interp);
@@ -135,6 +164,10 @@ void GameWorld::render(Client & client)
 	Entity * playerEntity = getEntity(m_player.id, m_player.type);
 	if (playerEntity)
 		playerEntity->renderFuture(client.getRenderer(), *m_player.m_prevCore, *m_player.m_currentCore, client.getFrameProgress());
+
+	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
+	for (auto & v : m_entitiesByType)
+		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
 }
 
 void GameWorld::load()
@@ -161,14 +194,14 @@ void GameWorld::onSnapshot(Unpacker & unpacker, Client & client)
 	unpacker.unpack<TICK_MIN, TICK_MAX>(tick);
 
 	//only process if the snapshot is new
-	if (!m_snapshots.empty() && m_snapshots.back().tick > tick)
+	if (!m_snapshots.empty() && m_snapshots.back().tick >= tick)
 		return;
 
 	m_snapshots.emplace_back();
 	Snapshot & s = m_snapshots.back();
 	s.tick = tick;
 
-	m_lastSnapshotTick = m_tick + client.getFrameProgress();
+	m_lastSnapshotLocalTick = m_tick + client.getFrameProgress();
 
 	int ackedInputSeq;
 	unpacker.unpack<TICK_MIN, TICK_MAX>(ackedInputSeq);
@@ -189,7 +222,7 @@ void GameWorld::onSnapshot(Unpacker & unpacker, Client & client)
 			entity = new NetHuman();
 		}
 		entity->unpack(unpacker);
-		s.m_entities[id].reset(entity);
+		s.entities[id].reset(entity);
 	}
 }
 

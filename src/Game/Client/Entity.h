@@ -12,7 +12,7 @@ class Entity
 {
 public:
 	Entity(int id, EntityType type);
-
+	~Entity() { std::cout << "I'm destroyed!\n"; }
 	int getId() const;
 	EntityType getType() const;
 	void setAlive(bool alive);

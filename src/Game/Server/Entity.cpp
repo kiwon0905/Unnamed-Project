@@ -23,14 +23,14 @@ Peer * Entity::getPlayer()
 	return m_player;
 }
 
-void Entity::die()
-{
-	m_alive = false;
-}
-
 bool Entity::isAlive()
 {
 	return m_alive;
+}
+
+void Entity::setAlive(bool alive)
+{
+	m_alive = alive;
 }
 
 sf::Vector2f Entity::getPosition()

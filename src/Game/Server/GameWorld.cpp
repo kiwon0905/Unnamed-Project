@@ -15,7 +15,8 @@ GameWorld::GameWorld()
 
 void GameWorld::onDisconnect(Peer & peer)
 {
-	
+	if (peer.getEntity())
+		peer.getEntity()->setAlive(false);
 }
 
 void GameWorld::prepare(std::vector<std::unique_ptr<Peer>> & players)
@@ -43,6 +44,10 @@ void GameWorld::update(float dt, std::vector<std::unique_ptr<Peer>> & players)
 	for (auto & v : m_entitiesByType)
 		for (auto & e : v)
 			e->update(dt, *this);
+
+	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
+	for (auto & v : m_entitiesByType)
+		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
 
 	if (m_tick % 3 == 0)
 	{

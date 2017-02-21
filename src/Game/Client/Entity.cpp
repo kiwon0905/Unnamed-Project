@@ -23,5 +23,5 @@ void Entity::setAlive(bool alive)
 
 bool Entity::isAlive() const
 {
-	return !m_alive;
+	return m_alive;
 }

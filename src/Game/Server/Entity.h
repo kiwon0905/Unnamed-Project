@@ -14,8 +14,8 @@ public:
 	int getId();
 	EntityType getType();
 	Peer * getPlayer();
-	void die();
 	bool isAlive();
+	void setAlive(bool alive);
 	sf::Vector2f getPosition();
 
 	virtual void update(float dt, GameWorld & gameWorld) = 0;
