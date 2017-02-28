@@ -59,6 +59,10 @@ public:
 	void pack(std::int32_t data);
 	template <std::uint32_t min = (std::numeric_limits<std::uint32_t>::min)(), std::uint32_t max = (std::numeric_limits<std::uint32_t>::max)()>
 	void pack(std::uint32_t data);
+	template <std::int64_t min = (std::numeric_limits<std::int64_t>::min)(), std::int64_t max = (std::numeric_limits<std::int64_t>::max)()>
+	void pack(std::int64_t data);
+	template <std::uint64_t min = (std::numeric_limits<std::uint64_t>::min)(), std::uint64_t max = (std::numeric_limits<std::uint64_t>::max)()>
+	void pack(std::uint64_t data);
 	template<int minInt, int maxInt, int res>
 	void pack(float data);
 	template<int res>
@@ -80,6 +84,7 @@ private:
 	void pack8(std::uint8_t data, std::size_t bits);
 	void pack16(std::uint16_t data, std::size_t bits);
 	void pack32(std::uint32_t data, std::size_t bits);
+	void pack64(std::uint64_t data, std::size_t bits);
 	std::vector<std::uint8_t> m_data;
 	std::size_t m_bitPos;
 };
@@ -104,6 +109,10 @@ public:
 	void unpack(std::int32_t & data);
 	template <std::uint32_t min = (std::numeric_limits<std::uint32_t>::min)(), std::uint32_t max = (std::numeric_limits<std::uint32_t>::max)()>
 	void unpack(std::uint32_t & data);
+	template <std::int64_t min = (std::numeric_limits<std::int64_t>::min)(), std::int64_t max = (std::numeric_limits<std::int64_t>::max)()>
+	void unpack(std::int64_t & data);
+	template <std::uint64_t min = (std::numeric_limits<std::uint64_t>::min)(), std::uint64_t max = (std::numeric_limits<std::uint64_t>::max)()>
+	void unpack(std::uint64_t & data);
 	template<int minInt, int maxInt, int res>
 	void unpack(float & data);
 	template<int res>
@@ -118,6 +127,7 @@ private:
 	void unpack8(std::uint8_t & data, std::size_t bits);
 	void unpack16(std::uint16_t & data, std::size_t bits);
 	void unpack32(std::uint32_t & data, std::size_t bits);
+	void unpack64(std::uint64_t & data, std::size_t bits);
 	void check(std::size_t bits);
 	const std::uint8_t * m_data;
 	std::size_t m_size;

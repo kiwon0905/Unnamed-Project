@@ -111,6 +111,22 @@ void Packer::pack32(std::uint32_t data, std::size_t bits)
 	pack8(*p, bits);
 }
 
+void Packer::pack64(std::uint64_t data, std::size_t bits)
+{
+	assert(bits <= 64);
+	if (bits == 0)
+		return;
+
+	std::uint8_t * p = reinterpret_cast<std::uint8_t*>(&data);
+	while (bits >= 8)
+	{
+		pack8(*p, 8);
+		p++;
+		bits -= 8;
+	}
+	pack8(*p, bits);
+}
+
 Unpacker::Unpacker(const void * data, std::size_t size) :
 	m_data(static_cast<const std::uint8_t*>(data)),
 	m_size(size),
@@ -228,6 +244,28 @@ void Unpacker::unpack32(std::uint32_t & data, std::size_t bits)
 		return;
 
 	std::uint32_t value = 0;
+	std::uint8_t * p = reinterpret_cast<std::uint8_t*>(&value);
+	while (bits >= 8)
+	{
+		std::uint8_t val;
+		unpack8(val, 8);
+		*p |= val;
+		p++;
+		bits -= 8;
+	}
+	std::uint8_t val = 0;
+	unpack8(val, bits);
+	*p |= val;
+	data = value;
+}
+
+void Unpacker::unpack64(std::uint64_t & data, std::size_t bits)
+{
+	check(bits);
+	if (bits == 0)
+		return;
+
+	std::uint64_t value = 0;
 	std::uint8_t * p = reinterpret_cast<std::uint8_t*>(&value);
 	while (bits >= 8)
 	{

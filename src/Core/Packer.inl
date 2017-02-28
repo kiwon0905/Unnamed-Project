@@ -62,6 +62,27 @@ void Packer::pack(std::uint32_t data)
 	pack32(data, bits);
 }
 
+template<std::int64_t min, std::int64_t max>
+inline void Packer::pack(std::int64_t data)
+{
+	assert(min < max && "min must be less than max");
+	assert(data >= min && "value must be greater than or equal to min");
+	assert(data <= max && "value must be less than or equal to max");
+	const int bits = BitsRequired<min, max>::result;
+	uint64_t unsignedValue = data - min;
+	pack64(unsignedValue, bits);
+}
+
+template<std::uint64_t min, std::uint64_t max>
+inline void Packer::pack(std::uint64_t data)
+{
+	assert(min < max && "min must be less than max");
+	assert(data >= min && "value must be greater than or equal to min");
+	assert(data <= max && "value must be less than or equal to max");
+	const int bits = BitsRequired<min, max>::result;
+	pack64(data, bits);
+}
+
 template<int minInt, int maxInt, int res>
 void Packer::pack(float data)
 {
@@ -141,6 +162,25 @@ void Unpacker::unpack(std::uint32_t & data)
 	assert(min < max && "min must be less than max");
 	const int bits = BitsRequired<min, max>::result;
 	unpack32(data, bits);
+}
+
+template<std::int64_t min, std::int64_t max>
+inline void Unpacker::unpack(std::int64_t & data)
+{
+	assert(min < max && "min must be less than max");
+	const int bits = BitsRequired<min, max>::result;
+	uint64_t unsignedValue;
+	unpack64(unsignedValue, bits);
+	int64_t value = (int64_t)unsignedValue + min;
+	data = value;
+}
+
+template<std::uint64_t min, std::uint64_t max>
+inline void Unpacker::unpack(std::uint64_t & data)
+{
+	assert(min < max && "min must be less than max");
+	const int bits = BitsRequired<min, max>::result;
+	unpack64(data, bits);
 }
 
 template<int minInt, int maxInt, int res>
