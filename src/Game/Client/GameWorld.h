@@ -15,6 +15,7 @@ public:
 	struct Snapshot
 	{
 		int tick;
+		float clientTick;
 		std::unordered_map<int, std::unique_ptr<NetEntity>> entities;
 	};
 	struct Input
@@ -32,9 +33,6 @@ public:
 	void load();
 	void onWorldInfo(Unpacker & unpacker, Client & client);
 	void onSnapshot(Unpacker & unpacker, Client & client);
-
-	const std::deque<Snapshot> & getSnapshots();
-	const std::deque<Input> & getInputs();
 private:
 	Entity * createEntity(int id, EntityType type);
 	Entity * getEntity(int id, EntityType type);
@@ -44,13 +42,11 @@ private:
 	double m_delay = .1;
 
 	int m_lastAckedInputTick = -1;
-
-	std::deque<Input> m_inputs;
-	std::deque<std::pair<int, std::unique_ptr<CharacterCore>>> m_history;
-	std::deque<Snapshot> m_snapshots;
-	float m_lastSnapshotLocalTick = 0.f;
 	int m_tick = 0;
-	int m_lastSnapshotTick = -1;
+
+	std::deque<std::unique_ptr<Snapshot>> m_snapshots;
+	Snapshot * m_prevSnapshot = nullptr;
+
 
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 
@@ -60,6 +56,8 @@ private:
 		EntityType type;
 		std::unique_ptr<CharacterCore> m_currentCore;
 		std::unique_ptr<CharacterCore> m_prevCore;
+		std::deque<std::pair<int, std::unique_ptr<CharacterCore>>> m_history;
+		std::deque<Input> m_inputs;
 	} m_player;
 
 };
