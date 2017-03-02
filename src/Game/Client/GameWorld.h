@@ -34,12 +34,18 @@ public:
 	void onWorldInfo(Unpacker & unpacker, Client & client);
 	void onSnapshot(Unpacker & unpacker, Client & client);
 private:
+	enum State
+	{
+		LOADING,
+		ENTERING,
+		IN_GAME
+	};
 	Entity * createEntity(int id, EntityType type);
 	Entity * getEntity(int id, EntityType type);
 	CharacterCore * createCharacterCore(EntityType type);
 
-	bool m_ready = false;
-	double m_delay = .1;
+	State m_state = LOADING;
+	float m_delay = .1f;
 
 	int m_lastAckedInputTick = -1;
 	int m_tick = 0;

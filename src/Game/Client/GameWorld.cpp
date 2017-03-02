@@ -22,7 +22,21 @@ void GameWorld::update(float dt, Client & client)
 {
 	m_tick++;
 
-	if (m_ready)
+	if (m_state == ENTERING)
+	{
+		if (m_snapshots.empty())
+			return;
+		float firstTime = m_snapshots.front()->clientTick / static_cast<float>(TICK_RATE);
+		if (firstTime < m_tick / static_cast<float>(TICK_RATE) - m_delay)
+		{
+			Logger::getInstance().info("Entered game");
+			m_state = IN_GAME;
+			Packer packer;
+			packer.pack(Msg::CL_READY);
+			client.getNetwork().send(packer, true);
+		}
+	}
+	else if(m_state == IN_GAME)
 	{
 		Input input;
 		input.bits = 0;
@@ -38,6 +52,7 @@ void GameWorld::update(float dt, Client & client)
 	
 
 
+		//TODO: Improve
 		Entity * e = getEntity(m_player.id, m_player.type);
 		if (e)
 		{
@@ -70,25 +85,12 @@ void GameWorld::update(float dt, Client & client)
 
 void GameWorld::render(Client & client)
 {
-	if (m_snapshots.empty())
+	if (m_state != IN_GAME)
 		return;
 	float renderTick = m_tick + client.getFrameProgress();
 	float renderTime = renderTick / static_cast<float>(TICK_RATE) - m_delay;
 	
-	if (!m_ready)
-	{
-		float firstTime = m_snapshots.front()->clientTick / static_cast<float>(TICK_RATE);
-		if (firstTime < renderTime)
-		{
-			Logger::getInstance().info("Entered game");
-			m_ready = true;
-			Packer packer;
-			packer.pack(Msg::CL_READY);
-			client.getNetwork().send(packer, true);
-		}
-		else
-			return;
-	}
+
 
 	//find snapshots to interpolate between
 	Snapshot * s0 = m_snapshots.back().get();
@@ -127,10 +129,10 @@ void GameWorld::render(Client & client)
 					getEntity(p.first, p.second->getType())->setAlive(false);
 
 		m_prevSnapshot = s0;
+		//delete old snapshots
 		while (m_snapshots.front()->tick < m_prevSnapshot->tick)
 			m_snapshots.pop_front();
 	}
-
 
 
 	//draw other entities
@@ -172,7 +174,7 @@ void GameWorld::onWorldInfo(Unpacker & unpacker, Client & client)
 	packer.pack(Msg::CL_LOAD_COMPLETE);
 	client.getNetwork().send(packer, true);
 	Logger::getInstance().info("Loading complete. Entering game...");
-
+	m_state = ENTERING;
 }
 
 void GameWorld::onSnapshot(Unpacker & unpacker, Client & client)
