@@ -44,13 +44,13 @@ void Peer::setState(State state)
 	m_state = state;
 }
 
-void Peer::onInput(unsigned bits, int seq)
+void Peer::onInput(unsigned bits, int tick)
 {
-	if (!m_inputs.empty() && m_lastInput.tick >= seq)
+	if (!m_inputs.empty() && tick < m_lastInput.tick)
 		return;
 	Input input;
 	input.bits = bits;
-	input.tick = seq;
+	input.tick = tick;
 	m_inputs.push(input);
 }
 
@@ -64,7 +64,7 @@ Input Peer::popInput()
 	return m_lastInput;
 }
 
-int Peer::getLastUsedInputSeq()
+int Peer::getLastUsedInputTick()
 {
 	return m_lastInput.tick;
 }

@@ -14,15 +14,12 @@ void Human::update(float dt, GameWorld & world)
 {
 	Input input = m_player->popInput();
 	m_core.update(dt, input.bits);
-	m_position = m_core.getPosition();
 }
 
 void Human::sync(Packer & packer)
 {
-	//id,type,pos
-
-
 	NetHuman human;
-	human.position = m_position;
+	human.position = m_core.getPosition();
+	human.velocity = m_core.getVelocity();;
 	human.pack(packer);
 }

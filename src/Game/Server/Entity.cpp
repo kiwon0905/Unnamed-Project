@@ -32,8 +32,3 @@ void Entity::setAlive(bool alive)
 {
 	m_alive = alive;
 }
-
-sf::Vector2f Entity::getPosition()
-{
-	return m_position;
-}

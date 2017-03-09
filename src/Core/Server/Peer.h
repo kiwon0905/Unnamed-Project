@@ -41,7 +41,7 @@ public:
 	void setState(State state);
 	void onInput(unsigned bits, int seq);
 	Input popInput();
-	int getLastUsedInputSeq();
+	int getLastUsedInputTick();
 private:
 	int m_id;
 	ENetPeer * m_peer;

@@ -62,7 +62,7 @@ void GameWorld::sync(Peer & peer)
 	Packer packer;
 	packer.pack(Msg::SV_SNAPSHOT);
 	packer.pack<TICK_MIN, TICK_MAX>(m_tick);
-	packer.pack<TICK_MIN, TICK_MAX>(peer.getLastUsedInputSeq());
+	packer.pack<TICK_MIN, TICK_MAX>(peer.getLastUsedInputTick());
 	std::size_t count = 0;
 	for (auto & v : m_entitiesByType)
 		count += v.size();

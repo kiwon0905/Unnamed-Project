@@ -37,7 +37,7 @@ bool Client::initialize()
 	int height = width * 9 / 16;
 	window.create(sf::VideoMode(width, height), "");
 	window.resetGLStates();
-	window.setFramerateLimit(300);
+	//window.setFramerateLimit(300);
 	return true;
 }
 

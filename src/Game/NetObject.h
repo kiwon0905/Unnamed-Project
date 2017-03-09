@@ -17,4 +17,5 @@ struct NetHuman : public NetEntity
 	void unpack(Unpacker & unpacker);
 	EntityType getType();
 	sf::Vector2f position;
+	sf::Vector2f velocity;
 };

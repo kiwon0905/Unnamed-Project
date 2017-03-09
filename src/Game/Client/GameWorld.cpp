@@ -54,7 +54,10 @@ void GameWorld::update(float dt, Client & client)
 
 		//TODO: Improve
 		Entity * e = getEntity(m_player.id, m_player.type);
-		if (e)
+		NetEntity * ne = nullptr;
+		if (m_snapshots.back()->entities.count(m_player.id))
+			ne = m_snapshots.back()->entities[m_player.id].get();
+		if (e && ne)
 		{
 			//TODO: only repredict when a new snapshot is received from the server
 			m_player.m_inputs.push_back(input);
@@ -67,7 +70,7 @@ void GameWorld::update(float dt, Client & client)
 				if (h.first == m_lastAckedInputTick)
 					predictedCore = h.second.get();
 			}
-			m_player.m_currentCore->rollback(m_snapshots.back()->entities[m_player.id].get(), predictedCore);
+			m_player.m_currentCore->rollback(ne, predictedCore);
 			
 			for(auto & i :m_player. m_inputs)
 			{ 
@@ -75,7 +78,7 @@ void GameWorld::update(float dt, Client & client)
 				m_player.m_currentCore->update(dt, i.bits);
 			}
 
-
+			std::cout << "tick: " << input.tick << ", pos: " << m_player.m_currentCore->getPosition().x << ", " << m_player.m_currentCore->getPosition().y << "\n";
 			m_player.m_history.emplace_back(input.tick, m_player.m_currentCore->clone());
 			while (!m_player.m_history.empty() && m_player.m_history.front().first < m_lastAckedInputTick)
 				m_player.m_history.pop_front();

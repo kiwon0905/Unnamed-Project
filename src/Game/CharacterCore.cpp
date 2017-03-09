@@ -12,6 +12,11 @@ void CharacterCore::setPosition(const sf::Vector2f & v)
 	m_position = v;
 }
 
+const sf::Vector2f & CharacterCore::getVelocity() const
+{
+	return m_velocity;
+}
+
 void HumanCore::update(float dt, unsigned input)
 {
 	int direction = 0;
@@ -49,13 +54,12 @@ void HumanCore::rollback(const NetEntity * ne, const CharacterCore * core)
 	const NetHuman * nh = static_cast<const NetHuman *>(ne);
 	const HumanCore * hc = static_cast<const HumanCore*>(core);
 
+	
 	if (hc)
-	{
 		m_position = lerp(hc->m_position, nh->position, .1f);
-	//	std::cout << "predictd:" << hc->getPosition().x << " server: " << nh->position.x << "\n";
-	}
 	else
 		m_position = nh->position;
+	m_velocity = nh->velocity;
 }
 
 CharacterCore * HumanCore::clone()
