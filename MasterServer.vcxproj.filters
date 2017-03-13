@@ -7,56 +7,56 @@
     <Filter Include="Core\MasterServer">
       <UniqueIdentifier>{ad6b3785-ace8-4913-8287-31983c79bcd9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Shared">
+      <UniqueIdentifier>{e7b5cf79-5031-4905-b5c1-f2b0ca329d60}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Core\Aabb.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\ENetUtility.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\Logger.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\Parser.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\Protocol.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\MasterServer\MasterServer.h">
       <Filter>Core\MasterServer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\Protocol.h">
+      <Filter>Core\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Parser.h">
+      <Filter>Core\Shared</Filter>
+    </ClInclude>
     <ClInclude Include="src\Core\Packer.h">
-      <Filter>Core</Filter>
+      <Filter>Core\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Logger.h">
+      <Filter>Core\Shared</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\IdPool.h">
-      <Filter>Core</Filter>
+      <Filter>Core\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ENetUtility.h">
+      <Filter>Core\Shared</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Core\ENetUtility.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Logger.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Parser.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\MasterServer\MasterServer.cpp">
       <Filter>Core\MasterServer</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\MasterServer\MasterServerMain.cpp">
       <Filter>Core\MasterServer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Parser.cpp">
+      <Filter>Core\Shared</Filter>
+    </ClCompile>
     <ClCompile Include="src\Core\Packer.cpp">
-      <Filter>Core</Filter>
+      <Filter>Core\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Logger.cpp">
+      <Filter>Core\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ENetUtility.cpp">
+      <Filter>Core\Shared</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Core\Packer.inl">
-      <Filter>Core</Filter>
+      <Filter>Core\Shared</Filter>
     </None>
   </ItemGroup>
 </Project>

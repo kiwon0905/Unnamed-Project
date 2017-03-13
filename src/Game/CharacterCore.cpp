@@ -54,7 +54,6 @@ void HumanCore::rollback(const NetEntity * ne, const CharacterCore * core)
 	const NetHuman * nh = static_cast<const NetHuman *>(ne);
 	const HumanCore * hc = static_cast<const HumanCore*>(core);
 
-	
 	if (hc)
 		m_position = lerp(hc->m_position, nh->position, .1f);
 	else

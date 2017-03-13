@@ -13,23 +13,14 @@
     <Filter Include="Game\Client">
       <UniqueIdentifier>{32769ca0-93bf-40a0-910f-35c3b1a8329d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Shared">
+      <UniqueIdentifier>{a7932f2c-d2fd-471a-904e-4c5fea283206}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Shared">
+      <UniqueIdentifier>{a07b61a3-ce00-4533-9e4f-655667542c52}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Core\Aabb.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\ENetUtility.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\Logger.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\Parser.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\Protocol.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\Client\Client.h">
       <Filter>Core\Client</Filter>
     </ClInclude>
@@ -66,20 +57,8 @@
     <ClInclude Include="src\Game\Client\Entity.h">
       <Filter>Game\Client</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Packer.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Game\Control.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Game\GameCore.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="src\Game\Client\Human.h">
       <Filter>Game\Client</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\MathUtility.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Client\AssetManager.h">
       <Filter>Core\Client</Filter>
@@ -87,23 +66,44 @@
     <ClInclude Include="src\Core\Client\RoomScreen.h">
       <Filter>Core\Client</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\CharacterCore.h">
-      <Filter>Game</Filter>
+    <ClInclude Include="src\Core\Protocol.h">
+      <Filter>Core\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Parser.h">
+      <Filter>Core\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Packer.h">
+      <Filter>Core\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\MathUtility.h">
+      <Filter>Core\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Logger.h">
+      <Filter>Core\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ENetUtility.h">
+      <Filter>Core\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Aabb.h">
+      <Filter>Core\Shared</Filter>
     </ClInclude>
     <ClInclude Include="src\Game\NetObject.h">
-      <Filter>Game</Filter>
+      <Filter>Game\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\GameCore.h">
+      <Filter>Game\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Control.h">
+      <Filter>Game\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\CharacterCore.h">
+      <Filter>Game\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Map.h">
+      <Filter>Game\Shared</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Core\ENetUtility.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Logger.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Parser.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Client\Client.cpp">
       <Filter>Core\Client</Filter>
     </ClCompile>
@@ -140,9 +140,6 @@
     <ClCompile Include="src\Game\Client\Entity.cpp">
       <Filter>Game\Client</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Packer.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\Game\Client\Human.cpp">
       <Filter>Game\Client</Filter>
     </ClCompile>
@@ -152,16 +149,31 @@
     <ClCompile Include="src\Core\Client\RoomScreen.cpp">
       <Filter>Core\Client</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\CharacterCore.cpp">
-      <Filter>Game</Filter>
+    <ClCompile Include="src\Core\Parser.cpp">
+      <Filter>Core\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Packer.cpp">
+      <Filter>Core\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Logger.cpp">
+      <Filter>Core\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ENetUtility.cpp">
+      <Filter>Core\Shared</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\NetObject.cpp">
-      <Filter>Game</Filter>
+      <Filter>Game\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\CharacterCore.cpp">
+      <Filter>Game\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Map.cpp">
+      <Filter>Game\Shared</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Core\Packer.inl">
-      <Filter>Core</Filter>
+      <Filter>Core\Shared</Filter>
     </None>
   </ItemGroup>
 </Project>

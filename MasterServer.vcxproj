@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Core\Aabb.h" />
     <ClInclude Include="src\Core\ENetUtility.h" />
     <ClInclude Include="src\Core\IdPool.h" />
     <ClInclude Include="src\Core\Logger.h" />

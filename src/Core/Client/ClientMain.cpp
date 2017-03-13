@@ -1,5 +1,4 @@
 #include "Client.h"
-#include "Core/Packer.h"
 
 #ifdef _DEBUG
 	#include <stdlib.h>
@@ -11,23 +10,27 @@
 	#endif
 #endif
 
-#include "Core/Packer.h"
 
-enum A
-{
-	First,a, b, c, d, LAST
-};
-
+#include "Game/Map.h"
 
 int main()
 {
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
-	SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS);
-	Client client;
-	client.run();
+//	Client client;
+//	client.run();
+	Map map;
+	map.loadFromFile("map/grass.xml");
 
+	std::cout << map.getSize().x << ", " << map.getSize().y << "\n";
+	for (auto & v : map.getData())
+	{
+		for (int i : v)
+			std::cout << i << ", ";
+	std::cout << "\n";
+
+	}
 }
 /*
 #include "Core/MathUtility.h"

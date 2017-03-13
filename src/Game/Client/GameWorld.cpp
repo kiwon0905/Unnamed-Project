@@ -77,8 +77,6 @@ void GameWorld::update(float dt, Client & client)
 				m_player.m_prevCore.reset(m_player.m_currentCore->clone());
 				m_player.m_currentCore->update(dt, i.bits);
 			}
-
-			std::cout << "tick: " << input.tick << ", pos: " << m_player.m_currentCore->getPosition().x << ", " << m_player.m_currentCore->getPosition().y << "\n";
 			m_player.m_history.emplace_back(input.tick, m_player.m_currentCore->clone());
 			while (!m_player.m_history.empty() && m_player.m_history.front().first < m_lastAckedInputTick)
 				m_player.m_history.pop_front();
