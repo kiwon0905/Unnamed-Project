@@ -2,6 +2,7 @@
 
 #include "Core/Packer.h"
 #include "Game/GameCore.h"
+#include "Game/Map.h"
 #include "Human.h"
 
 #include <enet/enet.h>
@@ -33,6 +34,7 @@ private:
 	bool m_reset = false;
 	bool m_started = false;
 	int m_nextEntityId = ENTITY_ID_MIN;
-
+	std::string m_mapName;
+	Map m_map;
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 };

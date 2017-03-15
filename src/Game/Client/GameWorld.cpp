@@ -90,8 +90,23 @@ void GameWorld::render(Client & client)
 		return;
 	float renderTick = m_tick + client.getFrameProgress();
 	float renderTime = renderTick / static_cast<float>(TICK_RATE) - m_delay;
-	
 
+	Entity * playerEntity = getEntity(m_player.id, m_player.type);
+
+	if (playerEntity)
+	{
+		sf::Vector2f camPos = lerp(m_player.m_prevCore->getPosition(), m_player.m_currentCore->getPosition(), client.getFrameProgress());
+		client.getRenderer().setViewCenter(camPos.x, camPos.y);
+	}
+
+
+
+	sf::RenderStates states;
+	states.texture = m_tileTexture;
+	client.getContext().window.draw(m_tileVertices, states);
+	//draw me
+	if (playerEntity)
+		playerEntity->renderFuture(client.getRenderer(), *m_player.m_prevCore, *m_player.m_currentCore, client.getFrameProgress());
 
 	//find snapshots to interpolate between
 	Snapshot * s0 = m_snapshots.back().get();
@@ -137,7 +152,6 @@ void GameWorld::render(Client & client)
 
 
 	//draw other entities
-
 	for (auto & p : s0->entities)
 	{
 		Entity * e = getEntity(p.first, p.second->getType());
@@ -150,11 +164,6 @@ void GameWorld::render(Client & client)
 			e->renderPast(client.getRenderer(), fromEntity, toEntity, interp);
 	}
 
-	//draw me
-	Entity * playerEntity = getEntity(m_player.id, m_player.type);
-	if (playerEntity)
-		playerEntity->renderFuture(client.getRenderer(), *m_player.m_prevCore, *m_player.m_currentCore, client.getFrameProgress());
-
 	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
 	for (auto & v : m_entitiesByType)
 		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
@@ -164,13 +173,58 @@ void GameWorld::load()
 {
 }
 
+template <class T>
+std::ostream & operator<<(std::ostream & os, sf::Vector2<T> & v)
+{
+	return os << "(" << v.x << ", " << v.y << ")";
+}
+
 void GameWorld::onWorldInfo(Unpacker & unpacker, Client & client)
 {
 	unpacker.unpack<ENTITY_ID_MIN, ENTITY_ID_MAX>(m_player.id);
 	unpacker.unpack(m_player.type);
+	unpacker.unpack(m_mapName);
 	m_player.m_currentCore.reset(createCharacterCore(m_player.type));
 	m_player.m_prevCore.reset(createCharacterCore(m_player.type));
+	
+	m_map.loadFromFile("map/" + m_mapName + ".xml");
+	m_tileTexture = client.getContext().assetManager.get<sf::Texture>("assets/" + m_mapName + ".png");
+	//create vertex array
+	const std::vector<std::vector<int>> & data = m_map.getData();
+	int tileSize = m_map.getTileSize();
+	m_tileVertices.setPrimitiveType(sf::PrimitiveType::Quads);
+	int textureWidth = m_tileTexture->getSize().x / tileSize;
+	int textureHeight = m_tileTexture->getSize().y / tileSize;
+	for (std::size_t y = 0; y < data.size(); ++y)
+	{
+		for (std::size_t x = 0; x < data[0].size(); ++x)
+		{
+			if (!data[y][x])
+				continue;
+			sf::Vertex a, b, c, d;
 
+			a.position = sf::Vector2f(x * tileSize, y * tileSize);
+			b.position = sf::Vector2f((x + 1) * tileSize, y * tileSize);
+			c.position = sf::Vector2f((x + 1) * tileSize, (y + 1) * tileSize);
+			d.position = sf::Vector2f(x * tileSize, (y + 1) * tileSize);
+
+			int tx = (data[y][x] - 1) % textureWidth;
+			int ty = (data[y][x] - 1) / textureHeight;
+
+			a.texCoords = sf::Vector2f(tx * tileSize, ty * tileSize);
+			b.texCoords = sf::Vector2f((tx + 1) * tileSize, ty * tileSize);
+			c.texCoords = sf::Vector2f((tx + 1) * tileSize, (ty + 1) * tileSize);
+			d.texCoords = sf::Vector2f(tx * tileSize, (ty + 1) * tileSize);
+
+					
+			m_tileVertices.append(a);
+			m_tileVertices.append(b);
+			m_tileVertices.append(c);
+			m_tileVertices.append(d);
+		}
+	}
+	
+	
 	Packer packer;
 	packer.pack(Msg::CL_LOAD_COMPLETE);
 	client.getNetwork().send(packer, true);

@@ -5,6 +5,7 @@
 #include "Core/Client/Client.h"
 #include "Core/Packer.h"
 #include "Game/NetObject.h"
+#include "Game/Map.h"
 
 #include <unordered_map>
 #include <deque>
@@ -53,7 +54,10 @@ private:
 	std::deque<std::unique_ptr<Snapshot>> m_snapshots;
 	Snapshot * m_prevSnapshot = nullptr;
 
-
+	std::string m_mapName;
+	Map m_map;
+	sf::VertexArray m_tileVertices;
+	sf::Texture * m_tileTexture;
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 
 	struct Player

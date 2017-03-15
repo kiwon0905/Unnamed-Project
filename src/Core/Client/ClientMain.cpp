@@ -18,19 +18,8 @@ int main()
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
-//	Client client;
-//	client.run();
-	Map map;
-	map.loadFromFile("map/grass.xml");
-
-	std::cout << map.getSize().x << ", " << map.getSize().y << "\n";
-	for (auto & v : map.getData())
-	{
-		for (int i : v)
-			std::cout << i << ", ";
-	std::cout << "\n";
-
-	}
+	Client client;
+	client.run();
 }
 /*
 #include "Core/MathUtility.h"

@@ -26,8 +26,6 @@ bool Map::loadFromFile(const std::string & s)
 			m_data.emplace_back();
 		m_data.back().push_back(tile);	
 	}
-	std::cout << "x: " << m_data[0].size() << "\n";
-	std::cout << "y: " << m_data.size() << "\n";
 	return true;
 }
 

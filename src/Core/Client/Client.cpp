@@ -10,6 +10,12 @@
 bool Client::initialize()
 {
 
+	sf::RenderWindow & window = getContext().window;
+	int width = sf::VideoMode::getDesktopMode().width * 4 / 7;
+	int height = width * 9 / 16;
+	window.create(sf::VideoMode(width, height), "");
+	window.resetGLStates();
+
 	if (!m_context.parser.loadFromFile("client-config.txt"))
 	{
 		Logger::getInstance().error("Failed to load client-config.txt");
@@ -32,11 +38,7 @@ bool Client::initialize()
 		return false;
 	Logger::getInstance().info("Initialization successful");
 
-	sf::RenderWindow & window = getContext().window;
-	int width = sf::VideoMode::getDesktopMode().width * 4 / 7;
-	int height = width * 9 / 16;
-	window.create(sf::VideoMode(width, height), "");
-	window.resetGLStates();
+
 	//window.setFramerateLimit(300);
 	return true;
 }
@@ -99,6 +101,8 @@ void Client::run()
 			}
 			m_context.window.clear();
 			m_screenStack.render(*this);
+
+			m_renderer.setDefaultView();
 			m_gui.render(*this);
 			m_renderer.renderText("FPS: " + std::to_string(fps), 0.f, 0.f);
 			m_context.window.display();

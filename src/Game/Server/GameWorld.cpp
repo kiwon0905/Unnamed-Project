@@ -30,7 +30,8 @@ void GameWorld::prepare(std::vector<std::unique_ptr<Peer>> & players)
 		p->send(packer, true);
 	}
 
-
+	m_mapName = "grass";
+	m_map.loadFromFile("map/" + m_mapName + ".xml");
 }
 
 void GameWorld::start()
@@ -93,6 +94,7 @@ void GameWorld::onRequestInfo(Peer & peer)
 	packer.pack(Msg::SV_WORLD_INFO);
 	packer.pack<ENTITY_ID_MIN, ENTITY_ID_MAX>(peer.getEntity()->getId());
 	packer.pack(peer.getEntity()->getType());
+	packer.pack(m_mapName);
 	peer.send(packer, true);
 }
 
