@@ -6,12 +6,16 @@ bool Renderer::initialize(Client & client)
 	m_target = &client.getContext().window;
 	m_assetManager = &client.getContext().assetManager;
 	m_assetManager->get<sf::Font>("arial.ttf");
-	view = m_target->getDefaultView();
 	return true;
 }
 
 void Renderer::finalize(Client & client)
 {
+}
+
+void Renderer::setTarget(sf::RenderTarget * target)
+{
+	m_target = target;
 }
 
 void Renderer::renderText(const std::string & s, float x, float y)
@@ -32,21 +36,4 @@ void Renderer::renderHuman(float x, float y)
 	r.setFillColor(sf::Color::Yellow);
 	r.setPosition({ x,y });
 	m_target->draw(r);
-}
-
-void Renderer::setViewCenter(float x, float y)
-{
-	view.setCenter(x, y);
-	m_target->setView(view);
-}
-
-void Renderer::setViewSize(float x, float y)
-{
-	view.setSize(x, y);
-	m_target->setView(view);
-}
-
-void Renderer::setDefaultView()
-{
-	m_target->setView(m_target->getDefaultView());
 }

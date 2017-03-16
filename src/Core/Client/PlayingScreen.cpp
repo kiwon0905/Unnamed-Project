@@ -6,6 +6,8 @@
 
 void PlayingScreen::onEnter(Client & client)
 {
+	m_gameWorld.init(client);
+	
 	Packer packer;
 	packer.pack(Msg::CL_REQUEST_WORLD_INFO);
 

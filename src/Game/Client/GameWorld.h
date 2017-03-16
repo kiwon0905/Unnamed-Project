@@ -27,11 +27,11 @@ public:
 	
 	GameWorld();
 
+	void init(Client & client);
 	void onDisconnect();
 	void update(float dt, Client & client);
 	void render(Client & client);
 
-	void load();
 	void onWorldInfo(Unpacker & unpacker, Client & client);
 	void onSnapshot(Unpacker & unpacker, Client & client);
 private:
@@ -70,4 +70,6 @@ private:
 		std::deque<Input> m_inputs;
 	} m_player;
 
+	sf::Vector2f m_cameraSize;
+	sf::RenderTexture m_renderTexture;
 };

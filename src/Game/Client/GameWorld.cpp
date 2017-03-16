@@ -7,10 +7,30 @@
 #include "Core/MathUtility.h"
 #include "Core/Logger.h"
 
+template <class T>
+std::ostream & operator<<(std::ostream & os, sf::Vector2<T> & v)
+{
+	return os << "(" << v.x << ", " << v.y << ")";
+}
+
+
 GameWorld::GameWorld()
 {
 	m_entitiesByType.resize(EntityType::COUNT);
+}
 
+void GameWorld::init(Client & client)
+{
+	float verticleCameraSize = 2000.f;
+	float horizontalCameraSize = verticleCameraSize / client.getContext().window.getSize().x * client.getContext().window.getSize().y;
+	m_cameraSize = { verticleCameraSize, horizontalCameraSize };
+	
+	if (!m_renderTexture.create(static_cast<unsigned>(verticleCameraSize + .5f), static_cast<unsigned>(horizontalCameraSize + .5f)))
+	{
+		std::cout << "render texture failed\n";
+	}
+	m_renderTexture.setSmooth(true);
+	std::cout << m_renderTexture.getSize() << "\n";
 }
 
 void GameWorld::onDisconnect()
@@ -92,18 +112,25 @@ void GameWorld::render(Client & client)
 	float renderTime = renderTick / static_cast<float>(TICK_RATE) - m_delay;
 
 	Entity * playerEntity = getEntity(m_player.id, m_player.type);
-
+	m_renderTexture.clear(sf::Color::Cyan);
+	//adjust camera position
 	if (playerEntity)
 	{
 		sf::Vector2f camPos = lerp(m_player.m_prevCore->getPosition(), m_player.m_currentCore->getPosition(), client.getFrameProgress());
-		client.getRenderer().setViewCenter(camPos.x + .5f, camPos.y + .5f);
+		sf::View view = m_renderTexture.getDefaultView();
+		std::cout << "default center: " << view.getCenter() << "\n";
+		view.setCenter(camPos);
+		std::cout << "camPos: " << camPos << "\n";
+		m_renderTexture.setView(view);
 	}
 
+	client.getRenderer().setTarget(&m_renderTexture);
 
-
+	//draw tilemap
 	sf::RenderStates states;
 	states.texture = m_tileTexture;
-	client.getContext().window.draw(m_tileVertices, states);
+	m_renderTexture.draw(m_tileVertices, states);
+
 	//draw me
 	if (playerEntity)
 		playerEntity->renderFuture(client.getRenderer(), *m_player.m_prevCore, *m_player.m_currentCore, client.getFrameProgress());
@@ -163,36 +190,34 @@ void GameWorld::render(Client & client)
 		if (p.first != m_player.id)
 			e->renderPast(client.getRenderer(), fromEntity, toEntity, interp);
 	}
+	m_renderTexture.display();
+	sf::Sprite sprite;
+	sprite.setTexture(m_renderTexture.getTexture());
+	float scaleFactor = static_cast<float>(client.getContext().window.getSize().x) / m_renderTexture.getSize().x;
+	sprite.setScale(scaleFactor, scaleFactor);
+	client.getContext().window.draw(sprite);
 
 	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
 	for (auto & v : m_entitiesByType)
 		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
 }
 
-void GameWorld::load()
-{
-}
-
-template <class T>
-std::ostream & operator<<(std::ostream & os, sf::Vector2<T> & v)
-{
-	return os << "(" << v.x << ", " << v.y << ")";
-}
-
 void GameWorld::onWorldInfo(Unpacker & unpacker, Client & client)
 {
 	Logger::getInstance().info("Loading...");
+	//read map data
 	unpacker.unpack<ENTITY_ID_MIN, ENTITY_ID_MAX>(m_player.id);
 	unpacker.unpack(m_player.type);
 	unpacker.unpack(m_mapName);
 	m_player.m_currentCore.reset(createCharacterCore(m_player.type));
 	m_player.m_prevCore.reset(createCharacterCore(m_player.type));
 	
+	//load textures
 	m_map.loadFromFile("map/" + m_mapName + ".xml");
 	m_tileTexture = client.getContext().assetManager.get<sf::Texture>("assets/" + m_mapName + ".png");
 	m_tileTexture->setSmooth(true);
-	//m_tileTexture->setSmooth(true);
-	//create vertex array
+
+	//create tile map
 	const std::vector<std::vector<int>> & data = m_map.getData();
 	int tileSize = m_map.getTileSize();
 	m_tileVertices.setPrimitiveType(sf::PrimitiveType::Quads);
@@ -226,7 +251,9 @@ void GameWorld::onWorldInfo(Unpacker & unpacker, Client & client)
 		}
 	}
 	
+	//
 	
+	//send ack to server
 	Packer packer;
 	packer.pack(Msg::CL_LOAD_COMPLETE);
 	client.getNetwork().send(packer, true);

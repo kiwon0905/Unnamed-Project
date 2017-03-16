@@ -28,5 +28,6 @@ void Human::renderFuture(Renderer & renderer, const CharacterCore & prevCore, co
 {
 	sf::Vector2f pos = lerp(prevCore.getPosition(), prevCurrent.getPosition(), t);
 	renderer.renderHuman(pos.x, pos.y);
+	std::cout << "human: " << pos.x << ", " <<pos.y<< "\n";
 }
 

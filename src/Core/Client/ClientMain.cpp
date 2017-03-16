@@ -21,12 +21,15 @@ int main()
 	Client client;
 	client.run();
 }
+
 /*
 #include "Core/MathUtility.h"
 #include <SFML/Graphics.hpp>
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1000, 800), "SFML works!");
+	sf::RenderTexture renderTexture;
+	renderTexture.create(1000, 800);
 	sf::CircleShape shape(100.f);
 	shape.setFillColor(sf::Color::Green);
 	
@@ -59,13 +62,27 @@ int main()
 				pos.x += 5.f;
 		}
 		float t = elapsed.asSeconds() / sf::seconds(1 / 60.f).asSeconds();
-		window.clear();
+		
+		renderTexture.clear();
 		sf::Vector2f renderPos = lerp(oldPos, pos, t);
-		std::cout << "renderPos: " << renderPos.x << "\n";
+		sf::View view = renderTexture.getDefaultView();
+		view.setCenter(renderPos);
+		renderTexture.setView(view);
+		renderTexture.draw(shape);
 		shape.setPosition(pos);
-		window.draw(shape);
+		renderTexture.display();
+		
+		window.clear();
+		sf::Sprite sprite;
+		sprite.setTexture(renderTexture.getTexture());
+		sprite.setScale(.5f, .5f);
+		window.draw(sprite);
+
 		window.display();
 	}
+
+
+
 	return 0;
 }
 
