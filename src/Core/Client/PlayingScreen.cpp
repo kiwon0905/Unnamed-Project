@@ -10,7 +10,6 @@ void PlayingScreen::onEnter(Client & client)
 	packer.pack(Msg::CL_REQUEST_WORLD_INFO);
 
 	client.getNetwork().send(packer, true);
-	Logger::getInstance().info("Loading...");
 }
 
 void PlayingScreen::handleEvent(const sf::Event & ev, Client & client)

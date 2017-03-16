@@ -96,7 +96,7 @@ void GameWorld::render(Client & client)
 	if (playerEntity)
 	{
 		sf::Vector2f camPos = lerp(m_player.m_prevCore->getPosition(), m_player.m_currentCore->getPosition(), client.getFrameProgress());
-		client.getRenderer().setViewCenter(camPos.x, camPos.y);
+		client.getRenderer().setViewCenter(camPos.x + .5f, camPos.y + .5f);
 	}
 
 
@@ -181,6 +181,7 @@ std::ostream & operator<<(std::ostream & os, sf::Vector2<T> & v)
 
 void GameWorld::onWorldInfo(Unpacker & unpacker, Client & client)
 {
+	Logger::getInstance().info("Loading...");
 	unpacker.unpack<ENTITY_ID_MIN, ENTITY_ID_MAX>(m_player.id);
 	unpacker.unpack(m_player.type);
 	unpacker.unpack(m_mapName);
@@ -189,6 +190,8 @@ void GameWorld::onWorldInfo(Unpacker & unpacker, Client & client)
 	
 	m_map.loadFromFile("map/" + m_mapName + ".xml");
 	m_tileTexture = client.getContext().assetManager.get<sf::Texture>("assets/" + m_mapName + ".png");
+	m_tileTexture->setSmooth(true);
+	//m_tileTexture->setSmooth(true);
 	//create vertex array
 	const std::vector<std::vector<int>> & data = m_map.getData();
 	int tileSize = m_map.getTileSize();
@@ -202,7 +205,6 @@ void GameWorld::onWorldInfo(Unpacker & unpacker, Client & client)
 			if (!data[y][x])
 				continue;
 			sf::Vertex a, b, c, d;
-
 			a.position = sf::Vector2f(x * tileSize, y * tileSize);
 			b.position = sf::Vector2f((x + 1) * tileSize, y * tileSize);
 			c.position = sf::Vector2f((x + 1) * tileSize, (y + 1) * tileSize);
@@ -211,10 +213,10 @@ void GameWorld::onWorldInfo(Unpacker & unpacker, Client & client)
 			int tx = (data[y][x] - 1) % textureWidth;
 			int ty = (data[y][x] - 1) / textureHeight;
 
-			a.texCoords = sf::Vector2f(tx * tileSize, ty * tileSize);
-			b.texCoords = sf::Vector2f((tx + 1) * tileSize, ty * tileSize);
-			c.texCoords = sf::Vector2f((tx + 1) * tileSize, (ty + 1) * tileSize);
-			d.texCoords = sf::Vector2f(tx * tileSize, (ty + 1) * tileSize);
+			a.texCoords = sf::Vector2f(tx * tileSize, ty * tileSize) + sf::Vector2f(0.5f, 0.5f);
+			b.texCoords = sf::Vector2f((tx + 1) * tileSize, ty * tileSize) + sf::Vector2f(-0.5f, 0.5f);
+			c.texCoords = sf::Vector2f((tx + 1) * tileSize, (ty + 1) * tileSize) + sf::Vector2f(-0.5f, -0.5f);
+			d.texCoords = sf::Vector2f(tx * tileSize, (ty + 1) * tileSize) + sf::Vector2f(0.5f, -0.5f);
 
 					
 			m_tileVertices.append(a);
