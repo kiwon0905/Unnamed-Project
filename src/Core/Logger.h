@@ -1,8 +1,5 @@
 #pragma once
 #include <iostream>
-#include <SFML/System.hpp>
-
-#include "Aabb.h"
 #include <mutex>
 class Logger
 {
@@ -24,16 +21,3 @@ private:
 	Logger() {}
 	std::mutex m_mutex;
 };
-
-
-template <typename T>
-std::ostream & operator<<(std::ostream & os, const sf::Vector2<T> & v)
-{
-	return os << "( " << v.x << ", " << v.y << " )";
-}
-
-template <typename T>
-std::ostream & operator<<(std::ostream & os, const Aabb<T> & aabb)
-{
-	return os << "( " << aabb.left << ", " << aabb.top << ", " << aabb.left + aabb.width << ", " << aabb.top + aabb.height << " )";
-}

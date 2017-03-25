@@ -98,6 +98,11 @@ void GameWorld::onRequestInfo(Peer & peer)
 	peer.send(packer, true);
 }
 
+const Map & GameWorld::getMap()
+{
+	return m_map;
+}
+
 Entity * GameWorld::createEntity(EntityType type, Peer * p)
 {
 	Entity * e;

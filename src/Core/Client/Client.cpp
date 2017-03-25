@@ -12,7 +12,6 @@ bool Client::initialize()
 
 	sf::RenderWindow & window = getContext().window;
 	window.create(sf::VideoMode(1600, 900), "");
-	window.create(sf::VideoMode::getFullscreenModes()[0], "", sf::Style::Fullscreen);
 	window.resetGLStates();
 
 	if (!m_context.parser.loadFromFile("client-config.txt"))

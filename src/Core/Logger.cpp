@@ -1,5 +1,5 @@
 #include "Logger.h"
-
+#include <string>
 void Logger::info(const std::string & s)
 {
 	m_mutex.lock();

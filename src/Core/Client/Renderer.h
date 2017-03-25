@@ -11,7 +11,7 @@ public:
 	void finalize(Client & client);
 
 	void setTarget(sf::RenderTarget * target);
-	void renderText(const std::string & s, float x, float y);
+	void renderText(const std::string & s, float x, float y, unsigned size = 30, sf::Color color = sf::Color::White);
 	void renderHuman(float x, float y);
 private:
 	sf::RenderTarget * m_target;

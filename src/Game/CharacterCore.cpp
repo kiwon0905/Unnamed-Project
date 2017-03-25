@@ -17,7 +17,8 @@ const sf::Vector2f & CharacterCore::getVelocity() const
 	return m_velocity;
 }
 
-void HumanCore::update(float dt, unsigned input)
+
+void HumanCore::update(float dt, unsigned input, const Map & map)
 {
 	int direction = 0;
 	if (input & Control::MOVE_LEFT)
@@ -45,8 +46,10 @@ void HumanCore::update(float dt, unsigned input)
 	else
 		m_velocity.y = 0.f;
 
-	
-	m_position += m_velocity * dt;
+	//sf::Vector2f dv = m_velocity * dt;
+	Aabb<float> aabb(m_position.x, m_position.y, 50.f, 50.f);
+	sf::Vector2f dv = map.move(aabb, m_velocity * dt);
+	m_position += dv;
 }
 
 void HumanCore::rollback(const NetEntity * ne, const CharacterCore * core)

@@ -25,10 +25,8 @@ void GameWorld::init(Client & client)
 	float horizontalCameraSize = verticleCameraSize / client.getContext().window.getSize().x * client.getContext().window.getSize().y;
 	m_cameraSize = { verticleCameraSize, horizontalCameraSize };
 	
-	if (!m_renderTexture.create(static_cast<unsigned>(verticleCameraSize + .5f), static_cast<unsigned>(horizontalCameraSize + .5f)))
-	{
-		std::cout << "render texture failed\n";
-	}
+	m_renderTexture.create(static_cast<unsigned>(verticleCameraSize + .5f), static_cast<unsigned>(horizontalCameraSize + .5f));
+
 	m_renderTexture.setSmooth(true);
 	std::cout << m_renderTexture.getSize() << "\n";
 }
@@ -95,11 +93,14 @@ void GameWorld::update(float dt, Client & client)
 			for(auto & i :m_player. m_inputs)
 			{ 
 				m_player.m_prevCore.reset(m_player.m_currentCore->clone());
-				m_player.m_currentCore->update(dt, i.bits);
+				m_player.m_currentCore->update(dt, i.bits, m_map);
 			}
 			m_player.m_history.emplace_back(input.tick, m_player.m_currentCore->clone());
 			while (!m_player.m_history.empty() && m_player.m_history.front().first < m_lastAckedInputTick)
 				m_player.m_history.pop_front();
+
+		//	m_player.m_prevCore.reset(m_player.m_currentCore->clone());
+		//	m_player.m_currentCore->update(dt, input.bits, m_map);
 		}
 	}
 }
@@ -112,15 +113,16 @@ void GameWorld::render(Client & client)
 	float renderTime = renderTick / static_cast<float>(TICK_RATE) - m_delay;
 
 	Entity * playerEntity = getEntity(m_player.id, m_player.type);
-	m_renderTexture.clear(sf::Color::Cyan);
+	m_renderTexture.clear();
+	sf::RectangleShape background;
+	background.setSize(static_cast<sf::Vector2f>(m_map.getSize() * m_map.getTileSize()));
+	m_renderTexture.draw(background);
 	//adjust camera position
 	if (playerEntity)
 	{
 		sf::Vector2f camPos = lerp(m_player.m_prevCore->getPosition(), m_player.m_currentCore->getPosition(), client.getFrameProgress());
 		sf::View view = m_renderTexture.getDefaultView();
-		std::cout << "default center: " << view.getCenter() << "\n";
 		view.setCenter(camPos);
-		std::cout << "camPos: " << camPos << "\n";
 		m_renderTexture.setView(view);
 	}
 
@@ -135,6 +137,7 @@ void GameWorld::render(Client & client)
 	if (playerEntity)
 		playerEntity->renderFuture(client.getRenderer(), *m_player.m_prevCore, *m_player.m_currentCore, client.getFrameProgress());
 
+	
 	//find snapshots to interpolate between
 	Snapshot * s0 = m_snapshots.back().get();
 	Snapshot * s1 = nullptr;
@@ -218,25 +221,24 @@ void GameWorld::onWorldInfo(Unpacker & unpacker, Client & client)
 	m_tileTexture->setSmooth(true);
 
 	//create tile map
-	const std::vector<std::vector<int>> & data = m_map.getData();
 	int tileSize = m_map.getTileSize();
 	m_tileVertices.setPrimitiveType(sf::PrimitiveType::Quads);
 	int textureWidth = m_tileTexture->getSize().x / tileSize;
 	int textureHeight = m_tileTexture->getSize().y / tileSize;
-	for (std::size_t y = 0; y < data.size(); ++y)
+	for (std::size_t y = 0; y < m_map.getSize().y; ++y)
 	{
-		for (std::size_t x = 0; x < data[0].size(); ++x)
+		for (std::size_t x = 0; x < m_map.getSize().x; ++x)
 		{
-			if (!data[y][x])
+			int tile = m_map.getTile(x, y);
+			if (!m_map.getTile(x, y))
 				continue;
 			sf::Vertex a, b, c, d;
 			a.position = sf::Vector2f(x * tileSize, y * tileSize);
 			b.position = sf::Vector2f((x + 1) * tileSize, y * tileSize);
 			c.position = sf::Vector2f((x + 1) * tileSize, (y + 1) * tileSize);
 			d.position = sf::Vector2f(x * tileSize, (y + 1) * tileSize);
-
-			int tx = (data[y][x] - 1) % textureWidth;
-			int ty = (data[y][x] - 1) / textureHeight;
+			int tx = (tile - 1) % textureWidth;
+			int ty = (tile - 1) / textureHeight;
 
 			a.texCoords = sf::Vector2f(tx * tileSize, ty * tileSize) + sf::Vector2f(0.5f, 0.5f);
 			b.texCoords = sf::Vector2f((tx + 1) * tileSize, ty * tileSize) + sf::Vector2f(-0.5f, 0.5f);
@@ -250,9 +252,6 @@ void GameWorld::onWorldInfo(Unpacker & unpacker, Client & client)
 			m_tileVertices.append(d);
 		}
 	}
-	
-	//
-	
 	//send ack to server
 	Packer packer;
 	packer.pack(Msg::CL_LOAD_COMPLETE);

@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Core\Aabb.h" />
     <ClInclude Include="src\Core\Client\Client.h" />
     <ClInclude Include="src\Core\Client\Gui.h" />
     <ClInclude Include="src\Core\Client\Input.h" />
@@ -38,6 +37,7 @@
     <ClInclude Include="src\Core\Packer.h" />
     <ClInclude Include="src\Core\Parser.h" />
     <ClInclude Include="src\Core\Protocol.h" />
+    <ClInclude Include="src\Game\Aabb.h" />
     <ClInclude Include="src\Game\Client\Human.h" />
     <ClInclude Include="src\Game\Client\Entity.h" />
     <ClInclude Include="src\Game\Client\GameWorld.h" />

@@ -2,11 +2,12 @@
 #include <SFML/System.hpp>
 
 #include "NetObject.h"
+#include "Map.h"
 
 class CharacterCore
 {
 public:
-	virtual void update(float dt, unsigned input) = 0;
+	virtual void update(float dt, unsigned input, const Map & map) = 0;
 	const sf::Vector2f & getPosition() const;
 	void setPosition(const sf::Vector2f & v);
 	const sf::Vector2f & getVelocity() const;
@@ -21,7 +22,7 @@ protected:
 class HumanCore : public CharacterCore
 {
 public:
-	void update(float dt, unsigned input);
+	void update(float dt, unsigned input, const Map & map);
 	void rollback(const NetEntity * ne, const CharacterCore * core);
 	CharacterCore * clone();
 

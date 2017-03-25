@@ -24,6 +24,7 @@ public:
 	void reset();
 
 	void onRequestInfo(Peer & peer);
+	const Map & getMap();
 private:
 	Entity * createEntity(EntityType type, Peer * p);
 	Entity * getEntity(int id, EntityType type);

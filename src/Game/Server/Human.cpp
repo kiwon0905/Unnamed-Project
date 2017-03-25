@@ -1,4 +1,5 @@
 #include "Human.h"
+#include "GameWorld.h"
 #include "Game/GameCore.h"
 #include "Game/Control.h"
 #include "Game/NetObject.h"
@@ -13,7 +14,7 @@ Human::Human(int id, Peer * player):
 void Human::update(float dt, GameWorld & world)
 {
 	Input input = m_player->popInput();
-	m_core.update(dt, input.bits);
+	m_core.update(dt, input.bits, world.getMap());
 }
 
 void Human::sync(Packer & packer)

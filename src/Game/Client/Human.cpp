@@ -24,10 +24,10 @@ void Human::renderPast(Renderer & renderer, const NetEntity * from, const NetEnt
 	renderer.renderHuman(pos.x, pos.y);
 }
 
-void Human::renderFuture(Renderer & renderer, const CharacterCore & prevCore, const CharacterCore & prevCurrent, float t)
+void Human::renderFuture(Renderer & renderer, const CharacterCore & prevCore, const CharacterCore & currentCore, float t)
 {
-	sf::Vector2f pos = lerp(prevCore.getPosition(), prevCurrent.getPosition(), t);
+	sf::Vector2f pos = lerp(prevCore.getPosition(), currentCore.getPosition(), t);
 	renderer.renderHuman(pos.x, pos.y);
-	std::cout << "human: " << pos.x << ", " <<pos.y<< "\n";
+	
 }
 

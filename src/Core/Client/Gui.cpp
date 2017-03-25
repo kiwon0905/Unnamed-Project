@@ -18,7 +18,6 @@ void Gui::update(float dt, Client & client)
 
 void Gui::render(Client & client)
 {
-	//client.getContext()->window.setView(sf::View(sf::FloatRect(0, 0, 1000, 1000)));
 	m_gui.Display(client.getContext().window);
 }
 
