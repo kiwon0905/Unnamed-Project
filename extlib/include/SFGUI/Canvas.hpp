@@ -68,7 +68,7 @@ class SFGUI_API Canvas : public Widget {
 		 * @param type Type of primitives to draw.
 		 * @param states Render states to use for drawing.
 		 */
-		void Draw( const sf::Vertex* vertices, unsigned int vertex_count, sf::PrimitiveType type, const sf::RenderStates& states = sf::RenderStates::Default );
+		void Draw( const sf::Vertex* vertices, std::size_t vertex_count, sf::PrimitiveType type, const sf::RenderStates& states = sf::RenderStates::Default );
 
 		/** Set the sf::View that the canvas should use when performing SFML drawing.
 		 * @param view The sf::View that the canvas should when performing SFML drawing.
@@ -110,7 +110,8 @@ class SFGUI_API Canvas : public Widget {
 		std::shared_ptr<Signal> m_custom_draw_callback;
 		std::shared_ptr<RendererViewport> m_custom_viewport;
 		std::shared_ptr<sf::RenderTexture> m_render_texture;
-		std::unique_ptr<sf::Shader> m_shader;
+		unsigned int m_shader = 0;
+		int m_texture_location = 0;
 		unsigned int m_vertex_location = 0;
 		unsigned int m_texture_coordinate_location = 0;
 
