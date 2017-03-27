@@ -25,7 +25,7 @@ void Renderer::renderText(const std::string & s, float x, float y, unsigned size
 	text.setFillColor(sf::Color::White);
 	text.setString(s);
 	text.setFont(*font);
-	text.setPosition(x + .5f, y + .5f);
+	text.setPosition(static_cast<int>(x + .5f), static_cast<int>(y + .5f));
 	text.setCharacterSize(size);
 	text.setFillColor(color);
 	m_target->draw(text);

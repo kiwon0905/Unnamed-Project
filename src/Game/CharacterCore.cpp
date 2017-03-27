@@ -33,6 +33,7 @@ void HumanCore::update(float dt, unsigned input, const Map & map)
 	else
 		m_velocity.x = 0.f;
 
+	//m_velocity.y += -10 * dt;	
 	direction = 0;
 	if (input & Control::MOVE_DOWN)
 		direction--;
@@ -50,6 +51,8 @@ void HumanCore::update(float dt, unsigned input, const Map & map)
 	Aabb<float> aabb(m_position.x, m_position.y, 50.f, 50.f);
 	sf::Vector2f dv = map.move(aabb, m_velocity * dt);
 	m_position += dv;
+
+	//std::cout << "pos: " << m_position.x <<", "<<m_position.y << "\n";
 }
 
 void HumanCore::rollback(const NetEntity * ne, const CharacterCore * core)

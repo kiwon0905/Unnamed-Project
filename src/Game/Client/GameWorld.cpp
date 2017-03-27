@@ -21,7 +21,7 @@ GameWorld::GameWorld()
 
 void GameWorld::init(Client & client)
 {
-	float verticleCameraSize = 2000.f;
+	float verticleCameraSize = 1600.f;
 	float horizontalCameraSize = verticleCameraSize / client.getContext().window.getSize().x * client.getContext().window.getSize().y;
 	m_cameraSize = { verticleCameraSize, horizontalCameraSize };
 	
