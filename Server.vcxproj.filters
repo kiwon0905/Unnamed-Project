@@ -45,9 +45,6 @@
     <ClInclude Include="src\Core\Packer.h">
       <Filter>Core\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\MathUtility.h">
-      <Filter>Core\Shared</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\Logger.h">
       <Filter>Core\Shared</Filter>
     </ClInclude>
@@ -74,6 +71,9 @@
     </ClInclude>
     <ClInclude Include="src\Game\Aabb.h">
       <Filter>Game\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Utility.h">
+      <Filter>Core\Shared</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

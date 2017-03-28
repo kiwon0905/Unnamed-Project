@@ -48,6 +48,7 @@ private:
 	State m_state = LOADING;
 	float m_delay = .1f;
 
+	bool m_repredict = false;
 	int m_lastAckedInputTick = -1;
 	int m_tick = 0;
 
@@ -64,10 +65,10 @@ private:
 	{
 		int id = -1;
 		EntityType type;
-		std::unique_ptr<CharacterCore> m_currentCore;
-		std::unique_ptr<CharacterCore> m_prevCore;
-		std::deque<std::pair<int, std::unique_ptr<CharacterCore>>> m_history;
-		std::deque<Input> m_inputs;
+		std::unique_ptr<CharacterCore> currentCore;
+		std::unique_ptr<CharacterCore> prevCore;
+		std::deque<std::pair<int, std::unique_ptr<CharacterCore>>> history;
+		std::deque<Input> inputs;
 	} m_player;
 
 	sf::Vector2f m_cameraSize;

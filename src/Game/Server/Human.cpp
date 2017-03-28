@@ -3,7 +3,7 @@
 #include "Game/GameCore.h"
 #include "Game/Control.h"
 #include "Game/NetObject.h"
-#include "Core/MathUtility.h"
+#include "Core/Utility.h"
 #include "Core/Server/Peer.h"
 
 Human::Human(int id, Peer * player):

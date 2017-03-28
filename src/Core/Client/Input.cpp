@@ -2,7 +2,7 @@
 #include "Client.h"
 
 #include <bitset>
-
+ 
 bool Input::initialize(Client & client)
 {
 	m_binds[Control::MOVE_LEFT] = sf::Keyboard::Left;
@@ -20,24 +20,24 @@ void Input::finalize(Client & client)
 
 unsigned Input::getBits()
 {
-	m_bits = 0;
+	unsigned bits = 0;
 
 	if (sf::Keyboard::isKeyPressed(m_binds[Control::MOVE_LEFT]))
-		m_bits |= Control::MOVE_LEFT;
+		bits |= Control::MOVE_LEFT;
 
 	if (sf::Keyboard::isKeyPressed(m_binds[Control::MOVE_RIGHT]))
-		m_bits |= Control::MOVE_RIGHT;
+		bits |= Control::MOVE_RIGHT;
 
 
 	if (sf::Keyboard::isKeyPressed(m_binds[Control::MOVE_UP]))
-		m_bits |= Control::MOVE_UP;
+		bits |= Control::MOVE_UP;
 
 	if (sf::Keyboard::isKeyPressed(m_binds[Control::MOVE_DOWN]))
-		m_bits |= Control::MOVE_DOWN;
+		bits |= Control::MOVE_DOWN;
 
 
 	if (sf::Keyboard::isKeyPressed(m_binds[Control::JUMP]))
-		m_bits |= Control::JUMP;
+		bits |= Control::JUMP;
 
-	return m_bits;
+	return bits;
 }

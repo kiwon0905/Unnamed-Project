@@ -16,5 +16,4 @@ public:
 	unsigned getBits();
 private:
 	std::unordered_map<Control, sf::Keyboard::Key> m_binds;
-	unsigned m_bits;
 };

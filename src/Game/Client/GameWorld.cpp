@@ -4,15 +4,8 @@
 
 #include "Core/Protocol.h"
 #include "Core/Client/Client.h"
-#include "Core/MathUtility.h"
+#include "Core/Utility.h"
 #include "Core/Logger.h"
-
-template <class T>
-std::ostream & operator<<(std::ostream & os, sf::Vector2<T> & v)
-{
-	return os << "(" << v.x << ", " << v.y << ")";
-}
-
 
 GameWorld::GameWorld()
 {
@@ -24,7 +17,7 @@ void GameWorld::init(Client & client)
 	float verticleCameraSize = 1600.f;
 	float horizontalCameraSize = verticleCameraSize / client.getContext().window.getSize().x * client.getContext().window.getSize().y;
 	m_cameraSize = { verticleCameraSize, horizontalCameraSize };
-	
+
 	m_renderTexture.create(static_cast<unsigned>(verticleCameraSize + .5f), static_cast<unsigned>(horizontalCameraSize + .5f));
 
 	m_renderTexture.setSmooth(true);
@@ -54,53 +47,46 @@ void GameWorld::update(float dt, Client & client)
 			client.getNetwork().send(packer, true);
 		}
 	}
-	else if(m_state == IN_GAME)
+	else if (m_state == IN_GAME)
 	{
-		Input input;
-		input.bits = 0;
-		if (client.getContext().window.hasFocus())
-			input.bits = client.getInput().getBits();
-		input.tick = m_tick;
-
-		Packer packer;
-		packer.pack(Msg::CL_INPUT);
-		packer.pack<TICK_MIN, TICK_MAX>(input.tick);
-		packer.pack(std::uint8_t(input.bits));
-		client.getNetwork().send(packer, false);
-	
-
-
-		//TODO: Improve
 		Entity * e = getEntity(m_player.id, m_player.type);
-		NetEntity * ne = nullptr;
-		if (m_snapshots.back()->entities.count(m_player.id))
-			ne = m_snapshots.back()->entities[m_player.id].get();
-		if (e && ne)
+		//predict
+		if (e)
 		{
-			//TODO: only repredict when a new snapshot is received from the server
-			m_player.m_inputs.push_back(input);
-			while (!m_player.m_inputs.empty() && m_player.m_inputs.front().tick <= m_lastAckedInputTick)
-				m_player.m_inputs.pop_front();
+			//read input
+			Input input;
+			input.bits = 0;
+			if (client.getContext().window.hasFocus())
+				input.bits = client.getInput().getBits();
+			input.tick = m_tick;
+			m_player.inputs.push_back(input);
 
-			CharacterCore * predictedCore = nullptr;
-			for (auto & h : m_player.m_history)
+			//send input to server
+			Packer packer;
+			packer.pack(Msg::CL_INPUT);
+			packer.pack<TICK_MIN, TICK_MAX>(input.tick);
+			packer.pack(std::uint8_t(input.bits));
+			client.getNetwork().send(packer, false);
+
+			//simulate
+			m_player.prevCore.reset(m_player.currentCore->clone());
+			m_player.currentCore->update(dt, input.bits, m_map);
+
+			NetEntity * ne = nullptr;
+			ne = m_snapshots.back()->entities[m_player.id].get();
+			if (m_repredict && ne)
 			{
-				if (h.first == m_lastAckedInputTick)
-					predictedCore = h.second.get();
+				while (m_player.inputs.front().tick <= m_lastAckedInputTick)
+					m_player.inputs.pop_front();
+				
+				m_player.currentCore->assign(ne);
+				for (auto & i : m_player.inputs)
+				{
+					m_player.prevCore.reset(m_player.currentCore->clone());
+					m_player.currentCore->update(dt, i.bits, m_map);
+				}
+				m_repredict = false;
 			}
-			m_player.m_currentCore->rollback(ne, predictedCore);
-			
-			for(auto & i :m_player. m_inputs)
-			{ 
-				m_player.m_prevCore.reset(m_player.m_currentCore->clone());
-				m_player.m_currentCore->update(dt, i.bits, m_map);
-			}
-			m_player.m_history.emplace_back(input.tick, m_player.m_currentCore->clone());
-			while (!m_player.m_history.empty() && m_player.m_history.front().first < m_lastAckedInputTick)
-				m_player.m_history.pop_front();
-
-		//	m_player.m_prevCore.reset(m_player.m_currentCore->clone());
-		//	m_player.m_currentCore->update(dt, input.bits, m_map);
 		}
 	}
 }
@@ -112,32 +98,6 @@ void GameWorld::render(Client & client)
 	float renderTick = m_tick + client.getFrameProgress();
 	float renderTime = renderTick / static_cast<float>(TICK_RATE) - m_delay;
 
-	Entity * playerEntity = getEntity(m_player.id, m_player.type);
-	m_renderTexture.clear();
-	sf::RectangleShape background;
-	background.setSize(static_cast<sf::Vector2f>(m_map.getSize() * m_map.getTileSize()));
-	m_renderTexture.draw(background);
-	//adjust camera position
-	if (playerEntity)
-	{
-		sf::Vector2f camPos = lerp(m_player.m_prevCore->getPosition(), m_player.m_currentCore->getPosition(), client.getFrameProgress());
-		sf::View view = m_renderTexture.getDefaultView();
-		view.setCenter(camPos);
-		m_renderTexture.setView(view);
-	}
-
-	client.getRenderer().setTarget(&m_renderTexture);
-
-	//draw tilemap
-	sf::RenderStates states;
-	states.texture = m_tileTexture;
-	m_renderTexture.draw(m_tileVertices, states);
-
-	//draw me
-	if (playerEntity)
-		playerEntity->renderFuture(client.getRenderer(), *m_player.m_prevCore, *m_player.m_currentCore, client.getFrameProgress());
-
-	
 	//find snapshots to interpolate between
 	Snapshot * s0 = m_snapshots.back().get();
 	Snapshot * s1 = nullptr;
@@ -152,7 +112,7 @@ void GameWorld::render(Client & client)
 			break;
 		}
 	}
-	
+
 	float interp = 0.f;
 	if (s1)
 	{
@@ -169,7 +129,7 @@ void GameWorld::render(Client & client)
 			if (!m_prevSnapshot || !m_prevSnapshot->entities.count(p.first))
 				createEntity(p.first, p.second->getType());
 
-		if(m_prevSnapshot)
+		if (m_prevSnapshot)
 			for (auto & p : m_prevSnapshot->entities)
 				if (!s0->entities.count(p.first))
 					getEntity(p.first, p.second->getType())->setAlive(false);
@@ -178,8 +138,42 @@ void GameWorld::render(Client & client)
 		//delete old snapshots
 		while (m_snapshots.front()->tick < m_prevSnapshot->tick)
 			m_snapshots.pop_front();
+
+
+		auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
+		for (auto & v : m_entitiesByType)
+			v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
 	}
 
+	m_renderTexture.clear();
+	sf::RectangleShape background;
+	background.setSize(static_cast<sf::Vector2f>(m_map.getSize() * m_map.getTileSize()));
+	m_renderTexture.draw(background);
+	
+	
+	//adjust camera position
+	Entity * playerEntity = getEntity(m_player.id, m_player.type);
+	if (playerEntity)
+	{
+		sf::Vector2f camPos = lerp(m_player.prevCore->getPosition(), m_player.currentCore->getPosition(), client.getFrameProgress());
+		sf::View view = m_renderTexture.getDefaultView();
+		view.setCenter(camPos);
+		m_renderTexture.setView(view);
+	}
+	else
+	{
+		//TODO
+	}
+
+	//draw tilemap
+	client.getRenderer().setTarget(&m_renderTexture);
+	sf::RenderStates states;
+	states.texture = m_tileTexture;
+	m_renderTexture.draw(m_tileVertices, states);
+
+	//draw player entity
+	if (playerEntity)
+		playerEntity->renderFuture(client.getRenderer(), *m_player.prevCore, *m_player.currentCore, client.getFrameProgress());
 
 	//draw other entities
 	for (auto & p : s0->entities)
@@ -199,10 +193,6 @@ void GameWorld::render(Client & client)
 	float scaleFactor = static_cast<float>(client.getContext().window.getSize().x) / m_renderTexture.getSize().x;
 	sprite.setScale(scaleFactor, scaleFactor);
 	client.getContext().window.draw(sprite);
-
-	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
-	for (auto & v : m_entitiesByType)
-		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
 }
 
 void GameWorld::onWorldInfo(Unpacker & unpacker, Client & client)
@@ -212,8 +202,8 @@ void GameWorld::onWorldInfo(Unpacker & unpacker, Client & client)
 	unpacker.unpack<ENTITY_ID_MIN, ENTITY_ID_MAX>(m_player.id);
 	unpacker.unpack(m_player.type);
 	unpacker.unpack(m_mapName);
-	m_player.m_currentCore.reset(createCharacterCore(m_player.type));
-	m_player.m_prevCore.reset(createCharacterCore(m_player.type));
+	m_player.currentCore.reset(createCharacterCore(m_player.type));
+	m_player.prevCore.reset(createCharacterCore(m_player.type));
 	
 	//load textures
 	m_map.loadFromFile("map/" + m_mapName + ".xml");
@@ -296,6 +286,7 @@ void GameWorld::onSnapshot(Unpacker & unpacker, Client & client)
 		s->entities[id].reset(entity);
 	}
 	m_snapshots.emplace_back(s);
+	m_repredict = true;
 }
 
 Entity * GameWorld::createEntity(int id, EntityType type)

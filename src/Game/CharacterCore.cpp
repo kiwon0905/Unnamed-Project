@@ -1,6 +1,6 @@
 #include "CharacterCore.h"
 #include "Control.h"
-#include "Core/MathUtility.h"
+#include "Core/Utility.h"
 #include <iostream>
 const sf::Vector2f & CharacterCore::getPosition() const
 {
@@ -25,7 +25,7 @@ void HumanCore::update(float dt, unsigned input, const Map & map)
 		direction--;
 	if (input & Control::MOVE_RIGHT)
 		direction++;
-	
+
 	if (direction > 0)
 		m_velocity.x = 300.f;
 	else if (direction < 0)
@@ -40,31 +40,44 @@ void HumanCore::update(float dt, unsigned input, const Map & map)
 	if (input & Control::MOVE_UP)
 		direction++;
 
-	if (direction > 0)
-		m_velocity.y = -300.f;
-	else if (direction < 0)
-		m_velocity.y = 300.f;
-	else
-		m_velocity.y = 0.f;
-
-	//sf::Vector2f dv = m_velocity * dt;
 	Aabb<float> aabb(m_position.x, m_position.y, 50.f, 50.f);
-	sf::Vector2f dv = map.move(aabb, m_velocity * dt);
-	m_position += dv;
 
-	//std::cout << "pos: " << m_position.x <<", "<<m_position.y << "\n";
+
+	bool grounded = map.isGrounded(aabb);
+	
+	if (grounded)
+	{
+		if (input & Control::JUMP)
+		{
+			m_velocity.y = -300.f;
+		}
+		else
+		{
+			m_velocity.y = 0.f;
+		}
+	}
+	else
+	{
+		m_velocity.y += 1000.f * dt;
+	}
+	sf::Vector2f dv = map.move(aabb, m_velocity * dt);
+
+	if(length(dv) > 0.001f)
+		m_position += dv;
 }
 
-void HumanCore::rollback(const NetEntity * ne, const CharacterCore * core)
+void HumanCore::assign(const NetEntity * ne)
 {
 	const NetHuman * nh = static_cast<const NetHuman *>(ne);
-	const HumanCore * hc = static_cast<const HumanCore*>(core);
-
-	if (hc)
-		m_position = lerp(hc->m_position, nh->position, .1f);
-	else
-		m_position = nh->position;
+	m_position = nh->position;
 	m_velocity = nh->velocity;
+}
+
+void HumanCore::smooth(const CharacterCore * core)
+{
+	const HumanCore * hc = static_cast<const HumanCore*>(core);
+	m_velocity = hc->m_velocity;
+	m_position = lerp(m_position, hc->m_position, .1f);
 }
 
 CharacterCore * HumanCore::clone()

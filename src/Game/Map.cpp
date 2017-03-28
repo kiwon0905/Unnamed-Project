@@ -153,6 +153,21 @@ sf::Vector2f Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 	return ret;
 }
 
+bool Map::isGrounded(const Aabb<float> & aabb) const
+{
+	int startX = aabb.left / m_tileSize;
+	int endX = (aabb.left + aabb.width) / m_tileSize;
+
+	int y = (aabb.top + aabb.height + 1) / m_tileSize;
+
+	for (int x = startX; x <= endX; ++x)
+	{
+		if (getTile(x, y) > 0)
+			return true;
+	}
+	return false;
+}
+
 int Map::getTile(int x, int y) const
 {
 	if (0 <= x && x < m_size.x && 0 <= y && y < m_size.y)

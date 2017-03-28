@@ -1,6 +1,6 @@
 #include "Human.h"
 #include "Game/Client/GameWorld.h"
-#include "Core/MathUtility.h"
+#include "Core/Utility.h"
 
 Human::Human(int id):
 	Entity(id, EntityType::HUMAN)
