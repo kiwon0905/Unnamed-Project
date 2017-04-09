@@ -5,7 +5,6 @@
 #include "Network.h"
 #include "Gui.h"
 #include "ScreenStack.h"
-#include "Renderer.h"
 #include "Input.h"
 
 #include "Core/Parser.h"
@@ -28,10 +27,9 @@ public:
 	Context & getContext() {return m_context;}
 	Network & getNetwork() { return m_network; }
 	ScreenStack & getScreenStack() { return m_screenStack; }
-	Renderer & getRenderer() { return m_renderer; }
 	Gui & getGui() { return m_gui; }
 	Input & getInput() { return m_input; }
-	float getFrameProgress() { return m_frameProgress; }
+
 private:
 	bool initialize();
 	void finalize();
@@ -40,7 +38,10 @@ private:
 	Network m_network;
 	Gui m_gui;
 	ScreenStack m_screenStack;
-	Renderer m_renderer;
 	Input m_input;
-	float m_frameProgress;
+
+	//some statistics
+	sf::Time m_frameTime;
+	sf::Time m_minFrameTime = sf::seconds(10.f);
+	sf::Time m_maxFrameTime = sf::seconds(0.f);
 };

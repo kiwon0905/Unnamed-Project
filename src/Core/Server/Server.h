@@ -21,6 +21,8 @@ public:
 	void run();
 	void finalize();
 
+	void flushPackets();
+	const std::vector<std::unique_ptr<Peer>> & getPlayers() const;
 private:
 	struct Config
 	{
@@ -33,18 +35,19 @@ private:
 	{
 		PRE_GAME,
 		LOADING,
-		ENTERING,
 		IN_GAME
 	};
 
-	void parseCommands();
-	void handlePacket(Msg msg, Unpacker unpacker, ENetPeer * peer);
+	void handleCommands();
+	void handleNetwork();
+	void update();
+
 	Peer * getPeer(const ENetPeer * peer);
 	bool ensurePlayers(Peer::State state);
 
 	std::unique_ptr<std::thread> m_parsingThread;
 	std::atomic<bool> m_running = false;
-	ENetHost * m_gameServer = nullptr;
+	ENetHost * m_server = nullptr;
 	ENetPeer * m_masterServer = nullptr;
 	Config m_config;
 	State m_state = PRE_GAME;
@@ -52,5 +55,4 @@ private:
 	int m_nextPeerId = 0;
 	std::vector<std::unique_ptr<Peer>> m_players;
 	GameWorld m_gameWorld;
-	sf::Clock m_clock;
 };

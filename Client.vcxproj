@@ -22,11 +22,9 @@
     <ClInclude Include="src\Core\Client\Client.h" />
     <ClInclude Include="src\Core\Client\Gui.h" />
     <ClInclude Include="src\Core\Client\Input.h" />
-    <ClInclude Include="src\Core\Client\JobExecutor.h" />
     <ClInclude Include="src\Core\Client\LobbyScreen.h" />
     <ClInclude Include="src\Core\Client\Network.h" />
     <ClInclude Include="src\Core\Client\PlayingScreen.h" />
-    <ClInclude Include="src\Core\Client\Renderer.h" />
     <ClInclude Include="src\Core\Client\AssetManager.h" />
     <ClInclude Include="src\Core\Client\RoomScreen.h" />
     <ClInclude Include="src\Core\Client\Screen.h" />
@@ -40,23 +38,21 @@
     <ClInclude Include="src\Game\Aabb.h" />
     <ClInclude Include="src\Game\Client\Human.h" />
     <ClInclude Include="src\Game\Client\Entity.h" />
-    <ClInclude Include="src\Game\Client\GameWorld.h" />
     <ClInclude Include="src\Game\Control.h" />
     <ClInclude Include="src\Game\CharacterCore.h" />
-    <ClInclude Include="src\Game\GameCore.h" />
+    <ClInclude Include="src\Game\GameConfig.h" />
     <ClInclude Include="src\Game\Map.h" />
     <ClInclude Include="src\Game\NetObject.h" />
+    <ClInclude Include="src\Game\Snapshot.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Client\Client.cpp" />
     <ClCompile Include="src\Core\Client\ClientMain.cpp" />
     <ClCompile Include="src\Core\Client\Gui.cpp" />
     <ClCompile Include="src\Core\Client\Input.cpp" />
-    <ClCompile Include="src\Core\Client\JobExecutor.cpp" />
     <ClCompile Include="src\Core\Client\LobbyScreen.cpp" />
     <ClCompile Include="src\Core\Client\Network.cpp" />
     <ClCompile Include="src\Core\Client\PlayingScreen.cpp" />
-    <ClCompile Include="src\Core\Client\Renderer.cpp" />
     <ClCompile Include="src\Core\Client\AssetManager.cpp" />
     <ClCompile Include="src\Core\Client\RoomScreen.cpp" />
     <ClCompile Include="src\Core\Client\ScreenStack.cpp" />
@@ -65,11 +61,11 @@
     <ClCompile Include="src\Core\Packer.cpp" />
     <ClCompile Include="src\Core\Parser.cpp" />
     <ClCompile Include="src\Game\Client\Entity.cpp" />
-    <ClCompile Include="src\Game\Client\GameWorld.cpp" />
     <ClCompile Include="src\Game\Client\Human.cpp" />
     <ClCompile Include="src\Game\CharacterCore.cpp" />
     <ClCompile Include="src\Game\Map.cpp" />
     <ClCompile Include="src\Game\NetObject.cpp" />
+    <ClCompile Include="src\Game\Snapshot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Core\Packer.inl" />

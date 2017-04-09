@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Core/Packer.h"
-#include "Game/GameCore.h"
+#include "Game/GameConfig.h"
 #include "Game/Map.h"
+#include "Game/Snapshot.h"
 #include "Human.h"
 
 #include <enet/enet.h>
@@ -17,25 +18,33 @@ class GameWorld
 public:
 	GameWorld();
 
-	void onDisconnect(Peer & peer);
-	void prepare(std::vector<std::unique_ptr<Peer>> & players);
-	void start();
-	void update(float dt, std::vector<std::unique_ptr<Peer>> & players);
-	void reset();
 
-	void onRequestInfo(Peer & peer);
+	void prepare(Server & server);
+
+	void onDisconnect(Peer & peer, Server & server);
+	void onRequestGameInfo(Peer & peer, Server & server);
+	void onInput(Peer & peer, Server & server, Unpacker & unpacker);
+
+	void start();
+	void reset();
+	void update(Server & server);
+
+	int getCurrentTick();
 	const Map & getMap();
 private:
+	void snap(Server & server);
 	Entity * createEntity(EntityType type, Peer * p);
 	Entity * getEntity(int id, EntityType type);
 
-	void sync(Peer & peer);
-
-	int m_tick = 0;
 	bool m_reset = false;
-	bool m_started = false;
-	int m_nextEntityId = ENTITY_ID_MIN;
+
+	sf::Clock m_clock;
+	int m_tick = 0;
+
 	std::string m_mapName;
 	Map m_map;
+	
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
+	int m_nextEntityId = 0;
+	SnapshotContainer m_snapshots;
 };

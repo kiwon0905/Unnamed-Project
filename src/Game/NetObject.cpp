@@ -1,7 +1,9 @@
 #include "NetObject.h"
-#include "GameCore.h"
+#include "GameConfig.h"
 
-void NetHuman::pack(Packer & packer)
+
+
+void NetHuman::write(Packer & packer) const
 {
 	packer.pack<4>(0.f, 5000.f, position.x);
 	packer.pack<4>(0.f, 5000.f, position.y);
@@ -9,7 +11,7 @@ void NetHuman::pack(Packer & packer)
 	packer.pack<4>(-5000.f, 5000.f, velocity.y);
 }
 
-void NetHuman::unpack(Unpacker & unpacker)
+void NetHuman::read(Unpacker & unpacker)
 {
 	unpacker.unpack<4>(0.f, 5000.f, position.x);
 	unpacker.unpack<4>(0.f, 5000.f, position.y);
@@ -17,7 +19,18 @@ void NetHuman::unpack(Unpacker & unpacker)
 	unpacker.unpack<4>(-5000.f, 5000.f, velocity.y);
 }
 
-EntityType NetHuman::getType()
+NetItem::Type NetHuman::getType() const
 {
-	return EntityType::HUMAN;
+	return Type::HUMAN;
+}
+
+NetItem * NetItem::create(Type type)
+{
+	switch (type)
+	{
+	case NetItem::HUMAN:
+		return new NetHuman;
+	default:
+		return nullptr;
+	}
 }

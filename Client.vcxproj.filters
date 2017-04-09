@@ -27,9 +27,6 @@
     <ClInclude Include="src\Core\Client\Gui.h">
       <Filter>Core\Client</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Client\JobExecutor.h">
-      <Filter>Core\Client</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\Client\LobbyScreen.h">
       <Filter>Core\Client</Filter>
     </ClInclude>
@@ -37,9 +34,6 @@
       <Filter>Core\Client</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Client\PlayingScreen.h">
-      <Filter>Core\Client</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\Client\Renderer.h">
       <Filter>Core\Client</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Client\Screen.h">
@@ -50,9 +44,6 @@
     </ClInclude>
     <ClInclude Include="src\Core\Client\Input.h">
       <Filter>Core\Client</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Game\Client\GameWorld.h">
-      <Filter>Game\Client</Filter>
     </ClInclude>
     <ClInclude Include="src\Game\Client\Entity.h">
       <Filter>Game\Client</Filter>
@@ -84,9 +75,6 @@
     <ClInclude Include="src\Game\NetObject.h">
       <Filter>Game\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\GameCore.h">
-      <Filter>Game\Shared</Filter>
-    </ClInclude>
     <ClInclude Include="src\Game\Control.h">
       <Filter>Game\Shared</Filter>
     </ClInclude>
@@ -102,6 +90,12 @@
     <ClInclude Include="src\Core\Utility.h">
       <Filter>Core\Shared</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\GameConfig.h">
+      <Filter>Game\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Snapshot.h">
+      <Filter>Core\Shared</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Client\Client.cpp">
@@ -113,9 +107,6 @@
     <ClCompile Include="src\Core\Client\Gui.cpp">
       <Filter>Core\Client</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Client\JobExecutor.cpp">
-      <Filter>Core\Client</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Client\LobbyScreen.cpp">
       <Filter>Core\Client</Filter>
     </ClCompile>
@@ -125,17 +116,11 @@
     <ClCompile Include="src\Core\Client\PlayingScreen.cpp">
       <Filter>Core\Client</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Client\Renderer.cpp">
-      <Filter>Core\Client</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Client\ScreenStack.cpp">
       <Filter>Core\Client</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Client\Input.cpp">
       <Filter>Core\Client</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Game\Client\GameWorld.cpp">
-      <Filter>Game\Client</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\Client\Entity.cpp">
       <Filter>Game\Client</Filter>
@@ -169,6 +154,9 @@
     </ClCompile>
     <ClCompile Include="src\Game\Map.cpp">
       <Filter>Game\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Snapshot.cpp">
+      <Filter>Core\Shared</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

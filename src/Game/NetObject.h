@@ -1,21 +1,31 @@
 #pragma once
 
-#include "GameCore.h"
+#include "GameConfig.h"
 #include "Core/Packer.h"
 #include <SFML/System.hpp>
 
-struct NetEntity
+struct NetItem
 {
-	virtual void pack(Packer & packer) = 0;
-	virtual void unpack(Unpacker & unpacker) = 0;
-	virtual EntityType getType() = 0;
+	virtual ~NetItem() {}
+	enum Type
+	{
+		HUMAN,
+		COUNT
+	};
+	static NetItem * create(Type type);
+	virtual void write(Packer & packer) const = 0;
+	virtual void read(Unpacker & unpacker) = 0;
+	virtual Type getType() const = 0;
 };
 
-struct NetHuman : public NetEntity
+//////////////////////////////////////////////////////////////
+
+struct NetHuman : public NetItem
 {
-	void pack(Packer & packer);
-	void unpack(Unpacker & unpacker);
-	EntityType getType();
+	void write(Packer & packer) const;
+	void read(Unpacker & unpacker);
+	Type getType() const;
 	sf::Vector2f position;
 	sf::Vector2f velocity;
 };
+

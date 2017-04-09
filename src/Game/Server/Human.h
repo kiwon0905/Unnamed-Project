@@ -7,8 +7,8 @@ class Human : public Entity
 public:
 	Human(int id, Peer * player);
 
-	void update(float dt, GameWorld & world);
-	void sync(Packer & packer);
+	void tick(float dt, GameWorld & world);
+	void snap(Snapshot & snapshot) const;
 private:
 	HumanCore m_core;
 };

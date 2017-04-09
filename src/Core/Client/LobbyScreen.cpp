@@ -14,14 +14,6 @@ void LobbyScreen::onEnter(Client & client)
 {
 	loadUi(client);
 
-	/*auto requestJob = [&client]()
-	{
-		Packet packet;
-		packet << Msg::CL_REQUEST_INTERNET_SERVER_LIST;
-		ENetAddress addr = enutil::toENetAddress("localhost", 12344);
-		int i = enutil::send(client.getNetworkManager().getSocket(), addr, packet);
-	};
-	m_jobScheduler.addJob(requestJob, 2.f);*/
 }
 
 void LobbyScreen::handleEvent(const sf::Event & ev, Client & client)
@@ -93,9 +85,8 @@ void LobbyScreen::handlePacket(Unpacker & unpacker, const ENetAddress & addr, Cl
 	}
 }
 
-void LobbyScreen::update(float dt, Client & client)
+void LobbyScreen::update(Client & client)
 {
-	m_jobScheduler.update(dt);
 }
 
 void LobbyScreen::render(Client & client)
@@ -106,6 +97,7 @@ void LobbyScreen::render(Client & client)
 void LobbyScreen::onExit(Client & client)
 {
 	hideUi(client);
+	std::cout << "lobby exit!";
 }
 
 void LobbyScreen::onObscure(Client & client)

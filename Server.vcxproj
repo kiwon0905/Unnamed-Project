@@ -31,12 +31,13 @@
     <ClInclude Include="src\Game\Aabb.h" />
     <ClInclude Include="src\Game\CharacterCore.h" />
     <ClInclude Include="src\Game\Control.h" />
-    <ClInclude Include="src\Game\GameCore.h" />
+    <ClInclude Include="src\Game\GameConfig.h" />
     <ClInclude Include="src\Game\Map.h" />
     <ClInclude Include="src\Game\NetObject.h" />
     <ClInclude Include="src\Game\Server\Human.h" />
     <ClInclude Include="src\Game\Server\Entity.h" />
     <ClInclude Include="src\Game\Server\GameWorld.h" />
+    <ClInclude Include="src\Game\Snapshot.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\ENetUtility.cpp" />
@@ -52,6 +53,7 @@
     <ClCompile Include="src\Game\Server\Human.cpp" />
     <ClCompile Include="src\Game\Server\Entity.cpp" />
     <ClCompile Include="src\Game\Server\GameWorld.cpp" />
+    <ClCompile Include="src\Game\Snapshot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Core\Packer.inl" />

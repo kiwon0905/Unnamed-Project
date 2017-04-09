@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Screen.h"
-#include "JobExecutor.h"
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include <SFGUI/Widgets.hpp>
@@ -13,7 +12,7 @@ public:
 	void handleEvent(const sf::Event & ev, Client & client);
 	void handleNetEvent(ENetEvent & netEv, Client & client);
 	void handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client);
-	void update(float dt, Client & client);
+	void update(Client & client);
 	void render(Client & client);
 	void onExit(Client & client);
 	void onObscure(Client & client);
@@ -31,7 +30,6 @@ private:
 		sf::Uint32 id;
 		std::string name;
 	};
-	JobExecutor m_jobScheduler;
 	std::vector<ServerInfo> m_internetGameServers;
 	sfg::Window::Ptr m_window;
 	sfg::Notebook::Ptr m_notebook;

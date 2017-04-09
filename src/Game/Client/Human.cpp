@@ -1,6 +1,7 @@
 #include "Human.h"
-#include "Game/Client/GameWorld.h"
 #include "Core/Utility.h"
+
+#include <SFML/Graphics.hpp>
 
 Human::Human(int id):
 	Entity(id, EntityType::HUMAN)
@@ -12,7 +13,7 @@ void Human::update(float dt, GameWorld & world)
 {
 }
 
-void Human::renderPast(Renderer & renderer, const NetEntity * from, const NetEntity * to, float t)
+void Human::renderPast(const NetItem * from, const NetItem * to, float t, sf::RenderTarget & target)
 {
 	const NetHuman * h0 = static_cast<const NetHuman*>(from);
 	const NetHuman * h1 = static_cast<const NetHuman*>(to);
@@ -21,13 +22,15 @@ void Human::renderPast(Renderer & renderer, const NetEntity * from, const NetEnt
 	if(to)
 		pos = lerp(h0->position, h1->position, t);
 
-	renderer.renderHuman(pos.x, pos.y);
+	sf::RectangleShape r;
+	r.setSize({ 50.f, 50.f });
+	r.setPosition(pos);
+	target.draw(r);
 }
 
-void Human::renderFuture(Renderer & renderer, const CharacterCore & prevCore, const CharacterCore & currentCore, float t)
+void Human::renderFuture(const CharacterCore & prevCore, const CharacterCore & currentCore, float t)
 {
 	sf::Vector2f pos = lerp(prevCore.getPosition(), currentCore.getPosition(), t);
-	renderer.renderHuman(pos.x, pos.y);
 	
 }
 

@@ -2,6 +2,7 @@
 #include "PlayingScreen.h"
 #include "Core/Protocol.h"
 #include "Core/Logger.h"
+#include "Core/Client/Client.h"
 
 void RoomScreen::onEnter(Client & client)
 {
@@ -35,7 +36,7 @@ void RoomScreen::handlePacket(Unpacker & unpacker, const ENetAddress & addr, Cli
 {
 }
 
-void RoomScreen::update(float dt, Client & client)
+void RoomScreen::update(Client & client)
 {
 }
 
@@ -45,6 +46,7 @@ void RoomScreen::render(Client & client)
 
 void RoomScreen::onExit(Client & client)
 {
+	std::cout << "room exit!\ns";
 }
 
 void RoomScreen::onObscure(Client & client)

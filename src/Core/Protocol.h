@@ -10,7 +10,7 @@ enum class Msg
 	//client -> server
 	CL_REQUEST_JOIN_GAME,
 	CL_REQUEST_ROOM_INFO,
-	CL_REQUEST_WORLD_INFO,
+	CL_REQUEST_GAME_INFO,
 	CL_LOAD_COMPLETE,
 	CL_READY,
 	CL_INPUT,
@@ -24,14 +24,21 @@ enum class Msg
 	SV_ACCEPT_JOIN,
 	SV_REJECT_JOIN,
 	SV_LOAD_GAME,
-	SV_WORLD_INFO,
+	SV_GAME_INFO,
 	SV_SNAPSHOT,
+	SV_INPUT_TIMING,
 
 	//master -> client
 	MSV_INTERNET_SERVER_LIST,
 
 	INVALID,
 	COUNT
+};
+
+
+struct GameInfo
+{
+
 };
 
 //Master server 

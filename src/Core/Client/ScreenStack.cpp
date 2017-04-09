@@ -12,9 +12,9 @@ void ScreenStack::finalize(Client & client)
 {
 }
 
-void ScreenStack::update(float dt, Client & client)
+void ScreenStack::update(Client & client)
 {
-	m_screens.top()->update(dt, client);
+	m_screens.top()->update(client);
 }
 
 void ScreenStack::render(Client & client)

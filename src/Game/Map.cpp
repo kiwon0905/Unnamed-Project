@@ -68,7 +68,7 @@ sf::Vector2f Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 	{
 		int x = (aabb2.left + aabb2.width) / m_tileSize + 1;
 		float minDistance = dv.x;
-		while (x < (m_size.x + 1) && x * m_tileSize < aabb2.left + aabb2.width + dv.x)
+		while (x < m_size.x + 1 && x * m_tileSize < aabb2.left + aabb2.width + dv.x)
 		{
 			int startY = aabb2.top / m_tileSize;
 			int endY = (aabb2.top + aabb2.height) / m_tileSize;

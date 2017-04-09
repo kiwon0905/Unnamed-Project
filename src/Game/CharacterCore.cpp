@@ -17,8 +17,19 @@ const sf::Vector2f & CharacterCore::getVelocity() const
 	return m_velocity;
 }
 
+CharacterCore * createCore(EntityType type)
+{
+	switch (type)
+	{
+	case EntityType::HUMAN:
+		return new HumanCore;
+		break;
+	default:
+		return nullptr;
+	}
+}
 
-void HumanCore::update(float dt, unsigned input, const Map & map)
+void HumanCore::tick(float dt, unsigned input, const Map & map)
 {
 	int direction = 0;
 	if (input & Control::MOVE_LEFT)
@@ -27,9 +38,9 @@ void HumanCore::update(float dt, unsigned input, const Map & map)
 		direction++;
 
 	if (direction > 0)
-		m_velocity.x = 300.f;
+		m_velocity.x = 500.f;
 	else if (direction < 0)
-		m_velocity.x = -300.f;
+		m_velocity.x = -500.f;
 	else
 		m_velocity.x = 0.f;
 
@@ -49,7 +60,7 @@ void HumanCore::update(float dt, unsigned input, const Map & map)
 	{
 		if (input & Control::JUMP)
 		{
-			m_velocity.y = -300.f;
+			m_velocity.y = -700.f;
 		}
 		else
 		{
@@ -66,18 +77,11 @@ void HumanCore::update(float dt, unsigned input, const Map & map)
 		m_position += dv;
 }
 
-void HumanCore::assign(const NetEntity * ne)
+void HumanCore::assign(const NetItem * ne)
 {
 	const NetHuman * nh = static_cast<const NetHuman *>(ne);
 	m_position = nh->position;
 	m_velocity = nh->velocity;
-}
-
-void HumanCore::smooth(const CharacterCore * core)
-{
-	const HumanCore * hc = static_cast<const HumanCore*>(core);
-	m_velocity = hc->m_velocity;
-	m_position = lerp(m_position, hc->m_position, .1f);
 }
 
 CharacterCore * HumanCore::clone()

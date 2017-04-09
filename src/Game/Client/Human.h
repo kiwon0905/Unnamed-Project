@@ -8,8 +8,8 @@ class Human : public Entity
 public:
 	Human(int id);
 	void update(float dt, GameWorld & world);
-	void renderPast(Renderer & renderer, const NetEntity * from, const NetEntity * to, float t);
-	void renderFuture(Renderer & renderer, const CharacterCore & prevCore, const CharacterCore & prevCurrent, float t);
+	void renderPast(const NetItem * from, const NetItem * to, float t, sf::RenderTarget & target);
+	void renderFuture(const CharacterCore & prevCore, const CharacterCore & prevCurrent, float t);
 	
 
 };

@@ -27,8 +27,7 @@ public:
 	{
 		PRE_GAME,
 		LOADING,
-		ENTERING,
-		PLAYING
+		IN_GAME
 	};
 
 	Peer(int id, ENetPeer * peer);
@@ -39,14 +38,13 @@ public:
 	bool send(Packer & packer, bool reliable);
 	State getState() const;
 	void setState(State state);
-	void onInput(unsigned bits, int seq);
-	Input popInput();
-	int getLastUsedInputTick();
+	
+	void onInput(unsigned bits, int tick);
+	Input popInput(int tick);
 private:
 	int m_id;
 	ENetPeer * m_peer;
 	Entity * m_entity = nullptr;
 	State m_state = PRE_GAME;
-	Input m_lastInput;
 	std::priority_queue<Input, std::vector<Input>, InputComparator> m_inputs;
 };

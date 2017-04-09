@@ -10,18 +10,20 @@
 
 GameWorld::GameWorld()
 {
-	m_entitiesByType.resize(EntityType::COUNT);
+	m_entitiesByType.resize(static_cast<int>(EntityType::COUNT));
 }
 
-void GameWorld::onDisconnect(Peer & peer)
+void GameWorld::onDisconnect(Peer & peer, Server & server)
 {
 	if (peer.getEntity())
 		peer.getEntity()->setAlive(false);
 }
 
-void GameWorld::prepare(std::vector<std::unique_ptr<Peer>> & players)
+void GameWorld::prepare(Server & server)
 {
-	for (auto & p : players)
+	m_mapName = "grass";
+	m_map.loadFromFile("map/grass.xml");
+	for (const auto & p : server.getPlayers())
 	{
 		Human * h = static_cast<Human*>(createEntity(EntityType::HUMAN, p.get()));
 		p->setEntity(h);
@@ -30,57 +32,92 @@ void GameWorld::prepare(std::vector<std::unique_ptr<Peer>> & players)
 		p->send(packer, true);
 	}
 
-	m_mapName = "grass";
-	m_map.loadFromFile("map/" + m_mapName + ".xml");
+
+}
+
+void GameWorld::onRequestGameInfo(Peer & peer, Server & server)
+{
+	//pack this player's id first
+	Packer packer;
+	packer.pack(Msg::SV_GAME_INFO);
+	packer.pack(m_mapName);
+	packer.pack<0, MAX_PLAYER_ID>(server.getPlayers().size());
+	packer.pack<0, MAX_PLAYER_ID>(peer.getId());				//my player id
+	packer.pack<0, MAX_ENTITY_ID>(peer.getEntity()->getId());	//my entity id
+	packer.pack(peer.getEntity()->getType());					//my entity type
+
+	for (const auto & p : server.getPlayers())
+	{
+		if (p->getId() != peer.getId())
+		{
+			packer.pack<0, MAX_PLAYER_ID>(p->getId());				//player id
+			packer.pack<0, MAX_ENTITY_ID>(p->getEntity()->getId());	//entity id
+		}
+	}
+	peer.send(packer, true);
+}
+
+void GameWorld::onInput(Peer & peer, Server & server, Unpacker & unpacker)
+{
+	int tick;
+	uint32_t bits;
+	unpacker.unpack<0, MAX_TICK>(tick);
+	unpacker.unpack(bits);
+	peer.onInput(bits, tick);
+	if (m_tick % 2 == 0)
+	{
+		sf::Time timeLeft = sf::seconds(tick / TICKS_PER_SEC) - m_clock.getElapsedTime();
+
+		Packer packer;
+		packer.pack(Msg::SV_INPUT_TIMING);
+		packer.pack<0, MAX_TICK>(tick);
+		packer.pack(timeLeft.asMilliseconds());
+		peer.send(packer, false);
+	}
+
 }
 
 void GameWorld::start()
 {
 	Logger::getInstance().info("The game has started.");
-	m_started = true;
+	m_clock.restart();
 }
 
-void GameWorld::update(float dt, std::vector<std::unique_ptr<Peer>> & players)
+void GameWorld::update(Server & server)
 {
-	for (auto & v : m_entitiesByType)
-		for (auto & e : v)
-			e->update(dt, *this);
+	static sf::Time accumulator, prevTime;
+	sf::Time current = m_clock.getElapsedTime();
+	sf::Time dt = current - prevTime;
+	prevTime = current;
+	accumulator += dt;
 
-	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
-	for (auto & v : m_entitiesByType)
-		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
-
-	if (m_tick % 3 == 0)
+	while (accumulator >= sf::seconds(1.f / TICKS_PER_SEC))
 	{
-		for (auto & peer : players)
-			sync(*peer);
-	}
-	m_tick++;
-}
-
-void GameWorld::sync(Peer & peer)
-{
-	Packer packer;
-	packer.pack(Msg::SV_SNAPSHOT);
-	packer.pack<TICK_MIN, TICK_MAX>(m_tick);
-	packer.pack<TICK_MIN, TICK_MAX>(peer.getLastUsedInputTick());
-	std::size_t count = 0;
-	for (auto & v : m_entitiesByType)
-		count += v.size();
-
-	packer.pack<ENTITY_ID_MIN, ENTITY_ID_MAX>(count);
-	for (auto & v : m_entitiesByType)
-	{
-		for (auto & e : v)
-		{
-			packer.pack<ENTITY_ID_MIN, ENTITY_ID_MAX>(e->getId());
-			packer.pack(e->getType());
-			e->sync(packer);
-		}
-	}
-
-	peer.send(packer, false);
+		m_tick++;
+		accumulator -= sf::seconds(1.f / TICKS_PER_SEC);
 	
+
+		for (auto & v : m_entitiesByType)
+			for (auto & e : v)
+				e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), *this);
+
+		auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
+		for (auto & v : m_entitiesByType)
+			v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
+
+		if (m_tick % 2 == 0)
+			snap(server);
+	}
+}
+
+int GameWorld::getCurrentTick()
+{
+	return m_tick;
+}
+
+const Map & GameWorld::getMap()
+{
+	return  m_map;
 }
 
 void GameWorld::reset()
@@ -88,19 +125,20 @@ void GameWorld::reset()
 	m_reset = true;
 }
 
-void GameWorld::onRequestInfo(Peer & peer)
+void GameWorld::snap(Server & server)
 {
 	Packer packer;
-	packer.pack(Msg::SV_WORLD_INFO);
-	packer.pack<ENTITY_ID_MIN, ENTITY_ID_MAX>(peer.getEntity()->getId());
-	packer.pack(peer.getEntity()->getType());
-	packer.pack(m_mapName);
-	peer.send(packer, true);
-}
+	packer.pack(Msg::SV_SNAPSHOT);
+	packer.pack<0, MAX_TICK>(m_tick);
+	Snapshot * snapshot = new Snapshot;
 
-const Map & GameWorld::getMap()
-{
-	return m_map;
+	for (const auto & v : m_entitiesByType)
+		for (const auto & e : v)
+			e->snap(*snapshot);
+	snapshot->write(packer);
+
+	for (auto & p : server.getPlayers())
+		p->send(packer, false);
 }
 
 Entity * GameWorld::createEntity(EntityType type, Peer * p)
@@ -109,13 +147,13 @@ Entity * GameWorld::createEntity(EntityType type, Peer * p)
 	if (type == EntityType::HUMAN)
 		e = new Human(m_nextEntityId++, p);
 		
-	m_entitiesByType[type].emplace_back(e);
+	m_entitiesByType[static_cast<int>(type)].emplace_back(e);
 	return e;
 }
 
 Entity * GameWorld::getEntity(int id, EntityType type)
 {
-	for (auto & e : m_entitiesByType[type])
+	for (auto & e : m_entitiesByType[static_cast<int>(type)])
 		if (e->getId() == id)
 			return e.get();
 	return nullptr;

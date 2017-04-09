@@ -14,7 +14,7 @@ class ScreenStack
 public:
 	bool initialize(Client & client);
 	void finalize(Client & client);
-	void update(float dt, Client & client);
+	void update(Client & client);
 	void render(Client & client);
 
 
