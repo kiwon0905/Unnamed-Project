@@ -18,7 +18,7 @@ public:
 	bool isAlive() const;
 	virtual void update(float dt, GameWorld & world) = 0;
 	virtual void renderPast(const NetItem * from, const NetItem * to, float t, sf::RenderTarget & target) = 0;
-	virtual void renderFuture(const CharacterCore & prevCore, const CharacterCore & prevCurrent, float t) = 0;
+	virtual void renderFuture(const CharacterCore & prevCore, const CharacterCore & prevCurrent, float t, sf::RenderTarget & target) = 0;
 protected:
 	int m_id;
 	EntityType m_type;

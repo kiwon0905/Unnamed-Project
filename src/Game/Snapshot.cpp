@@ -88,6 +88,13 @@ Snapshot * SnapshotContainer::get(int tick)
 	return  nullptr;
 }
 
+Snapshot * SnapshotContainer::getLast()
+{
+	if (m_snapshots.empty())
+		return nullptr;
+	return m_snapshots.back().snapshot.get();
+}
+
 void SnapshotContainer::add(Snapshot * snapshot, int tick)
 {
 	m_snapshots.emplace_back(tick, snapshot);

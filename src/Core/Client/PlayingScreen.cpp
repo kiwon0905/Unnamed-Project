@@ -75,16 +75,19 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		{
 			std::string mapName;
 			int numPlayer;
-			EntityType myEntityType;
+			EntityType playerEntityType;
 			unpacker.unpack(mapName);
 			unpacker.unpack<0, MAX_PLAYER_ID>(numPlayer);
-			unpacker.unpack<0, MAX_PLAYER_ID>(myPlayer.id);
-			unpacker.unpack<0, MAX_ENTITY_ID>(myPlayer.entityId);
-			unpacker.unpack(myEntityType);
+			unpacker.unpack<0, MAX_PLAYER_ID>(m_myPlayer.id);
+			unpacker.unpack<0, MAX_ENTITY_ID>(m_myPlayer.entityId);
+			unpacker.unpack(playerEntityType);
+
+			m_playerCurrentCore.reset(createCore(playerEntityType));
+			m_playerPrevCore.reset(createCore(playerEntityType));
 
 			std::cout << "map: " << mapName << "\n";
 			std::cout << "total " << numPlayer << " players.\n";
-			std::cout << "my player id: " << myPlayer.id << " entity id: " << myPlayer.entityId << " entity type: " << static_cast<int>(myEntityType) << "\n";
+			std::cout << "my player id: " << m_myPlayer.id << " entity id: " << m_myPlayer.entityId << " entity type: " << static_cast<int>(playerEntityType) << "\n";
 
 			for (int i = 0; i < numPlayer - 1; ++i)
 			{
@@ -133,8 +136,8 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			}
 
 			//create character core;
-			m_playerCurrentCore.reset(createCore(myEntityType));
-			m_playerPrevCore.reset(createCore(myEntityType));
+			m_playerCurrentCore.reset(createCore(playerEntityType));
+			m_playerPrevCore.reset(createCore(playerEntityType));
 
 			//send ack
 			Packer packer;
@@ -146,6 +149,9 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 
 		else if (msg == Msg::SV_SNAPSHOT)
 		{
+			if (m_state == LOADING)
+				return;
+			
 			int serverTick;
 			unpacker.unpack<0, MAX_TICK>(serverTick);
 
@@ -168,7 +174,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					std::cout << "start tick: " << m_startTick << "\n";
 					std::cout << "predicted tick: " << m_predictedTick << "\n";
 				}
-				else if(serverTick - 4 >= m_startTick)	//delay by 4 ticks. 
+				else if(serverTick - m_renderDelayTick >= m_startTick)	//delay by 4 ticks. 
 				{
 					m_state = IN_GAME;
 					m_renderTime.reset(sf::seconds(m_startTick / TICKS_PER_SEC));
@@ -176,13 +182,13 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 				}
 		
 			}
-			else
+			else if(m_state == IN_GAME)
 			{
-				sf::Time target = sf::seconds((serverTick - 4) / TICKS_PER_SEC);
+				sf::Time target = sf::seconds((serverTick - m_renderDelayTick) / TICKS_PER_SEC);
 				m_renderTime.update(target, sf::seconds(1.f));
+				m_repredict = true;
 			}
 			m_numReceivedSnapshots++;
-
 		}
 
 		else if (msg == Msg::SV_INPUT_TIMING)
@@ -231,6 +237,7 @@ void PlayingScreen::update(Client & client)
 		{
 			m_predictedTick++;
 
+			//inputs
 			uint32_t i = 0;
 			if(client.getContext().window.hasFocus())
 				i = client.getInput().getBits();
@@ -240,6 +247,35 @@ void PlayingScreen::update(Client & client)
 			m_inputs[m_currentInputIndex].elapsed.restart();
 			m_currentInputIndex++;
 			m_currentInputIndex = m_currentInputIndex % 200;
+
+			//predict
+			if (m_myPlayer.entityId != -1)
+			{
+				m_playerPrevCore.reset(m_playerCurrentCore->clone());
+				m_playerCurrentCore->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), i, m_map);
+			}
+			if (m_repredict && m_myPlayer.entityId != -1)
+			{
+				Snapshot * s = m_snapshots.getLast();
+				NetItem * e = s->getEntity(m_myPlayer.entityId);
+				if (e)
+				{
+					m_playerCurrentCore->assign(e);
+					m_playerPrevCore->assign(e);
+				}
+				for (int t = m_lastSnapshotTick + 1; t <= m_predictedTick; ++t)
+				{
+					for (const auto & i : m_inputs)
+					{
+						if (i.tick == t)
+						{
+							m_playerPrevCore.reset(m_playerCurrentCore->clone());
+							m_playerCurrentCore->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), i.data, m_map);
+						}
+					}
+				}
+				m_repredict = false;
+			}
 
 			Packer packer;
 			packer.pack(Msg::CL_INPUT);
@@ -288,17 +324,28 @@ void PlayingScreen::render(Client & client)
 			m_entitiesByType[static_cast<int>(e->getType())].emplace_back(e);
 		}
 		NetItem * from = s.first->snapshot->getEntity(e->getId());
-
 		NetItem * to = nullptr;
 		if (s.second)
 		{
 			to = s.second->snapshot->getEntity(e->getId());
 			if (!to)
+			{
 				e->setAlive(false);
+				if (e->getId() == m_myPlayer.entityId)
+				{
+					m_playerPrevCore = nullptr;
+					m_playerCurrentCore = nullptr;
+					m_myPlayer.entityId = -1;
+				}
+			}
 		}
+		if(e->getId() != m_myPlayer.entityId)
+			e->renderPast(from, to, t, m_renderTexture);
 		else
-			std::cout << "!";
-		e->renderPast(from, to, t, m_renderTexture);
+		{
+			float predT = (m_predictedTime.getElapsedTime().asSeconds() - m_predictedTick / TICKS_PER_SEC);
+			e->renderFuture(*m_playerPrevCore.get(), *m_playerCurrentCore.get(), predT, m_renderTexture);
+		}
 	}
 	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
 	for (auto & v : m_entitiesByType)

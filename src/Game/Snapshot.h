@@ -36,6 +36,7 @@ class SnapshotContainer
 {
 public:
 	Snapshot * get(int tick);
+	Snapshot * getLast();
 	void add(Snapshot * snapshot, int tick);
 
 	std::pair<TickedSnapshot*, TickedSnapshot*> find(float tick);

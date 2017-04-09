@@ -48,7 +48,7 @@ private:
 		int entityId;
 	};
 	std::vector<PlayerInfo> m_players;
-	PlayerInfo myPlayer;
+	PlayerInfo m_myPlayer;
 	State m_state = LOADING;
 
 	struct Input
@@ -62,14 +62,15 @@ private:
 	std::size_t m_currentInputIndex = 0;
 
 	sf::Time m_prevPredictedTime;
+	int m_renderDelayTick = 4;
 	SmoothClock m_renderTime;
 	SmoothClock m_predictedTime;
 	SnapshotContainer m_snapshots;
-
 	int m_numReceivedSnapshots = 0;
 	int m_startTick = -1;
 	int m_lastSnapshotTick = -1;
 	int m_predictedTick = -1;
+	bool m_repredict = false;
 
 	std::unique_ptr<CharacterCore> m_playerCurrentCore;
 	std::unique_ptr<CharacterCore> m_playerPrevCore;
