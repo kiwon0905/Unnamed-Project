@@ -2,12 +2,6 @@
 #include "GameConfig.h"
 
 
-int mround(float f)
-{
-	if (f > 0)
-		return (int)(f + 0.5f);
-	return (int)(f - 0.5f);
-}
 void NetHuman::write(Packer & packer) const
 {
 	packer.pack<2>(0.f, 5000.f, position.x);

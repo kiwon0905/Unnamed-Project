@@ -7,10 +7,11 @@
 class CharacterCore
 {
 public:
-	virtual void tick(float dt, unsigned input, const Map & map) = 0;
 	const sf::Vector2f & getPosition() const;
 	void setPosition(const sf::Vector2f & v);
 	const sf::Vector2f & getVelocity() const;
+
+	virtual void tick(float dt, unsigned input, const Map & map) = 0;
 	virtual void assign(const NetItem * ne) = 0;
 	virtual CharacterCore * clone() = 0;
 protected:

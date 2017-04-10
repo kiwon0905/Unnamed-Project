@@ -23,6 +23,8 @@ void Human::renderPast(const NetItem * from, const NetItem * to, float t, sf::Re
 		pos = lerp(h0->position, h1->position, t);
 
 	sf::RectangleShape r;
+	r.setFillColor(sf::Color::Green);
+
 	r.setSize({ 50.f, 50.f });
 	r.setPosition(pos);
 	target.draw(r);
@@ -33,9 +35,8 @@ void Human::renderFuture(const CharacterCore & prevCore, const CharacterCore & c
 	sf::Vector2f pos = lerp(prevCore.getPosition(), currentCore.getPosition(), t);
 	sf::RectangleShape r;
 	r.setSize({ 50.f, 50.f });
+	r.setFillColor(sf::Color::Green);
 	r.setPosition(pos);
-
-	std::cout << "position: " << pos << "\n";
 	target.draw(r);
 }
 

@@ -75,14 +75,14 @@ private:
 
 	std::unique_ptr<CharacterCore> m_playerCurrentCore;
 	std::unique_ptr<CharacterCore> m_playerPrevCore;
-
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 
 	Map m_map;
 	sf::Texture * m_tileTexture;
 	sf::RenderTexture m_renderTexture;
 	sf::VertexArray m_tileVertices;
-	sf::Vector2f m_cameraSize;
+	sf::View m_view;
 
 	Entity * getEntity(int id);
+	
 };

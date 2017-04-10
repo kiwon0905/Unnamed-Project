@@ -6,7 +6,7 @@
 #include "Core/Packer.h"
 #include "Core/Protocol.h"
 #include "Core/Logger.h"
-
+#include "Core/Utility.h"
 sf::Time SmoothClock::getElapsedTime()
 {
 	sf::Time dt = m_clock.getElapsedTime() - m_snap;
@@ -52,7 +52,7 @@ void PlayingScreen::onEnter(Client & client)
 
 	float verticleCameraSize = 3200.f;
 	float horizontalCameraSize = verticleCameraSize / client.getContext().window.getSize().x * client.getContext().window.getSize().y;
-	m_cameraSize = { verticleCameraSize, horizontalCameraSize };
+	m_view.setSize(verticleCameraSize, horizontalCameraSize);
 	m_renderTexture.create(static_cast<unsigned>(verticleCameraSize + .5f), static_cast<unsigned>(horizontalCameraSize + .5f));
 	m_renderTexture.setSmooth(true);
 }
@@ -295,20 +295,35 @@ void PlayingScreen::render(Client & client)
 		return;
 
 	m_renderTexture.clear();
+	sf::RectangleShape background;
+	background.setSize(static_cast<sf::Vector2f>(m_map.getSize() * m_map.getTileSize()));
+	m_renderTexture.draw(background);
 
 	//tile map
 	sf::RenderStates states;
 	states.texture = m_tileTexture;
 	m_renderTexture.draw(m_tileVertices, states);
 
-	//entities
+	//camera
+	if (m_myPlayer.entityId != -1)
+	{
+		float predT = m_accumulator / sf::seconds(1.f / TICKS_PER_SEC);
+		sf::Vector2f pos = lerp(m_playerPrevCore->getPosition(), m_playerCurrentCore->getPosition(), predT);
+		m_view.setCenter(pos);
+		m_renderTexture.setView(m_view);
+	}
+	else
+	{
+		//TODO
+	}
+
 	float renderTick = m_renderTime.getElapsedTime().asSeconds() * TICKS_PER_SEC;
 	auto & s = m_snapshots.find(renderTick);
 	float t = 0.f;
 	if (s.second)
 		t = (renderTick - s.first->tick) / (s.second->tick - s.first->tick);
 
-
+	//entities
 	for (auto & p : s.first->snapshot->getEntities())
 	{
 		Entity * e = getEntity(p.first);
@@ -332,6 +347,7 @@ void PlayingScreen::render(Client & client)
 			if (!to)
 			{
 				e->setAlive(false);
+				//our own player died
 				if (e->getId() == m_myPlayer.entityId)
 				{
 					m_playerPrevCore = nullptr;
