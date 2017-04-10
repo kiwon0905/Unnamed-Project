@@ -31,10 +31,11 @@ void Human::renderPast(const NetItem * from, const NetItem * to, float t, sf::Re
 void Human::renderFuture(const CharacterCore & prevCore, const CharacterCore & currentCore, float t, sf::RenderTarget & target)
 {
 	sf::Vector2f pos = lerp(prevCore.getPosition(), currentCore.getPosition(), t);
-	//std::cout << "pos: " << pos << "\n";
 	sf::RectangleShape r;
 	r.setSize({ 50.f, 50.f });
 	r.setPosition(pos);
+
+	std::cout << "position: " << pos << "\n";
 	target.draw(r);
 }
 

@@ -38,6 +38,7 @@ public:
 	Snapshot * get(int tick);
 	Snapshot * getLast();
 	void add(Snapshot * snapshot, int tick);
+	void removeUntil(int tick);
 
 	std::pair<TickedSnapshot*, TickedSnapshot*> find(float tick);
 private:

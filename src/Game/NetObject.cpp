@@ -2,21 +2,26 @@
 #include "GameConfig.h"
 
 
-
+int mround(float f)
+{
+	if (f > 0)
+		return (int)(f + 0.5f);
+	return (int)(f - 0.5f);
+}
 void NetHuman::write(Packer & packer) const
 {
-	packer.pack<4>(0.f, 5000.f, position.x);
-	packer.pack<4>(0.f, 5000.f, position.y);
-	packer.pack<4>(-5000.f, 5000.f, velocity.x);
-	packer.pack<4>(-5000.f, 5000.f, velocity.y);
+	packer.pack<2>(0.f, 5000.f, position.x);
+	packer.pack<2>(0.f, 5000.f, position.y);
+	packer.pack<2>(-5000.f, 5000.f, velocity.x);
+	packer.pack<2>(-5000.f, 5000.f, velocity.y);
 }
 
 void NetHuman::read(Unpacker & unpacker)
 {
-	unpacker.unpack<4>(0.f, 5000.f, position.x);
-	unpacker.unpack<4>(0.f, 5000.f, position.y);
-	unpacker.unpack<4>(-5000.f, 5000.f, velocity.x);
-	unpacker.unpack<4>(-5000.f, 5000.f, velocity.y);
+	unpacker.unpack<2>(0.f, 5000.f, position.x);
+	unpacker.unpack<2>(0.f, 5000.f, position.y);
+	unpacker.unpack<2>(-5000.f, 5000.f, velocity.x);
+	unpacker.unpack<2>(-5000.f, 5000.f, velocity.y);
 }
 
 NetItem::Type NetHuman::getType() const

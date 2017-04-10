@@ -65,6 +65,7 @@ private:
 	int m_renderDelayTick = 4;
 	SmoothClock m_renderTime;
 	SmoothClock m_predictedTime;
+	sf::Time m_accumulator;
 	SnapshotContainer m_snapshots;
 	int m_numReceivedSnapshots = 0;
 	int m_startTick = -1;

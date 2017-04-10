@@ -71,10 +71,16 @@ void HumanCore::tick(float dt, unsigned input, const Map & map)
 	{
 		m_velocity.y += 1000.f * dt;
 	}
-	sf::Vector2f dv = map.move(aabb, m_velocity * dt);
+	MoveResult result = map.move(aabb, m_velocity * dt);
+	if (result.horizontalTile)
+		m_velocity.x = 0.f;
+	if (result.verticalTile)
+		m_velocity.y = 0.f;
+	if (result.verticalTile == -1)
+		m_velocity.y = -1000.f;
 
-	if(length(dv) > 0.001f)
-		m_position += dv;
+	if(length(result.v) > 0.001f)
+		m_position += result.v;
 }
 
 void HumanCore::assign(const NetItem * ne)

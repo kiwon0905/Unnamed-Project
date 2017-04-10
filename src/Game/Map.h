@@ -5,6 +5,14 @@
 #include <string>
 #include <vector>
 #include <iostream>
+
+struct MoveResult
+{
+	sf::Vector2f v;
+	int horizontalTile = 0;
+	int verticalTile = 0;
+};
+
 class Map
 {
 public:
@@ -14,7 +22,7 @@ public:
 	const std::string & getTilesetFile() const;
 	int getTileSize() const;
 	int getTile(int x, int y) const;
-	sf::Vector2f move(const Aabb<float> & aabb, const sf::Vector2f & dv) const;
+	MoveResult move(const Aabb<float> & aabb, const sf::Vector2f & dv) const;
 	bool isGrounded(const Aabb<float> & aabb) const;
 private:
 

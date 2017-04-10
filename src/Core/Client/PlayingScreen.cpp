@@ -202,7 +202,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 				if (input.tick == inputTick)
 				{
 					sf::Time target = input.predictedTime + input.elapsed.getElapsedTime() - sf::milliseconds(timeLeft - 100);
-					m_predictedTime.update(target, sf::seconds(1));
+					m_predictedTime.update(target, sf::seconds(1.f));
 				}
 			}
 		}
@@ -225,15 +225,14 @@ void PlayingScreen::handlePacket(Unpacker & unpacker, const ENetAddress & addr, 
 
 void PlayingScreen::update(Client & client)
 {
-	static sf::Time accumulator;
 	if (m_state == IN_GAME)
 	{
 		sf::Time current = m_predictedTime.getElapsedTime();
 		sf::Time dt = current - m_prevPredictedTime;
 		m_prevPredictedTime = current;
-		accumulator += dt;
+		m_accumulator += dt;
 
-		while (accumulator >= sf::seconds(1.f / TICKS_PER_SEC))
+		while (m_accumulator >= sf::seconds(1.f / TICKS_PER_SEC))
 		{
 			m_predictedTick++;
 
@@ -247,6 +246,13 @@ void PlayingScreen::update(Client & client)
 			m_inputs[m_currentInputIndex].elapsed.restart();
 			m_currentInputIndex++;
 			m_currentInputIndex = m_currentInputIndex % 200;
+
+			//send to server
+			Packer packer;
+			packer.pack(Msg::CL_INPUT);
+			packer.pack<0, MAX_TICK>(m_predictedTick);
+			packer.pack(i);
+			client.getNetwork().send(packer, false);
 
 			//predict
 			if (m_myPlayer.entityId != -1)
@@ -277,13 +283,7 @@ void PlayingScreen::update(Client & client)
 				m_repredict = false;
 			}
 
-			Packer packer;
-			packer.pack(Msg::CL_INPUT);
-			packer.pack<0, MAX_TICK>(m_predictedTick);
-			packer.pack(i);
-			client.getNetwork().send(packer, false);
-
-			accumulator -= sf::seconds(1 / TICKS_PER_SEC);
+			m_accumulator -= sf::seconds(1 / TICKS_PER_SEC);
 		}
 
 	}
@@ -307,7 +307,8 @@ void PlayingScreen::render(Client & client)
 	float t = 0.f;
 	if (s.second)
 		t = (renderTick - s.first->tick) / (s.second->tick - s.first->tick);
-	
+
+
 	for (auto & p : s.first->snapshot->getEntities())
 	{
 		Entity * e = getEntity(p.first);
@@ -343,7 +344,7 @@ void PlayingScreen::render(Client & client)
 			e->renderPast(from, to, t, m_renderTexture);
 		else
 		{
-			float predT = (m_predictedTime.getElapsedTime().asSeconds() - m_predictedTick / TICKS_PER_SEC);
+			float predT = m_accumulator / sf::seconds(1.f / TICKS_PER_SEC);
 			e->renderFuture(*m_playerPrevCore.get(), *m_playerCurrentCore.get(), predT, m_renderTexture);
 		}
 	}

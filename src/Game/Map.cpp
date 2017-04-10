@@ -59,15 +59,18 @@ int Map::getTileSize() const
 	return m_tileSize;
 }
 
-sf::Vector2f Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
+MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 {
-	sf::Vector2f ret = dv;
+	MoveResult result;
+	result.v = dv;
+
 	Aabb<float> aabb2 = aabb;
 
 	if (dv.x > 0)
 	{
 		int x = (aabb2.left + aabb2.width) / m_tileSize + 1;
 		float minDistance = dv.x;
+		
 		while (x < m_size.x + 1 && x * m_tileSize < aabb2.left + aabb2.width + dv.x)
 		{
 			int startY = aabb2.top / m_tileSize;
@@ -78,14 +81,16 @@ sf::Vector2f Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 				{
 					float distance = m_tileSize * x - (aabb2.left + aabb2.width);
 					if (distance < minDistance)
+					{
 						minDistance = distance;
+						result.v.x = minDistance - 0.001f;
+						result.horizontalTile = getTile(x, y);
+					}
 				}
 			}
 			x++;
 		}
-		ret.x = minDistance - 0.001f;
 	}
-
 	else if (dv.x < 0)
 	{
 		int x = (aabb2.left) / m_tileSize - 1;
@@ -100,14 +105,18 @@ sf::Vector2f Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 				{
 					float distance = (x + 1) * m_tileSize - aabb2.left;
 					if (distance > maxDistance)
+					{
 						maxDistance = distance;
+						result.v.x = maxDistance + 0.001f;
+						result.horizontalTile = getTile(x, y);
+					}
 				}
 			}
 			--x;
 		}
-		ret.x = maxDistance + 0.001f;
 	}
-	aabb2.left += ret.x;
+
+	aabb2.left += result.v.x;
 	if (dv.y > 0)
 	{
 		int y = (aabb2.top + aabb2.height) / m_tileSize + 1;
@@ -122,12 +131,15 @@ sf::Vector2f Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 				{
 					float distance = m_tileSize * y - (aabb2.top + aabb2.height);
 					if (distance < minDistance)
+					{
 						minDistance = distance;
+						result.v.y = minDistance - 0.001f;
+						result.verticalTile = getTile(x, y);
+					}
 				}
 			}
 			++y;
 		}
-		ret.y = minDistance - 0.001f;
 	}
 	else if (dv.y < 0)
 	{
@@ -143,14 +155,17 @@ sf::Vector2f Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 				{
 					float distance = (y + 1) * m_tileSize - aabb2.top;
 					if (distance > maxDistance)
+					{
 						maxDistance = distance;
+						result.v.y = maxDistance + 0.001f;
+						result.verticalTile = getTile(x, y);
+					}
 				}
 			}
 			--y;
 		}
-		ret.y = maxDistance + 0.001f;
 	}
-	return ret;
+	return result;
 }
 
 bool Map::isGrounded(const Aabb<float> & aabb) const

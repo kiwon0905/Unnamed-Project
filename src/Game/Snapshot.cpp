@@ -100,6 +100,15 @@ void SnapshotContainer::add(Snapshot * snapshot, int tick)
 	m_snapshots.emplace_back(tick, snapshot);
 }
 
+void SnapshotContainer::removeUntil(int tick)
+{
+	auto pred = [tick](const TickedSnapshot & s)
+	{
+		return s.tick <= tick;
+	};
+	m_snapshots.erase(std::remove_if(m_snapshots.begin(), m_snapshots.end(), pred), m_snapshots.end());
+}
+
 std::pair<TickedSnapshot*, TickedSnapshot*> SnapshotContainer::find(float tick)
 {
 	std::pair<TickedSnapshot*, TickedSnapshot*> pair;
