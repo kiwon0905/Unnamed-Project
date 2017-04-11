@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Screen.h"
-#include "Game/CharacterCore.h"
+#include "Game/GameCore.h"
 #include "Game/Snapshot.h"
 #include "Game/Client/Entity.h"
 #include <SFML/Graphics.hpp>

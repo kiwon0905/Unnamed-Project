@@ -1,5 +1,6 @@
 #include "PlayingScreen.h"
 #include "Game/Client/Human.h"
+#include "Game/Client/Projectile.h"
 #include "Game/GameConfig.h"
 
 #include "Core/Client/Client.h"
@@ -263,7 +264,7 @@ void PlayingScreen::update(Client & client)
 			if (m_repredict && m_myPlayer.entityId != -1)
 			{
 				Snapshot * s = m_snapshots.getLast();
-				NetItem * e = s->getEntity(m_myPlayer.entityId);
+				NetObject * e = s->getEntity(m_myPlayer.entityId);
 				if (e)
 				{
 					m_playerCurrentCore->assign(e);
@@ -331,16 +332,18 @@ void PlayingScreen::render(Client & client)
 		{
 			switch (p.second->getType())
 			{
-			case NetItem::HUMAN:
+			case NetObject::HUMAN:
 				e = new Human(p.first);
 				break;
+			case NetObject::PROJECTILE:
+				e = new Projectile(p.first);
 			default:
 				break;
 			}
 			m_entitiesByType[static_cast<int>(e->getType())].emplace_back(e);
 		}
-		NetItem * from = s.first->snapshot->getEntity(e->getId());
-		NetItem * to = nullptr;
+		NetObject * from = s.first->snapshot->getEntity(e->getId());
+		NetObject * to = nullptr;
 		if (s.second)
 		{
 			to = s.second->snapshot->getEntity(e->getId());

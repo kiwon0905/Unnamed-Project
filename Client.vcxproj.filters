@@ -78,9 +78,6 @@
     <ClInclude Include="src\Game\Control.h">
       <Filter>Game\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\CharacterCore.h">
-      <Filter>Game\Shared</Filter>
-    </ClInclude>
     <ClInclude Include="src\Game\Map.h">
       <Filter>Game\Shared</Filter>
     </ClInclude>
@@ -95,6 +92,12 @@
     </ClInclude>
     <ClInclude Include="src\Game\Snapshot.h">
       <Filter>Core\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\GameCore.h">
+      <Filter>Game\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Client\Projectile.h">
+      <Filter>Game\Client</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -149,14 +152,17 @@
     <ClCompile Include="src\Game\NetObject.cpp">
       <Filter>Game\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\CharacterCore.cpp">
-      <Filter>Game\Shared</Filter>
-    </ClCompile>
     <ClCompile Include="src\Game\Map.cpp">
       <Filter>Game\Shared</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\Snapshot.cpp">
       <Filter>Core\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\GameCore.cpp">
+      <Filter>Game\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Client\Projectile.cpp">
+      <Filter>Game\Client</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

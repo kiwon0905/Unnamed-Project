@@ -2,27 +2,27 @@
 #include "GameConfig.h"
 #include "Game/NetObject.h"
 
-NetItem * Snapshot::getEntity(int id)
+NetObject * Snapshot::getEntity(int id)
 {
 	if (m_entities.count(id))
 		return m_entities[id].get();
 	return nullptr;
 }
 
-NetItem * Snapshot::addEntity(NetItem::Type type, int id)
+NetObject * Snapshot::addEntity(NetObject::Type type, int id)
 {
 	if(m_entities.size() + m_events.size() >= MAX_SNAPSHOT_ITEM_SIZE)
 		return nullptr;
-	NetItem * entity = NetItem::create(type);
+	NetObject * entity = NetObject::create(type);
 	m_entities[id].reset(entity);
 	return entity;
 }	
 
-NetItem * Snapshot::addEvent(NetItem::Type type)
+NetObject * Snapshot::addEvent(NetObject::Type type)
 {
 	if (m_entities.size() + m_events.size() >= MAX_SNAPSHOT_ITEM_SIZE)
 		return nullptr;
-	NetItem * event = NetItem::create(type);
+	NetObject * event = NetObject::create(type);
 	m_events.emplace_back(event);
 	return event;
 }
@@ -34,12 +34,12 @@ void Snapshot::read(Unpacker & unpacker)
 	
 	for (int i = 0; i < numItems; ++i)
 	{
-		NetItem::Type type;
+		NetObject::Type type;
 		unpacker.unpack(type);
 
-		NetItem * item = NetItem::create(type);
+		NetObject * item = NetObject::create(type);
 		
-		if (type <= NetItem::HUMAN)
+		if (type < NetObject::ENTITY_COUNT)
 		{
 			int id;
 			unpacker.unpack<0, MAX_ENTITY_ID>(id);

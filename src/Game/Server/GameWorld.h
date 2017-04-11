@@ -31,10 +31,11 @@ public:
 
 	int getCurrentTick();
 	const Map & getMap();
+
+	Entity * createEntity(EntityType type, Peer * p = nullptr);
+	Entity * getEntity(int id, EntityType type);
 private:
 	void snap(Server & server);
-	Entity * createEntity(EntityType type, Peer * p);
-	Entity * getEntity(int id, EntityType type);
 
 	bool m_reset = false;
 

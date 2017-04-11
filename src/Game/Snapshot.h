@@ -10,19 +10,19 @@
 class Snapshot
 {
 public:
-	NetItem * getEntity(int id);
+	NetObject * getEntity(int id);
 
-	NetItem * addEntity(NetItem::Type type, int id);
-	NetItem * addEvent(NetItem::Type type);
+	NetObject * addEntity(NetObject::Type type, int id);
+	NetObject * addEvent(NetObject::Type type);
 
 	void read(Unpacker & unpacker);
 	void write(Packer & packer);
 
-	const std::unordered_map<int, std::unique_ptr<NetItem>> & getEntities() const { return m_entities; }
-	const std::vector<std::unique_ptr<NetItem>> & getEvents() const { return m_events; }
+	const std::unordered_map<int, std::unique_ptr<NetObject>> & getEntities() const { return m_entities; }
+	const std::vector<std::unique_ptr<NetObject>> & getEvents() const { return m_events; }
 private:
-	std::unordered_map<int, std::unique_ptr<NetItem>> m_entities;
-	std::vector<std::unique_ptr<NetItem>> m_events;
+	std::unordered_map<int, std::unique_ptr<NetObject>> m_entities;
+	std::vector<std::unique_ptr<NetObject>> m_events;
 };
 
 struct TickedSnapshot

@@ -77,14 +77,15 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 			int endY = (aabb2.top + aabb2.height) / m_tileSize;
 			for (int y = startY; y <= endY; ++y)
 			{
-				if (getTile(x, y))
+				int tile = getTile(x, y);
+				if (tile)
 				{
 					float distance = m_tileSize * x - (aabb2.left + aabb2.width);
 					if (distance < minDistance)
 					{
 						minDistance = distance;
 						result.v.x = minDistance - 0.001f;
-						result.horizontalTile = getTile(x, y);
+						result.horizontalTile = tile;
 					}
 				}
 			}
@@ -101,14 +102,15 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 			int endY = (aabb2.top + aabb2.height) / m_tileSize;
 			for (int y = startY; y <= endY; ++y)
 			{
-				if (getTile(x, y))
+				int tile = getTile(x, y);
+				if (tile)
 				{
 					float distance = (x + 1) * m_tileSize - aabb2.left;
 					if (distance > maxDistance)
 					{
 						maxDistance = distance;
 						result.v.x = maxDistance + 0.001f;
-						result.horizontalTile = getTile(x, y);
+						result.horizontalTile = tile;
 					}
 				}
 			}
@@ -127,14 +129,15 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 			int endX = (aabb2.left + aabb2.width) / m_tileSize;
 			for (int x = startX; x <= endX; ++x)
 			{
-				if (getTile(x, y))
+				int tile = getTile(x, y);
+				if (tile)
 				{
 					float distance = m_tileSize * y - (aabb2.top + aabb2.height);
 					if (distance < minDistance)
 					{
 						minDistance = distance;
 						result.v.y = minDistance - 0.001f;
-						result.verticalTile = getTile(x, y);
+						result.verticalTile = tile;
 					}
 				}
 			}
@@ -151,6 +154,7 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 			int endX = (aabb2.left + aabb2.width) / m_tileSize;
 			for (int x = startX; x <= endX; ++x)
 			{
+				int tile = getTile(x, y);
 				if (getTile(x, y))
 				{
 					float distance = (y + 1) * m_tileSize - aabb2.top;
@@ -158,7 +162,7 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 					{
 						maxDistance = distance;
 						result.v.y = maxDistance + 0.001f;
-						result.verticalTile = getTile(x, y);
+						result.verticalTile = tile;
 					}
 				}
 			}

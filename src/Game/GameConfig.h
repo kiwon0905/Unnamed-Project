@@ -12,5 +12,6 @@ enum class EntityType
 {
 	NONE,
 	HUMAN,
+	PROJECTILE,
 	COUNT
 };

@@ -4,15 +4,17 @@
 #include "Core/Packer.h"
 #include <SFML/System.hpp>
 
-struct NetItem
+struct NetObject
 {
-	virtual ~NetItem() {}
+	virtual ~NetObject() {}
 	enum Type
 	{
 		HUMAN,
+		PROJECTILE,
+		ENTITY_COUNT,
 		COUNT
 	};
-	static NetItem * create(Type type);
+	static NetObject * create(Type type);
 	virtual void write(Packer & packer) const = 0;
 	virtual void read(Unpacker & unpacker) = 0;
 	virtual Type getType() const = 0;
@@ -20,7 +22,7 @@ struct NetItem
 
 //////////////////////////////////////////////////////////////
 
-struct NetHuman : public NetItem
+struct NetHuman : public NetObject
 {
 	void write(Packer & packer) const;
 	void read(Unpacker & unpacker);
@@ -29,3 +31,10 @@ struct NetHuman : public NetItem
 	sf::Vector2f velocity;
 };
 
+struct NetProjectile : public NetObject
+{
+	void write(Packer & packer) const;
+	void read(Unpacker & unpacker);
+	Type getType() const;
+	sf::Vector2f position;
+};

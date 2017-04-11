@@ -5,6 +5,7 @@
 #include "Core/Logger.h"
 
 #include "Human.h"
+#include "Projectile.h"
 #include <iostream>
 #include <bitset>
 
@@ -143,9 +144,18 @@ void GameWorld::snap(Server & server)
 Entity * GameWorld::createEntity(EntityType type, Peer * p)
 {
 	Entity * e;
-	if (type == EntityType::HUMAN)
+	switch (type)
+	{
+	case EntityType::HUMAN:
 		e = new Human(m_nextEntityId++, p);
-		
+		break;
+	case EntityType::PROJECTILE:
+		e = new Projectile(m_nextEntityId++);
+		break;
+	default:
+		return nullptr;
+	}
+
 	m_entitiesByType[static_cast<int>(type)].emplace_back(e);
 	return e;
 }

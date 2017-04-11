@@ -9,11 +9,7 @@ Human::Human(int id):
 
 }
 
-void Human::update(float dt, GameWorld & world)
-{
-}
-
-void Human::renderPast(const NetItem * from, const NetItem * to, float t, sf::RenderTarget & target)
+void Human::renderPast(const NetObject * from, const NetObject * to, float t, sf::RenderTarget & target)
 {
 	const NetHuman * h0 = static_cast<const NetHuman*>(from);
 	const NetHuman * h1 = static_cast<const NetHuman*>(to);
@@ -24,7 +20,6 @@ void Human::renderPast(const NetItem * from, const NetItem * to, float t, sf::Re
 
 	sf::RectangleShape r;
 	r.setFillColor(sf::Color::Green);
-
 	r.setSize({ 50.f, 50.f });
 	r.setPosition(pos);
 	target.draw(r);

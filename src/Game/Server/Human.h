@@ -1,6 +1,6 @@
 #pragma once
 #include "Entity.h"
-#include "Game/CharacterCore.h"
+#include "Game/GameCore.h"
 
 class Human : public Entity
 {
@@ -11,4 +11,5 @@ public:
 	void snap(Snapshot & snapshot) const;
 private:
 	HumanCore m_core;
+	int m_fireCooldown = 0;
 };

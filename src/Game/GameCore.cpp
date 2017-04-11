@@ -1,4 +1,4 @@
-#include "CharacterCore.h"
+#include "GameCore.h"
 #include "Control.h"
 #include "Core/Utility.h"
 #include <iostream>
@@ -44,12 +44,6 @@ void HumanCore::tick(float dt, unsigned input, const Map & map)
 	else
 		m_velocity.x = 0.f;
 
-	//m_velocity.y += -10 * dt;	
-	direction = 0;
-	if (input & Control::MOVE_DOWN)
-		direction--;
-	if (input & Control::MOVE_UP)
-		direction++;
 
 	Aabb<float> aabb(m_position.x, m_position.y, 50.f, 50.f);
 
@@ -83,7 +77,7 @@ void HumanCore::tick(float dt, unsigned input, const Map & map)
 		m_position += result.v;
 }
 
-void HumanCore::assign(const NetItem * ne)
+void HumanCore::assign(const NetObject * ne)
 {
 	const NetHuman * nh = static_cast<const NetHuman *>(ne);
 	m_position = nh->position;

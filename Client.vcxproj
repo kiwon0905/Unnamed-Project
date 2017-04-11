@@ -38,9 +38,10 @@
     <ClInclude Include="src\Game\Aabb.h" />
     <ClInclude Include="src\Game\Client\Human.h" />
     <ClInclude Include="src\Game\Client\Entity.h" />
+    <ClInclude Include="src\Game\Client\Projectile.h" />
     <ClInclude Include="src\Game\Control.h" />
-    <ClInclude Include="src\Game\CharacterCore.h" />
     <ClInclude Include="src\Game\GameConfig.h" />
+    <ClInclude Include="src\Game\GameCore.h" />
     <ClInclude Include="src\Game\Map.h" />
     <ClInclude Include="src\Game\NetObject.h" />
     <ClInclude Include="src\Game\Snapshot.h" />
@@ -62,7 +63,8 @@
     <ClCompile Include="src\Core\Parser.cpp" />
     <ClCompile Include="src\Game\Client\Entity.cpp" />
     <ClCompile Include="src\Game\Client\Human.cpp" />
-    <ClCompile Include="src\Game\CharacterCore.cpp" />
+    <ClCompile Include="src\Game\Client\Projectile.cpp" />
+    <ClCompile Include="src\Game\GameCore.cpp" />
     <ClCompile Include="src\Game\Map.cpp" />
     <ClCompile Include="src\Game\NetObject.cpp" />
     <ClCompile Include="src\Game\Snapshot.cpp" />

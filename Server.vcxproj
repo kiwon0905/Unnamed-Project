@@ -29,7 +29,7 @@
     <ClInclude Include="src\Core\Server\Server.h" />
     <ClInclude Include="src\Core\Utility.h" />
     <ClInclude Include="src\Game\Aabb.h" />
-    <ClInclude Include="src\Game\CharacterCore.h" />
+    <ClInclude Include="src\Game\GameCore.h" />
     <ClInclude Include="src\Game\Control.h" />
     <ClInclude Include="src\Game\GameConfig.h" />
     <ClInclude Include="src\Game\Map.h" />
@@ -37,6 +37,7 @@
     <ClInclude Include="src\Game\Server\Human.h" />
     <ClInclude Include="src\Game\Server\Entity.h" />
     <ClInclude Include="src\Game\Server\GameWorld.h" />
+    <ClInclude Include="src\Game\Server\Projectile.h" />
     <ClInclude Include="src\Game\Snapshot.h" />
   </ItemGroup>
   <ItemGroup>
@@ -47,12 +48,13 @@
     <ClCompile Include="src\Core\Server\Peer.cpp" />
     <ClCompile Include="src\Core\Server\Server.cpp" />
     <ClCompile Include="src\Core\Server\ServerMain.cpp" />
-    <ClCompile Include="src\Game\CharacterCore.cpp" />
+    <ClCompile Include="src\Game\GameCore.cpp" />
     <ClCompile Include="src\Game\Map.cpp" />
     <ClCompile Include="src\Game\NetObject.cpp" />
     <ClCompile Include="src\Game\Server\Human.cpp" />
     <ClCompile Include="src\Game\Server\Entity.cpp" />
     <ClCompile Include="src\Game\Server\GameWorld.cpp" />
+    <ClCompile Include="src\Game\Server\Projectile.cpp" />
     <ClCompile Include="src\Game\Snapshot.cpp" />
   </ItemGroup>
   <ItemGroup>
