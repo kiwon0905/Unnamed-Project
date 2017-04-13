@@ -61,8 +61,9 @@ private:
 	Input m_inputs[200];
 	std::size_t m_currentInputIndex = 0;
 
+	//timing variables
 	sf::Time m_prevPredictedTime;
-	int m_renderDelayTick = 4;
+	int m_renderDelayTick = 1;
 	SmoothClock m_renderTime;
 	SmoothClock m_predictedTime;
 	sf::Time m_accumulator;
@@ -73,9 +74,10 @@ private:
 	int m_predictedTick = -1;
 	bool m_repredict = false;
 
-	std::unique_ptr<CharacterCore> m_playerCurrentCore;
-	std::unique_ptr<CharacterCore> m_playerPrevCore;
+
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
+
+
 
 	Map m_map;
 	sf::Texture * m_tileTexture;
@@ -83,6 +85,7 @@ private:
 	sf::VertexArray m_tileVertices;
 	sf::View m_view;
 
+
 	Entity * getEntity(int id);
-	
+
 };

@@ -2,11 +2,13 @@
 #include "GameConfig.h"
 #include "Game/NetObject.h"
 
-NetObject * Snapshot::getEntity(int id)
+const NetObject * Snapshot::getEntity(int id) const
 {
-	if (m_entities.count(id))
-		return m_entities[id].get();
+	auto iter = m_entities.find(id);
+	if(iter != m_entities.end())
+		return iter->second.get();
 	return nullptr;
+
 }
 
 NetObject * Snapshot::addEntity(NetObject::Type type, int id)

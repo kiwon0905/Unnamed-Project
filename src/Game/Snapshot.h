@@ -10,7 +10,7 @@
 class Snapshot
 {
 public:
-	NetObject * getEntity(int id);
+	const NetObject * getEntity(int id) const;
 
 	NetObject * addEntity(NetObject::Type type, int id);
 	NetObject * addEvent(NetObject::Type type);

@@ -83,9 +83,6 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			unpacker.unpack<0, MAX_ENTITY_ID>(m_myPlayer.entityId);
 			unpacker.unpack(playerEntityType);
 
-			m_playerCurrentCore.reset(createCore(playerEntityType));
-			m_playerPrevCore.reset(createCore(playerEntityType));
-
 			std::cout << "map: " << mapName << "\n";
 			std::cout << "total " << numPlayer << " players.\n";
 			std::cout << "my player id: " << m_myPlayer.id << " entity id: " << m_myPlayer.entityId << " entity type: " << static_cast<int>(playerEntityType) << "\n";
@@ -135,10 +132,6 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					m_tileVertices.append(d);
 				}
 			}
-
-			//create character core;
-			m_playerCurrentCore.reset(createCore(playerEntityType));
-			m_playerPrevCore.reset(createCore(playerEntityType));
 
 			//send ack
 			Packer packer;
@@ -202,7 +195,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			{
 				if (input.tick == inputTick)
 				{
-					sf::Time target = input.predictedTime + input.elapsed.getElapsedTime() - sf::milliseconds(timeLeft - 100);
+					sf::Time target = input.predictedTime + input.elapsed.getElapsedTime() - sf::milliseconds(timeLeft - 50);
 					m_predictedTime.update(target, sf::seconds(1.f));
 				}
 			}
@@ -256,30 +249,53 @@ void PlayingScreen::update(Client & client)
 			client.getNetwork().send(packer, false);
 
 			//predict
-			if (m_myPlayer.entityId != -1)
+			for (auto & v : m_entitiesByType)
 			{
-				m_playerPrevCore.reset(m_playerCurrentCore->clone());
-				m_playerCurrentCore->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), i, m_map);
-			}
-			if (m_repredict && m_myPlayer.entityId != -1)
-			{
-				Snapshot * s = m_snapshots.getLast();
-				NetObject * e = s->getEntity(m_myPlayer.entityId);
-				if (e)
+				for (auto & e : v)
 				{
-					m_playerCurrentCore->assign(e);
-					m_playerPrevCore->assign(e);
-				}
-				for (int t = m_lastSnapshotTick + 1; t <= m_predictedTick; ++t)
-				{
-					for (const auto & i : m_inputs)
+					if (e->isPredicted())
 					{
-						if (i.tick == t)
+						e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), i, m_map);	
+					}
+				}
+			}
+
+			//repredict
+			if (m_repredict)
+			{
+
+				Snapshot * s = m_snapshots.getLast();
+				for (auto & v : m_entitiesByType)
+				{
+					for (auto & e : v)
+					{
+						if (e->isPredicted())
 						{
-							m_playerPrevCore.reset(m_playerCurrentCore->clone());
-							m_playerCurrentCore->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), i.data, m_map);
+							e->rollback(*s);
 						}
 					}
+				}
+
+
+				for (int t = m_lastSnapshotTick + 1; t <= m_predictedTick; ++t)
+				{
+					//TODO improve
+					unsigned input = 0;
+					for (const auto & i : m_inputs)
+						if (i.tick == t)
+							input = i.data;
+					
+					for (auto & v : m_entitiesByType)
+					{
+						for (auto & e : v)
+						{
+							if (e->isPredicted())
+							{
+								e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), input, m_map);
+							}
+						}
+					}
+
 				}
 				m_repredict = false;
 			}
@@ -305,22 +321,13 @@ void PlayingScreen::render(Client & client)
 	states.texture = m_tileTexture;
 	m_renderTexture.draw(m_tileVertices, states);
 
-	//camera
-	if (m_myPlayer.entityId != -1)
-	{
-		float predT = m_accumulator / sf::seconds(1.f / TICKS_PER_SEC);
-		sf::Vector2f pos = lerp(m_playerPrevCore->getPosition(), m_playerCurrentCore->getPosition(), predT);
-		m_view.setCenter(pos);
-		m_renderTexture.setView(m_view);
-	}
-	else
-	{
-		//TODO
-	}
-
 	float renderTick = m_renderTime.getElapsedTime().asSeconds() * TICKS_PER_SEC;
-	auto & s = m_snapshots.find(renderTick);
+	const auto & s = m_snapshots.find(renderTick);
+
+	//calculate interpolation
 	float t = 0.f;
+	float predT = m_accumulator / sf::seconds(1.f / TICKS_PER_SEC);
+
 	if (s.second)
 		t = (renderTick - s.first->tick) / (s.second->tick - s.first->tick);
 
@@ -341,35 +348,41 @@ void PlayingScreen::render(Client & client)
 				break;
 			}
 			m_entitiesByType[static_cast<int>(e->getType())].emplace_back(e);
+	
+			if (p.first == m_myPlayer.entityId)
+				e->setPrediction(false);
+
 		}
-		NetObject * from = s.first->snapshot->getEntity(e->getId());
-		NetObject * to = nullptr;
+
+		//check if this entity doesn't exist in the next snapshot
+		if (s.second && !s.second->snapshot->getEntity(e->getId()))
+			e->setAlive(false);
+
+
+		Snapshot * s0 = s.first->snapshot.get();
+		Snapshot * s1 = nullptr;
 		if (s.second)
-		{
-			to = s.second->snapshot->getEntity(e->getId());
-			if (!to)
-			{
-				e->setAlive(false);
-				//our own player died
-				if (e->getId() == m_myPlayer.entityId)
-				{
-					m_playerPrevCore = nullptr;
-					m_playerCurrentCore = nullptr;
-					m_myPlayer.entityId = -1;
-				}
-			}
-		}
-		if(e->getId() != m_myPlayer.entityId)
-			e->renderPast(from, to, t, m_renderTexture);
+			s1 = s.second->snapshot.get();
+
+		if (e->isPredicted())
+			e->render(s0, s1, predT, m_renderTexture);
 		else
-		{
-			float predT = m_accumulator / sf::seconds(1.f / TICKS_PER_SEC);
-			e->renderFuture(*m_playerPrevCore.get(), *m_playerCurrentCore.get(), predT, m_renderTexture);
-		}
+			e->render(s0, s1, t, m_renderTexture);
 	}
+
+	//camera
+	Entity * e = getEntity(m_myPlayer.entityId);
+	if (e)
+	{
+		m_view.setCenter(e->getPosition());
+		m_renderTexture.setView(m_view);
+	}
+
+	//clean up entities and delete old snapshots
 	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
 	for (auto & v : m_entitiesByType)
 		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
+	m_snapshots.removeUntil(s.first->tick - 1);
 
 	//draw everything to the window
 	m_renderTexture.display();

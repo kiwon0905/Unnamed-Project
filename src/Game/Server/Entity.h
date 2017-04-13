@@ -12,9 +12,12 @@ class Entity
 public:
 	Entity(int id, EntityType type, Peer * player);
 	virtual ~Entity() {}
+	
 	int getId();
 	EntityType getType();
+	
 	Peer * getPlayer();
+	
 	bool isAlive();
 	void setAlive(bool alive);
 

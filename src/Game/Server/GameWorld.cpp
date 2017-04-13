@@ -105,7 +105,7 @@ void GameWorld::update(Server & server)
 		for (auto & v : m_entitiesByType)
 			v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
 
-		if (m_tick % 2 == 0)
+		//if (m_tick % 2 == 0)
 			snap(server);
 	}
 }

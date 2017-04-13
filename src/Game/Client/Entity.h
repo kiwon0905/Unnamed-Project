@@ -7,19 +7,30 @@
 #include <SFML/Graphics.hpp>
 
 class GameWorld;
+class Snapshot;
 class Entity
 {
 public:
 	Entity(int id, EntityType type);
 	virtual ~Entity() {}
+	
 	int getId() const;
 	EntityType getType() const;
+	
+	void setPrediction(bool predict);
+	bool isPredicted();
+	virtual void rollback(const Snapshot & s) = 0;
+
 	void setAlive(bool alive);
 	bool isAlive() const;
-	virtual void renderPast(const NetObject * from, const NetObject * to, float t, sf::RenderTarget & target) = 0;
-	virtual void renderFuture(const CharacterCore & prevCore, const CharacterCore & prevCurrent, float t, sf::RenderTarget & target) = 0;
+	
+	const sf::Vector2f & getPosition() const;
+	virtual void tick(float dt, unsigned input, Map & map) = 0;
+	virtual void render(const Snapshot * from, const Snapshot * to, float t, sf::RenderTarget & target) = 0;
 protected:
 	int m_id;
 	EntityType m_type;
 	bool m_alive = true;
+	bool m_predicted = false;
+	sf::Vector2f m_position;
 };

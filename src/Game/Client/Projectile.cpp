@@ -1,5 +1,6 @@
 #include "Projectile.h"
 #include "Game/NetObject.h"
+#include "Game/Snapshot.h"
 #include "Core/Utility.h"
 #include <SFML/Graphics.hpp>
 
@@ -9,23 +10,37 @@ Projectile::Projectile(int id):
 
 }
 
-void Projectile::renderPast(const NetObject * from, const NetObject * to, float t, sf::RenderTarget & target)
+void Projectile::rollback(const Snapshot & s)
 {
-	const NetProjectile * p0 = static_cast<const NetProjectile*>(from);
-	const NetProjectile * p1 = static_cast<const NetProjectile*>(to);
-	sf::Vector2f pos = p0->position;
 
-	if (to)
-		pos = lerp(p0->position, p1->position, t);
-
-	sf::RectangleShape r;
-	r.setFillColor(sf::Color::Black);
-	r.setPosition(pos);
-	r.setSize({ 25.f, 25.f });
-	target.draw(r);
 }
 
-void Projectile::renderFuture(const CharacterCore & prevCore, const CharacterCore & prevCurrent, float t, sf::RenderTarget & target)
+void Projectile::tick(float dt, unsigned input, Map & map)
 {
 
+}
+
+void Projectile::render(const Snapshot * from, const Snapshot * to, float t, sf::RenderTarget & target)
+{
+	if (m_predicted)
+	{
+	}
+	else
+	{
+		const NetProjectile * p0 = static_cast<const NetProjectile*>(from->getEntity(m_id));
+		const NetProjectile * p1 = nullptr;
+		
+		if(to)
+			p1 = static_cast<const NetProjectile*>(to->getEntity(m_id));
+		sf::Vector2f pos = p0->position;
+
+		if (p1)
+			pos = lerp(p0->position, p1->position, t);
+
+		sf::RectangleShape r;
+		r.setFillColor(sf::Color::Black);
+		r.setPosition(pos);
+		r.setSize({ 25.f, 25.f });
+		target.draw(r);
+	}
 }

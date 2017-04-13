@@ -7,8 +7,11 @@ class Human : public Entity
 {
 public:
 	Human(int id);
-	void renderPast(const NetObject * from, const NetObject * to, float t, sf::RenderTarget & target);
-	void renderFuture(const CharacterCore & prevCore, const CharacterCore & prevCurrent, float t, sf::RenderTarget & target);
-	
+	void rollback(const Snapshot & s);
+	void tick(float dt, unsigned input, Map & map);
+	void render(const Snapshot * from, const Snapshot * to, float t, sf::RenderTarget & target);
 
+private:
+	HumanCore m_prevCore;
+	HumanCore m_currentCore;
 };

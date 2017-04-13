@@ -16,6 +16,16 @@ EntityType Entity::getType() const
 	return m_type;
 }
 
+void Entity::setPrediction(bool predict)
+{
+	m_predicted = predict;
+}
+
+bool Entity::isPredicted()
+{
+	return m_predicted;
+}
+
 void Entity::setAlive(bool alive)
 {
 	m_alive = alive;
@@ -24,4 +34,9 @@ void Entity::setAlive(bool alive)
 bool Entity::isAlive() const
 {
 	return m_alive;
+}
+
+const sf::Vector2f & Entity::getPosition() const
+{
+	return m_position;
 }
