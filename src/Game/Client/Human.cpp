@@ -29,11 +29,12 @@ void Human::render(const Snapshot * from, const Snapshot * to, float t, sf::Rend
 	sf::RectangleShape r;
 	r.setSize({ 50.f, 50.f });
 	r.setFillColor(sf::Color::Green);
-	sf::Vector2f pos;
+
+	sf::Vector2f position;
 
 	if (m_predicted)
 	{
-		pos = lerp(m_prevCore.getPosition(), m_currentCore.getPosition(), t);
+		position = lerp(m_prevCore.getPosition(), m_currentCore.getPosition(), t);
 	}
 	else
 	{
@@ -43,14 +44,17 @@ void Human::render(const Snapshot * from, const Snapshot * to, float t, sf::Rend
 		if(to)
 			h1 = static_cast<const NetHuman*>(to->getEntity(m_id));
 
-		pos = h0->position;
 
+		position = static_cast<sf::Vector2f>(h0->pos) / 100.f;
 		if (h1)
-			pos = lerp(h0->position, h1->position, t);
+		{
+			position.x = lerp(h0->pos.x / 100.f, h1->pos.x / 100.f, t);
+			position.y = lerp(h0->pos.y / 100.f, h1->pos.y / 100.f, t);
+		}
 	}
 
-	r.setPosition(pos);
+	r.setPosition(position);
 	target.draw(r);
-	m_position = pos;
+	m_position = position;
 }
 

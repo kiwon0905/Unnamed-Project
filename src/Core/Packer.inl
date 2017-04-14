@@ -83,23 +83,6 @@ inline void Packer::pack(std::uint64_t data)
 	pack64(data, bits);
 }
 
-template<int minInt, int maxInt, int res>
-void Packer::pack(float data)
-{
-	const int32_t min = minInt * Power<10, res>::value;
-	const int32_t max = maxInt * Power<10, res>::value;
-	int32_t intValue = (int32_t)(data * Power<10, res>::value);
-	pack<min, max>(intValue);
-}
-
-template<int res>
-inline void Packer::pack(float min, float max, float data)
-{
-	const int bits = bitsRequired<res>(min, max);
-	uint32_t intValue = static_cast<uint32_t>((data - min) * Power<10, res>::value);
-	pack32(intValue, bits);
-}
-
 template<typename T>
 inline std::enable_if_t<std::is_enum<T>::value> Packer::pack(T data)
 {
@@ -181,25 +164,6 @@ inline void Unpacker::unpack(std::uint64_t & data)
 	assert(min < max && "min must be less than max");
 	const int bits = BitsRequired<min, max>::result;
 	unpack64(data, bits);
-}
-
-template<int minInt, int maxInt, int res>
-void Unpacker::unpack(float & data)
-{
-	const int32_t min = minInt * Power<10, res>::value;
-	const int32_t max = maxInt * Power<10, res>::value;
-	int32_t intVal;
-	unpack<min, max>(intVal);
-	data = (float)intVal / Power<10, res>::value;
-}
-
-template<int res>
-inline void Unpacker::unpack(float min, float max, float & data)
-{
-	const int bits = bitsRequired<res>(min, max);
-	uint32_t unsignedValue;
-	unpack32(unsignedValue, bits);
-	data = ((float)unsignedValue / Power<10, res>::value + min);
 }
 
 template<typename T>

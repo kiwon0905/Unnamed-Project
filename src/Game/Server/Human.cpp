@@ -15,8 +15,8 @@ Human::Human(int id, Peer * player):
 void Human::tick(float dt, GameWorld & world)
 {
 	Input input = m_player->popInput(world.getCurrentTick());
-	m_core.tick(dt, input.bits, world.getMap());
 
+	m_core.tick(dt, input.bits, world.getMap());
 	if (input.bits & Control::PRIMARY_FIRE)
 	{
 		if (m_fireCooldown == 0)
@@ -38,7 +38,9 @@ void Human::snap(Snapshot & snapshot) const
 	NetHuman * h = static_cast<NetHuman*>(snapshot.addEntity(NetObject::HUMAN, m_id));
 	if (h)
 	{
-		h->velocity = m_core.getVelocity();
-		h->position = m_core.getPosition();
+		h->vel.x = roundToInt(m_core.getVelocity().x * 100.f);
+		h->vel.y = roundToInt(m_core.getVelocity().y * 100.f);
+		h->pos.x = roundToInt(m_core.getPosition().x * 100.f);
+		h->pos.y = roundToInt(m_core.getPosition().y * 100.f);
 	}
 }

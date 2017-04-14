@@ -38,9 +38,9 @@ void HumanCore::tick(float dt, unsigned input, const Map & map)
 		direction++;
 
 	if (direction > 0)
-		m_velocity.x = 500.f;
+		m_velocity.x = 600.f;
 	else if (direction < 0)
-		m_velocity.x = -500.f;
+		m_velocity.x = -600.f;
 	else
 		m_velocity.x = 0.f;
 
@@ -54,7 +54,7 @@ void HumanCore::tick(float dt, unsigned input, const Map & map)
 	{
 		if (input & Control::JUMP)
 		{
-			m_velocity.y = -700.f;
+			m_velocity.y = -1000.f;
 		}
 		else
 		{
@@ -80,13 +80,16 @@ void HumanCore::tick(float dt, unsigned input, const Map & map)
 void HumanCore::assign(const NetObject * ne)
 {
 	const NetHuman * nh = static_cast<const NetHuman *>(ne);
-	m_position = nh->position;
-	m_velocity = nh->velocity;
+	m_position.x = nh->pos.x / 100.f;
+	m_position.y = nh->pos.y / 100.f;
+	m_velocity.x = nh->vel.x / 100.f;
+	m_velocity.y = nh->vel.y / 100.f;
 }
 
 CharacterCore * HumanCore::clone()
 {
 	HumanCore * h = new HumanCore();
 	h->m_position = m_position;
+	h->m_velocity = m_velocity;
 	return h;
 }

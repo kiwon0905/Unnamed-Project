@@ -27,8 +27,9 @@ struct NetHuman : public NetObject
 	void write(Packer & packer) const;
 	void read(Unpacker & unpacker);
 	Type getType() const;
-	sf::Vector2f position;
-	sf::Vector2f velocity;
+
+	sf::Vector2i pos;
+	sf::Vector2i vel;
 };
 
 struct NetProjectile : public NetObject
@@ -36,5 +37,5 @@ struct NetProjectile : public NetObject
 	void write(Packer & packer) const;
 	void read(Unpacker & unpacker);
 	Type getType() const;
-	sf::Vector2f position;
+	sf::Vector2i pos;
 };

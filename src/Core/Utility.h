@@ -48,3 +48,10 @@ int comp(T a, T b, T threshold)
 	return 1;
 }
 
+
+inline int roundToInt(float f)
+{
+	if (f < 0)
+		return static_cast<int>(f - .5f);
+	return static_cast<int>(f + .5f);
+}

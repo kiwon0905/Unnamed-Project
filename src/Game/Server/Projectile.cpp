@@ -27,7 +27,8 @@ void Projectile::snap(Snapshot & snapshot) const
 	NetProjectile * np = static_cast<NetProjectile*>(snapshot.addEntity(NetObject::PROJECTILE, m_id));
 	if (np)
 	{
-		np->position = m_position;
+		np->pos.x = (int)std::round(m_position.x * 100.f);
+		np->pos.y = (int)std::round(m_position.y * 100.f);
 	}
 }
 

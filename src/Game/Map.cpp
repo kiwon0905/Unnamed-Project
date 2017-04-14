@@ -84,7 +84,7 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 					if (distance < minDistance)
 					{
 						minDistance = distance;
-						result.v.x = minDistance - 0.001f;
+						result.v.x = minDistance - 0.1f;
 						result.horizontalTile = tile;
 					}
 				}
@@ -109,7 +109,7 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 					if (distance > maxDistance)
 					{
 						maxDistance = distance;
-						result.v.x = maxDistance + 0.001f;
+						result.v.x = maxDistance + 0.1f;
 						result.horizontalTile = tile;
 					}
 				}
@@ -136,7 +136,7 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 					if (distance < minDistance)
 					{
 						minDistance = distance;
-						result.v.y = minDistance - 0.001f;
+						result.v.y = minDistance - 0.1f;
 						result.verticalTile = tile;
 					}
 				}
@@ -161,7 +161,7 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 					if (distance > maxDistance)
 					{
 						maxDistance = distance;
-						result.v.y = maxDistance + 0.001f;
+						result.v.y = maxDistance + 0.1f;
 						result.verticalTile = tile;
 					}
 				}

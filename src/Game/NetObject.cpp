@@ -16,18 +16,18 @@ NetObject * NetObject::create(Type type)
 
 void NetHuman::write(Packer & packer) const
 {
-	packer.pack<2>(0.f, 5000.f, position.x);
-	packer.pack<2>(0.f, 5000.f, position.y);
-	packer.pack<2>(-5000.f, 5000.f, velocity.x);
-	packer.pack<2>(-5000.f, 5000.f, velocity.y);
+	packer.pack<0, 500000>(pos.x);
+	packer.pack<0, 500000>(pos.y);
+	packer.pack<-500000, 500000>(vel.x);
+	packer.pack<-500000, 500000>(vel.y);
 }
 
 void NetHuman::read(Unpacker & unpacker)
 {
-	unpacker.unpack<2>(0.f, 5000.f, position.x);
-	unpacker.unpack<2>(0.f, 5000.f, position.y);
-	unpacker.unpack<2>(-5000.f, 5000.f, velocity.x);
-	unpacker.unpack<2>(-5000.f, 5000.f, velocity.y);
+	unpacker.unpack<0, 500000>(pos.x);
+	unpacker.unpack<0, 500000>(pos.y);
+	unpacker.unpack<-500000, 500000>(vel.x);
+	unpacker.unpack<-500000, 500000>(vel.y);
 }
 
 NetObject::Type NetHuman::getType() const
@@ -37,14 +37,14 @@ NetObject::Type NetHuman::getType() const
 
 void NetProjectile::write(Packer & packer) const
 {
-	packer.pack<2>(0.f, 5000.f, position.x);
-	packer.pack<2>(0.f, 5000.f, position.y);
+	packer.pack<0, 500000>(pos.x);
+	packer.pack<0, 500000>(pos.y);
 }
 
 void NetProjectile::read(Unpacker & unpacker)
 {
-	unpacker.unpack<2>(0.f, 5000.f, position.x);
-	unpacker.unpack<2>(0.f, 5000.f, position.y);
+	unpacker.unpack<0, 500000>(pos.x);
+	unpacker.unpack<0, 500000>(pos.y);
 }
 
 NetObject::Type NetProjectile::getType() const

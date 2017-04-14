@@ -350,13 +350,13 @@ void PlayingScreen::render(Client & client)
 			m_entitiesByType[static_cast<int>(e->getType())].emplace_back(e);
 	
 			if (p.first == m_myPlayer.entityId)
-				e->setPrediction(false);
+				e->setPrediction(true);
 
 		}
 
 		//check if this entity doesn't exist in the next snapshot
 		if (s.second && !s.second->snapshot->getEntity(e->getId()))
-			e->setAlive(false);
+			e->setAlive(true);
 
 
 		Snapshot * s0 = s.first->snapshot.get();

@@ -9,7 +9,7 @@
 		#define new DBG_NEW
 	#endif
 #endif
-
+#include "Core/Utility.h"
 int main()
 {
 #ifdef _DEBUG
@@ -17,7 +17,6 @@ int main()
 #endif
 	Client client;
 	client.run();
-
 }
 
 

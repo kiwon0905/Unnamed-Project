@@ -7,17 +7,6 @@
 
 #include <iostream>
 #include <bitset>
-template <int A, int B>
-struct Power
-{
-	static const int value = A * Power<A, B - 1>::value;
-};
-
-template <int A>
-struct Power<A, 0>
-{
-	static const int value = 1;
-};
 
 template<uint64_t val > struct Log2
 {
@@ -34,11 +23,7 @@ template<uint64_t min, uint64_t max> struct BitsRequired
 	static const uint32_t result = Log2<max - min>::result + 1;
 };
 
-template <int res>
-std::uint32_t bitsRequired(float min, float max)
-{
-	return static_cast<std::uint32_t>(std::log2(max * Power<10, res>::value - min * Power<10, res>::value)) + 1;
-}
+
 class Packer
 {
 public:
@@ -63,10 +48,7 @@ public:
 	void pack(std::int64_t data);
 	template <std::uint64_t min = (std::numeric_limits<std::uint64_t>::min)(), std::uint64_t max = (std::numeric_limits<std::uint64_t>::max)()>
 	void pack(std::uint64_t data);
-	template<int minInt, int maxInt, int res>
-	void pack(float data);
-	template<int res>
-	void pack(float min, float max, float data);
+
 	void pack(const std::string & data);
 	void pack(const void * data, std::size_t size);
 
@@ -113,10 +95,7 @@ public:
 	void unpack(std::int64_t & data);
 	template <std::uint64_t min = (std::numeric_limits<std::uint64_t>::min)(), std::uint64_t max = (std::numeric_limits<std::uint64_t>::max)()>
 	void unpack(std::uint64_t & data);
-	template<int minInt, int maxInt, int res>
-	void unpack(float & data);
-	template<int res>
-	void unpack(float min, float max, float & data);
+
 	void unpack(std::string & data);
 	void unpack(void * data, std::size_t size);
 
