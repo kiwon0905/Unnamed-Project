@@ -168,7 +168,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					std::cout << "start tick: " << m_startTick << "\n";
 					std::cout << "predicted tick: " << m_predictedTick << "\n";
 				}
-				else if(serverTick - m_renderDelayTick >= m_startTick)	//delay by 4 ticks. 
+				else if(serverTick - 2 >= m_startTick)	//delay by 4 ticks. 
 				{
 					m_state = IN_GAME;
 					m_renderTime.reset(sf::seconds(m_startTick / TICKS_PER_SEC));
@@ -178,7 +178,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			}
 			else if(m_state == IN_GAME)
 			{
-				sf::Time target = sf::seconds((serverTick - m_renderDelayTick) / TICKS_PER_SEC);
+				sf::Time target = sf::seconds((serverTick - 2) / TICKS_PER_SEC);
 				m_renderTime.update(target, sf::seconds(1.f));
 				m_repredict = true;
 			}

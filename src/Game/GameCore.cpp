@@ -45,11 +45,12 @@ void HumanCore::tick(float dt, unsigned input, const Map & map)
 		m_velocity.x = 0.f;
 
 
-	Aabb<float> aabb(m_position.x, m_position.y, 50.f, 50.f);
 
 
-	bool grounded = map.isGrounded(aabb);
+	Aabb<float> aabb(m_position.x, m_position.y, 30.f, 30.f);
 	
+	bool grounded = map.isGrounded(aabb);
+
 	if (grounded)
 	{
 		if (input & Control::JUMP)
@@ -65,15 +66,15 @@ void HumanCore::tick(float dt, unsigned input, const Map & map)
 	{
 		m_velocity.y += 1000.f * dt;
 	}
+
 	MoveResult result = map.move(aabb, m_velocity * dt);
+
 	if (result.horizontalTile)
 		m_velocity.x = 0.f;
 	if (result.verticalTile)
 		m_velocity.y = 0.f;
-	if (result.verticalTile == -1)
-		m_velocity.y = -1000.f;
 
-	if(length(result.v) > 0.001f)
+	if (length(result.v) > 0.001f)
 		m_position += result.v;
 }
 

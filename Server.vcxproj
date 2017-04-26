@@ -38,6 +38,7 @@
     <ClInclude Include="src\Game\Server\Entity.h" />
     <ClInclude Include="src\Game\Server\GameWorld.h" />
     <ClInclude Include="src\Game\Server\Projectile.h" />
+    <ClInclude Include="src\Game\Server\Zombie.h" />
     <ClInclude Include="src\Game\Snapshot.h" />
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +56,7 @@
     <ClCompile Include="src\Game\Server\Entity.cpp" />
     <ClCompile Include="src\Game\Server\GameWorld.cpp" />
     <ClCompile Include="src\Game\Server\Projectile.cpp" />
+    <ClCompile Include="src\Game\Server\Zombie.cpp" />
     <ClCompile Include="src\Game\Snapshot.cpp" />
   </ItemGroup>
   <ItemGroup>

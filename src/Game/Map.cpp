@@ -18,9 +18,6 @@ bool Map::loadFromFile(const std::string & s)
 	
 	std::istringstream ss(data);
 	
-	std::vector<int> fill(m_size.x + 2, -1);
-	m_data.emplace_back(fill);
-
 	std::string firstLine;
 	std::getline(ss, firstLine);
 	for(int r = 0; r < m_size.y; ++r)
@@ -30,17 +27,13 @@ bool Map::loadFromFile(const std::string & s)
 		std::istringstream liness(line);
 
 		m_data.emplace_back();
-		m_data.back().emplace_back(-1);
 		std::string token;
 		while (std::getline(liness, token, ','))
 		{
 			int tile = std::stoi(token);
 			m_data.back().emplace_back(tile);
 		}
-		m_data.back().emplace_back(-1);
 	}
-
-	m_data.emplace_back(fill);
 	return true;
 }
 
@@ -66,15 +59,19 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 
 	Aabb<float> aabb2 = aabb;
 
+	
 	if (dv.x > 0)
 	{
-		int x = (aabb2.left + aabb2.width) / m_tileSize + 1;
-		float minDistance = dv.x;
-		
-		while (x < m_size.x + 1 && x * m_tileSize < aabb2.left + aabb2.width + dv.x)
+		float minDistance = dv.x + 10.f;
+
+		int startX = (aabb2.left + aabb2.width) / m_tileSize + 1;
+		int endX = (aabb2.left + aabb2.width + dv.x) / m_tileSize;
+		int startY = aabb2.top / m_tileSize;
+		int endY = (aabb2.top + aabb2.height) / m_tileSize;
+
+
+		for(int x = startX; x <= endX; ++x)
 		{
-			int startY = aabb2.top / m_tileSize;
-			int endY = (aabb2.top + aabb2.height) / m_tileSize;
 			for (int y = startY; y <= endY; ++y)
 			{
 				int tile = getTile(x, y);
@@ -89,17 +86,18 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 					}
 				}
 			}
-			x++;
 		}
 	}
 	else if (dv.x < 0)
 	{
-		int x = (aabb2.left) / m_tileSize - 1;
-		float maxDistance = dv.x;
-		while (x >= -1 && (x + 1) * m_tileSize > aabb2.left + dv.x)
+		float maxDistance = dv.x - 10.f;
+		int startX = std::floor((aabb2.left + dv.x) / m_tileSize);
+		int endX = aabb2.left / m_tileSize - 1;
+		int startY = aabb2.top / m_tileSize;
+		int endY = (aabb2.top + aabb2.height) / m_tileSize;
+
+		for (int x = startX; x <= endX; ++x)
 		{
-			int startY = aabb2.top / m_tileSize;
-			int endY = (aabb2.top + aabb2.height) / m_tileSize;
 			for (int y = startY; y <= endY; ++y)
 			{
 				int tile = getTile(x, y);
@@ -114,19 +112,20 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 					}
 				}
 			}
-			--x;
 		}
 	}
 
 	aabb2.left += result.v.x;
 	if (dv.y > 0)
 	{
-		int y = (aabb2.top + aabb2.height) / m_tileSize + 1;
-		float minDistance = dv.y;
-		while (y < m_size.y + 1 && y * m_tileSize < aabb2.top + aabb2.height + dv.y)
+		float minDistance = dv.y + 10.f;
+		int startY = (aabb2.top + aabb2.height) / m_tileSize + 1;
+		int endY = (aabb2.top + aabb2.height + dv.y) / m_tileSize;
+		int startX = aabb2.left / m_tileSize;
+		int endX = (aabb2.left + aabb2.width) / m_tileSize;
+		
+		for(int y = startY; y <= endY; ++y)
 		{
-			int startX = aabb2.left / m_tileSize;
-			int endX = (aabb2.left + aabb2.width) / m_tileSize;
 			for (int x = startX; x <= endX; ++x)
 			{
 				int tile = getTile(x, y);
@@ -141,17 +140,18 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 					}
 				}
 			}
-			++y;
 		}
 	}
 	else if (dv.y < 0)
 	{
-		int y = aabb2.top / m_tileSize - 1;
-		float maxDistance = dv.y;
-		while (y >= -1 && (y + 1) * m_tileSize > aabb2.top + dv.y)
+		float maxDistance = dv.y - 10.f;
+		int startY = std::floor((aabb2.top + dv.y) / m_tileSize);
+		int endY = aabb2.top / m_tileSize - 1;
+		int startX = aabb2.left / m_tileSize;
+		int endX = (aabb2.left + aabb2.width) / m_tileSize;
+		for(int y = startY; y <= endY; ++y)
 		{
-			int startX = aabb2.left / m_tileSize;
-			int endX = (aabb2.left + aabb2.width) / m_tileSize;
+
 			for (int x = startX; x <= endX; ++x)
 			{
 				int tile = getTile(x, y);
@@ -166,7 +166,6 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 					}
 				}
 			}
-			--y;
 		}
 	}
 	return result;
@@ -181,7 +180,7 @@ bool Map::isGrounded(const Aabb<float> & aabb) const
 
 	for (int x = startX; x <= endX; ++x)
 	{
-		if (getTile(x, y) > 0)
+		if (getTile(x, y) != 0)
 			return true;
 	}
 	return false;
@@ -190,6 +189,6 @@ bool Map::isGrounded(const Aabb<float> & aabb) const
 int Map::getTile(int x, int y) const
 {
 	if (0 <= x && x < m_size.x && 0 <= y && y < m_size.y)
-		return m_data[y + 1][x + 1];
+		return m_data[y][x];
 	return -1;
 }

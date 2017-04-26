@@ -99,6 +99,9 @@
     <ClInclude Include="src\Game\Client\Projectile.h">
       <Filter>Game\Client</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\Client\Zombie.h">
+      <Filter>Game\Client</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Client\Client.cpp">
@@ -162,6 +165,9 @@
       <Filter>Game\Shared</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\Client\Projectile.cpp">
+      <Filter>Game\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Client\Zombie.cpp">
       <Filter>Game\Client</Filter>
     </ClCompile>
   </ItemGroup>

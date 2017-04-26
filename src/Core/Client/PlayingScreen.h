@@ -63,7 +63,6 @@ private:
 
 	//timing variables
 	sf::Time m_prevPredictedTime;
-	int m_renderDelayTick = 1;
 	SmoothClock m_renderTime;
 	SmoothClock m_predictedTime;
 	sf::Time m_accumulator;
