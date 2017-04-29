@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Screen.h"
+#include "Core/Client/Graph.h"
 #include "Game/GameCore.h"
 #include "Game/Snapshot.h"
 #include "Game/Client/Entity.h"
@@ -73,7 +74,8 @@ private:
 	int m_predictedTick = -1;
 	bool m_repredict = false;
 
-
+	std::unique_ptr<Graph> m_predictionGraph;
+	std::unique_ptr<Graph> m_snapshotGraph;
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 
 

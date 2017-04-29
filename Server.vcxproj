@@ -29,6 +29,7 @@
     <ClInclude Include="src\Core\Server\Server.h" />
     <ClInclude Include="src\Core\Utility.h" />
     <ClInclude Include="src\Game\Aabb.h" />
+    <ClInclude Include="src\Game\Enums.h" />
     <ClInclude Include="src\Game\GameCore.h" />
     <ClInclude Include="src\Game\Control.h" />
     <ClInclude Include="src\Game\GameConfig.h" />

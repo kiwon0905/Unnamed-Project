@@ -1,5 +1,5 @@
 #pragma once
-#include "Game/GameConfig.h"
+#include "Game/Enums.h"
 #include "Game/Snapshot.h"
 
 #include <SFML/System.hpp>

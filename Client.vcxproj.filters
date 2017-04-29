@@ -102,6 +102,12 @@
     <ClInclude Include="src\Game\Client\Zombie.h">
       <Filter>Game\Client</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\Enums.h">
+      <Filter>Game\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Client\Graph.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Client\Client.cpp">
@@ -169,6 +175,9 @@
     </ClCompile>
     <ClCompile Include="src\Game\Client\Zombie.cpp">
       <Filter>Game\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\Graph.cpp">
+      <Filter>Core\Client</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

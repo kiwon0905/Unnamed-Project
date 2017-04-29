@@ -27,7 +27,7 @@ void Human::tick(float dt, unsigned input, Map & map)
 void Human::render(const Snapshot * from, const Snapshot * to, float t, sf::RenderTarget & target)
 {
 	sf::RectangleShape r;
-	r.setSize({ 30.f, 30.f });
+	r.setSize({ 30.f, 60.f });
 	r.setFillColor(sf::Color::Green);
 
 	sf::Vector2f position;

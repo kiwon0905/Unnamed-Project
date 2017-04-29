@@ -39,9 +39,4 @@ private:
 	Gui m_gui;
 	ScreenStack m_screenStack;
 	Input m_input;
-
-	//some statistics
-	sf::Time m_frameTime;
-	sf::Time m_minFrameTime = sf::seconds(10.f);
-	sf::Time m_maxFrameTime = sf::seconds(0.f);
 };

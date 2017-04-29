@@ -56,6 +56,13 @@ void PlayingScreen::onEnter(Client & client)
 	m_view.setSize(verticleCameraSize, horizontalCameraSize);
 	m_renderTexture.create(static_cast<unsigned>(verticleCameraSize + .5f), static_cast<unsigned>(horizontalCameraSize + .5f));
 	m_renderTexture.setSmooth(true);
+
+	const sf::Font * font = client.getContext().assetManager.get<sf::Font>("arial.ttf");
+	m_predictionGraph = std::make_unique<Graph>(-50.f, 100.f, *font, "Prediction timing(ms)");
+	m_predictionGraph->setPosition({ 0.f, 600. });
+	m_snapshotGraph = std::make_unique<Graph>(-50.f, 100.f, *font, "Snapshot timing(ms)");
+	m_snapshotGraph->setPosition({ 0.f, 300.f });
+	
 }
 
 void PlayingScreen::handleEvent(const sf::Event & ev, Client & client)
@@ -168,7 +175,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					std::cout << "start tick: " << m_startTick << "\n";
 					std::cout << "predicted tick: " << m_predictedTick << "\n";
 				}
-				else if(serverTick - 2 >= m_startTick)	//delay by 4 ticks. 
+				else if(serverTick - 2 >= m_startTick) 
 				{
 					m_state = IN_GAME;
 					m_renderTime.reset(sf::seconds(m_startTick / TICKS_PER_SEC));
@@ -181,6 +188,9 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 				sf::Time target = sf::seconds((serverTick - 2) / TICKS_PER_SEC);
 				m_renderTime.update(target, sf::seconds(1.f));
 				m_repredict = true;
+
+				sf::Time difference = sf::seconds(serverTick / TICKS_PER_SEC) - m_renderTime.getElapsedTime();
+				m_snapshotGraph->addSample(difference.asMicroseconds() / 1000.f);
 			}
 			m_numReceivedSnapshots++;
 		}
@@ -197,6 +207,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 				{
 					sf::Time target = input.predictedTime + input.elapsed.getElapsedTime() - sf::milliseconds(timeLeft - 50);
 					m_predictedTime.update(target, sf::seconds(1.f));
+					m_predictionGraph->addSample(timeLeft);
 				}
 			}
 		}
@@ -391,6 +402,10 @@ void PlayingScreen::render(Client & client)
 	float scaleFactor = static_cast<float>(client.getContext().window.getSize().x) / m_renderTexture.getSize().x;
 	sprite.setScale(scaleFactor, scaleFactor);
 	client.getContext().window.draw(sprite);
+
+
+	client.getContext().window.draw(*m_snapshotGraph);
+	client.getContext().window.draw(*m_predictionGraph);
 }
 
 void PlayingScreen::onExit(Client & client)

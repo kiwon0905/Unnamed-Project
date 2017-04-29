@@ -1,5 +1,5 @@
 #pragma once
-#include "Game/GameConfig.h"
+#include "Game/Enums.h"
 #include "Game/GameCore.h"
 #include "Game/NetObject.h"
 

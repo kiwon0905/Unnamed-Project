@@ -84,6 +84,9 @@
     <ClInclude Include="src\Game\Map.h">
       <Filter>Game\Shared</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\Enums.h">
+      <Filter>Game\Shared</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game\Server\GameWorld.cpp">

@@ -1,33 +1,6 @@
 #include "GameCore.h"
 #include "Control.h"
 #include "Core/Utility.h"
-#include <iostream>
-const sf::Vector2f & CharacterCore::getPosition() const
-{
-	return m_position;
-}
-
-void CharacterCore::setPosition(const sf::Vector2f & v)
-{
-	m_position = v;
-}
-
-const sf::Vector2f & CharacterCore::getVelocity() const
-{
-	return m_velocity;
-}
-
-CharacterCore * createCore(EntityType type)
-{
-	switch (type)
-	{
-	case EntityType::HUMAN:
-		return new HumanCore;
-		break;
-	default:
-		return nullptr;
-	}
-}
 
 void HumanCore::tick(float dt, unsigned input, const Map & map)
 {
@@ -44,10 +17,7 @@ void HumanCore::tick(float dt, unsigned input, const Map & map)
 	else
 		m_velocity.x = 0.f;
 
-
-
-
-	Aabb<float> aabb(m_position.x, m_position.y, 30.f, 30.f);
+	Aabb<float> aabb(m_position.x, m_position.y, 30.f, 60.f);
 	
 	bool grounded = map.isGrounded(aabb);
 
@@ -87,10 +57,12 @@ void HumanCore::assign(const NetObject * ne)
 	m_velocity.y = nh->vel.y / 100.f;
 }
 
-CharacterCore * HumanCore::clone()
+const sf::Vector2f & HumanCore::getPosition() const
 {
-	HumanCore * h = new HumanCore();
-	h->m_position = m_position;
-	h->m_velocity = m_velocity;
-	return h;
+	return m_position;
+}
+
+const sf::Vector2f & HumanCore::getVelocity() const
+{
+	return m_velocity;
 }

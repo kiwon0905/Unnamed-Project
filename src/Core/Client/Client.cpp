@@ -1,6 +1,7 @@
 #include "Client.h"
 #include "LobbyScreen.h"
 #include "Game/GameConfig.h"
+#include "Graph.h"
 #include "Core/Logger.h"
 #include "Core/ENetUtility.h"
 
@@ -11,7 +12,7 @@ bool Client::initialize()
 {
 
 	sf::RenderWindow & window = getContext().window;
-	window.create(sf::VideoMode(1600, 900), "");
+	window.create(sf::VideoMode(1600, 900), "", sf::Style::Default, sf::ContextSettings(0, 0, 8));
 	window.resetGLStates();
 
 	if (!m_context.parser.loadFromFile("client-config.txt"))
@@ -35,7 +36,7 @@ bool Client::initialize()
 
 	m_screenStack.push(new LobbyScreen);
 	m_screenStack.applyChanges(*this);
-	//window.setFramerateLimit(300);
+	window.setFramerateLimit(500);
 	return true;
 }
 
@@ -44,17 +45,20 @@ void Client::run()
 	if (initialize())
 	{
 		sf::Clock clock;
+		sf::Time old;
+		sf::Time current;
 
 
+		const sf::Font * font = m_context.assetManager.get<sf::Font>("arial.ttf");
+		Graph frameTimeGraph(0.f, 20.f, *font, "Frame time(ms)");
+		frameTimeGraph.setSize({ 200.f, 100.f });
 		while (!m_screenStack.isEmpty())
 		{
-			sf::Time dt = clock.restart();
-			m_frameTime = dt;
-			if (dt < m_minFrameTime)
-				m_minFrameTime = dt;
-			if (dt > m_maxFrameTime)
-				m_maxFrameTime = dt;
+			old = current;
+			current = clock.getElapsedTime();
 
+			sf::Time dt = current - old;
+			frameTimeGraph.addSample(dt.asMicroseconds() / 1000.f);
 			sf::Event event;
 			while (m_context.window.pollEvent(event))
 			{
@@ -86,6 +90,9 @@ void Client::run()
 			m_context.window.clear();
 			m_screenStack.render(*this);
 			m_gui.render(*this);
+
+			m_context.window.draw(frameTimeGraph);
+
 			m_context.window.display();
 
 			m_screenStack.applyChanges(*this);

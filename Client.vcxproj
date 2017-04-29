@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\Client\Client.h" />
+    <ClInclude Include="src\Core\Client\Graph.h" />
     <ClInclude Include="src\Core\Client\Gui.h" />
     <ClInclude Include="src\Core\Client\Input.h" />
     <ClInclude Include="src\Core\Client\LobbyScreen.h" />
@@ -41,6 +42,7 @@
     <ClInclude Include="src\Game\Client\Projectile.h" />
     <ClInclude Include="src\Game\Client\Zombie.h" />
     <ClInclude Include="src\Game\Control.h" />
+    <ClInclude Include="src\Game\Enums.h" />
     <ClInclude Include="src\Game\GameConfig.h" />
     <ClInclude Include="src\Game\GameCore.h" />
     <ClInclude Include="src\Game\Map.h" />
@@ -50,6 +52,7 @@
   <ItemGroup>
     <ClCompile Include="src\Core\Client\Client.cpp" />
     <ClCompile Include="src\Core\Client\ClientMain.cpp" />
+    <ClCompile Include="src\Core\Client\Graph.cpp" />
     <ClCompile Include="src\Core\Client\Gui.cpp" />
     <ClCompile Include="src\Core\Client\Input.cpp" />
     <ClCompile Include="src\Core\Client\LobbyScreen.cpp" />
