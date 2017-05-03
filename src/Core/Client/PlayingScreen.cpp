@@ -13,7 +13,7 @@ sf::Time SmoothClock::getElapsedTime()
 	sf::Time dt = m_clock.getElapsedTime() - m_snap;
 
 	if (dt >= m_converge)
-		return m_target + dt;
+		return m_target + dt - m_converge;
 	else
 	{
 		float progress = dt / m_converge;
