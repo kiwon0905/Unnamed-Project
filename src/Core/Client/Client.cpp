@@ -36,7 +36,7 @@ bool Client::initialize()
 
 	m_screenStack.push(new LobbyScreen);
 	m_screenStack.applyChanges(*this);
-	window.setFramerateLimit(500);
+	window.setFramerateLimit(300);
 	return true;
 }
 
@@ -96,7 +96,6 @@ void Client::run()
 			m_context.window.display();
 
 			m_screenStack.applyChanges(*this);
-			std::this_thread::sleep_for(std::chrono::microseconds(1));
 		}
 	}
 	finalize();
