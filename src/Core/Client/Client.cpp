@@ -47,11 +47,13 @@ void Client::run()
 		sf::Clock clock;
 		sf::Time old;
 		sf::Time current;
-
+		sf::Time fpsAccumulator;
+		int numFrames = 0;
 
 		const sf::Font * font = m_context.assetManager.get<sf::Font>("arial.ttf");
 		Graph frameTimeGraph(0.f, 20.f, *font, "Frame time(ms)");
 		frameTimeGraph.setSize({ 200.f, 100.f });
+		
 		while (!m_screenStack.isEmpty())
 		{
 			old = current;
@@ -60,6 +62,15 @@ void Client::run()
 			sf::Time dt = current - old;
 			frameTimeGraph.addSample(dt.asMicroseconds() / 1000.f);
 			sf::Event event;
+			
+			fpsAccumulator += dt;
+			if (fpsAccumulator > sf::seconds(1.f))
+			{
+				m_context.window.setTitle("FPS: " + std::to_string(numFrames));
+				numFrames = 0;
+				fpsAccumulator = sf::Time::Zero;
+			}
+			numFrames++;
 			while (m_context.window.pollEvent(event))
 			{
 				if (event.type == sf::Event::Closed)
