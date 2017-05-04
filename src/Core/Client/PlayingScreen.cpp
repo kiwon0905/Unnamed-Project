@@ -169,9 +169,9 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 				if (m_numReceivedSnapshots == 0)
 				{
 					m_startTick = serverTick;
-					m_predictedTime.reset(sf::seconds(static_cast<float>(m_startTick + 10) / TICKS_PER_SEC));
-					m_prevPredictedTime = sf::seconds(static_cast<float>(m_startTick + 10) / TICKS_PER_SEC);
-					m_predictedTick = m_startTick + 10;
+					m_predictedTime.reset(sf::seconds(static_cast<float>(m_startTick + 5) / TICKS_PER_SEC));
+					m_prevPredictedTime = sf::seconds(static_cast<float>(m_startTick + 5) / TICKS_PER_SEC);
+					m_predictedTick = m_startTick + 5;
 					std::cout << "start tick: " << m_startTick << "\n";
 					std::cout << "predicted tick: " << m_predictedTick << "\n";
 				}

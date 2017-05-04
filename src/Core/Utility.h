@@ -48,6 +48,16 @@ int comp(T a, T b, T threshold)
 	return 1;
 }
 
+template<typename T>
+inline T clampedAdd(T min, T max, T current, T modifier)
+{
+	T val = current + modifier;
+	if (val < min)
+		val = min;
+	if (val > max)
+		val = max;
+	return val;
+}
 
 inline int roundToInt(float f)
 {

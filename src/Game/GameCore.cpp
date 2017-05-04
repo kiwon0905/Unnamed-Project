@@ -2,6 +2,7 @@
 #include "Control.h"
 #include "Core/Utility.h"
 
+
 void HumanCore::tick(float dt, unsigned input, const Map & map)
 {
 	int direction = 0;
@@ -11,11 +12,11 @@ void HumanCore::tick(float dt, unsigned input, const Map & map)
 		direction++;
 
 	if (direction > 0)
-		m_velocity.x = 600.f;
+		m_velocity.x = clampedAdd(-600.f, 600.f, m_velocity.x, 100.f);
 	else if (direction < 0)
-		m_velocity.x = -600.f;
+		m_velocity.x = clampedAdd(-600.f, 600.f, m_velocity.x, -100.f);
 	else
-		m_velocity.x = 0.f;
+		m_velocity.x = m_velocity.x * .5f;
 
 	Aabb<float> aabb(m_position.x, m_position.y, 30.f, 60.f);
 	
