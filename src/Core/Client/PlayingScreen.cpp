@@ -337,7 +337,7 @@ void PlayingScreen::render(Client & client)
 		t = (renderTick - s.first->tick) / (s.second->tick - s.first->tick);
 
 	//handle entities and remove old snapshots
-	for (auto & p : s.first->snapshot->getEntities())
+	for (auto & p : s0->getEntities())
 	{
 		Entity * e = getEntity(p.first);
 		if (!e)
@@ -356,8 +356,11 @@ void PlayingScreen::render(Client & client)
 			if (p.first == m_myPlayer.entityId)
 				e->setPrediction(true);
 		}
+
 		//check if this entity doesn't exist in the next snapshot
-		if (s.second && !s.second->snapshot->getEntity(e->getId()))
+		if (s1 && !s1->getEntity(e->getId()))
+			e->setAlive(false);
+		if (!s0->getEntity(e->getId()))
 			e->setAlive(false);
 	}
 	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
