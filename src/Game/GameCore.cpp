@@ -12,13 +12,13 @@ void HumanCore::tick(float dt, unsigned input, const Map & map)
 		direction++;
 
 	if (direction > 0)
-		m_velocity.x = clampedAdd(-600.f, 600.f, m_velocity.x, 100.f);
+		m_velocity.x = 600;// clampedAdd(-600.f, 600.f, m_velocity.x, 3200 * dt);
 	else if (direction < 0)
-		m_velocity.x = clampedAdd(-600.f, 600.f, m_velocity.x, -100.f);
+		m_velocity.x = -600;// clampedAdd(-600.f, 600.f, m_velocity.x, -3200.f * dt);
 	else
 		m_velocity.x = m_velocity.x * .5f;
 
-	Aabb<float> aabb(m_position.x, m_position.y, 30.f, 60.f);
+	Aabb<float> aabb(m_position.x, m_position.y, 70.f, 70.f);
 	
 	bool grounded = map.isGrounded(aabb);
 
@@ -26,7 +26,7 @@ void HumanCore::tick(float dt, unsigned input, const Map & map)
 	{
 		if (input & Control::JUMP)
 		{
-			m_velocity.y = -1000.f;
+			m_velocity.y = -700.f;
 		}
 		else
 		{
@@ -35,7 +35,7 @@ void HumanCore::tick(float dt, unsigned input, const Map & map)
 	}
 	else
 	{
-		m_velocity.y += 1000.f * dt;
+		m_velocity.y += 800.f * dt;
 	}
 
 	MoveResult result = map.move(aabb, m_velocity * dt);

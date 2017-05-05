@@ -26,7 +26,8 @@ public:
 	
 	const sf::Vector2f & getPosition() const;
 	virtual void tick(float dt, unsigned input, Map & map) = 0;
-	virtual void render(const Snapshot * from, const Snapshot * to, float t, sf::RenderTarget & target) = 0;
+	virtual void preRender(const Snapshot * from, const Snapshot * to, float t) = 0;
+	virtual void render(sf::RenderTarget & target) = 0;
 protected:
 	int m_id;
 	EntityType m_type;

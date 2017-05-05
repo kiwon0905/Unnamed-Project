@@ -51,7 +51,7 @@ void PlayingScreen::onEnter(Client & client)
 	packer.pack(Msg::CL_REQUEST_GAME_INFO);
 	client.getNetwork().send(packer, true);
 
-	float verticleCameraSize = 3200.f;
+	float verticleCameraSize = 1600.f;
 	float horizontalCameraSize = verticleCameraSize / client.getContext().window.getSize().x * client.getContext().window.getSize().y;
 	m_view.setSize(verticleCameraSize, horizontalCameraSize);
 	m_renderTexture.create(static_cast<unsigned>(verticleCameraSize + .5f), static_cast<unsigned>(horizontalCameraSize + .5f));
@@ -239,6 +239,8 @@ void PlayingScreen::update(Client & client)
 
 		while (m_accumulator >= sf::seconds(1.f / TICKS_PER_SEC))
 		{
+			m_accumulator -= sf::seconds(1 / TICKS_PER_SEC);
+
 			m_predictedTick++;
 
 			//inputs
@@ -310,8 +312,6 @@ void PlayingScreen::update(Client & client)
 				}
 				m_repredict = false;
 			}
-
-			m_accumulator -= sf::seconds(1 / TICKS_PER_SEC);
 		}
 
 	}
@@ -322,27 +322,21 @@ void PlayingScreen::render(Client & client)
 	if (m_state != IN_GAME)
 		return;
 
-	m_renderTexture.clear();
-	sf::RectangleShape background;
-	background.setSize(static_cast<sf::Vector2f>(m_map.getSize() * m_map.getTileSize()));
-	m_renderTexture.draw(background);
-
-	//tile map
-	sf::RenderStates states;
-	states.texture = m_tileTexture;
-	m_renderTexture.draw(m_tileVertices, states);
-
+	//find snapshots
 	float renderTick = m_renderTime.getElapsedTime().asSeconds() * TICKS_PER_SEC;
 	const auto & s = m_snapshots.find(renderTick);
+	Snapshot * s0 = s.first->snapshot.get();
+	Snapshot * s1 = nullptr;
+	if (s.second)
+		s1 = s.second->snapshot.get();
 
-	//calculate interpolation
+	//calculate interp
 	float t = 0.f;
 	float predT = m_accumulator / sf::seconds(1.f / TICKS_PER_SEC);
-
-	if (s.second)
+	if (s1)
 		t = (renderTick - s.first->tick) / (s.second->tick - s.first->tick);
 
-	//entities
+	//handle entities and remove old snapshots
 	for (auto & p : s.first->snapshot->getEntities())
 	{
 		Entity * e = getEntity(p.first);
@@ -359,26 +353,32 @@ void PlayingScreen::render(Client & client)
 				break;
 			}
 			m_entitiesByType[static_cast<int>(e->getType())].emplace_back(e);
-	
 			if (p.first == m_myPlayer.entityId)
 				e->setPrediction(true);
-
 		}
-
 		//check if this entity doesn't exist in the next snapshot
 		if (s.second && !s.second->snapshot->getEntity(e->getId()))
-			e->setAlive(true);
+			e->setAlive(false);
+	}
+	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
+	for (auto & v : m_entitiesByType)
+		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
+	m_snapshots.removeUntil(s.first->tick - 1);
 
 
-		Snapshot * s0 = s.first->snapshot.get();
-		Snapshot * s1 = nullptr;
-		if (s.second)
-			s1 = s.second->snapshot.get();
 
-		if (e->isPredicted())
-			e->render(s0, s1, predT, m_renderTexture);
-		else
-			e->render(s0, s1, t, m_renderTexture);
+
+
+	//entity pre render
+	for (auto & v : m_entitiesByType)
+	{
+		for (auto & e : v)
+		{
+			if (e->isPredicted())
+				e->preRender(s0, s1, predT);
+			else
+				e->preRender(s0, s1, t);
+		}
 	}
 
 	//camera
@@ -389,11 +389,26 @@ void PlayingScreen::render(Client & client)
 		m_renderTexture.setView(m_view);
 	}
 
-	//clean up entities and delete old snapshots
-	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
+	//clear texture
+	m_renderTexture.clear();
+	sf::RectangleShape background;
+	background.setSize(static_cast<sf::Vector2f>(m_map.getSize() * m_map.getTileSize()));
+	m_renderTexture.draw(background);
+
+	//draw tile map
+	sf::RenderStates states;
+	states.texture = m_tileTexture;
+	m_renderTexture.draw(m_tileVertices, states);
+
+	//draw entities
 	for (auto & v : m_entitiesByType)
-		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
-	m_snapshots.removeUntil(s.first->tick - 1);
+	{
+		for (auto & e : v)
+		{
+			e->render(m_renderTexture);
+		}
+	}
+
 
 	//draw everything to the window
 	m_renderTexture.display();

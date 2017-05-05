@@ -36,8 +36,8 @@ bool Client::initialize()
 
 	m_screenStack.push(new LobbyScreen);
 	m_screenStack.applyChanges(*this);
-	window.setVerticalSyncEnabled(true);
-	//window.setFramerateLimit(300);
+	//window.setVerticalSyncEnabled(true);
+	window.setFramerateLimit(300);
 	return true;
 }
 
@@ -59,10 +59,9 @@ void Client::run()
 		{
 			old = current;
 			current = clock.getElapsedTime();
-
 			sf::Time dt = current - old;
+			
 			frameTimeGraph.addSample(dt.asMicroseconds() / 1000.f);
-			sf::Event event;
 			
 			fpsAccumulator += dt;
 			if (fpsAccumulator > sf::seconds(1.f))
@@ -71,7 +70,9 @@ void Client::run()
 				numFrames = 0;
 				fpsAccumulator = sf::Time::Zero;
 			}
-			numFrames++;
+			numFrames++;	
+
+			sf::Event event;
 			while (m_context.window.pollEvent(event))
 			{
 				if (event.type == sf::Event::Closed)
@@ -96,8 +97,8 @@ void Client::run()
 			while (m_network.receive(unpacker, addr))
 			m_screenStack.handlePacket(unpacker, addr, *this);*/
 
-
 			m_screenStack.update(*this);
+
 			
 			m_context.window.clear();
 			m_screenStack.render(*this);

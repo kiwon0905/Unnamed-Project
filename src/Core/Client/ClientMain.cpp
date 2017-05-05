@@ -20,9 +20,10 @@ int main()
 	client.run();
 }
 
-/*
 
+/*
 #include "Graph.h"
+#include "Core/Utility.h"
 #include <SFML/Graphics.hpp>
 
 int randInt(int min, int max)
@@ -31,26 +32,27 @@ int randInt(int min, int max)
 }
 int main()
 {
-	sf::Font font;
-	font.loadFromFile("arial.ttf");
-	srand(time(NULL));
+
 	sf::RenderWindow window;
+
 	window.create(sf::VideoMode(1600, 900), "", sf::Style::Default, sf::ContextSettings(0, 0, 8));
-	sf::CircleShape shape(100.f);
+
+	window.setVerticalSyncEnabled(true);
+	sf::CircleShape shape(30.f);
 	shape.setFillColor(sf::Color::Green);
 
-	Graph g(-50.f, 50.f, font, "data");
-	g.setSize({ 150.f, 150.f });
-	g.setMaxSampleSize(128);
-	for (int i = 0; i < 220; ++i)
-	{
-		float f = randInt(-150, 50);
-		g.addSample(f);
-		std::cout << "f: " << f << "\n";
-	}
+	sf::Vector2f pos, prevPos;
+	sf::Clock clock;
+	sf::Time accum;
+
+	sf::Texture texture;
+	texture.loadFromFile("hi.png");
+	sf::Sprite spr;
+	spr.setTexture(texture);
 
 	while (window.isOpen())
 	{
+		accum += clock.restart();
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -58,12 +60,44 @@ int main()
 				window.close();
 		}
 
-		window.clear();
-		window.draw(g);
+		while (accum >= sf::seconds(1 / 50.f))
+		{
+			accum -= sf::seconds(1 / 50.f);
+			sf::Vector2f vel;
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+			{
+				vel.y = -600.f;
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+			{
+				vel.y = 600.f;
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+			{
+				vel.x = -600.f;
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+			{
+				vel.x = 600.f;
+			}
+			prevPos = pos;
+			pos += vel * sf::seconds(1 / 50.f).asSeconds();
+		
+		}
+		float alpha = accum / sf::seconds(1 / 50.f);
+
+		sf::Vector2f renderPos = lerp(prevPos, pos, alpha);
+		shape.setPosition(renderPos);
+
+		window.clear(sf::Color::Cyan);
+		window.draw(spr);
+		window.draw(shape);
+		sf::View view = window.getDefaultView();
+		view.setCenter(renderPos);
+		window.setView(view);
+
 		window.display();
 	}
 
 	return 0;
-}
-
-*/
+}*/

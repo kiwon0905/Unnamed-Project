@@ -20,7 +20,7 @@ void Projectile::tick(float dt, unsigned input, Map & map)
 
 }
 
-void Projectile::render(const Snapshot * from, const Snapshot * to, float t, sf::RenderTarget & target)
+void Projectile::preRender(const Snapshot * from, const Snapshot * to, float t)
 {
 	if (m_predicted)
 	{
@@ -29,20 +29,28 @@ void Projectile::render(const Snapshot * from, const Snapshot * to, float t, sf:
 	{
 		const NetProjectile * p0 = static_cast<const NetProjectile*>(from->getEntity(m_id));
 		const NetProjectile * p1 = nullptr;
-		
-		if(to)
+
+		if (to)
 			p1 = static_cast<const NetProjectile*>(to->getEntity(m_id));
-		sf::Vector2f pos = static_cast<sf::Vector2f>(p0->pos) / 100.f;
+		m_position = static_cast<sf::Vector2f>(p0->pos) / 100.f;
 
 		if (p1)
 		{
-			pos = lerp(static_cast<sf::Vector2f>(p0->pos) / 100.f, static_cast<sf::Vector2f>(p1->pos) / 100.f, t);
-
+			m_position = lerp(static_cast<sf::Vector2f>(p0->pos) / 100.f, static_cast<sf::Vector2f>(p1->pos) / 100.f, t);
 		}
+	}
+}
 
+void Projectile::render(sf::RenderTarget & target)
+{
+	if (m_predicted)
+	{
+	}
+	else
+	{
 		sf::RectangleShape r;
 		r.setFillColor(sf::Color::Black);
-		r.setPosition(pos);
+		r.setPosition(m_position);
 		r.setSize({ 25.f, 25.f });
 		target.draw(r);
 	}
