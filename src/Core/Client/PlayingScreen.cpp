@@ -10,7 +10,7 @@
 #include "Core/Utility.h"
 sf::Time SmoothClock::getElapsedTime()
 {
-	sf::Time dt = m_clock.getElapsedTime() - m_snap;
+/*	sf::Time dt = m_clock.getElapsedTime() - m_snap;
 
 	if (dt >= m_converge)
 		return m_target + dt;
@@ -18,7 +18,25 @@ sf::Time SmoothClock::getElapsedTime()
 	{
 		float progress = dt / m_converge;
 		return m_current + (m_target + m_converge - m_current) * progress;
-	}
+	}*/
+
+	
+	sf::Time dt = m_clock.getElapsedTime() - m_snap;
+
+
+	sf::Time c = m_current + dt;
+	sf::Time t = m_target + dt;
+
+	float adjustSpeed = m_adjustSpeed[0];
+	if (t > c)
+		adjustSpeed = m_adjustSpeed[1];
+
+	float a = dt.asSeconds() * adjustSpeed;
+	if (a > 1.0f)
+		a = 1.0f;
+
+	sf::Time r = c + (t - c)*a;
+	return r;
 }
 void SmoothClock::reset(sf::Time target)
 {
@@ -27,7 +45,11 @@ void SmoothClock::reset(sf::Time target)
 	m_current = target;
 	m_target = target;
 	m_converge = sf::Time::Zero;
+
+	m_adjustSpeed[0] = 0.3f;
+	m_adjustSpeed[1] = 0.3f;
 }
+
 void SmoothClock::update(sf::Time target, sf::Time converge)
 {
 	m_current = getElapsedTime();
@@ -38,6 +60,55 @@ void SmoothClock::update(sf::Time target, sf::Time converge)
 	if (delta < sf::Time::Zero && converge < -delta)
 		converge = -delta;
 	m_converge = converge;
+}
+
+void SmoothClock::update2(sf::Time target, sf::Time timeLeft, int adjustDirection)
+{
+	int updateTimer = 1;
+	if (timeLeft < sf::Time::Zero)
+	{
+		int IsSpike = 0;
+		if (timeLeft < sf::milliseconds(-50))
+		{
+			IsSpike = 1;
+
+			m_spikeCounter += 5;
+			if (m_spikeCounter > 50)
+				m_spikeCounter = 50;
+		}
+
+		if (IsSpike && m_spikeCounter < 15)
+		{
+			updateTimer = 0;
+		}
+		else
+		{
+			if (m_adjustSpeed[adjustDirection] < 30.0f)
+				m_adjustSpeed[adjustDirection] *= 2.0f;
+		}
+	}
+	else
+	{
+		if (m_spikeCounter)
+			m_spikeCounter--;
+
+
+		m_adjustSpeed[adjustDirection] *= 0.95f;
+		if (m_adjustSpeed[adjustDirection] < 2.0f)
+			m_adjustSpeed[adjustDirection] = 2.0f;
+	}
+
+	if (updateTimer)
+	{
+		m_current = getElapsedTime();
+		m_target = target;
+		m_snap = m_clock.getElapsedTime();
+	}
+}
+
+void SmoothClock::setAdjustSpeed(int direction, float speed)
+{
+	m_adjustSpeed[direction] = speed;
 }
 
 PlayingScreen::PlayingScreen()
@@ -58,7 +129,7 @@ void PlayingScreen::onEnter(Client & client)
 	m_renderTexture.setSmooth(true);
 
 	const sf::Font * font = client.getContext().assetManager.get<sf::Font>("arial.ttf");
-	m_predictionGraph = std::make_unique<Graph>(-50.f, 100.f, *font, "Prediction timing(ms)");
+	m_predictionGraph = std::make_unique<Graph>(-150.f, 150.f, *font, "Prediction timing(ms)");
 	m_predictionGraph->setPosition({ 0.f, 600. });
 	m_snapshotGraph = std::make_unique<Graph>(-50.f, 100.f, *font, "Snapshot timing(ms)");
 	m_snapshotGraph->setPosition({ 0.f, 300.f });
@@ -171,6 +242,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					m_startTick = serverTick;
 					m_predictedTime.reset(sf::seconds(static_cast<float>(m_startTick + 5) / TICKS_PER_SEC));
 					m_prevPredictedTime = sf::seconds(static_cast<float>(m_startTick + 5) / TICKS_PER_SEC);
+					m_predictedTime.setAdjustSpeed(1, 1000.f);
 					m_predictedTick = m_startTick + 5;
 					std::cout << "start tick: " << m_startTick << "\n";
 					std::cout << "predicted tick: " << m_predictedTick << "\n";
@@ -186,11 +258,12 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			else if(m_state == IN_GAME)
 			{
 				sf::Time target = sf::seconds((serverTick - 2) / TICKS_PER_SEC);
-				m_renderTime.update(target, sf::seconds(1.f));
+				sf::Time timeLeft = sf::seconds(serverTick / TICKS_PER_SEC) - m_renderTime.getElapsedTime();
+				m_renderTime.update2(target, timeLeft, 0);
+				//m_renderTime.update(target, sf::seconds(1.f));
 				m_repredict = true;
 
-				sf::Time difference = sf::seconds(serverTick / TICKS_PER_SEC) - m_renderTime.getElapsedTime();
-				m_snapshotGraph->addSample(difference.asMicroseconds() / 1000.f);
+				m_snapshotGraph->addSample(timeLeft.asMicroseconds() / 1000.f);
 			}
 			m_numReceivedSnapshots++;
 		}
@@ -206,7 +279,8 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 				if (input.tick == inputTick)
 				{
 					sf::Time target = input.predictedTime + input.elapsed.getElapsedTime() - sf::milliseconds(timeLeft - 50);
-					m_predictedTime.update(target, sf::seconds(1.f));
+					//m_predictedTime.update(target, sf::seconds(1.f));
+					m_predictedTime.update2(target, sf::milliseconds(timeLeft), 1);
 					m_predictionGraph->addSample(timeLeft);
 				}
 			}
@@ -237,8 +311,10 @@ void PlayingScreen::update(Client & client)
 		m_prevPredictedTime = current;
 		m_accumulator += dt;
 
+		int i = 0;
 		while (m_accumulator >= sf::seconds(1.f / TICKS_PER_SEC))
 		{
+			++i;
 			m_accumulator -= sf::seconds(1 / TICKS_PER_SEC);
 
 			m_predictedTick++;
@@ -260,7 +336,7 @@ void PlayingScreen::update(Client & client)
 			packer.pack<0, MAX_TICK>(m_predictedTick);
 			packer.pack(i);
 			client.getNetwork().send(packer, false);
-
+			client.getNetwork().flush();
 			//predict
 			for (auto & v : m_entitiesByType)
 			{
@@ -313,7 +389,8 @@ void PlayingScreen::update(Client & client)
 				m_repredict = false;
 			}
 		}
-
+		if (i > 1)
+			std::cout << "double update!";
 	}
 }
 

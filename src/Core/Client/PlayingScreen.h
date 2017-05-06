@@ -14,12 +14,17 @@ public:
 	sf::Time getElapsedTime();
 	void reset(sf::Time target = sf::Time::Zero);
 	void update(sf::Time target, sf::Time converge);
+	void update2(sf::Time target, sf::Time timeLeft, int adjustDirection);
+	void setAdjustSpeed(int direction, float speed);
 private:
 	sf::Clock m_clock;
 	sf::Time m_snap;
 	sf::Time m_current;
 	sf::Time m_target;
 	sf::Time m_converge;
+
+	float m_adjustSpeed[2];
+	int m_spikeCounter;
 };
 
 class PlayingScreen : public Screen

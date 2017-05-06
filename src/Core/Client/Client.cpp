@@ -36,8 +36,8 @@ bool Client::initialize()
 
 	m_screenStack.push(new LobbyScreen);
 	m_screenStack.applyChanges(*this);
-	//window.setVerticalSyncEnabled(true);
-	window.setFramerateLimit(300);
+	window.setVerticalSyncEnabled(true);
+	//window.setFramerateLimit(300);
 	return true;
 }
 

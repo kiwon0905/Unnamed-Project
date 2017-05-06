@@ -24,7 +24,10 @@ public:
 	bool connect(const ENetAddress & addr);
 	void disconnect();
 	bool send(const Packer & packer, bool reliable);
-
+	void flush()
+	{
+		enet_host_flush(m_client);
+	}
 	ENetEvent * peekEvent();
 	void popEvent();
 	bool send(Packer & packer, ENetAddress & addr);
