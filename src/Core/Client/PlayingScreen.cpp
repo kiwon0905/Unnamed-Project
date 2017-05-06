@@ -64,22 +64,22 @@ void SmoothClock::update(sf::Time target, sf::Time converge)
 
 void SmoothClock::update2(sf::Time target, sf::Time timeLeft, int adjustDirection)
 {
-	int updateTimer = 1;
+	bool needUpdate = true;
 	if (timeLeft < sf::Time::Zero)
 	{
-		int IsSpike = 0;
+		bool isSpike = false;
 		if (timeLeft < sf::milliseconds(-50))
 		{
-			IsSpike = 1;
+			isSpike = true;
 
 			m_spikeCounter += 5;
 			if (m_spikeCounter > 50)
 				m_spikeCounter = 50;
 		}
 
-		if (IsSpike && m_spikeCounter < 15)
+		if (isSpike && m_spikeCounter < 15)
 		{
-			updateTimer = 0;
+			needUpdate = false;
 		}
 		else
 		{
@@ -90,7 +90,11 @@ void SmoothClock::update2(sf::Time target, sf::Time timeLeft, int adjustDirectio
 	else
 	{
 		if (m_spikeCounter)
+		{
 			m_spikeCounter--;
+			if (m_spikeCounter < 0)
+				m_spikeCounter = 0;
+		}
 
 
 		m_adjustSpeed[adjustDirection] *= 0.95f;
@@ -98,7 +102,7 @@ void SmoothClock::update2(sf::Time target, sf::Time timeLeft, int adjustDirectio
 			m_adjustSpeed[adjustDirection] = 2.0f;
 	}
 
-	if (updateTimer)
+	if (needUpdate)
 	{
 		m_current = getElapsedTime();
 		m_target = target;
