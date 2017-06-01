@@ -179,6 +179,9 @@
     <ClCompile Include="src\Core\Client\Graph.cpp">
       <Filter>Core\Client</Filter>
     </ClCompile>
+    <ClCompile Include="src\Game\Control.cpp">
+      <Filter>Game\Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Core\Packer.inl">

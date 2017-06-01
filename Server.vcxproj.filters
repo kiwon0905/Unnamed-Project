@@ -137,6 +137,9 @@
     <ClCompile Include="src\Game\Map.cpp">
       <Filter>Game\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="src\Game\Control.cpp">
+      <Filter>Game\Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Core\Packer.inl">

@@ -1,4 +1,6 @@
 #pragma once
+#include "Core/Packer.h"
+#include <SFML/System.hpp>
 
 enum Control
 {
@@ -10,4 +12,15 @@ enum Control
 	PRIMARY_FIRE = 1 << 5,
 	ABILITY1 = 1 << 6,
 	ABILITY2 = 1 << 7,
+};
+
+struct NetInput
+{
+	sf::Vector2f aimDirection;
+	int  moveDirection;
+	bool jump;
+	bool fire;
+
+	void write(Packer & packer);
+	void read(Unpacker & unpacker);
 };

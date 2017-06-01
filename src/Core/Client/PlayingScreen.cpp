@@ -417,10 +417,11 @@ void PlayingScreen::render(Client & client)
 	if (s1)
 		t = (renderTick - s.first->tick) / (s.second->tick - s.first->tick);
 
-	//handle entities and remove old snapshots
+	//create entities
 	for (auto & p : s0->getEntities())
 	{
 		Entity * e = getEntity(p.first);
+
 		if (!e)
 		{
 			switch (p.second->getType())
@@ -430,6 +431,7 @@ void PlayingScreen::render(Client & client)
 				break;
 			case NetObject::PROJECTILE:
 				e = new Projectile(p.first);
+				break;
 			default:
 				break;
 			}
@@ -437,13 +439,20 @@ void PlayingScreen::render(Client & client)
 			if (p.first == m_myPlayer.entityId)
 				e->setPrediction(true);
 		}
-
-		//check if this entity doesn't exist in the next snapshot
-		if (s1 && !s1->getEntity(e->getId()))
-			e->setAlive(false);
-		if (!s0->getEntity(e->getId()))
-			e->setAlive(false);
 	}
+
+	//delete entities
+	for (auto & v : m_entitiesByType)
+	{
+		for (auto & e : v)
+		{
+			if (s1 && !s1->getEntity(e->getId()))
+				e->setAlive(false);
+			if (!s0->getEntity(e->getId()))
+				e->setAlive(false);
+		}
+	}
+
 	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
 	for (auto & v : m_entitiesByType)
 		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());

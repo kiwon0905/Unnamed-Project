@@ -3,7 +3,6 @@
 
 bool Gui::initialize(Client & client)
 {
-	client.getContext().window.resetGLStates();
 	return true;
 }
 
