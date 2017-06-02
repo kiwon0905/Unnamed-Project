@@ -108,6 +108,7 @@ void Client::run()
 
 			m_context.window.display();
 
+			sf::sleep(sf::milliseconds(1));
 			m_screenStack.applyChanges(*this);
 		}
 	}

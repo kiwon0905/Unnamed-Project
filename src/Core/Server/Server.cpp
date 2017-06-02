@@ -110,8 +110,7 @@ void Server::run()
 
 			handleNetwork();
 			update();
-
-			std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+			sf::sleep(sf::milliseconds(1));
 		}
 	}
 
