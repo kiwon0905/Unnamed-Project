@@ -5,7 +5,7 @@
 class Projectile : public Entity
 {
 public:
-	Projectile(int id);
+	Projectile(int id, int shooterId);
 
 	void tick(float dt, GameWorld & gameWorld);
 	void snap(Snapshot & snapshot) const;
@@ -14,5 +14,5 @@ public:
 	void setVelocity(sf::Vector2f v);
 private:
 	sf::Vector2f m_velocity;
-	sf::Vector2f m_position;
+	int m_shooterId;
 };

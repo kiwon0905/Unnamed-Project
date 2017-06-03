@@ -280,7 +280,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			unpacker.unpack(timeLeft);
 			for (const auto & input : m_inputs)
 			{
-				if (input.tick == inputTick)
+				if (input.input.tick == inputTick)
 				{
 					sf::Time target = input.predictedTime + input.elapsed.getElapsedTime() - sf::milliseconds(timeLeft - 50);
 					//m_predictedTime.update(target, sf::seconds(1.f));
@@ -323,12 +323,11 @@ void PlayingScreen::update(Client & client)
 
 			m_predictedTick++;
 
-			//inputs
-			uint32_t i = 0;
-			if(client.getContext().window.hasFocus())
-				i = client.getInput().getBits();
-			m_inputs[m_currentInputIndex].data = i;
-			m_inputs[m_currentInputIndex].tick = m_predictedTick;
+			//read input
+			NetInput input = client.getInput().getInput(m_renderTexture, client.getContext().window);
+			input.tick = m_predictedTick;
+
+			m_inputs[m_currentInputIndex].input = input;
 			m_inputs[m_currentInputIndex].predictedTime = current;
 			m_inputs[m_currentInputIndex].elapsed.restart();
 			m_currentInputIndex++;
@@ -337,10 +336,11 @@ void PlayingScreen::update(Client & client)
 			//send to server
 			Packer packer;
 			packer.pack(Msg::CL_INPUT);
-			packer.pack<0, MAX_TICK>(m_predictedTick);
-			packer.pack(i);
+			input.write(packer);
 			client.getNetwork().send(packer, false);
 			client.getNetwork().flush();
+			
+			
 			//predict
 			for (auto & v : m_entitiesByType)
 			{
@@ -348,7 +348,7 @@ void PlayingScreen::update(Client & client)
 				{
 					if (e->isPredicted())
 					{
-						e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), i, m_map);	
+						e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), input, m_map);	
 					}
 				}
 			}
@@ -373,10 +373,10 @@ void PlayingScreen::update(Client & client)
 				for (int t = m_lastSnapshotTick + 1; t <= m_predictedTick; ++t)
 				{
 					//TODO improve
-					unsigned input = 0;
+					NetInput input;
 					for (const auto & i : m_inputs)
-						if (i.tick == t)
-							input = i.data;
+						if (i.input.tick == t)
+							input = i.input;
 					
 					for (auto & v : m_entitiesByType)
 					{

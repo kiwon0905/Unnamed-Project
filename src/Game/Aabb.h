@@ -85,7 +85,7 @@ template <typename T>
 bool Aabb<T>::intersects(const Aabb<T> & aabb) const
 {
 	Aabb<T> intersection;
-	return intersects(AABBangle, intersection);
+	return intersects(aabb, intersection);
 }
 
 template <typename T>
@@ -100,10 +100,10 @@ bool Aabb<T>::intersects(const Aabb<T> & aabb, Aabb<T> & intersection) const
 	T r1MaxY = (std::max)(top, static_cast<T>(top + height));
 
 	// Compute the min and max of the second AABBangle on both axes
-	T r2MinX = (std::min)(AABBangle.left, static_cast<T>(AABBangle.left + AABBangle.width));
-	T r2MaxX = (std::max)(AABBangle.left, static_cast<T>(AABBangle.left + AABBangle.width));
-	T r2MinY = (std::min)(AABBangle.top, static_cast<T>(AABBangle.top + AABBangle.height));
-	T r2MaxY = (std::max)(AABBangle.top, static_cast<T>(AABBangle.top + AABBangle.height));
+	T r2MinX = (std::min)(aabb.left, static_cast<T>(aabb.left + aabb.width));
+	T r2MaxX = (std::max)(aabb.left, static_cast<T>(aabb.left + aabb.width));
+	T r2MinY = (std::min)(aabb.top, static_cast<T>(aabb.top + aabb.height));
+	T r2MaxY = (std::max)(aabb.top, static_cast<T>(aabb.top + aabb.height));
 
 	// Compute the intersection boundaries
 	T interLeft = (std::max)(r1MinX, r2MinX);

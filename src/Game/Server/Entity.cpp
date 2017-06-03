@@ -1,5 +1,4 @@
 #include "Entity.h"
-#include "Game/Control.h"
 
 Entity::Entity(int id, EntityType type, Peer * player):
 	m_id(id),
@@ -31,4 +30,14 @@ bool Entity::isAlive()
 void Entity::setAlive(bool alive)
 {
 	m_alive = alive;
+}
+
+sf::Vector2f Entity::getPosition()
+{
+	return m_position;
+}
+
+Aabb<float> Entity::getAabb()
+{
+	return Aabb<float>(m_position, m_size);
 }

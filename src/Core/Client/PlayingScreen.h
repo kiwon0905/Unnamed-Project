@@ -5,6 +5,7 @@
 #include "Game/GameCore.h"
 #include "Game/Snapshot.h"
 #include "Game/Client/Entity.h"
+#include "Game/NetInput.h"
 #include <SFML/Graphics.hpp>
 
 
@@ -59,10 +60,9 @@ private:
 
 	struct Input
 	{
-		unsigned data;
-		int tick;
 		sf::Time predictedTime;
 		sf::Clock elapsed;
+		NetInput input;
 	};
 	Input m_inputs[200];
 	std::size_t m_currentInputIndex = 0;

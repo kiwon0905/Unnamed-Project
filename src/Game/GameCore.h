@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/System.hpp>
 
+#include "NetInput.h"
 #include "NetObject.h"
 #include "Map.h"
 
@@ -16,7 +17,7 @@ private:
 class HumanCore
 {
 public:
-	void tick(float dt, unsigned input, const Map & map);
+	void tick(float dt, const NetInput & input, const Map & map);
 	void assign(const NetObject * ne);
 
 	const sf::Vector2f & getPosition() const;

@@ -1,6 +1,7 @@
 #pragma once
 #include "Game/Enums.h"
 #include "Game/Snapshot.h"
+#include "Game/Aabb.h"
 
 #include <SFML/System.hpp>
 
@@ -21,11 +22,19 @@ public:
 	bool isAlive();
 	void setAlive(bool alive);
 
+	sf::Vector2f getPosition();
+	Aabb<float> getAabb();
+
 	virtual void tick(float dt, GameWorld & gameWorld) = 0;
 	virtual void snap(Snapshot & snapshot) const = 0;
+
 protected:
 	int m_id;
 	EntityType m_type;
 	bool m_alive = true;
 	Peer * m_player = nullptr;
+
+	sf::Vector2f m_position;
+	sf::Vector2f m_size;
+	
 };

@@ -2,7 +2,7 @@
 #include "Projectile.h"
 #include "GameWorld.h"
 #include "Game/GameConfig.h"
-#include "Game/Control.h"
+#include "Game/Netinput.h"
 #include "Game/NetObject.h"
 #include "Core/Utility.h"
 #include "Core/Server/Peer.h"
@@ -10,20 +10,23 @@
 Human::Human(int id, Peer * player):
 	Entity(id, EntityType::HUMAN, player)
 {
+	m_size = { 69.f, 69.f };
 }
 
 void Human::tick(float dt, GameWorld & world)
 {
-	Input input = m_player->popInput(world.getCurrentTick());
+	NetInput input = m_player->popInput(world.getCurrentTick());
 
-	m_core.tick(dt, input.bits, world.getMap());
-	if (input.bits & Control::PRIMARY_FIRE)
+	m_core.tick(dt, input, world.getMap());
+	if (input.fire)
 	{
 		if (m_fireCooldown == 0)
 		{
-			Projectile * p = static_cast<Projectile*>(world.createEntity(EntityType::PROJECTILE));
+			Projectile * p = world.createEntity<Projectile>(m_id);
+			sf::Vector2f v = input.aimDirection - m_core.getPosition();
+
 			p->setPosition(m_core.getPosition());
-			p->setVelocity(m_core.getVelocity());
+			p->setVelocity(unit(v) * 1500.f);
 			m_fireCooldown = 10;
 		}
 	}
@@ -31,6 +34,7 @@ void Human::tick(float dt, GameWorld & world)
 	m_fireCooldown--;
 	if (m_fireCooldown < 0)
 		m_fireCooldown = 0;
+	m_position = m_core.getPosition();
 }
 
 void Human::snap(Snapshot & snapshot) const

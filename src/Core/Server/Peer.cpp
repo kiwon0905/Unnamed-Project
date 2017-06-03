@@ -42,22 +42,17 @@ void Peer::setState(State state)
 	m_state = state;
 }
 
-void Peer::onInput(unsigned bits, int tick)
+void Peer::onInput(const NetInput & input)
 {
-	Input input;
-	input.bits = bits;
-	input.tick = tick;
 	m_inputs.push(input);
 }
 
-Input Peer::popInput(int tick)
+NetInput Peer::popInput(int tick)
 {
 	while (!m_inputs.empty() && m_inputs.top().tick < tick)
 		m_inputs.pop();
 
-	Input i;
-	i.bits = 0;
-	i.tick = -1;
+	NetInput i;
 	if (!m_inputs.empty() && m_inputs.top().tick == tick)
 	{
 		i = m_inputs.top();

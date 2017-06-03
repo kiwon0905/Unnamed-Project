@@ -4,20 +4,30 @@
 #include "Game/NetObject.h"
 #include "Game/Map.h"
 
-Projectile::Projectile(int id):
-	Entity(id, EntityType::PROJECTILE, nullptr)
+Projectile::Projectile(int id, int shooterId):
+	Entity(id, EntityType::PROJECTILE, nullptr),
+	m_shooterId(shooterId)
 {
+	m_size = { 25.f, 25.f };
 }
 
 void Projectile::tick(float dt, GameWorld & gameWorld)
 {
-	Aabb<float> aabb(m_position.x, m_position.y, 25.f, 25.f);
+	Aabb<float> aabb = getAabb();
 	MoveResult result = gameWorld.getMap().move(aabb, m_velocity * dt);
 	
 	if (result.horizontalTile || result.verticalTile)
 		m_alive = false;
 
 	m_position += result.v;
+
+	for (const auto & e : gameWorld.getEntities(EntityType::HUMAN))
+	{
+		if (e->getAabb().intersects(aabb))
+		{
+			std::cout << "!";
+		}
+	}
 }
 
 

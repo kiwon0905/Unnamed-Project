@@ -1,20 +1,14 @@
 #pragma once
 
 #include "Core/Packer.h"
+#include "Game/NetInput.h"
 #include <enet/enet.h>
-#include <deque>
 #include <queue>
 class Entity;
 
-struct Input
-{
-	unsigned bits;
-	int tick;
-};
-
 struct InputComparator
 {
-	bool operator()(const Input & i, const Input & j)
+	bool operator()(const NetInput & i, const NetInput & j)
 	{
 		return i.tick > j.tick;
 	}
@@ -39,12 +33,12 @@ public:
 	State getState() const;
 	void setState(State state);
 	
-	void onInput(unsigned bits, int tick);
-	Input popInput(int tick);
+	void onInput(const NetInput & input);
+	NetInput popInput(int tick);
 private:
 	int m_id;
 	ENetPeer * m_peer;
 	Entity * m_entity = nullptr;
 	State m_state = PRE_GAME;
-	std::priority_queue<Input, std::vector<Input>, InputComparator> m_inputs;
+	std::priority_queue<NetInput, std::vector<NetInput>, InputComparator> m_inputs;
 };

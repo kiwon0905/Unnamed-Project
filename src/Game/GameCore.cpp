@@ -1,41 +1,41 @@
 #include "GameCore.h"
-#include "Control.h"
 #include "Core/Utility.h"
 
 
-void HumanCore::tick(float dt, unsigned input, const Map & map)
+void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 {
-	int direction = 0;
-	if (input & Control::MOVE_LEFT)
-		direction--;
-	if (input & Control::MOVE_RIGHT)
-		direction++;
-
-	if (direction > 0)
-		m_velocity.x = 600;// clampedAdd(-600.f, 600.f, m_velocity.x, 3200 * dt);
-	else if (direction < 0)
-		m_velocity.x = -600;// clampedAdd(-600.f, 600.f, m_velocity.x, -3200.f * dt);
-	else
-		m_velocity.x = m_velocity.x * .5f;
-
-	Aabb<float> aabb(m_position.x, m_position.y, 70.f, 70.f);
-	
+	Aabb<float> aabb(m_position.x, m_position.y, 69.f, 69.f);
 	bool grounded = map.isGrounded(aabb);
+
+	float accel = 10000.f;
+	float friction = .5f;
+	float maxSpeed = 700.f;
+
+	if (!grounded)
+	{
+		accel = 3500.f;
+		friction = .99f;
+		//maxSpeed = 1400.f;
+	}
+
+	m_velocity.y = clampedAdd(-3000.f, 3000.f, m_velocity.y, 1000.f * dt);
+
+	if (input.moveDirection > 0)
+		m_velocity.x = clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, accel * dt);
+	else if (input.moveDirection < 0)
+		m_velocity.x = clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, -accel * dt);
+	else
+		m_velocity.x = m_velocity.x * friction;
 
 	if (grounded)
 	{
-		if (input & Control::JUMP)
+		if (input.jump)
 		{
 			m_velocity.y = -700.f;
-		}
-		else
-		{
-			m_velocity.y = 0.f;
 		}
 	}
 	else
 	{
-		m_velocity.y += 800.f * dt;
 	}
 
 	MoveResult result = map.move(aabb, m_velocity * dt);

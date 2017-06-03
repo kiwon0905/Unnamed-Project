@@ -57,9 +57,6 @@
     <ClInclude Include="src\Game\NetObject.h">
       <Filter>Game\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\Control.h">
-      <Filter>Game\Shared</Filter>
-    </ClInclude>
     <ClInclude Include="src\Game\Aabb.h">
       <Filter>Game\Shared</Filter>
     </ClInclude>
@@ -85,6 +82,9 @@
       <Filter>Game\Shared</Filter>
     </ClInclude>
     <ClInclude Include="src\Game\Enums.h">
+      <Filter>Game\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\NetInput.h">
       <Filter>Game\Shared</Filter>
     </ClInclude>
   </ItemGroup>
@@ -137,7 +137,7 @@
     <ClCompile Include="src\Game\Map.cpp">
       <Filter>Game\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Control.cpp">
+    <ClCompile Include="src\Game\NetInput.cpp">
       <Filter>Game\Shared</Filter>
     </ClCompile>
   </ItemGroup>

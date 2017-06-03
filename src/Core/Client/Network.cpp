@@ -47,7 +47,9 @@ void Network::update()
 			m_connecting = false;
 		}
 		if (event.type == ENET_EVENT_TYPE_CONNECT)
+		{
 			m_connecting = false;
+		}
 	}
 }
 

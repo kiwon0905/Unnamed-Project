@@ -2,6 +2,7 @@
 #include "Game/Enums.h"
 #include "Game/GameCore.h"
 #include "Game/NetObject.h"
+#include "Game/NetInput.h"
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
@@ -25,7 +26,7 @@ public:
 	bool isAlive() const;
 	
 	const sf::Vector2f & getPosition() const;
-	virtual void tick(float dt, unsigned input, Map & map) = 0;
+	virtual void tick(float dt, const NetInput & input, Map & map) = 0;
 	virtual void preRender(const Snapshot * from, const Snapshot * to, float t) = 0;
 	virtual void render(sf::RenderTarget & target) = 0;
 protected:

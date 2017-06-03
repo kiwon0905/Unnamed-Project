@@ -15,7 +15,7 @@ void Projectile::rollback(const Snapshot & s)
 
 }
 
-void Projectile::tick(float dt, unsigned input, Map & map)
+void Projectile::tick(float dt, const NetInput & input, Map & map)
 {
 
 }
@@ -48,10 +48,10 @@ void Projectile::render(sf::RenderTarget & target)
 	}
 	else
 	{
-		sf::RectangleShape r;
-		r.setFillColor(sf::Color::Black);
-		r.setPosition(m_position);
-		r.setSize({ 25.f, 25.f });
-		target.draw(r);
+		sf::CircleShape c;
+		c.setFillColor(sf::Color::Black);
+		c.setPosition(m_position);
+		c.setRadius(12.5f);
+		target.draw(c);
 	}
 }

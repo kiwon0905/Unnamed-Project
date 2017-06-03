@@ -32,8 +32,11 @@ public:
 	int getCurrentTick();
 	const Map & getMap();
 
-	Entity * createEntity(EntityType type, Peer * p = nullptr);
+	template <typename T, typename... Args>
+	T * createEntity(Args &&... args);
 	Entity * getEntity(int id, EntityType type);
+	const std::vector<std::unique_ptr<Entity>> & getEntities(EntityType type);
+
 private:
 	void snap(Server & server);
 
@@ -49,3 +52,11 @@ private:
 	int m_nextEntityId = 0;
 	SnapshotContainer m_snapshots;
 };
+
+template<typename T, typename ...Args>
+T * GameWorld::createEntity(Args && ...args)
+{
+	T * entity = new T(m_nextEntityId++, std::forward<Args>(args)...);
+	m_entitiesByType[static_cast<int>(entity->getType())].emplace_back(entity);
+	return entity;
+}

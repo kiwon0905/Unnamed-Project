@@ -15,7 +15,7 @@ void Human::rollback(const Snapshot & s)
 	m_currentCore.assign(nh);
 }
 
-void Human::tick(float dt, unsigned input, Map & map)
+void Human::tick(float dt, const NetInput & input, Map & map)
 {
 	if (m_predicted)
 	{
