@@ -498,7 +498,7 @@ void PlayingScreen::render(Client & client)
 	{
 		for (auto & e : v)
 		{
-			e->render(m_renderTexture);
+			e->render(m_renderTexture, client);
 		}
 	}
 

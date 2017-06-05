@@ -49,12 +49,31 @@ void Human::preRender(const Snapshot * from, const Snapshot * to, float t)
 }
 
 
-void Human::render(sf::RenderTarget & target)
+void Human::render(sf::RenderTarget & target, Client & client)
 {
-	sf::RectangleShape r;
-	r.setSize({ 70.f, 70.f });
-	r.setFillColor(sf::Color::Green);
-	r.setPosition(m_position);
-	target.draw(r);
+	sf::RectangleShape body;
+	body.setSize({ 69.f, 69.f });
+	body.setFillColor(sf::Color::Green);
+	body.setOutlineColor(sf::Color::Black);
+	body.setOutlineThickness(-3.f);
+	body.setPosition(m_position);
+	target.draw(body);
+
+	sf::RectangleShape gun;
+	gun.setSize({ 60.f, 20.f });
+	gun.setOrigin({ 0.f / 5.f, gun.getSize().y / 2.f });
+	gun.setPosition(m_position + sf::Vector2f(69.f, 69.f) / 2.f);
+	gun.setOutlineColor(sf::Color::Black);
+	gun.setOutlineThickness(-3.f);
+
+	if (m_predicted)
+	{
+
+		sf::Vector2f aim = target.mapPixelToCoords(sf::Mouse::getPosition(client.getContext().window)) - (body.getPosition() + body.getSize() / 2.f);
+		float angle = atan2f(aim.y, aim.x);
+		gun.setRotation(angle * 180.f / PI);
+	}
+	target.draw(gun);
+
 }
 

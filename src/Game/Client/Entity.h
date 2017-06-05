@@ -3,7 +3,7 @@
 #include "Game/GameCore.h"
 #include "Game/NetObject.h"
 #include "Game/NetInput.h"
-
+#include "Core/Client/Client.h"
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
@@ -28,7 +28,7 @@ public:
 	const sf::Vector2f & getPosition() const;
 	virtual void tick(float dt, const NetInput & input, Map & map) = 0;
 	virtual void preRender(const Snapshot * from, const Snapshot * to, float t) = 0;
-	virtual void render(sf::RenderTarget & target) = 0;
+	virtual void render(sf::RenderTarget & target, Client & client) = 0;
 protected:
 	int m_id;
 	EntityType m_type;

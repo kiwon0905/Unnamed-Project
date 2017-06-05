@@ -64,7 +64,7 @@ bool Network::connect(const ENetAddress & addr)
 
 	if (!m_server)
 		return false;
-	//enet_peer_timeout(m_server, ENET_PEER_TIMEOUT_LIMIT, 500, 1000);
+	enet_peer_timeout(m_server, ENET_PEER_TIMEOUT_LIMIT, 500, 3000);
 	m_connecting = true;
 	return true;
 }

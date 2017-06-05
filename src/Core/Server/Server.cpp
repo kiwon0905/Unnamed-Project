@@ -171,7 +171,7 @@ void Server::handleNetwork()
 		if (event.type == ENET_EVENT_TYPE_CONNECT)
 		{
 			Logger::getInstance().info(enutil::toString(event.peer->address) + " connected");
-			//	enet_peer_timeout(event.peer, ENET_PEER_TIMEOUT_LIMIT, 500, 1000);
+			enet_peer_timeout(event.peer, ENET_PEER_TIMEOUT_LIMIT, 500, 3000);
 		}
 		else if (event.type == ENET_EVENT_TYPE_RECEIVE)
 		{

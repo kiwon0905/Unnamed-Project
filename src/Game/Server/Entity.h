@@ -23,6 +23,7 @@ public:
 	void setAlive(bool alive);
 
 	sf::Vector2f getPosition();
+	sf::Vector2f getSize();
 	Aabb<float> getAabb();
 
 	virtual void tick(float dt, GameWorld & gameWorld) = 0;

@@ -4,6 +4,9 @@
 #include <iostream>
 #include <cmath>
 
+const float PI = 3.1415926535f;
+
+
 template <typename T>
 std::ostream & operator<<(std::ostream & os, const sf::Vector2<T> & v)
 {

@@ -41,7 +41,7 @@ void Projectile::preRender(const Snapshot * from, const Snapshot * to, float t)
 	}
 }
 
-void Projectile::render(sf::RenderTarget & target)
+void Projectile::render(sf::RenderTarget & target, Client & client)
 {
 	if (m_predicted)
 	{

@@ -10,7 +10,7 @@ public:
 	void rollback(const Snapshot & s);
 	void tick(float dt, const NetInput & input, Map & map);
 	void preRender(const Snapshot * from, const Snapshot * to, float t);
-	void render(sf::RenderTarget & target);
+	void render(sf::RenderTarget & target, Client & client);
 
 private:
 	HumanCore m_prevCore;
