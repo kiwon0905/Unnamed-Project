@@ -37,7 +37,5 @@ NetInput Input::getInput(const sf::RenderTarget & target, const sf::Window & win
 		input.aimDirection = target.mapPixelToCoords(sf::Mouse::getPosition(window));
 	}
 
-	
-
 	return input;
 }

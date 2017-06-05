@@ -40,10 +40,12 @@ void Human::preRender(const Snapshot * from, const Snapshot * to, float t)
 
 
 		m_position = static_cast<sf::Vector2f>(h0->pos) / 100.f;
+		m_aimAngle = static_cast<float>(h0->aimAngle);
 		if (h1)
 		{
 			m_position.x = lerp(h0->pos.x / 100.f, h1->pos.x / 100.f, t);
 			m_position.y = lerp(h0->pos.y / 100.f, h1->pos.y / 100.f, t);
+			m_aimAngle = lerp(static_cast<float>(h0->aimAngle), static_cast<float>(h1->aimAngle), t);
 		}
 	}
 }
@@ -66,13 +68,14 @@ void Human::render(sf::RenderTarget & target, Client & client)
 	gun.setOutlineColor(sf::Color::Black);
 	gun.setOutlineThickness(-3.f);
 
-	if (m_predicted)
+	if (m_predicted && client.getContext().window.hasFocus())
 	{
-
 		sf::Vector2f aim = target.mapPixelToCoords(sf::Mouse::getPosition(client.getContext().window)) - (body.getPosition() + body.getSize() / 2.f);
-		float angle = atan2f(aim.y, aim.x);
-		gun.setRotation(angle * 180.f / PI);
+		m_aimAngle = atan2f(aim.y, aim.x) * 180.f / PI;
 	}
+
+	gun.setRotation(m_aimAngle);
+
 	target.draw(gun);
 
 }

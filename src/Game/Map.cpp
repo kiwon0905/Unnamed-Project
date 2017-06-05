@@ -59,12 +59,13 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 
 	Aabb<float> aabb2 = aabb;
 
-	
+	//right
 	if (dv.x > 0)
 	{
-		float minDistance = dv.x + 10.f;
+		float minDistance = dv.x + 1000.f;
 
-		int startX = (aabb2.left + aabb2.width) / m_tileSize + 1;
+		//int startX = (aabb2.left + aabb2.width) / m_tileSize + 1;
+		int startX = aabb.left / m_tileSize;
 		int endX = (aabb2.left + aabb2.width + dv.x) / m_tileSize;
 		int startY = aabb2.top / m_tileSize;
 		int endY = (aabb2.top + aabb2.height) / m_tileSize;
@@ -88,11 +89,13 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 			}
 		}
 	}
+	//left
 	else if (dv.x < 0)
 	{
-		float maxDistance = dv.x - 10.f;
+		float maxDistance = dv.x - 1000.f;
 		int startX = std::floor((aabb2.left + dv.x) / m_tileSize);
-		int endX = aabb2.left / m_tileSize - 1;
+		//int endX = aabb2.left / m_tileSize - 1;
+		int endX = (aabb2.left + aabb2.width) / m_tileSize;
 		int startY = aabb2.top / m_tileSize;
 		int endY = (aabb2.top + aabb2.height) / m_tileSize;
 
@@ -116,10 +119,12 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 	}
 
 	aabb2.left += result.v.x;
+	//down
 	if (dv.y > 0)
 	{
-		float minDistance = dv.y + 10.f;
-		int startY = (aabb2.top + aabb2.height) / m_tileSize + 1;
+		float minDistance = dv.y + 1000.f;
+		//int startY = (aabb2.top + aabb2.height) / m_tileSize + 1;
+		int startY = (aabb2.top) / m_tileSize;
 		int endY = (aabb2.top + aabb2.height + dv.y) / m_tileSize;
 		int startX = aabb2.left / m_tileSize;
 		int endX = (aabb2.left + aabb2.width) / m_tileSize;
@@ -142,11 +147,13 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 			}
 		}
 	}
+	//up
 	else if (dv.y < 0)
 	{
-		float maxDistance = dv.y - 10.f;
-		int startY = std::floor((aabb2.top + dv.y) / m_tileSize);
-		int endY = aabb2.top / m_tileSize - 1;
+		float maxDistance = dv.y - 1000.f;
+		int startY = std::floor((aabb2.top + dv.y) / m_tileSize);	
+		//int endY = aabb2.top / m_tileSize - 1;
+		int endY = (aabb2.top + aabb2.height) / m_tileSize;
 		int startX = aabb2.left / m_tileSize;
 		int endX = (aabb2.left + aabb2.width) / m_tileSize;
 		for(int y = startY; y <= endY; ++y)

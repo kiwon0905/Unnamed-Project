@@ -18,18 +18,19 @@ void Human::tick(float dt, GameWorld & world)
 	NetInput input = m_player->popInput(world.getCurrentTick());
 
 	m_core.tick(dt, input, world.getMap());
+
+	sf::Vector2f center = m_position + m_size / 2.f;
+	sf::Vector2f v = input.aimDirection - center;
+
+	m_aimAngle = atan2f(v.y, v.x) * 180.f / PI;
+	m_aimAngle = normalizedAngle(m_aimAngle);
 	if (input.fire)
 	{
 		if (m_fireCooldown == 0)
 		{
 			Projectile * p = world.createEntity<Projectile>(m_id);
 
-
-			sf::Vector2f center = m_position + m_size / 2.f;
-
-
-			sf::Vector2f v = input.aimDirection - center;
-			p->setVelocity(unit(v) * 500.f);
+			p->setVelocity(unit(v) * 100.f);
 
 			p->setPosition(center + unit(v) * 60.f - p->getSize() / 2.f);
 			m_fireCooldown = 10;
@@ -51,5 +52,6 @@ void Human::snap(Snapshot & snapshot) const
 		h->vel.y = roundToInt(m_core.getVelocity().y * 100.f);
 		h->pos.x = roundToInt(m_core.getPosition().x * 100.f);
 		h->pos.y = roundToInt(m_core.getPosition().y * 100.f);
+		h->aimAngle = roundToInt(m_aimAngle);
 	}
 }

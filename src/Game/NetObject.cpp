@@ -20,6 +20,7 @@ void NetHuman::write(Packer & packer) const
 	packer.pack<0, 500000>(pos.y);
 	packer.pack<-500000, 500000>(vel.x);
 	packer.pack<-500000, 500000>(vel.y);
+	packer.pack<0, 360>(aimAngle);
 }
 
 void NetHuman::read(Unpacker & unpacker)
@@ -28,6 +29,7 @@ void NetHuman::read(Unpacker & unpacker)
 	unpacker.unpack<0, 500000>(pos.y);
 	unpacker.unpack<-500000, 500000>(vel.x);
 	unpacker.unpack<-500000, 500000>(vel.y);
+	unpacker.unpack<0, 360>(aimAngle);
 }
 
 NetObject::Type NetHuman::getType() const

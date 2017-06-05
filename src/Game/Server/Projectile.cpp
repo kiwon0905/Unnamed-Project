@@ -17,7 +17,9 @@ void Projectile::tick(float dt, GameWorld & gameWorld)
 	MoveResult result = gameWorld.getMap().move(aabb, m_velocity * dt);
 	
 	if (result.horizontalTile || result.verticalTile)
+	{
 		m_alive = false;
+	}
 
 	m_position += result.v;
 
@@ -25,7 +27,7 @@ void Projectile::tick(float dt, GameWorld & gameWorld)
 	{
 		if (e->getAabb().intersects(aabb))
 		{
-			std::cout << "!";
+		//	std::cout << "!";
 		}
 	}
 }

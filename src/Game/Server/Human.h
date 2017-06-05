@@ -15,4 +15,5 @@ private:
 	HumanCore m_core;
 	int m_fireCooldown = 0;
 	int m_health;
+	float m_aimAngle = 0.f;
 };

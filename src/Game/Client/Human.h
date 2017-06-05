@@ -15,4 +15,5 @@ public:
 private:
 	HumanCore m_prevCore;
 	HumanCore m_currentCore;
+	float m_aimAngle;
 };

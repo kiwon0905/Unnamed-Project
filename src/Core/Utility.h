@@ -68,3 +68,10 @@ inline int roundToInt(float f)
 		return static_cast<int>(f - .5f);
 	return static_cast<int>(f + .5f);
 }
+
+inline float normalizedAngle(float x) {
+	x = fmod(x, 360);
+	if (x < 0)
+		x += 360;
+	return x;
+}
