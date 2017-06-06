@@ -126,10 +126,12 @@ void PlayingScreen::onEnter(Client & client)
 	packer.pack(Msg::CL_REQUEST_GAME_INFO);
 	client.getNetwork().send(packer, true);
 
-	float verticleCameraSize = 1600.f;
+	float verticleCameraSize = 2000.f;
 	float horizontalCameraSize = verticleCameraSize / client.getContext().window.getSize().x * client.getContext().window.getSize().y;
 	m_view.setSize(verticleCameraSize, horizontalCameraSize);
-	m_renderTexture.create(static_cast<unsigned>(verticleCameraSize + .5f), static_cast<unsigned>(horizontalCameraSize + .5f));
+	
+	sf::Vector2u windowSize = client.getContext().window.getSize();
+	m_renderTexture.create(windowSize.x, windowSize.y);
 	m_renderTexture.setSmooth(true);
 
 	const sf::Font * font = client.getContext().assetManager.get<sf::Font>("arial.ttf");
@@ -326,7 +328,6 @@ void PlayingScreen::update(Client & client)
 			//read input
 			NetInput input = client.getInput().getInput(m_renderTexture, client.getContext().window);
 			input.tick = m_predictedTick;
-
 			m_inputs[m_currentInputIndex].input = input;
 			m_inputs[m_currentInputIndex].predictedTime = current;
 			m_inputs[m_currentInputIndex].elapsed.restart();
@@ -507,8 +508,6 @@ void PlayingScreen::render(Client & client)
 	m_renderTexture.display();
 	sf::Sprite sprite;
 	sprite.setTexture(m_renderTexture.getTexture());
-	float scaleFactor = static_cast<float>(client.getContext().window.getSize().x) / m_renderTexture.getSize().x;
-	sprite.setScale(scaleFactor, scaleFactor);
 	client.getContext().window.draw(sprite);
 
 

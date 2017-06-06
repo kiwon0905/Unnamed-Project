@@ -20,10 +20,9 @@ void Input::finalize(Client & client)
 NetInput Input::getInput(const sf::RenderTarget & target, const sf::Window & window)
 {
 	NetInput input;
-
+	input.aimDirection = target.mapPixelToCoords(sf::Mouse::getPosition(window));
 	if (window.hasFocus())
 	{
-		input.aimDirection = target.mapPixelToCoords(sf::Mouse::getPosition(window));
 		input.moveDirection = 0;
 
 		if (sf::Keyboard::isKeyPressed(m_binds[Control::MOVE_LEFT]))
@@ -33,8 +32,6 @@ NetInput Input::getInput(const sf::RenderTarget & target, const sf::Window & win
 
 		input.jump = sf::Keyboard::isKeyPressed(m_binds[Control::JUMP]);
 		input.fire = sf::Mouse::isButtonPressed(sf::Mouse::Left);
-
-		input.aimDirection = target.mapPixelToCoords(sf::Mouse::getPosition(window));
 	}
 
 	return input;

@@ -9,11 +9,11 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 
 	float accel = 10000.f;
 	float friction = .5f;
-	float maxSpeed = 700.f;
+	float maxSpeed = 500.f;
 
 	if (!grounded)
 	{
-		accel = 3500.f;
+		accel = 3000.f;
 		friction = .99f;
 		//maxSpeed = 1400.f;
 	}

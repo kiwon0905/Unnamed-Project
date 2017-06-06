@@ -68,14 +68,13 @@ void Human::render(sf::RenderTarget & target, Client & client)
 	gun.setOutlineColor(sf::Color::Black);
 	gun.setOutlineThickness(-3.f);
 
-	if (m_predicted && client.getContext().window.hasFocus())
+	if (m_predicted)
 	{
 		sf::Vector2f aim = target.mapPixelToCoords(sf::Mouse::getPosition(client.getContext().window)) - (body.getPosition() + body.getSize() / 2.f);
 		m_aimAngle = atan2f(aim.y, aim.x) * 180.f / PI;
 	}
 
 	gun.setRotation(m_aimAngle);
-
 	target.draw(gun);
 
 }
