@@ -8,11 +8,13 @@ Human::Human(int id):
 {
 }
 
-void Human::rollback(const Snapshot & s)
+void Human::rollback(const NetObject & e)
 {
-	const NetHuman * nh = static_cast<const NetHuman*>(s.getEntity(m_id));
-	m_prevCore.assign(nh);
-	m_currentCore.assign(nh);
+	const NetHuman & nh = static_cast<const NetHuman&>(e);
+
+	m_prevCore.assign(&nh);
+	m_currentCore.assign(&nh);
+
 }
 
 void Human::tick(float dt, const NetInput & input, Map & map)

@@ -13,7 +13,7 @@ Projectile::Projectile(int id, int shooterId):
 
 void Projectile::tick(float dt, GameWorld & gameWorld)
 {
-	Aabb<float> aabb = getAabb();
+	Aabb aabb = getAabb();
 	MoveResult result = gameWorld.getMap().move(aabb, m_velocity * dt);
 	
 	if (result.horizontalTile || result.verticalTile)
@@ -23,11 +23,13 @@ void Projectile::tick(float dt, GameWorld & gameWorld)
 
 	m_position += result.v;
 
-	for (const auto & e : gameWorld.getEntities(EntityType::HUMAN))
+	for (auto & e : gameWorld.getEntities(EntityType::HUMAN))
 	{
 		if (e->getAabb().intersects(aabb))
 		{
-		//	std::cout << "!";
+			Human & h = static_cast<Human &>(*e);
+			//h.takeDamage(10);
+			m_alive = false;
 		}
 	}
 }

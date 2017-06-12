@@ -65,6 +65,7 @@
     <ClCompile Include="src\Core\Logger.cpp" />
     <ClCompile Include="src\Core\Packer.cpp" />
     <ClCompile Include="src\Core\Parser.cpp" />
+    <ClCompile Include="src\Game\Aabb.cpp" />
     <ClCompile Include="src\Game\Client\Entity.cpp" />
     <ClCompile Include="src\Game\Client\Human.cpp" />
     <ClCompile Include="src\Game\Client\Projectile.cpp" />

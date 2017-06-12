@@ -50,6 +50,7 @@
     <ClCompile Include="src\Core\Server\Peer.cpp" />
     <ClCompile Include="src\Core\Server\Server.cpp" />
     <ClCompile Include="src\Core\Server\ServerMain.cpp" />
+    <ClCompile Include="src\Game\Aabb.cpp" />
     <ClCompile Include="src\Game\GameCore.cpp" />
     <ClCompile Include="src\Game\Map.cpp" />
     <ClCompile Include="src\Game\NetInput.cpp" />

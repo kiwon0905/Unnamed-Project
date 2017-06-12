@@ -24,7 +24,7 @@ public:
 
 	sf::Vector2f getPosition();
 	sf::Vector2f getSize();
-	Aabb<float> getAabb();
+	Aabb getAabb();
 
 	virtual void tick(float dt, GameWorld & gameWorld) = 0;
 	virtual void snap(Snapshot & snapshot) const = 0;

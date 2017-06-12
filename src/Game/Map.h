@@ -22,8 +22,8 @@ public:
 	const std::string & getTilesetFile() const;
 	int getTileSize() const;
 	int getTile(int x, int y) const;
-	MoveResult move(const Aabb<float> & aabb, const sf::Vector2f & dv) const;
-	bool isGrounded(const Aabb<float> & aabb) const;
+	MoveResult move(const Aabb & aabb, const sf::Vector2f & dv) const;
+	bool isGrounded(const Aabb & aabb) const;
 private:
 
 	sf::Vector2i m_size;

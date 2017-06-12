@@ -48,6 +48,7 @@ private:
 	std::string m_mapName;
 	Map m_map;
 	
+	std::vector<Entity *> m_newEntities;
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 	int m_nextEntityId = 0;
 	SnapshotContainer m_snapshots;
@@ -57,6 +58,6 @@ template<typename T, typename ...Args>
 T * GameWorld::createEntity(Args && ...args)
 {
 	T * entity = new T(m_nextEntityId++, std::forward<Args>(args)...);
-	m_entitiesByType[static_cast<int>(entity->getType())].emplace_back(entity);
+	m_newEntities.push_back(entity);
 	return entity;
 }

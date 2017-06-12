@@ -139,7 +139,6 @@ void PlayingScreen::onEnter(Client & client)
 	m_predictionGraph->setPosition({ 0.f, 600. });
 	m_snapshotGraph = std::make_unique<Graph>(-50.f, 100.f, *font, "Snapshot timing(ms)");
 	m_snapshotGraph->setPosition({ 0.f, 300.f });
-	
 }
 
 void PlayingScreen::handleEvent(const sf::Event & ev, Client & client)
@@ -365,31 +364,26 @@ void PlayingScreen::update(Client & client)
 					{
 						if (e->isPredicted())
 						{
-							e->rollback(*s);
-						}
-					}
-				}
-
-
-				for (int t = m_lastSnapshotTick + 1; t <= m_predictedTick; ++t)
-				{
-					//TODO improve
-					NetInput input;
-					for (const auto & i : m_inputs)
-						if (i.input.tick == t)
-							input = i.input;
-					
-					for (auto & v : m_entitiesByType)
-					{
-						for (auto & e : v)
-						{
-							if (e->isPredicted())
+							const NetObject * obj = s->getEntity(e->getId());
+							if (obj)
 							{
-								e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), input, m_map);
+								e->rollback(*obj);
+							
+							
+							
+								for (int t = m_lastSnapshotTick + 1; t <= m_predictedTick; ++t)
+								{
+									//TODO improve
+									NetInput input;
+									for (const auto & i : m_inputs)
+										if (i.input.tick == t)
+											input = i.input;
+
+									e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), input, m_map);
+								}		
 							}
 						}
 					}
-
 				}
 				m_repredict = false;
 			}

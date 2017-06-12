@@ -182,6 +182,9 @@
     <ClCompile Include="src\Game\NetInput.cpp">
       <Filter>Game\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="src\Game\Aabb.cpp">
+      <Filter>Game\Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Core\Packer.inl">

@@ -95,6 +95,11 @@ void GameWorld::update(Server & server)
 		m_tick++;
 		accumulator -= sf::seconds(1.f / TICKS_PER_SEC);
 	
+		for (Entity * e : m_newEntities)
+			m_entitiesByType[static_cast<int>(e->getType())].emplace_back(e);
+		m_newEntities.clear();
+		
+
 		for (auto & v : m_entitiesByType)
 			for (auto & e : v)
 				e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), *this);

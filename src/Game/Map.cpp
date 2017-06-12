@@ -52,12 +52,12 @@ int Map::getTileSize() const
 	return m_tileSize;
 }
 
-MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
+MoveResult Map::move(const Aabb & aabb, const sf::Vector2f & dv) const
 {
 	MoveResult result;
 	result.v = dv;
 
-	Aabb<float> aabb2 = aabb;
+	Aabb aabb2 = aabb;
 
 	//right
 	if (dv.x > 0)
@@ -65,10 +65,10 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 		float minDistance = dv.x + 1000.f;
 
 		//int startX = (aabb2.left + aabb2.width) / m_tileSize + 1;
-		int startX = aabb.left / m_tileSize;
-		int endX = (aabb2.left + aabb2.width + dv.x) / m_tileSize;
-		int startY = aabb2.top / m_tileSize;
-		int endY = (aabb2.top + aabb2.height) / m_tileSize;
+		int startX = aabb.x / m_tileSize;
+		int endX = (aabb2.x + aabb2.w + dv.x) / m_tileSize;
+		int startY = aabb2.y / m_tileSize;
+		int endY = (aabb2.y + aabb2.h) / m_tileSize;
 
 
 		for(int x = startX; x <= endX; ++x)
@@ -78,7 +78,7 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 				int tile = getTile(x, y);
 				if (tile)
 				{
-					float distance = m_tileSize * x - (aabb2.left + aabb2.width);
+					float distance = m_tileSize * x - (aabb2.x + aabb2.w);
 					if (distance < minDistance)
 					{
 						minDistance = distance;
@@ -93,11 +93,11 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 	else if (dv.x < 0)
 	{
 		float maxDistance = dv.x - 1000.f;
-		int startX = std::floor((aabb2.left + dv.x) / m_tileSize);
+		int startX = std::floor((aabb2.x + dv.x) / m_tileSize);
 		//int endX = aabb2.left / m_tileSize - 1;
-		int endX = (aabb2.left + aabb2.width) / m_tileSize;
-		int startY = aabb2.top / m_tileSize;
-		int endY = (aabb2.top + aabb2.height) / m_tileSize;
+		int endX = (aabb2.x + aabb2.w) / m_tileSize;
+		int startY = aabb2.y / m_tileSize;
+		int endY = (aabb2.y + aabb2.h) / m_tileSize;
 
 		for (int x = startX; x <= endX; ++x)
 		{
@@ -106,7 +106,7 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 				int tile = getTile(x, y);
 				if (tile)
 				{
-					float distance = (x + 1) * m_tileSize - aabb2.left;
+					float distance = (x + 1) * m_tileSize - aabb2.x;
 					if (distance > maxDistance)
 					{
 						maxDistance = distance;
@@ -118,16 +118,16 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 		}
 	}
 
-	aabb2.left += result.v.x;
+	aabb2.x += result.v.x;
 	//down
 	if (dv.y > 0)
 	{
 		float minDistance = dv.y + 1000.f;
 		//int startY = (aabb2.top + aabb2.height) / m_tileSize + 1;
-		int startY = (aabb2.top) / m_tileSize;
-		int endY = (aabb2.top + aabb2.height + dv.y) / m_tileSize;
-		int startX = aabb2.left / m_tileSize;
-		int endX = (aabb2.left + aabb2.width) / m_tileSize;
+		int startY = (aabb2.y) / m_tileSize;
+		int endY = (aabb2.y + aabb2.h + dv.y) / m_tileSize;
+		int startX = aabb2.x / m_tileSize;
+		int endX = (aabb2.x + aabb2.w) / m_tileSize;
 		
 		for(int y = startY; y <= endY; ++y)
 		{
@@ -136,7 +136,7 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 				int tile = getTile(x, y);
 				if (tile)
 				{
-					float distance = m_tileSize * y - (aabb2.top + aabb2.height);
+					float distance = m_tileSize * y - (aabb2.y + aabb2.h);
 					if (distance < minDistance)
 					{
 						minDistance = distance;
@@ -151,11 +151,11 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 	else if (dv.y < 0)
 	{
 		float maxDistance = dv.y - 1000.f;
-		int startY = std::floor((aabb2.top + dv.y) / m_tileSize);	
+		int startY = std::floor((aabb2.y + dv.y) / m_tileSize);	
 		//int endY = aabb2.top / m_tileSize - 1;
-		int endY = (aabb2.top + aabb2.height) / m_tileSize;
-		int startX = aabb2.left / m_tileSize;
-		int endX = (aabb2.left + aabb2.width) / m_tileSize;
+		int endY = (aabb2.y + aabb2.h) / m_tileSize;
+		int startX = aabb2.x / m_tileSize;
+		int endX = (aabb2.x + aabb2.w) / m_tileSize;
 		for(int y = startY; y <= endY; ++y)
 		{
 
@@ -164,7 +164,7 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 				int tile = getTile(x, y);
 				if (getTile(x, y))
 				{
-					float distance = (y + 1) * m_tileSize - aabb2.top;
+					float distance = (y + 1) * m_tileSize - aabb2.y;
 					if (distance > maxDistance)
 					{
 						maxDistance = distance;
@@ -178,12 +178,12 @@ MoveResult Map::move(const Aabb<float> & aabb, const sf::Vector2f & dv) const
 	return result;
 }
 
-bool Map::isGrounded(const Aabb<float> & aabb) const
+bool Map::isGrounded(const Aabb & aabb) const
 {
-	int startX = aabb.left / m_tileSize;
-	int endX = (aabb.left + aabb.width) / m_tileSize;
+	int startX = aabb.x / m_tileSize;
+	int endX = (aabb.x + aabb.w) / m_tileSize;
 
-	int y = (aabb.top + aabb.height + 1) / m_tileSize;
+	int y = (aabb.y + aabb.h + 1) / m_tileSize;
 
 	for (int x = startX; x <= endX; ++x)
 	{

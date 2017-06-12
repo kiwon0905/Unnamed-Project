@@ -108,7 +108,8 @@ void Client::run()
 
 			m_context.window.display();
 
-			sf::sleep(sf::milliseconds(1));
+			std::this_thread::sleep_for(std::chrono::microseconds(10));
+			//sf::sleep(sf::microseconds(1));
 			m_screenStack.applyChanges(*this);
 		}
 	}

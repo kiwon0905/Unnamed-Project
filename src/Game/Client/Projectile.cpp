@@ -10,7 +10,7 @@ Projectile::Projectile(int id):
 
 }
 
-void Projectile::rollback(const Snapshot & s)
+void Projectile::rollback(const NetObject & e)
 {
 
 }

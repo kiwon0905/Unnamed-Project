@@ -20,7 +20,7 @@ public:
 	
 	void setPrediction(bool predict);
 	bool isPredicted();
-	virtual void rollback(const Snapshot & s) = 0;
+	virtual void rollback(const NetObject & e) = 0;
 
 	void setAlive(bool alive);
 	bool isAlive() const;

@@ -4,12 +4,12 @@
 
 void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 {
-	Aabb<float> aabb(m_position.x, m_position.y, 69.f, 69.f);
+	Aabb aabb(m_position.x, m_position.y, 69.f, 69.f);
 	bool grounded = map.isGrounded(aabb);
 
 	float accel = 10000.f;
 	float friction = .5f;
-	float maxSpeed = 500.f;
+	float maxSpeed = 600.f;
 
 	if (!grounded)
 	{

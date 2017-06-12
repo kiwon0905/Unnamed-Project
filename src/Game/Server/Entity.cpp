@@ -42,7 +42,7 @@ sf::Vector2f Entity::getSize()
 	return m_size;
 }
 
-Aabb<float> Entity::getAabb()
+Aabb Entity::getAabb()
 {
-	return Aabb<float>(m_position, m_size);
+	return Aabb(m_position, m_size);
 }

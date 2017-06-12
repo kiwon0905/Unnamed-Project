@@ -30,7 +30,7 @@ void Human::tick(float dt, GameWorld & world)
 		{
 			Projectile * p = world.createEntity<Projectile>(m_id);
 
-			p->setVelocity(unit(v) * 2000.f);
+			p->setVelocity(unit(v) * 300.f);
 
 			p->setPosition(center + unit(v) * 60.f - p->getSize() / 2.f);
 			m_fireCooldown = 10;
@@ -54,4 +54,13 @@ void Human::snap(Snapshot & snapshot) const
 		h->pos.y = roundToInt(m_core.getPosition().y * 100.f);
 		h->aimAngle = roundToInt(m_aimAngle);
 	}
+}
+
+void Human::takeDamage(int dmg)
+{
+	m_health -= dmg;
+	if (m_health <= 0)
+		m_alive = false;
+
+	std::cout << "health: " << m_health << "\n";
 }
