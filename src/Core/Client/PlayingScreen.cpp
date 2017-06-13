@@ -488,6 +488,31 @@ void PlayingScreen::render(Client & client)
 	states.texture = m_tileTexture;
 	m_renderTexture.draw(m_tileVertices, states);
 
+	sf::VertexArray arr;
+	arr.setPrimitiveType(sf::Lines);
+	for (int i = 0; i < m_map.getSize().x; ++i)
+	{
+		sf::Vertex v, v2;
+		v.color = sf::Color::Black;
+		v2.color = sf::Color::Black;
+		v.position = sf::Vector2f(i * m_map.getTileSize(), 0.f);
+		v2.position = sf::Vector2f(i * m_map.getTileSize(), m_map.getTileSize() * m_map.getSize().y);
+		arr.append(v);
+		arr.append(v2);
+	}
+	for (int i = 0; i < m_map.getSize().y; ++i)
+	{
+		sf::Vertex v, v2;
+		v.color = sf::Color::Black;
+		v2.color = sf::Color::Black;
+		v.position = sf::Vector2f(0.f, i * m_map.getTileSize());
+		v2.position = sf::Vector2f(m_map.getSize().x * m_map.getTileSize(), i * m_map.getTileSize());
+		arr.append(v);
+		arr.append(v2);
+	}
+	m_renderTexture.draw(arr);
+
+
 	//draw entities
 	for (auto & v : m_entitiesByType)
 	{

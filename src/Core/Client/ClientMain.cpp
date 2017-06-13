@@ -10,7 +10,6 @@
 	#endif
 #endif
 
-
 int main()
 {
 #ifdef _DEBUG
@@ -21,35 +20,38 @@ int main()
 }
 
 
-/*
+
 #include "Graph.h"
 #include "Core/Utility.h"
 #include <SFML/Graphics.hpp>
+#include "Game/Aabb.h"
 
 int randInt(int min, int max)
 {
 	return rand() % (max + 1 - min) + min;
 }
+
+/*
 int main()
 {
-
+	std::cout << std::fixed << std::setprecision(6);
 	sf::RenderWindow window;
 
 	window.create(sf::VideoMode(1600, 900), "", sf::Style::Default, sf::ContextSettings(0, 0, 8));
 
-	window.setVerticalSyncEnabled(true);
-	sf::CircleShape shape(30.f);
-	shape.setFillColor(sf::Color::Green);
+
 
 	sf::Vector2f pos, prevPos;
 	sf::Clock clock;
 	sf::Time accum;
 
-	sf::Texture texture;
-	texture.loadFromFile("hi.png");
-	sf::Sprite spr;
-	spr.setTexture(texture);
+	Aabb w{ -300.f, -300.f, 500.f, 200.f };
 
+	Aabb aabb;
+	aabb.w = 100.f;
+	aabb.h = 100.f;
+	//sf::Vector2f vel = { 600.f, 600.f };
+	sf::Vector2f vel;
 	while (window.isOpen())
 	{
 		accum += clock.restart();
@@ -63,40 +65,70 @@ int main()
 		while (accum >= sf::seconds(1 / 50.f))
 		{
 			accum -= sf::seconds(1 / 50.f);
-			sf::Vector2f vel;
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+			vel = { 0.f, 0.f };
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 			{
-				vel.y = -600.f;
+				vel.y = -300.f;
 			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 			{
-				vel.y = 600.f;
+				vel.y = 300.f;
 			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 			{
-				vel.x = -600.f;
+				vel.x = -300.f;
 			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 			{
-				vel.x = 600.f;
+				vel.x = 300.f;
 			}
+			sf::Vector2f displacement = vel * sf::seconds(1 / 50.f).asSeconds();
+
+			aabb.x = pos.x;
+			aabb.y = pos.y;
+
 			prevPos = pos;
-			pos += vel * sf::seconds(1 / 50.f).asSeconds();
 		
+			
+			float time;
+			sf::Vector2i norm;
+			if (aabb.sweep(displacement, w, time, norm))
+			{
+				pos = { aabb.x, aabb.y };
+
+				float dot = (displacement.x* norm.y + displacement.y *norm.x)*(1 - time);
+				displacement.x = dot * norm.y;
+				displacement.y = dot * norm.x;
+				std::cout << "!";
+			}
+			pos += displacement;
+			//std::cout << "velocity: " << vel << "\n";
 		}
 		float alpha = accum / sf::seconds(1 / 50.f);
 
 		sf::Vector2f renderPos = lerp(prevPos, pos, alpha);
-		shape.setPosition(renderPos);
-
-		window.clear(sf::Color::Cyan);
-		window.draw(spr);
-		window.draw(shape);
 		sf::View view = window.getDefaultView();
 		view.setCenter(renderPos);
 		window.setView(view);
+		window.clear(sf::Color::Cyan);
+		sf::RectangleShape r;
+		r.setOutlineThickness(-2.f);
+		r.setOutlineColor(sf::Color::Black);
+		r.setPosition(renderPos);
+		r.setSize({ 100.f, 100.f });
+		window.draw(r);
+
+
+		sf::RectangleShape r2;
+		r2.setSize({ w.w, w.h });
+		r2.setPosition({ w.x, w.y });
+		r2.setFillColor(sf::Color::Black);
+		window.draw(r2);
 
 		window.display();
+
+
+		sf::sleep(sf::milliseconds(1));
 	}
 
 	return 0;

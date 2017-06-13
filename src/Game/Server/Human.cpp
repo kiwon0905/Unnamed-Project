@@ -28,12 +28,17 @@ void Human::tick(float dt, GameWorld & world)
 	{
 		if (m_fireCooldown == 0)
 		{
-			Projectile * p = world.createEntity<Projectile>(m_id);
+			sf::Vector2f firePos = center + unit(v) * 60.f - sf::Vector2f(25.f, 25.f) / 2.f;
+			if (world.getMap().getTile(firePos.x, firePos.y) == 0)
+			{
+				Projectile * p = world.createEntity<Projectile>(m_id);
 
-			p->setVelocity(unit(v) * 300.f);
+				p->setVelocity(unit(v) * 2000.f);
 
-			p->setPosition(center + unit(v) * 60.f - p->getSize() / 2.f);
-			m_fireCooldown = 10;
+				p->setPosition(firePos);
+				m_fireCooldown = 10;
+			}
+
 		}
 	}
 

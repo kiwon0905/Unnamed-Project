@@ -1,5 +1,5 @@
 #include "Aabb.h"
-
+#include <iostream>
 Aabb::Aabb():
 	x(0.f),
 	y(0.f),
@@ -72,4 +72,111 @@ bool Aabb::intersects(const Aabb & aabb, Aabb & intersection) const
 		intersection = Aabb();
 		return false;
 	}
+}
+
+bool Aabb::broadphase(const sf::Vector2f & v, const Aabb & aabb) const
+{
+	Aabb area;
+	area.x = v.x > 0 ? x : x + v.x;
+	area.y = v.y > 0 ? y : y + v.y;
+	area.w = v.x > 0 ? v.x + w : w - v.x;
+	area.h = v.y > 0 ? v.y + h : h - v.y;
+
+	return aabb.intersects(area);
+}
+
+bool Aabb::sweep(const sf::Vector2f & displacement, const Aabb & aabb, float & time, sf::Vector2i & norm)
+{
+	if (!broadphase(displacement, aabb))
+	{
+		norm.x = 0;
+		norm.y = 0;
+		time = 1.f;
+		return false;
+	}
+	sf::Vector2f entryDistance, exitDistance;
+
+	if (displacement.x > 0.f)
+	{
+		entryDistance.x = aabb.x - (x + w);
+		exitDistance.x = (aabb.x + aabb.w) - x;
+		norm.x = -1;
+	}
+	else
+	{
+		entryDistance.x = (aabb.x + aabb.w) - x;
+		exitDistance.x = aabb.x - (x + w);
+		norm.x = 1;
+	}
+	if (displacement.y > 0.f)
+	{
+		entryDistance.y = aabb.y - (y + h);
+		exitDistance.y = (aabb.y + aabb.h) - y;
+		norm.y = -1;
+	}
+	else
+	{
+		entryDistance.y = (aabb.y + aabb.h) - y;
+		exitDistance.y = aabb.y - (y + h);
+		norm.y = 1;
+	}
+
+	sf::Vector2f entryTime, exitTime;
+
+	if (displacement.x == 0.f)
+	{
+		entryTime.x = -std::numeric_limits<float>::infinity();
+		exitTime.x = std::numeric_limits<float>::infinity();
+	}
+	else
+	{
+		entryTime.x = entryDistance.x / displacement.x;
+		exitTime.x = exitDistance.x / displacement.x;
+	}
+	if (displacement.y == 0.f)
+	{
+		entryTime.y = -std::numeric_limits<float>::infinity();
+		exitTime.y = std::numeric_limits<float>::infinity();
+	}
+	else
+	{
+		entryTime.y = entryDistance.y / displacement.y;
+		exitTime.y = exitDistance.y / displacement.y;
+	}
+
+	float maxEntryTime = std::max(entryTime.x, entryTime.y);
+	float minExitTime = std::min(exitTime.x, exitTime.y);
+
+	//no collision
+	if (maxEntryTime > minExitTime || entryTime.x < 0.f && entryTime.y < 0.f || entryTime.x > 1.f || entryTime.y > 1.f)
+	{
+		norm.x = 0;
+		norm.y = 0;
+		time = 1.f;
+		return false;
+	}
+	else
+	{
+		if (entryTime.x > entryTime.y)
+		{
+			if (entryDistance.x < 0.0f)
+				norm.y = 0.0f;
+			else
+				norm.y = 0.0f;
+		}
+		else
+		{
+			if (entryDistance.y < 0.0f)
+				norm.x = 0.0f;
+			else
+				norm.x = 0.0f;
+		}
+		time = maxEntryTime;
+
+		sf::Vector2f push = displacement * time;
+		x += push.x;
+		y += push.y;
+		return true;
+	}
+
 }

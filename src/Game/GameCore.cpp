@@ -11,12 +11,14 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 	float friction = .5f;
 	float maxSpeed = 600.f;
 
+	
 	if (!grounded)
 	{
 		accel = 3000.f;
 		friction = .99f;
 		//maxSpeed = 1400.f;
 	}
+	
 
 	m_velocity.y = clampedAdd(-3000.f, 3000.f, m_velocity.y, 1000.f * dt);
 
@@ -37,16 +39,44 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 	else
 	{
 	}
+	
+	/*
+	m_velocity = { 0.f, 0.f };
+	if (input.moveDirection > 0)
+		m_velocity.x = 600.f;
+	if (input.moveDirection < 0)
+		m_velocity.x = -600.f;
+	if (input.vMoveDirection > 0)
+		m_velocity.y = 600.f;
+	if (input.vMoveDirection < 0)
+		m_velocity.y = -600.f;
+	*/
 
-	MoveResult result = map.move(aabb, m_velocity * dt);
+	sf::Vector2f d = m_velocity * dt;
+	while (true)
+	{
+		float time;
+		sf::Vector2i norm;
+		if (map.sweep(aabb, d, time, norm))
+		{
+			m_position = { aabb.x, aabb.y };
+			if (norm.x)
+			{
+				d.x = 0.f;
+				m_velocity.x = 0.f;
+			}
+			if (norm.y)
+			{
+				d.y = 0.f;
+				m_velocity.y = 0.f;
+			}
+		}
+		else
+			break;
+	}
 
-	if (result.horizontalTile)
-		m_velocity.x = 0.f;
-	if (result.verticalTile)
-		m_velocity.y = 0.f;
 
-	if (length(result.v) > 0.001f)
-		m_position += result.v;
+	m_position += d;
 }
 
 void HumanCore::assign(const NetObject * ne)

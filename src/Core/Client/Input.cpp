@@ -30,6 +30,11 @@ NetInput Input::getInput(const sf::RenderTarget & target, const sf::Window & win
 		if (sf::Keyboard::isKeyPressed(m_binds[Control::MOVE_RIGHT]))
 			input.moveDirection++;
 
+		if (sf::Keyboard::isKeyPressed(m_binds[Control::MOVE_UP]))
+			input.vMoveDirection--;
+		if (sf::Keyboard::isKeyPressed(m_binds[Control::MOVE_DOWN]))
+			input.vMoveDirection++;
+
 		input.jump = sf::Keyboard::isKeyPressed(m_binds[Control::JUMP]);
 		input.fire = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 	}
