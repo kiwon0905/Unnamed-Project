@@ -21,7 +21,8 @@ void Human::tick(float dt, GameWorld & world)
 
 	sf::Vector2f center = m_position + m_size / 2.f;
 	sf::Vector2f v = input.aimDirection - center;
-
+	if (v == sf::Vector2f())
+		v = sf::Vector2f(0.f, -1.f);
 	m_aimAngle = atan2f(v.y, v.x) * 180.f / PI;
 	m_aimAngle = normalizedAngle(m_aimAngle);
 	if (input.fire)
@@ -29,11 +30,15 @@ void Human::tick(float dt, GameWorld & world)
 		if (m_fireCooldown == 0)
 		{
 			sf::Vector2f firePos = center + unit(v) * 60.f - sf::Vector2f(25.f, 25.f) / 2.f;
-			if (world.getMap().getTile(firePos.x, firePos.y) == 0)
+			//std::cout << "firePos: " <<firePos<<"\n";
+			if (world.getMap().getTile(firePos.x, firePos.y) == 0 &&
+				world.getMap().getTile(firePos.x + 25.f, firePos.y) == 0 &&
+				world.getMap().getTile(firePos.x + 25.f, firePos.y + 25.f) == 0 &&
+				world.getMap().getTile(firePos.x, firePos.y + 25.f) == 0)
 			{
 				Projectile * p = world.createEntity<Projectile>(m_id);
 
-				p->setVelocity(unit(v) * 2000.f);
+				p->setVelocity(unit(v) * 1000.f);
 
 				p->setPosition(firePos);
 				m_fireCooldown = 10;

@@ -56,7 +56,7 @@ void Human::preRender(const Snapshot * from, const Snapshot * to, float t)
 void Human::render(sf::RenderTarget & target, Client & client)
 {
 	sf::RectangleShape body;
-	body.setSize({ 69.f, 69.f });
+	body.setSize({ 70.f, 70.f });
 	body.setFillColor(sf::Color::Green);
 	body.setOutlineColor(sf::Color::Black);
 	body.setOutlineThickness(-3.f);

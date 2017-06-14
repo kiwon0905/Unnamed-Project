@@ -23,8 +23,7 @@ public:
 	int getTileSize() const;
 	int getTile(int x, int y) const;
 	int getTile(float x, float y) const;
-	MoveResult move(const Aabb & aabb, const sf::Vector2f & dv) const;
-	int sweep(Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vector2i & norm) const;
+	int sweep(const Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vector2i & norm) const;
 	bool isGrounded(const Aabb & aabb) const;
 private:
 

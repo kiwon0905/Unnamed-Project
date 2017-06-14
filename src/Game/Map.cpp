@@ -52,138 +52,7 @@ int Map::getTileSize() const
 	return m_tileSize;
 }
 
-MoveResult Map::move(const Aabb & aabb, const sf::Vector2f & dv) const
-{
-	MoveResult result;
-	result.v = dv;
-
-	Aabb aabb2 = aabb;
-
-	Aabb area;
-	area.x = dv.x > 0 ? aabb.x : aabb.x + dv.x;
-	area.y = dv.y > 0 ? aabb.y : aabb.y + dv.y;
-	area.w = dv.x > 0 ? dv.x + aabb.w : aabb.w - dv.x;
-	area.h = dv.y > 0 ? dv.y + aabb.h : aabb.h - dv.y;
-//	std::cout << area.x << ", " << area.y << ", " << area.w << ", " << area.h << "\n";
-	if(dv != sf::Vector2f())
-	//std::cout << (int)(std::floor(area.x / m_tileSize)) << ", " << (int)(std::floor(area.y / m_tileSize)) <<", "<< (int)(area.w / m_tileSize) <<"," << (int)(area.h / m_tileSize) << "\n";
-	
-
-	//right
-	if (dv.x > 0)
-	{
-		float minDistance = dv.x + 1000.f;
-
-		int startX = (aabb2.x + aabb2.w) / m_tileSize + 1;
-		int endX = (aabb2.x + aabb2.w + dv.x) / m_tileSize;
-		int startY = aabb2.y / m_tileSize;
-		int endY = (aabb2.y + aabb2.h) / m_tileSize;
-
-
-		for(int x = startX; x <= endX; ++x)
-		{
-			for (int y = startY; y <= endY; ++y)
-			{
-				int tile = getTile(x, y);
-				if (tile)
-				{
-					float distance = m_tileSize * x - (aabb2.x + aabb2.w);
-					if (distance < minDistance)
-					{
-						minDistance = distance;
-						result.v.x = minDistance - 0.1f;
-						result.horizontalTile = tile;
-					}
-				}
-			}
-		}
-	}
-	//left
-	else if (dv.x < 0)
-	{
-		float maxDistance = dv.x - 1000.f;
-		int startX = std::floor((aabb2.x + dv.x) / m_tileSize);
-		int endX = aabb2.x / m_tileSize - 1;
-		int startY = aabb2.y / m_tileSize;
-		int endY = (aabb2.y + aabb2.h) / m_tileSize;
-
-		for (int x = startX; x <= endX; ++x)
-		{
-			for (int y = startY; y <= endY; ++y)
-			{
-				int tile = getTile(x, y);
-				if (tile)
-				{
-					float distance = (x + 1) * m_tileSize - aabb2.x;
-					if (distance > maxDistance)
-					{
-						maxDistance = distance;
-						result.v.x = maxDistance + 0.1f;
-						result.horizontalTile = tile;
-					}
-				}
-			}
-		}
-	}
-
-	aabb2.x += result.v.x;
-	//down
-	if (dv.y > 0)
-	{
-		float minDistance = dv.y + 1000.f;
-		int startY = (aabb2.y + aabb2.h) / m_tileSize + 1;
-		int endY = (aabb2.y + aabb2.h + dv.y) / m_tileSize;
-		int startX = aabb2.x / m_tileSize;
-		int endX = (aabb2.x + aabb2.w) / m_tileSize;
-		
-		for(int y = startY; y <= endY; ++y)
-		{
-			for (int x = startX; x <= endX; ++x)
-			{
-				int tile = getTile(x, y);
-				if (tile)
-				{
-					float distance = m_tileSize * y - (aabb2.y + aabb2.h);
-					if (distance < minDistance)
-					{
-						minDistance = distance;
-						result.v.y = minDistance - 0.1f;
-						result.verticalTile = tile;
-					}
-				}
-			}
-		}
-	}
-	//up
-	else if (dv.y < 0)
-	{
-		float maxDistance = dv.y - 1000.f;
-		int startY = std::floor((aabb2.y + dv.y) / m_tileSize);	
-		int endY = aabb2.y / m_tileSize - 1;
-		int startX = aabb2.x / m_tileSize;
-		int endX = (aabb2.x + aabb2.w) / m_tileSize;
-		for(int y = startY; y <= endY; ++y)
-		{
-			for (int x = startX; x <= endX; ++x)
-			{
-				int tile = getTile(x, y);
-				if (getTile(x, y))
-				{
-					float distance = (y + 1) * m_tileSize - aabb2.y;
-					if (distance > maxDistance)
-					{
-						maxDistance = distance;
-						result.v.y = maxDistance + 0.1f;
-						result.verticalTile = tile;
-					}
-				}
-			}
-		}
-	}
-	return result;
-}
-
-int Map::sweep(Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vector2i & norm) const
+int Map::sweep(const Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vector2i & norm) const
 {
 	//   x0    x1
 	//y0
@@ -204,38 +73,31 @@ int Map::sweep(Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vector2i &
 	int minTile = 0;
 	float minTime = 1.f;
 	sf::Vector2i minNorm;
-	Aabb retAabb = aabb;
 
 	for (int x = startX; x <= endX; ++x)
 	{
 		for (int y = startY; y <= endY; ++y)
 		{
 			int tile = getTile(x, y);
-			//std::cout << x << ", " << y << "\n";
 			if (tile)
 			{
 				float time;
 				sf::Vector2i norm;
-				Aabb temp = aabb;
 				Aabb tileAabb(x * m_tileSize, y * m_tileSize, m_tileSize, m_tileSize);
-				if (temp.sweep(d, tileAabb, time, norm))
+				if (aabb.sweep(d, tileAabb, time, norm))
 				{
 					if (time < minTime)
 					{
 						minTime = time;
 						minTile = tile;
 						minNorm = norm;
-						retAabb = temp;
 					}
 				}
 			}
 		}
 	}
-	//std::cout << "\n";
-
 	time = minTime;
 	norm = minNorm;
-	aabb = retAabb;
 	return minTile;
 }
 

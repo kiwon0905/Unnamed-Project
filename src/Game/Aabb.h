@@ -14,7 +14,7 @@ public:
 	bool intersects(const Aabb & aabb) const;
 	bool intersects(const Aabb & aabb, Aabb & intersection) const;
 
-	bool sweep(const sf::Vector2f & velocity, const Aabb & aabb, float & time, sf::Vector2i & norm);
+	bool sweep(const sf::Vector2f & velocity, const Aabb & aabb, float & time, sf::Vector2i & norm) const;
 	float x;   ///< Left coordinate of the Aabb
 	float y;    ///< Top coordinate of the Aabb
 	float w;  ///< Width of the Aabb

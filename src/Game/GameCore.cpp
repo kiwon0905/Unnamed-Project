@@ -4,7 +4,7 @@
 
 void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 {
-	Aabb aabb(m_position.x, m_position.y, 69.f, 69.f);
+	Aabb aabb(m_position.x, m_position.y, 70.f, 70.f);
 	bool grounded = map.isGrounded(aabb);
 
 	float accel = 10000.f;
@@ -53,27 +53,27 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 	*/
 
 	sf::Vector2f d = m_velocity * dt;
-	while (true)
+
+	float time;
+	sf::Vector2i norm;
+	while(map.sweep(aabb, d, time, norm))
 	{
-		float time;
-		sf::Vector2i norm;
-		if (map.sweep(aabb, d, time, norm))
+		aabb.x += d.x * time;
+		aabb.y += d.y * time;
+		if (norm.x)
 		{
-			m_position = { aabb.x, aabb.y };
-			if (norm.x)
-			{
-				d.x = 0.f;
-				m_velocity.x = 0.f;
-			}
-			if (norm.y)
-			{
-				d.y = 0.f;
-				m_velocity.y = 0.f;
-			}
+			d.x = 0.f;
+			m_velocity.x = 0.f;
 		}
-		else
-			break;
+		if (norm.y)
+		{
+			d.y = 0.f;
+			m_velocity.y = 0.f;
+		}
+		m_position = { aabb.x, aabb.y };
+		d *= (1 - time);
 	}
+
 
 
 	m_position += d;

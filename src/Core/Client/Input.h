@@ -5,6 +5,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
+#include <functional>
 
 enum Control
 {
@@ -28,5 +29,5 @@ public:
 	void finalize(Client & client);
 	NetInput getInput(const sf::RenderTarget & target, const sf::Window & window);
 private:
-	std::unordered_map<Control, sf::Keyboard::Key> m_binds;
+	std::unordered_map<Control, std::function<bool()>> m_controls;
 };

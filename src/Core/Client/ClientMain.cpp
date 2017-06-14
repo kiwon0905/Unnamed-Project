@@ -10,6 +10,7 @@
 	#endif
 #endif
 
+
 int main()
 {
 #ifdef _DEBUG
@@ -20,7 +21,7 @@ int main()
 }
 
 
-
+/*
 #include "Graph.h"
 #include "Core/Utility.h"
 #include <SFML/Graphics.hpp>
@@ -31,7 +32,7 @@ int randInt(int min, int max)
 	return rand() % (max + 1 - min) + min;
 }
 
-/*
+
 int main()
 {
 	std::cout << std::fixed << std::setprecision(6);
@@ -94,7 +95,9 @@ int main()
 			sf::Vector2i norm;
 			if (aabb.sweep(displacement, w, time, norm))
 			{
-				pos = { aabb.x, aabb.y };
+				pos.x += displacement.x * time;
+				pos.y += displacement.y * time;
+
 
 				float dot = (displacement.x* norm.y + displacement.y *norm.x)*(1 - time);
 				displacement.x = dot * norm.y;
@@ -112,7 +115,7 @@ int main()
 		window.setView(view);
 		window.clear(sf::Color::Cyan);
 		sf::RectangleShape r;
-		r.setOutlineThickness(-2.f);
+		r.setOutlineThickness(-1.f);
 		r.setOutlineColor(sf::Color::Black);
 		r.setPosition(renderPos);
 		r.setSize({ 100.f, 100.f });
@@ -123,6 +126,8 @@ int main()
 		r2.setSize({ w.w, w.h });
 		r2.setPosition({ w.x, w.y });
 		r2.setFillColor(sf::Color::Black);
+		r2.setOutlineThickness(-1.f);
+		r2.setOutlineColor(sf::Color::Yellow);
 		window.draw(r2);
 
 		window.display();

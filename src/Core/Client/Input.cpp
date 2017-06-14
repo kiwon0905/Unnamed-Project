@@ -5,11 +5,12 @@
  
 bool Input::initialize(Client & client)
 {
-	m_binds[Control::MOVE_LEFT] = sf::Keyboard::A;
-	m_binds[Control::MOVE_RIGHT] = sf::Keyboard::D;
-	m_binds[Control::MOVE_UP] = sf::Keyboard::W;
-	m_binds[Control::MOVE_DOWN] = sf::Keyboard::S;
-	m_binds[Control::JUMP] = sf::Keyboard::Space;
+	m_controls[Control::MOVE_LEFT] = std::bind(sf::Keyboard::isKeyPressed, sf::Keyboard::A);
+	m_controls[Control::MOVE_RIGHT] = std::bind(sf::Keyboard::isKeyPressed, sf::Keyboard::D);
+	m_controls[Control::MOVE_UP] = std::bind(sf::Keyboard::isKeyPressed, sf::Keyboard::W);
+	m_controls[Control::MOVE_DOWN] = std::bind(sf::Keyboard::isKeyPressed, sf::Keyboard::S);
+	m_controls[Control::JUMP] = std::bind(sf::Keyboard::isKeyPressed, sf::Keyboard::Space);
+	m_controls[Control::PRIMARY_FIRE] = std::bind(sf::Mouse::isButtonPressed, sf::Mouse::Left);
 	return true;
 }
 
@@ -23,20 +24,19 @@ NetInput Input::getInput(const sf::RenderTarget & target, const sf::Window & win
 	input.aimDirection = target.mapPixelToCoords(sf::Mouse::getPosition(window));
 	if (window.hasFocus())
 	{
-		input.moveDirection = 0;
-
-		if (sf::Keyboard::isKeyPressed(m_binds[Control::MOVE_LEFT]))
+		if (m_controls[Control::MOVE_LEFT]())
 			input.moveDirection--;
-		if (sf::Keyboard::isKeyPressed(m_binds[Control::MOVE_RIGHT]))
+		if (m_controls[Control::MOVE_RIGHT]())
 			input.moveDirection++;
 
-		if (sf::Keyboard::isKeyPressed(m_binds[Control::MOVE_UP]))
+		if (m_controls[Control::MOVE_UP]())
 			input.vMoveDirection--;
-		if (sf::Keyboard::isKeyPressed(m_binds[Control::MOVE_DOWN]))
+		if (m_controls[Control::MOVE_DOWN]())
 			input.vMoveDirection++;
 
-		input.jump = sf::Keyboard::isKeyPressed(m_binds[Control::JUMP]);
-		input.fire = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+
+		input.jump = m_controls[Control::JUMP]();
+		input.fire = m_controls[Control::PRIMARY_FIRE]();
 	}
 
 	return input;

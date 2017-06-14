@@ -14,50 +14,38 @@ Projectile::Projectile(int id, int shooterId):
 void Projectile::tick(float dt, GameWorld & gameWorld)
 {
 	Aabb aabb = getAabb();
-	/*MoveResult result = gameWorld.getMap().move(aabb, m_velocity * dt);
-	
-	if (result.horizontalTile || result.verticalTile)
-	{
-		m_alive = false;
-	}*/
-
 
 	sf::Vector2f d = m_velocity * dt;
 	
-	while (true)
+
+	float time;
+	sf::Vector2i norm;
+	int tile = gameWorld.getMap().sweep(aabb, d, time, norm);
+	if (tile)
 	{
-		float time;
-		sf::Vector2i norm;
-		if (gameWorld.getMap().sweep(aabb, d, time, norm))
-		{
-			d *= (1 - time);
-			if (norm.x)
-			{
-				d.x = -d.x;
-				m_velocity.x = -m_velocity.x;
-			}
-			if (norm.y)
-			{
-				d.y = -d.y;
-				m_velocity.y = -m_velocity.y;
-			}
-		}
-		else
-			break;
+		m_alive = false;
+		d *= time;
+		aabb.x += d.x;
+		aabb.y += d.y;
+		m_position = { aabb.x, aabb.y };
+		d = { 0.f, 0.f };
 	}
+	
 
-
-	m_position += d;
 
 	for (auto & e : gameWorld.getEntities(EntityType::HUMAN))
 	{
-		if (e->getAabb().intersects(aabb))
+		if (e->getId() != m_shooterId && aabb.sweep(d, e->getAabb(), time, norm))
 		{
-			Human & h = static_cast<Human &>(*e);
-			//h.takeDamage(10);
-		//	m_alive = false;
+			m_alive = false;
+			d *= time;
+			aabb.x += d.x;
+			aabb.y += d.y;
+			m_position = { aabb.x, aabb.y };
+			d = { 0.f, 0.f };
 		}
 	}
+	m_position += d;
 }
 
 
