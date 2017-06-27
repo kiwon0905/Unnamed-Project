@@ -17,7 +17,7 @@ public:
 	int getId();
 	EntityType getType();
 	
-	Peer * getPlayer();
+	//Peer * getPlayer();
 	
 	bool isAlive();
 	void setAlive(bool alive);

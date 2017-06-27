@@ -35,6 +35,7 @@
     <ClInclude Include="src\Game\Map.h" />
     <ClInclude Include="src\Game\NetInput.h" />
     <ClInclude Include="src\Game\NetObject.h" />
+    <ClInclude Include="src\Game\Server\GameMode.h" />
     <ClInclude Include="src\Game\Server\Human.h" />
     <ClInclude Include="src\Game\Server\Entity.h" />
     <ClInclude Include="src\Game\Server\GameWorld.h" />
@@ -55,6 +56,7 @@
     <ClCompile Include="src\Game\Map.cpp" />
     <ClCompile Include="src\Game\NetInput.cpp" />
     <ClCompile Include="src\Game\NetObject.cpp" />
+    <ClCompile Include="src\Game\Server\GameMode.cpp" />
     <ClCompile Include="src\Game\Server\Human.cpp" />
     <ClCompile Include="src\Game\Server\Entity.cpp" />
     <ClCompile Include="src\Game\Server\GameWorld.cpp" />

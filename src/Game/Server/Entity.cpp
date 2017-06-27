@@ -17,10 +17,11 @@ EntityType Entity::getType()
 	return m_type;
 }
 
+/*
 Peer * Entity::getPlayer()
 {
 	return m_player;
-}
+}*/
 
 bool Entity::isAlive()
 {

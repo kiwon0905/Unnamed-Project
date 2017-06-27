@@ -18,33 +18,42 @@ void Projectile::tick(float dt, GameWorld & gameWorld)
 	sf::Vector2f d = m_velocity * dt;
 	
 
-	float time;
-	sf::Vector2i norm;
-	int tile = gameWorld.getMap().sweep(aabb, d, time, norm);
-	if (tile)
-	{
-		m_alive = false;
-		d *= time;
-		aabb.x += d.x;
-		aabb.y += d.y;
-		m_position = { aabb.x, aabb.y };
-		d = { 0.f, 0.f };
-	}
+
+	float minTime = 1.f;
+	sf::Vector2i minNorm;
+
 	
+	gameWorld.getMap().sweep(aabb, d, minTime, minNorm);
 
 
+	Entity * hitEntity = nullptr;
 	for (auto & e : gameWorld.getEntities(EntityType::HUMAN))
 	{
+		float time;
+		sf::Vector2i norm;
 		if (e->getId() != m_shooterId && aabb.sweep(d, e->getAabb(), time, norm))
 		{
-			m_alive = false;
-			d *= time;
-			aabb.x += d.x;
-			aabb.y += d.y;
-			m_position = { aabb.x, aabb.y };
-			d = { 0.f, 0.f };
+			if (time < minTime)
+			{
+				minTime = time;
+				minNorm = norm;
+				hitEntity = e.get();
+			}
 		}
 	}
+
+	if (minTime != 1.f)
+	{
+		m_alive = false;
+		if (hitEntity && hitEntity->getId() != m_shooterId)
+		{
+			Human * h = static_cast<Human*>(hitEntity);
+			h->takeDamage(10);
+		}
+	}
+
+	d *= minTime;
+
 	m_position += d;
 }
 

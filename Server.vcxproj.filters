@@ -87,6 +87,9 @@
     <ClInclude Include="src\Game\NetInput.h">
       <Filter>Game\Shared</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\Server\GameMode.h">
+      <Filter>Game\Server</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game\Server\GameWorld.cpp">
@@ -142,6 +145,9 @@
     </ClCompile>
     <ClCompile Include="src\Game\Aabb.cpp">
       <Filter>Game\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Server\GameMode.cpp">
+      <Filter>Game\Server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

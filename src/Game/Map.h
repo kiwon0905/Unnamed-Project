@@ -6,12 +6,6 @@
 #include <vector>
 #include <iostream>
 
-struct MoveResult
-{
-	sf::Vector2f v;
-	int horizontalTile = 0;
-	int verticalTile = 0;
-};
 
 class Map
 {
@@ -24,6 +18,7 @@ public:
 	int getTile(int x, int y) const;
 	int getTile(float x, float y) const;
 	int sweep(const Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vector2i & norm) const;
+	bool slideSweep(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f & out, sf::Vector2i & norm, sf::Vector2i & tile) const;
 	bool isGrounded(const Aabb & aabb) const;
 private:
 

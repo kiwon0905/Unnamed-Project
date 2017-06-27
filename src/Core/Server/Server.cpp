@@ -151,7 +151,7 @@ void Server::handleCommands()
 		{
 			if (m_players.size() > 0)
 			{
-				m_gameWorld.prepare(*this);
+				m_gameWorld.load(*this);
 				m_state = LOADING;
 			}
 			else
@@ -180,7 +180,6 @@ void Server::handleNetwork()
 			Msg msg;
 			unpacker.unpack(msg);
 
-			Peer * peer = getPeer(event.peer);
 
 			if (msg == Msg::CL_REQUEST_JOIN_GAME)
 			{
@@ -197,16 +196,22 @@ void Server::handleNetwork()
 				}
 				enutil::send(packer, event.peer, true);
 			}
-			else if (msg == Msg::CL_REQUEST_ROOM_INFO && peer)
+
+			Peer * peer = getPeer(event.peer);
+			if (!peer)
+				continue;
+
+
+			if (msg == Msg::CL_REQUEST_ROOM_INFO)
 			{
 
 			}
-			else if (msg == Msg::CL_REQUEST_GAME_INFO && peer && m_state == LOADING)
+			else if (msg == Msg::CL_REQUEST_GAME_INFO && m_state == LOADING)
 			{
 				peer->setState(Peer::LOADING);
 				m_gameWorld.onRequestGameInfo(*peer, *this);
 			}
-			else if (msg == Msg::CL_LOAD_COMPLETE && peer && m_state == LOADING)
+			else if (msg == Msg::CL_LOAD_COMPLETE && m_state == LOADING)
 			{
 				peer->setState(Peer::IN_GAME);
 				Logger::getInstance().info(std::to_string(peer->getId()) + " has loaded");
@@ -217,7 +222,7 @@ void Server::handleNetwork()
 					Logger::getInstance().info("Everyone has loaded");
 				}
 			}
-			else if (msg == Msg::CL_INPUT && peer && m_state == IN_GAME)
+			else if (msg == Msg::CL_INPUT && m_state == IN_GAME)
 			{
 				m_gameWorld.onInput(*peer, *this, unpacker);
 			}
@@ -241,7 +246,11 @@ void Server::handleNetwork()
 
 void Server::update()
 {
-	if (m_state == LOADING)
+	if (m_state == PRE_GAME)
+	{
+
+	}
+	else if (m_state == LOADING)
 	{
 		//TODO: loading timeouts, etc...
 	}

@@ -2,6 +2,7 @@
 
 
 #include "AssetManager.h"
+#include "SoundPlayer.h"
 #include "Network.h"
 #include "Gui.h"
 #include "ScreenStack.h"
@@ -24,7 +25,8 @@ public:
 
 	void run();
 
-	Context & getContext() {return m_context;}
+	Context & getContext() { return m_context; }
+	SoundPlayer & getSoundPlayer() { return m_soundPlayer; }
 	Network & getNetwork() { return m_network; }
 	ScreenStack & getScreenStack() { return m_screenStack; }
 	Gui & getGui() { return m_gui; }
@@ -35,6 +37,7 @@ private:
 	void finalize();
 private:
 	Context m_context;
+	SoundPlayer m_soundPlayer;
 	Network m_network;
 	Gui m_gui;
 	ScreenStack m_screenStack;

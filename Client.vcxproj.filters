@@ -108,6 +108,9 @@
     <ClInclude Include="src\Game\NetInput.h">
       <Filter>Game\Shared</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\Client\SoundPlayer.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Client\Client.cpp">
@@ -184,6 +187,9 @@
     </ClCompile>
     <ClCompile Include="src\Game\Aabb.cpp">
       <Filter>Game\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\SoundPlayer.cpp">
+      <Filter>Core\Client</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

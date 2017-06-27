@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Client\SoundPlayer.h" />
     <ClInclude Include="src\Core\Client\Client.h" />
     <ClInclude Include="src\Core\Client\Graph.h" />
     <ClInclude Include="src\Core\Client\Gui.h" />
@@ -50,6 +51,7 @@
     <ClInclude Include="src\Game\Snapshot.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Client\SoundPlayer.cpp" />
     <ClCompile Include="src\Core\Client\Client.cpp" />
     <ClCompile Include="src\Core\Client\ClientMain.cpp" />
     <ClCompile Include="src\Core\Client\Graph.cpp" />

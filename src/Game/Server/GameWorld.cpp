@@ -20,7 +20,7 @@ void GameWorld::onDisconnect(Peer & peer, Server & server)
 		peer.getEntity()->setAlive(false);
 }
 
-void GameWorld::prepare(Server & server)
+void GameWorld::load(Server & server)
 {
 	m_mapName = "grass";
 	m_map.loadFromFile("map/grass.xml");

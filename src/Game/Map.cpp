@@ -101,10 +101,140 @@ int Map::sweep(const Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vect
 	return minTile;
 }
 
+bool Map::slideSweep(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f & out, sf::Vector2i & norm, sf::Vector2i & tile) const
+{
+	Aabb aabb2 = aabb;
+
+	bool collided = false;
+	out = d;
+	norm = sf::Vector2i();
+	//right
+	if (d.x > 0)
+	{
+		float minDistance = d.x + 1000.f;
+
+		//int startX = (aabb2.left + aabb2.width) / m_tileSize + 1;
+		int startX = aabb.x / m_tileSize;
+		int endX = (aabb2.x + aabb2.w + d.x) / m_tileSize;
+		int startY = aabb2.y / m_tileSize;
+		int endY = (aabb2.y + aabb2.h) / m_tileSize;
+
+
+		for (int x = startX; x <= endX; ++x)
+		{
+			for (int y = startY; y <= endY; ++y)
+			{
+				int tile = getTile(x, y);
+				if (tile)
+				{
+					float distance = m_tileSize * x - (aabb2.x + aabb2.w);
+					if (distance < minDistance)
+					{
+						minDistance = distance;
+						out.x = minDistance - 0.1f;
+						norm.x = -1;
+						collided = true;
+					}
+				}
+			}
+		}
+	}
+	//left
+	else if (d.x < 0)
+	{
+		float maxDistance = d.x - 1000.f;
+		int startX = std::floor((aabb2.x + d.x) / m_tileSize);
+		//int endX = aabb2.left / m_tileSize - 1;
+		int endX = (aabb2.x + aabb2.w) / m_tileSize;
+		int startY = aabb2.y / m_tileSize;
+		int endY = (aabb2.y + aabb2.h) / m_tileSize;
+
+		for (int x = startX; x <= endX; ++x)
+		{
+			for (int y = startY; y <= endY; ++y)
+			{
+				int tile = getTile(x, y);
+				if (tile)
+				{
+					float distance = (x + 1) * m_tileSize - aabb2.x;
+					if (distance > maxDistance)
+					{
+						maxDistance = distance;
+						out.x = maxDistance + 0.1f;
+						norm.x = 1;
+						collided = true;
+					}
+				}
+			}
+		}
+	}
+
+	aabb2.x += out.x;
+	//down
+	if (d.y > 0)
+	{
+		float minDistance = d.y + 1000.f;
+		//int startY = (aabb2.top + aabb2.height) / m_tileSize + 1;
+		int startY = (aabb2.y) / m_tileSize;
+		int endY = (aabb2.y + aabb2.h + d.y) / m_tileSize;
+		int startX = aabb2.x / m_tileSize;
+		int endX = (aabb2.x + aabb2.w) / m_tileSize;
+
+		for (int y = startY; y <= endY; ++y)
+		{
+			for (int x = startX; x <= endX; ++x)
+			{
+				int tile = getTile(x, y);
+				if (tile)
+				{
+					float distance = m_tileSize * y - (aabb2.y + aabb2.h);
+					if (distance < minDistance)
+					{
+						minDistance = distance;
+						out.y = minDistance - 0.1f;
+						norm.y = -1;
+						collided = true;
+					}
+				}
+			}
+		}
+	}
+	//up
+	else if (d.y < 0)
+	{
+		float maxDistance = d.y - 1000.f;
+		int startY = std::floor((aabb2.y + d.y) / m_tileSize);
+		//int endY = aabb2.top / m_tileSize - 1;
+		int endY = (aabb2.y + aabb2.h) / m_tileSize;
+		int startX = aabb2.x / m_tileSize;
+		int endX = (aabb2.x + aabb2.w) / m_tileSize;
+		for (int y = startY; y <= endY; ++y)
+		{
+
+			for (int x = startX; x <= endX; ++x)
+			{
+				int tile = getTile(x, y);
+				if (getTile(x, y))
+				{
+					float distance = (y + 1) * m_tileSize - aabb2.y;
+					if (distance > maxDistance)
+					{
+						maxDistance = distance;
+						out.y = maxDistance + 0.1f;
+						norm.y = 1;
+						collided = true;
+					}
+				}
+			}
+		}
+	}
+	return collided;
+}
+
 bool Map::isGrounded(const Aabb & aabb) const
 {
-	int startX = std::floor((aabb.x + 1.f)/ m_tileSize);
-	int endX = std::floor((aabb.x + aabb.w - 1.f) / m_tileSize);
+	int startX = std::floor((aabb.x)/ m_tileSize);
+	int endX = std::floor((aabb.x + aabb.w) / m_tileSize);
 
 	int y = std::floor((aabb.y + aabb.h + 1) / m_tileSize);
 

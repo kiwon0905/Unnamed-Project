@@ -38,7 +38,7 @@ void Human::tick(float dt, GameWorld & world)
 			{
 				Projectile * p = world.createEntity<Projectile>(m_id);
 
-				p->setVelocity(unit(v) * 1000.f);
+				p->setVelocity(unit(v) * 1500.f);
 
 				p->setPosition(firePos);
 				m_fireCooldown = 10;

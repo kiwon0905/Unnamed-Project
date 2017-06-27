@@ -87,9 +87,7 @@ bool Aabb::broadphase(const sf::Vector2f & v, const Aabb & aabb) const
 
 bool Aabb::sweep(const sf::Vector2f & displacement, const Aabb & aabb, float & time, sf::Vector2i & norm) const
 {
-	Aabb temp = aabb;
-
-	if (!broadphase(displacement, temp))
+	if (!broadphase(displacement, aabb))
 	{
 		norm.x = 0;
 		norm.y = 0;
@@ -100,26 +98,26 @@ bool Aabb::sweep(const sf::Vector2f & displacement, const Aabb & aabb, float & t
 
 	if (displacement.x > 0.f)
 	{
-		entryDistance.x = temp.x - (x + w);
-		exitDistance.x = (temp.x + temp.w) - x;
+		entryDistance.x = aabb.x - (x + w);
+		exitDistance.x = (aabb.x + aabb.w) - x;
 		norm.x = -1;
 	}
 	else
 	{
-		entryDistance.x = (temp.x + temp.w) - x;
-		exitDistance.x = temp.x - (x + w);
+		entryDistance.x = (aabb.x + aabb.w) - x;
+		exitDistance.x = aabb.x - (x + w);
 		norm.x = 1;
 	}
 	if (displacement.y > 0.f)
 	{
-		entryDistance.y = temp.y - (y + h);
-		exitDistance.y = (temp.y + temp.h) - y;
+		entryDistance.y = aabb.y - (y + h);
+		exitDistance.y = (aabb.y + aabb.h) - y;
 		norm.y = -1;
 	}
 	else
 	{
-		entryDistance.y = (temp.y + temp.h) - y;
-		exitDistance.y = temp.y - (y + h);
+		entryDistance.y = (aabb.y + aabb.h) - y;
+		exitDistance.y = aabb.y - (y + h);
 		norm.y = 1;
 	}
 
@@ -159,13 +157,15 @@ bool Aabb::sweep(const sf::Vector2f & displacement, const Aabb & aabb, float & t
 	}
 	else
 	{
-		if (entryTime.x > entryTime.y)
+		if (entryTime.x < entryTime.y)
 		{
-			norm.y = 0.0f;
+			norm.x = 0;
+
 		}
-		else
+		else //if(entryTime.x > entryTime.y)
 		{
-			norm.x = 0.0f;
+			norm.y = 0;
+
 		}
 		time = maxEntryTime;
 

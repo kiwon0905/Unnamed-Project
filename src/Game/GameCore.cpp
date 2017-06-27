@@ -11,7 +11,8 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 	float friction = .5f;
 	float maxSpeed = 600.f;
 
-	
+	m_velocity.y = clampedAdd(-3000.f, 3000.f, m_velocity.y, 1000.f * dt);
+
 	if (!grounded)
 	{
 		accel = 3000.f;
@@ -20,7 +21,6 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 	}
 	
 
-	m_velocity.y = clampedAdd(-3000.f, 3000.f, m_velocity.y, 1000.f * dt);
 
 	if (input.moveDirection > 0)
 		m_velocity.x = clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, accel * dt);
@@ -38,6 +38,8 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 	}
 	else
 	{
+		//gravity
+
 	}
 	
 	/*
@@ -54,27 +56,19 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 
 	sf::Vector2f d = m_velocity * dt;
 
-	float time;
+	
+	sf::Vector2f out;
 	sf::Vector2i norm;
-	while(map.sweep(aabb, d, time, norm))
+	sf::Vector2i tile;
+	if (map.slideSweep(aabb, d, out, norm, tile))
 	{
-		aabb.x += d.x * time;
-		aabb.y += d.y * time;
 		if (norm.x)
-		{
-			d.x = 0.f;
 			m_velocity.x = 0.f;
-		}
 		if (norm.y)
-		{
-			d.y = 0.f;
 			m_velocity.y = 0.f;
-		}
-		m_position = { aabb.x, aabb.y };
-		d *= (1 - time);
+		d = out;
 	}
-
-
+	
 
 	m_position += d;
 }

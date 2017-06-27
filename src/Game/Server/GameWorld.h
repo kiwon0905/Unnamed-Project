@@ -19,7 +19,7 @@ public:
 	GameWorld();
 
 
-	void prepare(Server & server);
+	void load(Server & server);
 
 	void onDisconnect(Peer & peer, Server & server);
 	void onRequestGameInfo(Peer & peer, Server & server);
