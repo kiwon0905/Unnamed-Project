@@ -34,7 +34,14 @@ bool Map::loadFromFile(const std::string & s)
 			m_data.back().emplace_back(tile);
 		}
 	}
+	int slashPos = s.find_last_of("/");
+	m_name = s.substr(slashPos + 1, s.size() - 5 - slashPos);
 	return true;
+}
+
+const std::string & Map::getName()
+{
+	return m_name;
 }
 
 const sf::Vector2i & Map::getSize() const

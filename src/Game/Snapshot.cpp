@@ -111,6 +111,11 @@ void SnapshotContainer::removeUntil(int tick)
 	m_snapshots.erase(std::remove_if(m_snapshots.begin(), m_snapshots.end(), pred), m_snapshots.end());
 }
 
+void SnapshotContainer::clear()
+{
+	m_snapshots.clear();
+}
+
 std::pair<TickedSnapshot*, TickedSnapshot*> SnapshotContainer::find(float tick)
 {
 	std::pair<TickedSnapshot*, TickedSnapshot*> pair;

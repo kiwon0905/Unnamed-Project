@@ -39,7 +39,7 @@ public:
 	Snapshot * getLast();
 	void add(Snapshot * snapshot, int tick);
 	void removeUntil(int tick);
-
+	void clear();
 	std::pair<TickedSnapshot*, TickedSnapshot*> find(float tick);
 private:
 	std::vector<TickedSnapshot> m_snapshots;

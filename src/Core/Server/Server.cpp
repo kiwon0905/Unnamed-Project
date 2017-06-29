@@ -134,11 +134,6 @@ void Server::flushPackets()
 	enet_host_flush(m_server);
 }
 
-const std::vector<std::unique_ptr<Peer>>& Server::getPlayers() const
-{
-	return m_players;
-}
-
 void Server::handleCommands()
 {
 	while (m_running)
@@ -149,7 +144,9 @@ void Server::handleCommands()
 			m_running = false;
 		else if (line == "start_dev")
 		{
-			if (m_players.size() > 0)
+			m_gameContext.startMatch();
+		
+			/*if (m_players.size() > 0)
 			{
 				m_gameWorld.load(*this);
 				m_state = LOADING;
@@ -157,7 +154,7 @@ void Server::handleCommands()
 			else
 			{
 				Logger::getInstance().info("Need one or more player to start");
-			}
+			}*/
 		}
 	}
 
@@ -181,51 +178,8 @@ void Server::handleNetwork()
 			unpacker.unpack(msg);
 
 
-			if (msg == Msg::CL_REQUEST_JOIN_GAME)
-			{
-				Packer packer;
-				if (m_state == PRE_GAME && m_players.size() < MAX_PLAYER_ID + 1)
-				{
-					packer.pack(Msg::SV_ACCEPT_JOIN);
-					Peer * p = new Peer(m_nextPeerId++, event.peer);
-					m_players.emplace_back(p);
-				}
-				else
-				{
-					packer.pack(Msg::SV_REJECT_JOIN);
-				}
-				enutil::send(packer, event.peer, true);
-			}
-
-			Peer * peer = getPeer(event.peer);
-			if (!peer)
-				continue;
-
-
-			if (msg == Msg::CL_REQUEST_ROOM_INFO)
-			{
-
-			}
-			else if (msg == Msg::CL_REQUEST_GAME_INFO && m_state == LOADING)
-			{
-				peer->setState(Peer::LOADING);
-				m_gameWorld.onRequestGameInfo(*peer, *this);
-			}
-			else if (msg == Msg::CL_LOAD_COMPLETE && m_state == LOADING)
-			{
-				peer->setState(Peer::IN_GAME);
-				Logger::getInstance().info(std::to_string(peer->getId()) + " has loaded");
-				if (ensurePlayers(Peer::IN_GAME))
-				{
-					m_state = State::IN_GAME;
-					m_gameWorld.start();
-					Logger::getInstance().info("Everyone has loaded");
-				}
-			}
-			else if (msg == Msg::CL_INPUT && m_state == IN_GAME)
-			{
-				m_gameWorld.onInput(*peer, *this, unpacker);
-			}
+			if(event.peer != m_masterServer)
+				m_gameContext.onMsg(msg, unpacker, event.peer);
 			enet_packet_destroy(event.packet);
 		}
 		else if (event.type == ENET_EVENT_TYPE_DISCONNECT)
@@ -236,9 +190,12 @@ void Server::handleNetwork()
 			}
 			else
 			{
+				/*
 				Logger::getInstance().info(enutil::toString(event.peer->address) + " disconnected");
 				Peer * peer = getPeer(event.peer);
-				m_gameWorld.onDisconnect(*peer, *this);
+				m_gameWorld.onDisconnect(*peer, *this);*/
+
+				m_gameContext.onDisconnect(*event.peer);
 			}
 		}
 	}
@@ -246,6 +203,7 @@ void Server::handleNetwork()
 
 void Server::update()
 {
+	/**
 	if (m_state == PRE_GAME)
 	{
 
@@ -257,25 +215,6 @@ void Server::update()
 	else if (m_state == IN_GAME)
 	{
 		m_gameWorld.update(*this);
-	}
-}
-
-Peer * Server::getPeer(const ENetPeer * peer)
-{
-	for (auto & p : m_players)
-		if (p->getENetPeer() == peer)
-			return p.get();
-	return nullptr;
-}
-
-bool Server::ensurePlayers(Peer::State state)
-{
-	if (m_players.empty())
-		return false;
-	for (auto & p : m_players)
-	{
-		if (p->getState() != state)
-			return false;
-	}
-	return true;
+	}*/
+	m_gameContext.update();
 }

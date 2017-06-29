@@ -11,26 +11,21 @@
 #include <unordered_map>
 #include <memory>
 
-class Server;
+class GameContext;
 
 class GameWorld
 {
 public:
-	GameWorld();
+	GameWorld(GameContext * context);
 
+	void onDisconnect(Peer & peer);
 
-	void load(Server & server);
-
-	void onDisconnect(Peer & peer, Server & server);
-	void onRequestGameInfo(Peer & peer, Server & server);
-	void onInput(Peer & peer, Server & server, Unpacker & unpacker);
-
-	void start();
 	void reset();
-	void update(Server & server);
+	void tick();
+	void snap(Packer & packer);
 
-	int getCurrentTick();
 	const Map & getMap();
+	int getCurrentTick();
 
 	template <typename T, typename... Args>
 	T * createEntity(Args &&... args);
@@ -38,20 +33,11 @@ public:
 	const std::vector<std::unique_ptr<Entity>> & getEntities(EntityType type);
 
 private:
-	void snap(Server & server);
-
-	bool m_reset = false;
-
-	sf::Clock m_clock;
-	int m_tick = 0;
-
-	std::string m_mapName;
-	Map m_map;
+	GameContext * m_context;
 	
 	std::vector<Entity *> m_newEntities;
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 	int m_nextEntityId = 0;
-	SnapshotContainer m_snapshots;
 };
 
 template<typename T, typename ...Args>

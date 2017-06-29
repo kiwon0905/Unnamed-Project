@@ -9,139 +9,59 @@
 #include <iostream>
 #include <bitset>
 
-GameWorld::GameWorld()
+GameWorld::GameWorld(GameContext * context):
+	m_context(context)
 {
 	m_entitiesByType.resize(static_cast<int>(EntityType::COUNT));
 }
 
-void GameWorld::onDisconnect(Peer & peer, Server & server)
+void GameWorld::onDisconnect(Peer & peer)
 {
 	if (peer.getEntity())
 		peer.getEntity()->setAlive(false);
 }
 
-void GameWorld::load(Server & server)
+const Map & GameWorld::getMap()
 {
-	m_mapName = "grass";
-	m_map.loadFromFile("map/grass.xml");
-	for (const auto & p : server.getPlayers())
-	{
-		Human * h = createEntity<Human>(p.get());
-		p->setEntity(h);
-		Packer packer;
-		packer.pack(Msg::SV_LOAD_GAME);
-		p->send(packer, true);
-	}
-
-
-}
-
-void GameWorld::onRequestGameInfo(Peer & peer, Server & server)
-{
-	//pack this player's id first
-	Packer packer;
-	packer.pack(Msg::SV_GAME_INFO);
-	packer.pack(m_mapName);
-	packer.pack<0, MAX_PLAYER_ID>(server.getPlayers().size());
-	packer.pack<0, MAX_PLAYER_ID>(peer.getId());				//my player id
-	packer.pack<0, MAX_ENTITY_ID>(peer.getEntity()->getId());	//my entity id
-	packer.pack(peer.getEntity()->getType());					//my entity type
-
-	for (const auto & p : server.getPlayers())
-	{
-		if (p->getId() != peer.getId())
-		{
-			packer.pack<0, MAX_PLAYER_ID>(p->getId());				//player id
-			packer.pack<0, MAX_ENTITY_ID>(p->getEntity()->getId());	//entity id
-		}
-	}
-	peer.send(packer, true);
-}
-
-void GameWorld::onInput(Peer & peer, Server & server, Unpacker & unpacker)
-{
-	NetInput input;
-	input.read(unpacker);
-	peer.onInput(input);
-	if (m_tick % 2 == 0)
-	{
-		sf::Time timeLeft = sf::seconds(input.tick / TICKS_PER_SEC) - m_clock.getElapsedTime();
-
-		Packer packer;
-		packer.pack(Msg::SV_INPUT_TIMING);
-		packer.pack<0, MAX_TICK>(input.tick);
-		packer.pack(timeLeft.asMilliseconds());
-		peer.send(packer, false);
-	}
-
-}
-
-void GameWorld::start()
-{
-	Logger::getInstance().info("The game has started.");
-	m_clock.restart();
-}
-
-void GameWorld::update(Server & server)
-{
-	static sf::Time accumulator, prevTime;
-	sf::Time current = m_clock.getElapsedTime();
-	sf::Time dt = current - prevTime;
-	prevTime = current;
-	accumulator += dt;
-
-	while (accumulator >= sf::seconds(1.f / TICKS_PER_SEC))
-	{
-		m_tick++;
-		accumulator -= sf::seconds(1.f / TICKS_PER_SEC);
-	
-		for (Entity * e : m_newEntities)
-			m_entitiesByType[static_cast<int>(e->getType())].emplace_back(e);
-		m_newEntities.clear();
-		
-
-		for (auto & v : m_entitiesByType)
-			for (auto & e : v)
-				e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), *this);
-
-		auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
-		for (auto & v : m_entitiesByType)
-			v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
-
-		//if (m_tick % 2 == 0)
-			snap(server);
-	}
+	return m_context->getMap();
 }
 
 int GameWorld::getCurrentTick()
 {
-	return m_tick;
-}
-
-const Map & GameWorld::getMap()
-{
-	return  m_map;
+	return m_context->getCurrentTick();
 }
 
 void GameWorld::reset()
 {
-	m_reset = true;
+	for (auto & v : m_entitiesByType)
+		v.clear();
+	m_newEntities.clear();
+	m_nextEntityId = 0;
 }
 
-void GameWorld::snap(Server & server)
+void GameWorld::tick()
 {
-	Packer packer;
-	packer.pack(Msg::SV_SNAPSHOT);
-	packer.pack<0, MAX_TICK>(m_tick);
-	Snapshot * snapshot = new Snapshot;
+	for (Entity * e : m_newEntities)
+		m_entitiesByType[static_cast<int>(e->getType())].emplace_back(e);
+	m_newEntities.clear();
+
+	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
+	for (auto & v : m_entitiesByType)
+		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
+
+	for (auto & v : m_entitiesByType)
+		for (auto & e : v)
+			e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), *this);
+}
+
+void GameWorld::snap(Packer & packer)
+{
+	Snapshot snapshot;
 
 	for (const auto & v : m_entitiesByType)
 		for (const auto & e : v)
-			e->snap(*snapshot);
-	snapshot->write(packer);
-
-	for (auto & p : server.getPlayers())
-		p->send(packer, false);
+			e->snap(snapshot);
+	snapshot.write(packer);
 }
 
 Entity * GameWorld::getEntity(int id, EntityType type)
