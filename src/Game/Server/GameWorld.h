@@ -5,6 +5,7 @@
 #include "Game/Map.h"
 #include "Game/Snapshot.h"
 #include "Human.h"
+#include "Zombie.h"
 
 #include <enet/enet.h>
 #include <vector>

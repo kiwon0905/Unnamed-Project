@@ -4,6 +4,7 @@ enum class EntityType
 {
 	NONE,
 	HUMAN,
+	ZOMBIE,
 	PROJECTILE,
 	COUNT
 };

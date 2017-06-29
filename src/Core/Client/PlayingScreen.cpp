@@ -1,5 +1,6 @@
 #include "PlayingScreen.h"
 #include "Game/Client/Human.h"
+#include "Game/Client/Zombie.h"
 #include "Game/Client/Projectile.h"
 #include "Game/GameConfig.h"
 
@@ -423,6 +424,9 @@ void PlayingScreen::render(Client & client)
 			{
 			case NetObject::HUMAN:
 				e = new Human(p.first);
+				break;
+			case NetObject::ZOMBIE:
+				e = new Zombie(p.first);
 				break;
 			case NetObject::PROJECTILE:
 				e = new Projectile(p.first);

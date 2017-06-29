@@ -10,6 +10,7 @@ struct NetObject
 	enum Type
 	{
 		HUMAN,
+		ZOMBIE,
 		PROJECTILE,
 		ENTITY_COUNT,
 		COUNT
@@ -31,6 +32,16 @@ struct NetHuman : public NetObject
 	sf::Vector2i pos;
 	sf::Vector2i vel;
 	int aimAngle;
+};
+
+struct NetZombie : public NetObject
+{
+	void write(Packer & packer) const;
+	void read(Unpacker & unpacker);
+	Type getType() const;
+
+	sf::Vector2i pos;
+	sf::Vector2i vel;
 };
 
 struct NetProjectile : public NetObject

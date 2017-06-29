@@ -6,6 +6,11 @@
 class Zombie : public Entity
 {
 public:
-private:
+	Zombie(int id, Peer * player);
 
+	void tick(float dt, GameWorld & world);
+	void snap(Snapshot & snapshot) const;
+
+private:
+	ZombieCore m_core;
 };

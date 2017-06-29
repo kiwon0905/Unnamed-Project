@@ -156,10 +156,30 @@ void GameContext::endMatch()
 void GameContext::startRound()
 {
 	m_map.loadFromFile("map/grass.xml");
-	for (const auto & p : m_peers)
+
+	
+	for (std::size_t i = 0; i < m_peers.size(); ++i)
 	{
-		Human * h = m_gameWorld.createEntity<Human>(p.get());
-		p->setEntity(h);
+		auto & p = m_peers[i];
+
+		if (i == 0)
+		{
+			Zombie * z = m_gameWorld.createEntity<Zombie>(p.get());
+			p->setEntity(z);
+		}
+		else
+		{
+			Human * h = m_gameWorld.createEntity<Human>(p.get());
+			p->setEntity(h);
+
+		}
+		
+		
+		
+		
+		
+		
+		
 		Packer packer;
 		packer.pack(Msg::SV_LOAD_GAME);
 		p->send(packer, true);
