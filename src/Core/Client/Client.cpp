@@ -37,7 +37,7 @@ bool Client::initialize()
 	m_screenStack.push(new LobbyScreen);
 	m_screenStack.applyChanges(*this);
 	//window.setVerticalSyncEnabled(true);
-	window.setFramerateLimit(300);
+	//window.setFramerateLimit(300);
 	return true;
 }
 
@@ -104,11 +104,11 @@ void Client::run()
 			m_screenStack.render(*this);
 			m_gui.render(*this);
 
-			m_context.window.draw(frameTimeGraph);
+			//m_context.window.draw(frameTimeGraph);
 
 			m_context.window.display();
 
-			std::this_thread::sleep_for(std::chrono::microseconds(10));
+			//std::this_thread::sleep_for(std::chrono::microseconds(10));
 			//sf::sleep(sf::microseconds(1));
 			m_screenStack.applyChanges(*this);
 		}

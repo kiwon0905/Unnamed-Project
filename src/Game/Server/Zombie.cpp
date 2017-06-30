@@ -28,3 +28,10 @@ void Zombie::snap(Snapshot & snapshot) const
 		h->pos.y = roundToInt(m_core.getPosition().y * 100.f);
 	}
 }
+
+void Zombie::takeDamage(int dmg)
+{
+	m_health -= dmg;
+	if (m_health <= 0)
+		m_alive = false;
+}

@@ -29,7 +29,7 @@ public:
 	ENetPeer * getENetPeer() const;
 	Entity * getEntity();
 	void setEntity(Entity * e);
-	bool send(Packer & packer, bool reliable);
+	bool send(const Packer & packer, bool reliable);
 	State getState() const;
 	void setState(State state);
 	

@@ -27,7 +27,7 @@ void Projectile::tick(float dt, GameWorld & gameWorld)
 
 
 	Entity * hitEntity = nullptr;
-	for (auto & e : gameWorld.getEntities(EntityType::HUMAN))
+	for (auto & e : gameWorld.getEntities(EntityType::ZOMBIE))
 	{
 		float time;
 		sf::Vector2i norm;
@@ -47,8 +47,8 @@ void Projectile::tick(float dt, GameWorld & gameWorld)
 		m_alive = false;
 		if (hitEntity && hitEntity->getId() != m_shooterId)
 		{
-			Human * h = static_cast<Human*>(hitEntity);
-			h->takeDamage(10);
+			Zombie * z = static_cast<Zombie*>(hitEntity);
+			z->takeDamage(10);
 		}
 	}
 

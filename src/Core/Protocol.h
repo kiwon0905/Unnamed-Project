@@ -27,6 +27,7 @@ enum class Msg
 	SV_GAME_INFO,
 	SV_SNAPSHOT,
 	SV_INPUT_TIMING,
+	SV_ROUND_OVER,
 
 	//master -> client
 	MSV_INTERNET_SERVER_LIST,

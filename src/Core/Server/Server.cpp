@@ -144,7 +144,7 @@ void Server::handleCommands()
 			m_running = false;
 		else if (line == "start_dev")
 		{
-			m_gameContext.startMatch();
+			m_gameContext.startRound();
 		
 			/*if (m_players.size() > 0)
 			{

@@ -105,16 +105,15 @@ void GameContext::update()
 	}
 	else if (m_state == IN_GAME)
 	{
-		static sf::Time accumulator, prevTime;
 		sf::Time current = m_clock.getElapsedTime();
-		sf::Time dt = current - prevTime;
-		prevTime = current;
-		accumulator += dt;
+		sf::Time dt = current - m_prevTime;
+		m_prevTime = current;
+		m_accumulator += dt;
 
-		while (accumulator >= sf::seconds(1.f / TICKS_PER_SEC))
+		while (m_accumulator >= sf::seconds(1.f / TICKS_PER_SEC))
 		{
 			m_tick++;
-			accumulator -= sf::seconds(1.f / TICKS_PER_SEC);
+			m_accumulator -= sf::seconds(1.f / TICKS_PER_SEC);
 			m_gameWorld.tick();
 
 
@@ -123,8 +122,13 @@ void GameContext::update()
 			packer.pack<0, MAX_TICK>(m_tick);
 			m_gameWorld.snap(packer);
 			for (auto & p : m_peers)
+			{
 				p->send(packer, false);
+				std::cout << "snap\n";
+			}
 		}
+
+		checkRound();
 	}
 }
 
@@ -143,18 +147,10 @@ int GameContext::getCurrentTick()
 	return m_tick;
 }
 
-void GameContext::startMatch()
-{
-	m_state = LOADING;
-	startRound();
-}
-
-void GameContext::endMatch()
-{
-}
-
 void GameContext::startRound()
 {
+	m_state = LOADING;
+
 	m_map.loadFromFile("map/grass.xml");
 
 	
@@ -173,12 +169,7 @@ void GameContext::startRound()
 			p->setEntity(h);
 
 		}
-		
-		
-		
-		
-		
-		
+			
 		
 		Packer packer;
 		packer.pack(Msg::SV_LOAD_GAME);
@@ -186,8 +177,67 @@ void GameContext::startRound()
 	}
 }
 
-void GameContext::endRound()
+void GameContext::endRound(EntityType winner)
 {
+	if (winner == EntityType::NONE)
+		std::cout << "DRAW!\n";
+	else if (winner == EntityType::HUMAN)
+		std::cout << "HUMAN WIN\n";
+	else if (winner == EntityType::ZOMBIE)
+		std::cout << "ZOMBIE WIN\n";
+
+	Packer packer;
+	packer.pack(Msg::SV_ROUND_OVER);
+	packer.pack(winner);
+	broadcast(packer, true);
+	
+	m_gameWorld.reset();
+	m_state = PRE_GAME;
+	m_tick = 0;
+	m_prevTime = sf::Time::Zero;
+	m_accumulator = sf::Time::Zero;
+	for (auto & p : m_peers)
+		p->setState(Peer::PRE_GAME);
+}
+
+void GameContext::checkRound()
+{
+	std::size_t humanCount = m_gameWorld.getEntities(EntityType::HUMAN).size();
+	std::size_t zombieCount = m_gameWorld.getEntities(EntityType::ZOMBIE).size();
+
+	EntityType winner = EntityType::NONE;
+	//50 tick /s
+	//5 min = 15000 tick
+
+	//5 sec  = 250 tick
+	if (m_tick > 250)
+	{
+		std::cout << "HUMAN: " << humanCount << " ZOMBIE: " << zombieCount << "\n";
+		if (humanCount > 0)
+		{
+			winner = EntityType::HUMAN;
+		}
+		else if(humanCount == 0 && zombieCount > 0)
+		{
+			winner = EntityType::ZOMBIE;
+		}
+		endRound(winner);
+	}
+	/*
+	else
+	{
+		if (humanCount > 0 && zombieCount == 0)
+		{
+			winner = EntityType::HUMAN;
+		}
+		else if (humanCount == 0 && zombieCount > 0)
+		{
+			winner = EntityType::ZOMBIE;
+		}
+		if (winner != EntityType::NONE)
+			endRound(winner);
+	}*/
+
 }
 
 Peer * GameContext::getPeer(const ENetPeer * peer)
@@ -208,4 +258,15 @@ bool GameContext::ensurePlayers(Peer::State state)
 			return false;
 	}
 	return true;
+}
+
+void GameContext::broadcast(const Packer & packer, bool reliable, const Peer * exclude)
+{
+	for (auto & p : m_peers)
+	{
+		if (p.get() != exclude)
+		{
+			p->send(packer, reliable);
+		}
+	}
 }

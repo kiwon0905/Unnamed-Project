@@ -259,7 +259,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					m_renderTime.reset(sf::seconds(m_startTick / TICKS_PER_SEC));
 					std::cout << "startTime: " << m_startTick / TICKS_PER_SEC << " recv server time: " << serverTick / TICKS_PER_SEC << "\n";
 				}
-		
+				std::cout << "SNAP recvd!\n";
 			}
 			else if(m_state == IN_GAME)
 			{
@@ -290,6 +290,20 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					m_predictionGraph->addSample(timeLeft);
 				}
 			}
+		}
+
+		else if (msg == Msg::SV_ROUND_OVER)
+		{
+			EntityType winner;
+			unpacker.unpack(winner);
+			if (winner == EntityType::NONE)
+				std::cout << "DRAW!\n";
+			else if (winner == EntityType::HUMAN)
+				std::cout << "HUMAN WIN\n";
+			else if (winner == EntityType::ZOMBIE)
+				std::cout << "ZOMBIE WIN\n";
+
+			client.getScreenStack().pop();
 		}
 	}
 
@@ -400,7 +414,8 @@ void PlayingScreen::render(Client & client)
 		return;
 
 	//find snapshots
-	float renderTick = m_renderTime.getElapsedTime().asSeconds() * TICKS_PER_SEC;
+	sf::Time currentRenderTime = m_renderTime.getElapsedTime();
+	float renderTick = currentRenderTime.asSeconds() * TICKS_PER_SEC;
 	const auto & s = m_snapshots.find(renderTick);
 	Snapshot * s0 = s.first->snapshot.get();
 	Snapshot * s1 = nullptr;
@@ -514,7 +529,7 @@ void PlayingScreen::render(Client & client)
 		arr.append(v);
 		arr.append(v2);
 	}
-	m_renderTexture.draw(arr);
+	//m_renderTexture.draw(arr);
 
 
 	//draw entities
@@ -533,9 +548,16 @@ void PlayingScreen::render(Client & client)
 	sprite.setTexture(m_renderTexture.getTexture());
 	client.getContext().window.draw(sprite);
 
+	sf::Text timeText;
+	timeText.setFillColor(sf::Color::Blue);
+	timeText.setString(std::to_string(currentRenderTime.asMicroseconds() / 1000000));
+	timeText.setFont(*client.getContext().assetManager.get<sf::Font>("arial.ttf"));
+	timeText.setPosition(client.getContext().window.getSize().x / 2.f - timeText.getLocalBounds().width / 2.f, 0.f);
+	client.getContext().window.draw(timeText);
 
-	client.getContext().window.draw(*m_snapshotGraph);
-	client.getContext().window.draw(*m_predictionGraph);
+
+	//client.getContext().window.draw(*m_snapshotGraph);
+	//client.getContext().window.draw(*m_predictionGraph);
 }
 
 void PlayingScreen::onExit(Client & client)

@@ -27,7 +27,7 @@ void Peer::setEntity(Entity * e)
 	m_entity = e;
 }
 
-bool Peer::send(Packer & packer, bool reliable)
+bool Peer::send(const Packer & packer, bool reliable)
 {
 	return enutil::send(packer, m_peer, reliable);
 }

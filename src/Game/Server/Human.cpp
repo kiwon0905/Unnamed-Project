@@ -71,6 +71,4 @@ void Human::takeDamage(int dmg)
 	m_health -= dmg;
 	if (m_health <= 0)
 		m_alive = false;
-
-	std::cout << "health: " << m_health << "\n";
 }

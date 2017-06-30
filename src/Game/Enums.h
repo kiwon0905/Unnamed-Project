@@ -11,12 +11,6 @@ enum class EntityType
 
 enum class TEAM
 {
-	RED,
-	ORANGE,
-	YELLOW,
-	GREEN,
-	BLUE,
-	VIOLET,
-	PURPLE,
-	GREY
+	HUMAN,
+	ZOMBIE
 };

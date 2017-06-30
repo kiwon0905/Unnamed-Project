@@ -20,6 +20,7 @@ public:
 		PRE_GAME,
 		LOADING,
 		IN_GAME,
+		POST_GAME
 	};
 
 	void onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer);
@@ -30,13 +31,13 @@ public:
 	const Map & getMap();
 	int getCurrentTick();
 
-	void startMatch();
-	void endMatch();
 	void startRound();
-	void endRound();
+	void endRound(EntityType winner);
+	void checkRound();
 private:
 	Peer * getPeer(const ENetPeer * peer);
 	bool ensurePlayers(Peer::State state);
+	void broadcast(const Packer & packer, bool reliable, const Peer * exclude = nullptr);
 
 
 	State m_state = PRE_GAME;
@@ -45,6 +46,8 @@ private:
 
 	sf::Clock m_clock;
 	int m_tick = 0;
+	sf::Time m_accumulator;
+	sf::Time m_prevTime;
 	GameWorld m_gameWorld;
 	Map m_map;
 };
