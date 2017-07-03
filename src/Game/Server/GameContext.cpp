@@ -91,6 +91,11 @@ void GameContext::onDisconnect(const ENetPeer & peer)
 	Peer * p = getPeer(&peer);
 	if (p)
 		m_gameWorld.onDisconnect(*p);
+	auto pred = [&peer](const auto & ptr)
+	{
+		return ptr->getENetPeer() == &peer;
+	};
+	m_peers.erase(std::remove_if(m_peers.begin(), m_peers.end(), pred), m_peers.end());
 }
 
 void GameContext::update()
@@ -124,7 +129,6 @@ void GameContext::update()
 			for (auto & p : m_peers)
 			{
 				p->send(packer, false);
-				std::cout << "snap\n";
 			}
 		}
 
@@ -147,50 +151,24 @@ int GameContext::getCurrentTick()
 	return m_tick;
 }
 
-void GameContext::startRound()
+void GameContext::endRound(Team winner)
 {
-	m_state = LOADING;
-
-	m_map.loadFromFile("map/grass.xml");
-
-	
-	for (std::size_t i = 0; i < m_peers.size(); ++i)
-	{
-		auto & p = m_peers[i];
-
-		if (i == 0)
-		{
-			Zombie * z = m_gameWorld.createEntity<Zombie>(p.get());
-			p->setEntity(z);
-		}
-		else
-		{
-			Human * h = m_gameWorld.createEntity<Human>(p.get());
-			p->setEntity(h);
-
-		}
-			
-		
-		Packer packer;
-		packer.pack(Msg::SV_LOAD_GAME);
-		p->send(packer, true);
-	}
-}
-
-void GameContext::endRound(EntityType winner)
-{
-	if (winner == EntityType::NONE)
-		std::cout << "DRAW!\n";
-	else if (winner == EntityType::HUMAN)
-		std::cout << "HUMAN WIN\n";
-	else if (winner == EntityType::ZOMBIE)
-		std::cout << "ZOMBIE WIN\n";
+	if (winner == Team::A)
+		std::cout << "TEAM A WIN!\n";
+	else if (winner == Team::B)
+		std::cout << "TEAM B WIN\n";
+	else if (winner == Team::NONE)
+		std::cout << "DRAW\n";
 
 	Packer packer;
 	packer.pack(Msg::SV_ROUND_OVER);
 	packer.pack(winner);
 	broadcast(packer, true);
-	
+	reset();
+}
+
+void GameContext::reset()
+{
 	m_gameWorld.reset();
 	m_state = PRE_GAME;
 	m_tick = 0;
@@ -198,46 +176,6 @@ void GameContext::endRound(EntityType winner)
 	m_accumulator = sf::Time::Zero;
 	for (auto & p : m_peers)
 		p->setState(Peer::PRE_GAME);
-}
-
-void GameContext::checkRound()
-{
-	std::size_t humanCount = m_gameWorld.getEntities(EntityType::HUMAN).size();
-	std::size_t zombieCount = m_gameWorld.getEntities(EntityType::ZOMBIE).size();
-
-	EntityType winner = EntityType::NONE;
-	//50 tick /s
-	//5 min = 15000 tick
-
-	//5 sec  = 250 tick
-	if (m_tick > 250)
-	{
-		std::cout << "HUMAN: " << humanCount << " ZOMBIE: " << zombieCount << "\n";
-		if (humanCount > 0)
-		{
-			winner = EntityType::HUMAN;
-		}
-		else if(humanCount == 0 && zombieCount > 0)
-		{
-			winner = EntityType::ZOMBIE;
-		}
-		endRound(winner);
-	}
-	/*
-	else
-	{
-		if (humanCount > 0 && zombieCount == 0)
-		{
-			winner = EntityType::HUMAN;
-		}
-		else if (humanCount == 0 && zombieCount > 0)
-		{
-			winner = EntityType::ZOMBIE;
-		}
-		if (winner != EntityType::NONE)
-			endRound(winner);
-	}*/
-
 }
 
 Peer * GameContext::getPeer(const ENetPeer * peer)

@@ -83,15 +83,13 @@ private:
 	std::unique_ptr<Graph> m_snapshotGraph;
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 
-
-
 	Map m_map;
 	sf::Texture * m_tileTexture;
 	sf::RenderTexture m_renderTexture;
 	sf::VertexArray m_tileVertices;
 	sf::View m_view;
 
-
+	bool m_debugRender = false;
 	Entity * getEntity(int id);
 
 };

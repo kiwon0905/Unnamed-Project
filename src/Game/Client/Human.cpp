@@ -12,9 +12,8 @@ void Human::rollback(const NetObject & e)
 {
 	const NetHuman & nh = static_cast<const NetHuman&>(e);
 
-	m_prevCore.assign(&nh);
-	m_currentCore.assign(&nh);
-
+	m_prevCore.read(nh);
+	m_currentCore.read(nh);
 }
 
 void Human::tick(float dt, const NetInput & input, Map & map)
@@ -26,11 +25,11 @@ void Human::tick(float dt, const NetInput & input, Map & map)
 	}
 }
 
-void Human::preRender(const Snapshot * from, const Snapshot * to, float t)
+void Human::preRender(const Snapshot * from, const Snapshot * to, float predictedT, float t)
 {
 	if (m_predicted)
 	{
-		m_position = lerp(m_prevCore.getPosition(), m_currentCore.getPosition(), t);
+		m_position = lerp(m_prevCore.getPosition(), m_currentCore.getPosition(), predictedT);
 	}
 	else
 	{

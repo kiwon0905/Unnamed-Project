@@ -20,24 +20,31 @@ void Input::finalize(Client & client)
 
 NetInput Input::getInput(const sf::RenderTarget & target, const sf::Window & window)
 {
-	NetInput input;
-	input.aimDirection = target.mapPixelToCoords(sf::Mouse::getPosition(window));
+	static NetInput prevRawInput;
+	NetInput currentRawInput;
+	currentRawInput.aimDirection = target.mapPixelToCoords(sf::Mouse::getPosition(window));
 	if (window.hasFocus())
 	{
 		if (m_controls[Control::MOVE_LEFT]())
-			input.moveDirection--;
+			currentRawInput.moveDirection--;
 		if (m_controls[Control::MOVE_RIGHT]())
-			input.moveDirection++;
+			currentRawInput.moveDirection++;
 
 		if (m_controls[Control::MOVE_UP]())
-			input.vMoveDirection--;
+			currentRawInput.vMoveDirection--;
 		if (m_controls[Control::MOVE_DOWN]())
-			input.vMoveDirection++;
+			currentRawInput.vMoveDirection++;
 
 
-		input.jump = m_controls[Control::JUMP]();
-		input.fire = m_controls[Control::PRIMARY_FIRE]();
+		currentRawInput.jump = m_controls[Control::JUMP]();
+		currentRawInput.fire = m_controls[Control::PRIMARY_FIRE]();
 	}
-
-	return input;
+	NetInput sendInput = currentRawInput;
+	sendInput.fire = sendInput.jump = false;
+	if (currentRawInput.jump && !prevRawInput.jump)
+		sendInput.jump = true;
+	if (currentRawInput.fire && !prevRawInput.fire)
+		sendInput.fire = true;
+	prevRawInput = currentRawInput;
+	return sendInput;
 }

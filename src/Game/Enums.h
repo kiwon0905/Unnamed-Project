@@ -9,8 +9,10 @@ enum class EntityType
 	COUNT
 };
 
-enum class TEAM
+enum class Team
 {
-	HUMAN,
-	ZOMBIE
+	A,
+	B,
+	NONE,
+	COUNT
 };

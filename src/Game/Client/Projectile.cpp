@@ -20,7 +20,7 @@ void Projectile::tick(float dt, const NetInput & input, Map & map)
 
 }
 
-void Projectile::preRender(const Snapshot * from, const Snapshot * to, float t)
+void Projectile::preRender(const Snapshot * from, const Snapshot * to, float predictedT, float t)
 {
 	if (m_predicted)
 	{

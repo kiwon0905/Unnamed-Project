@@ -39,6 +39,7 @@
     <ClInclude Include="src\Game\Server\Human.h" />
     <ClInclude Include="src\Game\Server\Entity.h" />
     <ClInclude Include="src\Game\Server\GameWorld.h" />
+    <ClInclude Include="src\Game\Server\Infection.h" />
     <ClInclude Include="src\Game\Server\Projectile.h" />
     <ClInclude Include="src\Game\Server\Zombie.h" />
     <ClInclude Include="src\Game\Snapshot.h" />
@@ -51,6 +52,7 @@
     <ClCompile Include="src\Core\Server\Peer.cpp" />
     <ClCompile Include="src\Core\Server\Server.cpp" />
     <ClCompile Include="src\Core\Server\ServerMain.cpp" />
+    <ClCompile Include="src\Core\Utility.cpp" />
     <ClCompile Include="src\Game\Aabb.cpp" />
     <ClCompile Include="src\Game\GameCore.cpp" />
     <ClCompile Include="src\Game\Map.cpp" />
@@ -60,6 +62,7 @@
     <ClCompile Include="src\Game\Server\Human.cpp" />
     <ClCompile Include="src\Game\Server\Entity.cpp" />
     <ClCompile Include="src\Game\Server\GameWorld.cpp" />
+    <ClCompile Include="src\Game\Server\Infection.cpp" />
     <ClCompile Include="src\Game\Server\Projectile.cpp" />
     <ClCompile Include="src\Game\Server\Zombie.cpp" />
     <ClCompile Include="src\Game\Snapshot.cpp" />

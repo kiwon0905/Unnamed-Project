@@ -3,9 +3,9 @@
 #include <SFML/System.hpp>
 #include <iostream>
 #include <cmath>
+#include <random>
 
 const float PI = 3.1415926535f;
-
 
 template <typename T>
 std::ostream & operator<<(std::ostream & os, const sf::Vector2<T> & v)
@@ -75,3 +75,8 @@ inline float normalizedAngle(float x) {
 		x += 360;
 	return x;
 }
+
+void seedRand();
+int randInt(int a, int b);
+
+float randFloat(float a, float b);

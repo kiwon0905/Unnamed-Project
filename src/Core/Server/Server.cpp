@@ -4,6 +4,8 @@
 #include "Core/Protocol.h"
 #include "Core/ENetUtility.h"
 
+
+#include "Game/Server/Infection.h"
 #include <iostream>
 #include <string>
 
@@ -98,6 +100,8 @@ bool Server::initialize()
 	Logger::getInstance().info("Succesfully initialized server at " + enutil::toString(m_server->address));
 	m_running = true;
 	m_parsingThread.reset(new std::thread(&Server::handleCommands, this));
+
+	m_gameContext.reset(new Infection);
 	return true;
 }
 
@@ -144,7 +148,7 @@ void Server::handleCommands()
 			m_running = false;
 		else if (line == "start_dev")
 		{
-			m_gameContext.startRound();
+			m_gameContext->startRound();
 		
 			/*if (m_players.size() > 0)
 			{
@@ -179,7 +183,7 @@ void Server::handleNetwork()
 
 
 			if(event.peer != m_masterServer)
-				m_gameContext.onMsg(msg, unpacker, event.peer);
+				m_gameContext->onMsg(msg, unpacker, event.peer);
 			enet_packet_destroy(event.packet);
 		}
 		else if (event.type == ENET_EVENT_TYPE_DISCONNECT)
@@ -195,7 +199,7 @@ void Server::handleNetwork()
 				Peer * peer = getPeer(event.peer);
 				m_gameWorld.onDisconnect(*peer, *this);*/
 
-				m_gameContext.onDisconnect(*event.peer);
+				m_gameContext->onDisconnect(*event.peer);
 			}
 		}
 	}
@@ -216,5 +220,5 @@ void Server::update()
 	{
 		m_gameWorld.update(*this);
 	}*/
-	m_gameContext.update();
+	m_gameContext->update();
 }

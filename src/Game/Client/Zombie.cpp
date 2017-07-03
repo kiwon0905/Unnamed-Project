@@ -10,8 +10,8 @@ Zombie::Zombie(int id):
 void Zombie::rollback(const NetObject & e)
 {
 	const NetZombie & nz = static_cast<const NetZombie&>(e);
-	m_prevCore.assign(&nz);
-	m_currentCore.assign(&nz);
+	m_prevCore.read(nz);
+	m_currentCore.read(nz);
 }
 
 void Zombie::tick(float dt, const NetInput & input, Map & map)
@@ -23,28 +23,29 @@ void Zombie::tick(float dt, const NetInput & input, Map & map)
 	}
 }
 
-void Zombie::preRender(const Snapshot * from, const Snapshot * to, float t)
+void Zombie::preRender(const Snapshot * from, const Snapshot * to, float predictedT, float t)
 {
+	const NetZombie * z0 = static_cast<const NetZombie*>(from->getEntity(m_id));
+	const NetZombie * z1 = nullptr;
+	if (to)
+		z1 = static_cast<const NetZombie*>(to->getEntity(m_id));
+
 	if (m_predicted)
 	{
-		m_position = lerp(m_prevCore.getPosition(), m_currentCore.getPosition(), t);
+		m_position = lerp(m_prevCore.getPosition(), m_currentCore.getPosition(), predictedT);
 	}
 	else
 	{
-		const NetZombie * z0 = static_cast<const NetZombie*>(from->getEntity(m_id));
-		const NetZombie * z1 = nullptr;
-
-		if (to)
-			z1 = static_cast<const NetZombie*>(to->getEntity(m_id));
-
-
 		m_position = static_cast<sf::Vector2f>(z0->pos) / 100.f;
+
 		if (z1)
 		{
 			m_position.x = lerp(z0->pos.x / 100.f, z1->pos.x / 100.f, t);
 			m_position.y = lerp(z0->pos.y / 100.f, z1->pos.y / 100.f, t);
+
 		}
 	}
+
 }
 
 void Zombie::render(sf::RenderTarget & target, Client & client)

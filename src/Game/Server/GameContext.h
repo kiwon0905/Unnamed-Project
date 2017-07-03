@@ -6,6 +6,7 @@
 #include "Core/Server/Peer.h"
 
 #include "Game/Server/GameWorld.h"
+#include "Game/Enums.h"
 #include <enet/enet.h>
 #include <memory>
 
@@ -22,7 +23,7 @@ public:
 		IN_GAME,
 		POST_GAME
 	};
-
+	
 	void onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer);
 	void onDisconnect(const ENetPeer & peer);
 	void update();
@@ -31,10 +32,11 @@ public:
 	const Map & getMap();
 	int getCurrentTick();
 
-	void startRound();
-	void endRound(EntityType winner);
-	void checkRound();
-private:
+	virtual void startRound() = 0;
+	virtual void checkRound() = 0;
+	void endRound(Team winner);
+	void reset();
+protected:
 	Peer * getPeer(const ENetPeer * peer);
 	bool ensurePlayers(Peer::State state);
 	void broadcast(const Packer & packer, bool reliable, const Peer * exclude = nullptr);

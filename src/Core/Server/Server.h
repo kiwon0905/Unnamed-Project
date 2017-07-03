@@ -42,5 +42,5 @@ private:
 	ENetPeer * m_masterServer = nullptr;
 	Config m_config;
 
-	GameContext m_gameContext;
+	std::unique_ptr<GameContext> m_gameContext;
 };

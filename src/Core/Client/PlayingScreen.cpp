@@ -144,7 +144,35 @@ void PlayingScreen::onEnter(Client & client)
 
 void PlayingScreen::handleEvent(const sf::Event & ev, Client & client)
 {
+	static bool ctrl = false;
+	static bool shift = false;
+	static bool d = false;
+	static sf::Clock lastToggle;
+	if (ev.type == sf::Event::KeyPressed)
+	{
+		if(ev.key.control)
+			ctrl = true;
+		if (ev.key.shift)
+			shift = true;
+		if (ev.key.code == sf::Keyboard::D)
+			d = true;
 
+	}
+	else if (ev.type == sf::Event::KeyReleased)
+	{
+		if (ev.key.control)
+			ctrl = false;
+		if (ev.key.shift)
+			shift = false;
+		if (ev.key.code == sf::Keyboard::D)
+			d = false;
+	}
+	if (ctrl && shift && d && lastToggle.getElapsedTime() > sf::seconds(.2f))
+	{
+		std::cout << "enabled debug";
+		m_debugRender ^= 1;
+		lastToggle.restart();
+	}
 }
 
 void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
@@ -259,7 +287,6 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					m_renderTime.reset(sf::seconds(m_startTick / TICKS_PER_SEC));
 					std::cout << "startTime: " << m_startTick / TICKS_PER_SEC << " recv server time: " << serverTick / TICKS_PER_SEC << "\n";
 				}
-				std::cout << "SNAP recvd!\n";
 			}
 			else if(m_state == IN_GAME)
 			{
@@ -294,14 +321,14 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 
 		else if (msg == Msg::SV_ROUND_OVER)
 		{
-			EntityType winner;
+			Team winner;
 			unpacker.unpack(winner);
-			if (winner == EntityType::NONE)
+			if (winner == Team::NONE)
 				std::cout << "DRAW!\n";
-			else if (winner == EntityType::HUMAN)
-				std::cout << "HUMAN WIN\n";
-			else if (winner == EntityType::ZOMBIE)
-				std::cout << "ZOMBIE WIN\n";
+			else if (winner == Team::A)
+				std::cout << "TEAM A WIN\n";
+			else if (winner == Team::B)
+				std::cout << "TEAM B WIN\n";
 
 			client.getScreenStack().pop();
 		}
@@ -404,7 +431,10 @@ void PlayingScreen::update(Client & client)
 			}
 		}
 		if (i > 1)
-			std::cout << "double update!";
+		{
+
+			//std::cout << "double update!";
+		}
 	}
 }
 
@@ -416,6 +446,7 @@ void PlayingScreen::render(Client & client)
 	//find snapshots
 	sf::Time currentRenderTime = m_renderTime.getElapsedTime();
 	float renderTick = currentRenderTime.asSeconds() * TICKS_PER_SEC;
+
 	const auto & s = m_snapshots.find(renderTick);
 	Snapshot * s0 = s.first->snapshot.get();
 	Snapshot * s1 = nullptr;
@@ -460,8 +491,8 @@ void PlayingScreen::render(Client & client)
 	{
 		for (auto & e : v)
 		{
-			if (s1 && !s1->getEntity(e->getId()))
-				e->setAlive(false);
+	//		if (s1 && !s1->getEntity(e->getId()))
+	//			e->setAlive(false);
 			if (!s0->getEntity(e->getId()))
 				e->setAlive(false);
 		}
@@ -475,18 +506,10 @@ void PlayingScreen::render(Client & client)
 
 
 
-
 	//entity pre render
 	for (auto & v : m_entitiesByType)
-	{
 		for (auto & e : v)
-		{
-			if (e->isPredicted())
-				e->preRender(s0, s1, predT);
-			else
-				e->preRender(s0, s1, t);
-		}
-	}
+			e->preRender(s0, s1, predT, t);
 
 	//camera
 	Entity * e = getEntity(m_myPlayer.entityId);
@@ -507,29 +530,33 @@ void PlayingScreen::render(Client & client)
 	states.texture = m_tileTexture;
 	m_renderTexture.draw(m_tileVertices, states);
 
-	sf::VertexArray arr;
-	arr.setPrimitiveType(sf::Lines);
-	for (int i = 0; i < m_map.getSize().x; ++i)
+	if (m_debugRender)
 	{
-		sf::Vertex v, v2;
-		v.color = sf::Color::Black;
-		v2.color = sf::Color::Black;
-		v.position = sf::Vector2f(i * m_map.getTileSize(), 0.f);
-		v2.position = sf::Vector2f(i * m_map.getTileSize(), m_map.getTileSize() * m_map.getSize().y);
-		arr.append(v);
-		arr.append(v2);
+		sf::VertexArray arr;
+		arr.setPrimitiveType(sf::Lines);
+		for (int i = 0; i < m_map.getSize().x; ++i)
+		{
+			sf::Vertex v, v2;
+			v.color = sf::Color::Black;
+			v2.color = sf::Color::Black;
+			v.position = sf::Vector2f(i * m_map.getTileSize(), 0.f);
+			v2.position = sf::Vector2f(i * m_map.getTileSize(), m_map.getTileSize() * m_map.getSize().y);
+			arr.append(v);
+			arr.append(v2);
+		}
+		for (int i = 0; i < m_map.getSize().y; ++i)
+		{
+			sf::Vertex v, v2;
+			v.color = sf::Color::Black;
+			v2.color = sf::Color::Black;
+			v.position = sf::Vector2f(0.f, i * m_map.getTileSize());
+			v2.position = sf::Vector2f(m_map.getSize().x * m_map.getTileSize(), i * m_map.getTileSize());
+			arr.append(v);
+			arr.append(v2);
+		}
+		m_renderTexture.draw(arr);
 	}
-	for (int i = 0; i < m_map.getSize().y; ++i)
-	{
-		sf::Vertex v, v2;
-		v.color = sf::Color::Black;
-		v2.color = sf::Color::Black;
-		v.position = sf::Vector2f(0.f, i * m_map.getTileSize());
-		v2.position = sf::Vector2f(m_map.getSize().x * m_map.getTileSize(), i * m_map.getTileSize());
-		arr.append(v);
-		arr.append(v2);
-	}
-	//m_renderTexture.draw(arr);
+
 
 
 	//draw entities
@@ -555,9 +582,11 @@ void PlayingScreen::render(Client & client)
 	timeText.setPosition(client.getContext().window.getSize().x / 2.f - timeText.getLocalBounds().width / 2.f, 0.f);
 	client.getContext().window.draw(timeText);
 
-
-	//client.getContext().window.draw(*m_snapshotGraph);
-	//client.getContext().window.draw(*m_predictionGraph);
+	if (m_debugRender)
+	{
+		client.getContext().window.draw(*m_snapshotGraph);
+		client.getContext().window.draw(*m_predictionGraph);
+	}
 }
 
 void PlayingScreen::onExit(Client & client)

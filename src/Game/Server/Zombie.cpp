@@ -22,10 +22,7 @@ void Zombie::snap(Snapshot & snapshot) const
 	NetZombie * h = static_cast<NetZombie*>(snapshot.addEntity(NetObject::ZOMBIE, m_id));
 	if (h)
 	{
-		h->vel.x = roundToInt(m_core.getVelocity().x * 100.f);
-		h->vel.y = roundToInt(m_core.getVelocity().y * 100.f);
-		h->pos.x = roundToInt(m_core.getPosition().x * 100.f);
-		h->pos.y = roundToInt(m_core.getPosition().y * 100.f);
+		m_core.write(*h);
 	}
 }
 

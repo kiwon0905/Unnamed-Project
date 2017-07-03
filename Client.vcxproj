@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Client\AnimatedSprite.h" />
     <ClInclude Include="src\Core\Client\SoundPlayer.h" />
     <ClInclude Include="src\Core\Client\Client.h" />
     <ClInclude Include="src\Core\Client\Graph.h" />
@@ -51,6 +52,7 @@
     <ClInclude Include="src\Game\Snapshot.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Client\AnimatedSprite.cpp" />
     <ClCompile Include="src\Core\Client\SoundPlayer.cpp" />
     <ClCompile Include="src\Core\Client\Client.cpp" />
     <ClCompile Include="src\Core\Client\ClientMain.cpp" />
@@ -67,6 +69,7 @@
     <ClCompile Include="src\Core\Logger.cpp" />
     <ClCompile Include="src\Core\Packer.cpp" />
     <ClCompile Include="src\Core\Parser.cpp" />
+    <ClCompile Include="src\Core\Utility.cpp" />
     <ClCompile Include="src\Game\Aabb.cpp" />
     <ClCompile Include="src\Game\Client\Entity.cpp" />
     <ClCompile Include="src\Game\Client\Human.cpp" />
