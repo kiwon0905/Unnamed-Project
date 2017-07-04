@@ -71,7 +71,7 @@ void Human::render(sf::RenderTarget & target, Client & client)
 
 	if (m_predicted)
 	{
-		sf::Vector2f aim = target.mapPixelToCoords(sf::Mouse::getPosition(client.getContext().window)) - (body.getPosition() + body.getSize() / 2.f);
+		sf::Vector2f aim = target.mapPixelToCoords(sf::Mouse::getPosition(client.getWindow())) - (body.getPosition() + body.getSize() / 2.f);
 		m_aimAngle = atan2f(aim.y, aim.x) * 180.f / PI;
 	}
 

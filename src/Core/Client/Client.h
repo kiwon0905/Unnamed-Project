@@ -16,16 +16,11 @@
 class Client
 {
 public:
-	struct Context
-	{
-		sf::RenderWindow window;
-		Parser parser;
-		AssetManager assetManager;
-	};
-
 	void run();
 
-	Context & getContext() { return m_context; }
+	Parser & getParser() { return m_parser; }
+	sf::RenderWindow & getWindow() { return m_window; }
+	AssetManager & getAssetManager() { return m_assetManager; }
 	SoundPlayer & getSoundPlayer() { return m_soundPlayer; }
 	Network & getNetwork() { return m_network; }
 	ScreenStack & getScreenStack() { return m_screenStack; }
@@ -36,7 +31,9 @@ private:
 	bool initialize();
 	void finalize();
 private:
-	Context m_context;
+	Parser m_parser;
+	sf::RenderWindow m_window;
+	AssetManager m_assetManager;
 	SoundPlayer m_soundPlayer;
 	Network m_network;
 	Gui m_gui;

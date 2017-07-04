@@ -10,12 +10,10 @@
 
 bool Client::initialize()
 {
+	m_window.create(sf::VideoMode(1600, 900), "");
+	m_window.resetGLStates();
 
-	sf::RenderWindow & window = getContext().window;
-	window.create(sf::VideoMode(1600, 900), "");
-	window.resetGLStates();
-
-	if (!m_context.parser.loadFromFile("client-config.txt"))
+	if (!m_parser.loadFromFile("client-config.txt"))
 	{
 		Logger::getInstance().error("Failed to load client-config.txt");
 		return false;
@@ -52,7 +50,7 @@ void Client::run()
 		sf::Time fpsAccumulator;
 		int numFrames = 0;
 
-		const sf::Font * font = m_context.assetManager.get<sf::Font>("arial.ttf");
+		const sf::Font * font = m_assetManager.get<sf::Font>("arial.ttf");
 		Graph frameTimeGraph(0.f, 20.f, *font, "Frame time(ms)");
 		frameTimeGraph.setSize({ 200.f, 100.f });
 		
@@ -67,14 +65,14 @@ void Client::run()
 			fpsAccumulator += dt;
 			if (fpsAccumulator > sf::seconds(1.f))
 			{
-				m_context.window.setTitle("FPS: " + std::to_string(numFrames));
+				m_window.setTitle("FPS: " + std::to_string(numFrames));
 				numFrames = 0;
 				fpsAccumulator = sf::Time::Zero;
 			}
 			numFrames++;	
 
 			sf::Event event;
-			while (m_context.window.pollEvent(event))
+			while (m_window.pollEvent(event))
 			{
 				if (event.type == sf::Event::Closed)
 					m_screenStack.clear();
@@ -101,13 +99,13 @@ void Client::run()
 			m_screenStack.update(*this);
 
 			
-			m_context.window.clear();
+			m_window.clear();
 			m_screenStack.render(*this);
 			m_gui.render(*this);
 
 			//m_context.window.draw(frameTimeGraph);
 
-			m_context.window.display();
+			m_window.display();
 
 			//std::this_thread::sleep_for(std::chrono::microseconds(10));
 			//sf::sleep(sf::microseconds(1));

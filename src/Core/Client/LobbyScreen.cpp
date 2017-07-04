@@ -196,7 +196,7 @@ void LobbyScreen::refresh(Client & client)
 
 
 	std::string addr;
-	client.getContext().parser.get("masterAddr", addr);
+	client.getParser().get("masterAddr", addr);
 	ENetAddress address = enutil::toENetAddress(addr);
 	
 	Packer packer;

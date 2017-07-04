@@ -17,7 +17,7 @@ void Gui::update(float dt, Client & client)
 
 void Gui::render(Client & client)
 {
-	m_gui.Display(client.getContext().window);
+	m_gui.Display(client.getWindow());
 }
 
 void Gui::handleEvent(const sf::Event & event)
