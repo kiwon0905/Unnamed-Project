@@ -132,8 +132,6 @@ void PlayingScreen::onEnter(Client & client)
 	m_view.setSize(verticleCameraSize, horizontalCameraSize);
 	
 	sf::Vector2u windowSize = client.getContext().window.getSize();
-	m_renderTexture.create(windowSize.x, windowSize.y);
-	m_renderTexture.setSmooth(true);
 
 	const sf::Font * font = client.getContext().assetManager.get<sf::Font>("arial.ttf");
 	m_predictionGraph = std::make_unique<Graph>(-150.f, 150.f, *font, "Prediction timing(ms)");
@@ -367,7 +365,7 @@ void PlayingScreen::update(Client & client)
 			m_predictedTick++;
 
 			//read input
-			NetInput input = client.getInput().getInput(m_renderTexture, client.getContext().window);
+			NetInput input = client.getInput().getInput(client.getContext().window, client.getContext().window);
 			input.tick = m_predictedTick;
 			m_inputs[m_currentInputIndex].input = input;
 			m_inputs[m_currentInputIndex].predictedTime = current;
@@ -459,6 +457,7 @@ void PlayingScreen::render(Client & client)
 	if (s1)
 		t = (renderTick - s.first->tick) / (s.second->tick - s.first->tick);
 
+	
 	//create entities
 	for (auto & p : s0->getEntities())
 	{
@@ -491,8 +490,6 @@ void PlayingScreen::render(Client & client)
 	{
 		for (auto & e : v)
 		{
-	//		if (s1 && !s1->getEntity(e->getId()))
-	//			e->setAlive(false);
 			if (!s0->getEntity(e->getId()))
 				e->setAlive(false);
 		}
@@ -502,33 +499,33 @@ void PlayingScreen::render(Client & client)
 	for (auto & v : m_entitiesByType)
 		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
 	m_snapshots.removeUntil(s.first->tick - 1);
-
-
-
-
+	
 	//entity pre render
 	for (auto & v : m_entitiesByType)
 		for (auto & e : v)
 			e->preRender(s0, s1, predT, t);
+
 
 	//camera
 	Entity * e = getEntity(m_myPlayer.entityId);
 	if (e)
 	{
 		m_view.setCenter(e->getPosition());
-		m_renderTexture.setView(m_view);
 	}
-
+	sf::RenderWindow & window = client.getContext().window;
+	window.setView(m_view);
+	
 	//clear texture
-	m_renderTexture.clear();
 	sf::RectangleShape background;
 	background.setSize(static_cast<sf::Vector2f>(m_map.getSize() * m_map.getTileSize()));
-	m_renderTexture.draw(background);
+	window.draw(background);
+	
+
 
 	//draw tile map
 	sf::RenderStates states;
 	states.texture = m_tileTexture;
-	m_renderTexture.draw(m_tileVertices, states);
+	window.draw(m_tileVertices, states);
 
 	if (m_debugRender)
 	{
@@ -554,7 +551,7 @@ void PlayingScreen::render(Client & client)
 			arr.append(v);
 			arr.append(v2);
 		}
-		m_renderTexture.draw(arr);
+		window.draw(arr);
 	}
 
 
@@ -564,24 +561,18 @@ void PlayingScreen::render(Client & client)
 	{
 		for (auto & e : v)
 		{
-			e->render(m_renderTexture, client);
+			e->render(window, client);
 		}
 	}
 
-
-	//draw everything to the window
-	m_renderTexture.display();
-	sf::Sprite sprite;
-	sprite.setTexture(m_renderTexture.getTexture());
-	client.getContext().window.draw(sprite);
-
+	window.setView(window.getDefaultView());
 	sf::Text timeText;
 	timeText.setFillColor(sf::Color::Blue);
 	timeText.setString(std::to_string(currentRenderTime.asMicroseconds() / 1000000));
 	timeText.setFont(*client.getContext().assetManager.get<sf::Font>("arial.ttf"));
 	timeText.setPosition(client.getContext().window.getSize().x / 2.f - timeText.getLocalBounds().width / 2.f, 0.f);
 	client.getContext().window.draw(timeText);
-
+	
 	if (m_debugRender)
 	{
 		client.getContext().window.draw(*m_snapshotGraph);

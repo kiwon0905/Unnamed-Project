@@ -22,8 +22,8 @@ int main()
 }
 
 
-/*
 
+/*
 #include "Graph.h"
 #include "Core/Utility.h"
 #include <SFML/Graphics.hpp>
@@ -34,7 +34,7 @@ int main()
 {
 	sf::RenderWindow window;
 
-	window.create(sf::VideoMode(1600, 900), "", sf::Style::Default, sf::ContextSettings(0, 0, 8));
+	window.create(sf::VideoMode(1600, 900), "");
 
 	sf::Clock clock;
 

@@ -12,7 +12,7 @@ bool Client::initialize()
 {
 
 	sf::RenderWindow & window = getContext().window;
-	window.create(sf::VideoMode(1600, 900), "", sf::Style::Default, sf::ContextSettings(0, 0, 8));
+	window.create(sf::VideoMode(1600, 900), "");
 	window.resetGLStates();
 
 	if (!m_context.parser.loadFromFile("client-config.txt"))
@@ -36,7 +36,7 @@ bool Client::initialize()
 
 	m_screenStack.push(new LobbyScreen);
 	m_screenStack.applyChanges(*this);
-	window.setVerticalSyncEnabled(true);
+//	window.setVerticalSyncEnabled(true);
 	//window.setFramerateLimit(300);
 	//window.setMouseCursorGrabbed(true);
 	return true;
