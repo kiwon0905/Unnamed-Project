@@ -47,7 +47,8 @@ private:
 	{
 		LOADING,	//load assets
 		ENTERING,	//receive enough snapshots to interpolate, adjust timing
-		IN_GAME
+		IN_GAME,
+		POST_GAME
 	};
 	struct PlayerInfo
 	{

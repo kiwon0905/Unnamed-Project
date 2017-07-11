@@ -38,7 +38,7 @@ void Human::tick(float dt)
 				m_context->getMap().getTile(firePos.x + 25.f, firePos.y + 25.f) == 0 &&
 				m_context->getMap().getTile(firePos.x, firePos.y + 25.f) == 0)
 			{
-				Projectile * p = m_context->getWorld().createEntity<Projectile>(m_id);
+				Projectile * p = m_context->getWorld().createEntity<Projectile>(m_id, m_context->getPeer(m_peerId)->getTeam());
 
 				p->setVelocity(unit(v) * 1500.f);
 				p->setPosition(firePos);

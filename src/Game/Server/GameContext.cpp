@@ -192,7 +192,10 @@ void GameContext::reset()
 	m_prevTime = sf::Time::Zero;
 	m_accumulator = sf::Time::Zero;
 	for (auto & p : m_peers)
+	{
 		p->setState(Peer::PRE_GAME);
+		p->setEntity(nullptr);
+	}
 }
 
 Peer * GameContext::getPeer(const ENetPeer * peer)

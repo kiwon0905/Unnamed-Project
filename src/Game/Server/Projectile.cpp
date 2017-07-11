@@ -6,12 +6,12 @@
 #include "Game/Map.h"
 #include "Core/Server/Peer.h"
 
-Projectile::Projectile(int id, GameContext * context, int shooterId):
+Projectile::Projectile(int id, GameContext * context, int shooterId, Team shooterTeam):
 	Entity(id, EntityType::PROJECTILE, context),
-	m_shooterId(shooterId)
+	m_shooterId(shooterId),
+	m_team(shooterTeam)
 {
 	m_size = { 25.f, 25.f };
-	m_team = m_context->getPeer(shooterId)->getTeam();
 }
 
 void Projectile::tick(float dt)

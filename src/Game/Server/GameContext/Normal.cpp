@@ -12,6 +12,7 @@ void Normal::startRound()
 		auto & p = m_peers[i];
 
 		Human * h = m_gameWorld.createEntity<Human>(p->getId());
+		std::cout << "created human for peer " << p->getId() << "\n";
 		p->setEntity(h);
 
 		if (i % 2 == 0)
