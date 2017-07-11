@@ -1,9 +1,9 @@
 #include "Entity.h"
 
-Entity::Entity(int id, EntityType type, Peer * player):
+Entity::Entity(int id, EntityType type, GameContext * context):
 	m_id(id),
 	m_type(type),
-	m_player(player)
+	m_context(context)
 {
 }
 
@@ -16,12 +16,6 @@ EntityType Entity::getType()
 {
 	return m_type;
 }
-
-/*
-Peer * Entity::getPlayer()
-{
-	return m_player;
-}*/
 
 bool Entity::isAlive()
 {

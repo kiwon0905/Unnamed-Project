@@ -11,7 +11,7 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 	float friction = .5f;
 	float maxSpeed = 600.f;
 
-	m_velocity.y = clampedAdd(-3000.f, 3000.f, m_velocity.y, 1000.f * dt);
+	m_velocity.y = clampedAdd(-3000.f, 3000.f, m_velocity.y, 1300.f * dt);
 
 	if (!grounded)
 	{
@@ -29,6 +29,12 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 	else
 		m_velocity.x = m_velocity.x * friction;
 
+
+	if (grounded)
+	{
+		m_airJump = false;
+		m_groundJump = false;
+	}
 
 	if (input.jump)
 	{
@@ -48,12 +54,6 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 				m_velocity.y = -650.f;
 			}
 		}
-	}
-
-	if (grounded)
-	{
-		m_airJump = false;
-		m_groundJump = false;
 	}
 
 	sf::Vector2f d = m_velocity * dt;

@@ -5,7 +5,8 @@
 #include "Core/ENetUtility.h"
 
 
-#include "Game/Server/Infection.h"
+#include "Game/Server/GameContext/Infection.h"
+#include "Game/Server/GameContext/Normal.h"
 #include <iostream>
 #include <string>
 
@@ -101,7 +102,7 @@ bool Server::initialize()
 	m_running = true;
 	m_parsingThread.reset(new std::thread(&Server::handleCommands, this));
 
-	m_gameContext.reset(new Infection);
+	m_gameContext.reset(new Normal);
 	return true;
 }
 

@@ -1,43 +1,53 @@
 
 #include "Projectile.h"
 #include "GameWorld.h"
+#include "GameContext.h"
 #include "Game/NetObject.h"
 #include "Game/Map.h"
+#include "Core/Server/Peer.h"
 
-Projectile::Projectile(int id, int shooterId):
-	Entity(id, EntityType::PROJECTILE, nullptr),
+Projectile::Projectile(int id, GameContext * context, int shooterId):
+	Entity(id, EntityType::PROJECTILE, context),
 	m_shooterId(shooterId)
 {
 	m_size = { 25.f, 25.f };
+	m_team = m_context->getPeer(shooterId)->getTeam();
 }
 
-void Projectile::tick(float dt, GameWorld & gameWorld)
+void Projectile::tick(float dt)
 {
 	Aabb aabb = getAabb();
 
 	sf::Vector2f d = m_velocity * dt;
 	
-
-
 	float minTime = 1.f;
 	sf::Vector2i minNorm;
 
-	
-	gameWorld.getMap().sweep(aabb, d, minTime, minNorm);
+	//tile
+	m_context->getMap().sweep(aabb, d, minTime, minNorm);
 
 
-	Entity * hitEntity = nullptr;
-	for (auto & e : gameWorld.getEntities(EntityType::ZOMBIE))
+	Human * hitEntity = nullptr;
+
+	for (auto & e : m_context->getWorld().getEntities(EntityType::HUMAN))
 	{
-		float time;
-		sf::Vector2i norm;
-		if (e->getId() != m_shooterId && aabb.sweep(d, e->getAabb(), time, norm))
+		if (e->getId() == m_shooterId)
+			continue;
+		Human * h = static_cast<Human*>(e.get());
+
+		if (m_context->getPeer(h->getPeerId())->getTeam() != m_team)
 		{
-			if (time < minTime)
+			float time;
+			sf::Vector2i norm;
+
+			if (aabb.sweep(d * minTime, h->getAabb(), time, norm))
 			{
-				minTime = time;
-				minNorm = norm;
-				hitEntity = e.get();
+				if (time < minTime)
+				{
+					minTime = time;
+					minNorm = norm;
+					hitEntity = h;
+				}
 			}
 		}
 	}
@@ -45,11 +55,8 @@ void Projectile::tick(float dt, GameWorld & gameWorld)
 	if (minTime != 1.f)
 	{
 		m_alive = false;
-		if (hitEntity && hitEntity->getId() != m_shooterId)
-		{
-			Zombie * z = static_cast<Zombie*>(hitEntity);
-			z->takeDamage(10);
-		}
+		if (hitEntity)
+			hitEntity->takeDamage(10);
 	}
 
 	d *= minTime;

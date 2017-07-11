@@ -1,5 +1,5 @@
 #pragma once
-
+#include <string>
 enum class EntityType
 {
 	NONE,
@@ -16,3 +16,18 @@ enum class Team
 	NONE,
 	COUNT
 };
+
+inline std::string toString(Team t)
+{
+	switch (t)
+	{
+	case Team::A:
+		return "A";
+	case Team::B:
+		return "B";
+	case Team::NONE:
+		return "NONE";
+	default:
+		return "";
+	}
+}

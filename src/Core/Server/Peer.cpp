@@ -42,6 +42,16 @@ void Peer::setState(State state)
 	m_state = state;
 }
 
+Team Peer::getTeam()
+{
+	return m_team;
+}
+
+void Peer::setTeam(Team team)
+{
+	m_team = team;
+}
+
 void Peer::onInput(const NetInput & input)
 {
 	m_inputs.push(input);

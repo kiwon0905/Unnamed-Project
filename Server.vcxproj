@@ -36,10 +36,11 @@
     <ClInclude Include="src\Game\NetInput.h" />
     <ClInclude Include="src\Game\NetObject.h" />
     <ClInclude Include="src\Game\Server\GameContext.h" />
+    <ClInclude Include="src\Game\Server\GameContext\Infection.h" />
+    <ClInclude Include="src\Game\Server\GameContext\Normal.h" />
     <ClInclude Include="src\Game\Server\Human.h" />
     <ClInclude Include="src\Game\Server\Entity.h" />
     <ClInclude Include="src\Game\Server\GameWorld.h" />
-    <ClInclude Include="src\Game\Server\Infection.h" />
     <ClInclude Include="src\Game\Server\Projectile.h" />
     <ClInclude Include="src\Game\Server\Zombie.h" />
     <ClInclude Include="src\Game\Snapshot.h" />
@@ -59,10 +60,11 @@
     <ClCompile Include="src\Game\NetInput.cpp" />
     <ClCompile Include="src\Game\NetObject.cpp" />
     <ClCompile Include="src\Game\Server\GameContext.cpp" />
+    <ClCompile Include="src\Game\Server\GameContext\Infection.cpp" />
+    <ClCompile Include="src\Game\Server\GameContext\Normal.cpp" />
     <ClCompile Include="src\Game\Server\Human.cpp" />
     <ClCompile Include="src\Game\Server\Entity.cpp" />
     <ClCompile Include="src\Game\Server\GameWorld.cpp" />
-    <ClCompile Include="src\Game\Server\Infection.cpp" />
     <ClCompile Include="src\Game\Server\Projectile.cpp" />
     <ClCompile Include="src\Game\Server\Zombie.cpp" />
     <ClCompile Include="src\Game\Snapshot.cpp" />

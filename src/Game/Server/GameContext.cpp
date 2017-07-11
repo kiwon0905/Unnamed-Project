@@ -44,6 +44,7 @@ void GameContext::onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer)
 		packer.pack(m_map.getName());
 		packer.pack<0, MAX_PLAYER_ID>(m_peers.size());
 		packer.pack<0, MAX_PLAYER_ID>(peer->getId());				//my player id
+		packer.pack(peer->getTeam());								//team
 		packer.pack<0, MAX_ENTITY_ID>(peer->getEntity()->getId());	//my entity id
 		packer.pack(peer->getEntity()->getType());					//my entity type
 
@@ -52,6 +53,7 @@ void GameContext::onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer)
 			if (p->getId() != peer->getId())
 			{
 				packer.pack<0, MAX_PLAYER_ID>(p->getId());				//player id
+				packer.pack(p->getTeam());								//team
 				packer.pack<0, MAX_ENTITY_ID>(p->getEntity()->getId());	//entity id
 			}
 		}
@@ -130,9 +132,11 @@ void GameContext::update()
 			{
 				p->send(packer, false);
 			}
+		
+			checkRound();
+		
 		}
 
-		checkRound();
 	}
 }
 
@@ -141,9 +145,22 @@ const std::vector<std::unique_ptr<Peer>>& GameContext::getPeers()
 	return m_peers;
 }
 
+Peer * GameContext::getPeer(int id)
+{
+	for (auto & p : m_peers)
+		if (p->getId() == id)
+			return p.get();
+	return nullptr;
+}
+
 const Map & GameContext::getMap()
 {
 	return m_map;
+}
+
+GameWorld & GameContext::getWorld()
+{
+	return m_gameWorld;
 }
 
 int GameContext::getCurrentTick()

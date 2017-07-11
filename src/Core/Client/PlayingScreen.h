@@ -53,6 +53,7 @@ private:
 	{
 		int id;
 		int entityId;
+		Team team;
 	};
 	std::vector<PlayerInfo> m_players;
 	PlayerInfo m_myPlayer;
@@ -92,4 +93,6 @@ private:
 	bool m_debugRender = false;
 	Entity * getEntity(int id);
 
+public:
+	const PlayerInfo * getPlayerInfo(int entityId);
 };

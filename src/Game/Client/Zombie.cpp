@@ -48,7 +48,7 @@ void Zombie::preRender(const Snapshot * from, const Snapshot * to, float predict
 
 }
 
-void Zombie::render(sf::RenderTarget & target, Client & client)
+void Zombie::render(sf::RenderTarget & target, Client & client, PlayingScreen & ps)
 {
 	sf::RectangleShape body;
 	body.setSize({ 70.f, 70.f });

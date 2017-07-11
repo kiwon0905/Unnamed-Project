@@ -10,7 +10,7 @@ public:
 	void rollback(const NetObject & e);
 	void tick(float dt, const NetInput & input, Map & map);
 	void preRender(const Snapshot * from, const Snapshot * to, float predictedT, float t);
-	void render(sf::RenderTarget & target, Client & client);
+	void render(sf::RenderTarget & target, Client & client, PlayingScreen & ps);
 
 private:
 	HumanCore m_prevCore;

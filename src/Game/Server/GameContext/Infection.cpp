@@ -11,7 +11,7 @@ void Infection::startRound()
 	{
 		auto & p = m_peers[i];
 
-		Human * h = m_gameWorld.createEntity<Human>(p.get());
+		Human * h = m_gameWorld.createEntity<Human>(p->getId());
 		p->setEntity(h);
 
 		//Zombie * z = m_gameWorld.createEntity<Zombie>(p.get());

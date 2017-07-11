@@ -1,6 +1,8 @@
 #include "Human.h"
-#include "Core/Utility.h"
 #include "Game/Snapshot.h"
+#include "Core/Utility.h"
+#include "Core/Client/PlayingScreen.h"
+
 #include <SFML/Graphics.hpp>
 
 Human::Human(int id):
@@ -52,11 +54,13 @@ void Human::preRender(const Snapshot * from, const Snapshot * to, float predicte
 }
 
 
-void Human::render(sf::RenderTarget & target, Client & client)
+void Human::render(sf::RenderTarget & target, Client & client, PlayingScreen & ps)
 {
 	sf::RectangleShape body;
 	body.setSize({ 70.f, 70.f });
-	body.setFillColor(sf::Color::Green);
+
+	sf::Color teamColor = ps.getPlayerInfo(m_id)->team == Team::A ? sf::Color::Blue : sf::Color::Red;
+	body.setFillColor(teamColor);
 	body.setOutlineColor(sf::Color::Black);
 	body.setOutlineThickness(-3.f);
 	body.setPosition(m_position);

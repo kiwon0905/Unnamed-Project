@@ -190,20 +190,22 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			unpacker.unpack(mapName);
 			unpacker.unpack<0, MAX_PLAYER_ID>(numPlayer);
 			unpacker.unpack<0, MAX_PLAYER_ID>(m_myPlayer.id);
+			unpacker.unpack(m_myPlayer.team);
 			unpacker.unpack<0, MAX_ENTITY_ID>(m_myPlayer.entityId);
 			unpacker.unpack(playerEntityType);
 
 			std::cout << "map: " << mapName << "\n";
 			std::cout << "total " << numPlayer << " players.\n";
 			std::cout << "my player id: " << m_myPlayer.id << " entity id: " << m_myPlayer.entityId << " entity type: " << static_cast<int>(playerEntityType) << "\n";
-
+			std::cout << "my team: " << toString(m_myPlayer.team) << "\n";
 			for (int i = 0; i < numPlayer - 1; ++i)
 			{
 				PlayerInfo info;
 				unpacker.unpack<0, MAX_PLAYER_ID>(info.id);
+				unpacker.unpack(info.team);
 				unpacker.unpack<0, MAX_ENTITY_ID>(info.entityId);
 				m_players.push_back(info);
-				std::cout << "player" << info.id << " entity: " << info.entityId << "\n";
+				std::cout << "player" << info.id << " team: " <<toString(info.team) << " entity: " << info.entityId << "\n";
 			}
 
 			//load map
@@ -511,7 +513,26 @@ void PlayingScreen::render(Client & client)
 	Entity * e = getEntity(m_myPlayer.entityId);
 	if (e)
 	{
-		m_view.setCenter(e->getPosition());
+		sf::FloatRect area{ e->getPosition() - m_view.getSize() / 2.f, m_view.getSize() };
+		sf::Vector2f worldSize = static_cast<sf::Vector2f>(m_map.getSize()) * static_cast<float>(m_map.getTileSize());
+		sf::Vector2f center = e->getPosition();
+		if (area.left < 0.f)
+		{
+			center.x = m_view.getSize().x / 2.f;
+		}
+		else if (area.left + area.width > worldSize.x)
+		{
+			center.x = worldSize.x - m_view.getSize().x / 2.f;
+		}
+		if (area.top < 0.f)
+		{
+			center.y = m_view.getSize().y / 2.f;
+		}
+		else if (area.top + area.height > worldSize.y)
+		{
+			center.y = worldSize.y - m_view.getSize().y / 2.f;
+		}
+		m_view.setCenter(center);
 	}
 	sf::RenderWindow & window = client.getWindow();
 	window.setView(m_view);
@@ -560,14 +581,24 @@ void PlayingScreen::render(Client & client)
 	{
 		for (auto & e : v)
 		{
-			e->render(window, client);
+			e->render(window, client, *this);
 		}
 	}
 
 	window.setView(window.getDefaultView());
 	sf::Text timeText;
 	timeText.setFillColor(sf::Color::Blue);
-	timeText.setString(std::to_string(currentRenderTime.asMicroseconds() / 1000000) + "s");
+	int totalSeconds = currentRenderTime.asMicroseconds() / 1000000;
+	int minutes= totalSeconds / 60;
+	int seconds = totalSeconds % 60;
+
+	std::string minutesString = std::to_string(minutes);
+	std::string secondsString = std::to_string(seconds);
+	if (minutes < 10)
+		minutesString = "0" + minutesString;
+	if (seconds < 10)
+		secondsString = "0" + secondsString;
+	timeText.setString(minutesString + ":" + secondsString);
 	timeText.setFont(*client.getAssetManager().get<sf::Font>("arial.ttf"));
 	timeText.setPosition(static_cast<int>(client.getWindow().getSize().x / 2.f - timeText.getLocalBounds().width / 2.f), 0.f);
 	client.getWindow().draw(timeText);
@@ -597,5 +628,15 @@ Entity * PlayingScreen::getEntity(int id)
 		for (auto & e : v)
 			if (e->getId() == id)
 				return e.get();
+	return nullptr;
+}
+
+const PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfo(int entityId)
+{
+	if (entityId == m_myPlayer.entityId)
+		return &m_myPlayer;
+	for (const auto & p : m_players)
+		if (p.entityId == entityId)
+			return &p;
 	return nullptr;
 }

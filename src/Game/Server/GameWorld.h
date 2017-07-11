@@ -25,9 +25,6 @@ public:
 	void tick();
 	void snap(Packer & packer);
 
-	const Map & getMap();
-	int getCurrentTick();
-
 	template <typename T, typename... Args>
 	T * createEntity(Args &&... args);
 	Entity * getEntity(int id, EntityType type);
@@ -44,7 +41,7 @@ private:
 template<typename T, typename ...Args>
 T * GameWorld::createEntity(Args && ...args)
 {
-	T * entity = new T(m_nextEntityId++, std::forward<Args>(args)...);
+	T * entity = new T(m_nextEntityId++, m_context, std::forward<Args>(args)...);
 	m_newEntities.push_back(entity);
 	return entity;
 }

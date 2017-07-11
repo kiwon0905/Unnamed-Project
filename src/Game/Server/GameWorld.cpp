@@ -21,16 +21,6 @@ void GameWorld::onDisconnect(Peer & peer)
 		peer.getEntity()->setAlive(false);
 }
 
-const Map & GameWorld::getMap()
-{
-	return m_context->getMap();
-}
-
-int GameWorld::getCurrentTick()
-{
-	return m_context->getCurrentTick();
-}
-
 void GameWorld::reset()
 {
 	for (auto & v : m_entitiesByType)
@@ -51,7 +41,7 @@ void GameWorld::tick()
 
 	for (auto & v : m_entitiesByType)
 		for (auto & e : v)
-			e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), *this);
+			e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds());
 }
 
 void GameWorld::snap(Packer & packer)

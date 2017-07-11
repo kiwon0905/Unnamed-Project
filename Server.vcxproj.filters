@@ -90,7 +90,10 @@
     <ClInclude Include="src\Game\Server\GameContext.h">
       <Filter>Game\Server</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\Server\Infection.h">
+    <ClInclude Include="src\Game\Server\GameContext\Infection.h">
+      <Filter>Game\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Server\GameContext\Normal.h">
       <Filter>Game\Server</Filter>
     </ClInclude>
   </ItemGroup>
@@ -155,7 +158,10 @@
     <ClCompile Include="src\Core\Utility.cpp">
       <Filter>Core\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Server\Infection.cpp">
+    <ClCompile Include="src\Game\Server\GameContext\Infection.cpp">
+      <Filter>Game\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Server\GameContext\Normal.cpp">
       <Filter>Game\Server</Filter>
     </ClCompile>
   </ItemGroup>

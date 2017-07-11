@@ -1,4 +1,4 @@
-#include "GameContext.h"
+#include "Game/Server/GameContext.h"
 
 class Infection : public GameContext
 {

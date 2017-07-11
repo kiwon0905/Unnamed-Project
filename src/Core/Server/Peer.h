@@ -2,6 +2,7 @@
 
 #include "Core/Packer.h"
 #include "Game/NetInput.h"
+#include "Game/Enums.h"
 #include <enet/enet.h>
 #include <queue>
 class Entity;
@@ -32,7 +33,8 @@ public:
 	bool send(const Packer & packer, bool reliable);
 	State getState() const;
 	void setState(State state);
-	
+	Team getTeam();
+	void setTeam(Team team);
 	void onInput(const NetInput & input);
 	NetInput popInput(int tick);
 private:
@@ -40,5 +42,6 @@ private:
 	ENetPeer * m_peer;
 	Entity * m_entity = nullptr;
 	State m_state = PRE_GAME;
+	Team m_team = Team::NONE;
 	std::priority_queue<NetInput, std::vector<NetInput>, InputComparator> m_inputs;
 };

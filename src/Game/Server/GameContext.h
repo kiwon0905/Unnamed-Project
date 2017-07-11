@@ -29,7 +29,9 @@ public:
 	void update();
 
 	const std::vector<std::unique_ptr<Peer>> & getPeers();
+	Peer * getPeer(int id);
 	const Map & getMap();
+	GameWorld & getWorld();
 	int getCurrentTick();
 
 	virtual void startRound() = 0;
