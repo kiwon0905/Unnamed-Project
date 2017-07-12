@@ -8,11 +8,12 @@
 #include "Core/Utility.h"
 #include "Core/Server/Peer.h"
 
-Human::Human(int id, GameContext * context, int peerId) :
-	Entity(id, EntityType::HUMAN, context),
+Human::Human(int id, GameContext * context, int peerId, const sf::Vector2f & pos) :
+	Entity(id, EntityType::HUMAN, context, pos),
 	m_peerId(peerId)
 {
 	m_size = { 69.f, 69.f };
+	m_core.setPosition(pos);
 }
 
 void Human::tick(float dt)
@@ -61,6 +62,7 @@ void Human::snap(Snapshot & snapshot) const
 	{
 		m_core.write(*h);
 		h->aimAngle = roundToInt(m_aimAngle);
+		h->health = m_health;
 	}
 }
 

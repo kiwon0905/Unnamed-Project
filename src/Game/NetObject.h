@@ -34,6 +34,7 @@ struct NetHuman : public NetObject
 	bool groundJump;
 	bool airJump;
 	int aimAngle;
+	int health;
 };
 
 struct NetZombie : public NetObject

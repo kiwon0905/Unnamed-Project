@@ -11,6 +11,7 @@ class Map
 {
 public:
 	bool loadFromFile(const std::string & s);
+	bool loadFromTmx(const std::string & s);
 	const std::string & getName();
 
 	const sf::Vector2i & getSize() const;

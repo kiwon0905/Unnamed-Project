@@ -124,14 +124,18 @@ void GameContext::update()
 			m_gameWorld.tick();
 
 
-			Packer packer;
-			packer.pack(Msg::SV_SNAPSHOT);
-			packer.pack<0, MAX_TICK>(m_tick);
-			m_gameWorld.snap(packer);
-			for (auto & p : m_peers)
+
+			//if (m_tick % 2 == 0)
 			{
-				p->send(packer, false);
+				Packer packer;
+				packer.pack(Msg::SV_SNAPSHOT);
+				packer.pack<0, MAX_TICK>(m_tick);
+				m_gameWorld.snap(packer);
+				for (auto & p : m_peers)
+					p->send(packer, false);
 			}
+
+
 		
 			checkRound();
 		

@@ -39,6 +39,15 @@ bool Map::loadFromFile(const std::string & s)
 	return true;
 }
 
+bool Map::loadFromTmx(const std::string & s)
+{
+	tinyxml2::XMLDocument doc;
+	doc.LoadFile(s.c_str());
+
+
+	return true;
+}
+
 const std::string & Map::getName()
 {
 	return m_name;

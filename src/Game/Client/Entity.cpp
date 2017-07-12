@@ -35,8 +35,3 @@ bool Entity::isAlive() const
 {
 	return m_alive;
 }
-
-const sf::Vector2f & Entity::getPosition() const
-{
-	return m_position;
-}

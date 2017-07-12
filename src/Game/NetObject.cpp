@@ -25,6 +25,7 @@ void NetHuman::write(Packer & packer) const
 	packer.pack<0, 360>(aimAngle);
 	packer.pack(groundJump);
 	packer.pack(airJump);
+	packer.pack<0, 100>(health);
 }
 
 void NetHuman::read(Unpacker & unpacker)
@@ -36,6 +37,7 @@ void NetHuman::read(Unpacker & unpacker)
 	unpacker.unpack<0, 360>(aimAngle);
 	unpacker.unpack(groundJump);
 	unpacker.unpack(airJump);
+	unpacker.unpack<0, 100>(health);
 }
 
 NetObject::Type NetHuman::getType() const

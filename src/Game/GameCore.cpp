@@ -100,6 +100,11 @@ const sf::Vector2f & HumanCore::getPosition() const
 	return m_position;
 }
 
+void HumanCore::setPosition(const sf::Vector2f & pos)
+{
+	m_position = pos;
+}
+
 void ZombieCore::tick(float dt, const NetInput & input, const Map & map)
 {
 	Aabb aabb(m_position.x, m_position.y, 70.f, 70.f);

@@ -22,19 +22,18 @@ public:
 	
 	void setPrediction(bool predict);
 	bool isPredicted();
-	virtual void rollback(const NetObject & e) = 0;
 
 	void setAlive(bool alive);
 	bool isAlive() const;
 	
-	const sf::Vector2f & getPosition() const;
+	virtual void rollback(const NetObject & e) = 0;
+
 	virtual void tick(float dt, const NetInput & input, Map & map) = 0;
-	virtual void preRender(const Snapshot * from, const Snapshot * to, float predictedT, float t) = 0;
-	virtual void render(sf::RenderTarget & target, Client & client, PlayingScreen & ps) = 0;
+	virtual sf::Vector2f getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const = 0;
+	virtual void render(sf::RenderTarget & target, Client & client, PlayingScreen & ps, const Snapshot * from, const Snapshot * to, float predictedT, float t) = 0;
 protected:
 	int m_id;
 	EntityType m_type;
 	bool m_alive = true;
 	bool m_predicted = false;
-	sf::Vector2f m_position;
 };

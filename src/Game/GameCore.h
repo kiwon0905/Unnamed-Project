@@ -23,6 +23,7 @@ public:
 	void write(NetHuman & nh) const;
 
 	const sf::Vector2f & getPosition() const;
+	void setPosition(const sf::Vector2f & pos);
 private:
 	sf::Vector2f m_position;
 	sf::Vector2f m_velocity;

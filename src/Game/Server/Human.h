@@ -5,7 +5,7 @@
 class Human : public Entity
 {
 public:
-	Human(int id, GameContext * context, int peerId);
+	Human(int id, GameContext * context, int peerId, const sf::Vector2f & pos);
 
 	void tick(float dt);
 	void snap(Snapshot & snapshot) const;

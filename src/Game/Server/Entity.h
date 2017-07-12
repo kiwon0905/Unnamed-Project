@@ -12,7 +12,7 @@ class Peer;
 class Entity
 {
 public:
-	Entity(int id, EntityType type, GameContext * context);
+	Entity(int id, EntityType type, GameContext * context, const sf::Vector2f & pos = sf::Vector2f());
 	virtual ~Entity() {}
 	
 	int getId();

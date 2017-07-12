@@ -210,7 +210,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 
 			//load map
 			m_map.loadFromFile("map/" + mapName + ".xml");
-			m_tileTexture = client.getAssetManager().get<sf::Texture>("assets/" + mapName + ".png");
+			m_tileTexture = client.getAssetManager().get<sf::Texture>(m_map.getTilesetFile());
 			m_tileTexture->setSmooth(true);
 
 			//create tile map
@@ -504,18 +504,13 @@ void PlayingScreen::render(Client & client)
 		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
 	m_snapshots.removeUntil(s.first->tick - 1);
 	
-	//entity pre render (needs to be done before view)
-	for (auto & v : m_entitiesByType)
-		for (auto & e : v)
-			e->preRender(s0, s1, predT, t);
-
 	//camera
 	Entity * e = getEntity(m_myPlayer.entityId);
 	if (e)
 	{
-		sf::FloatRect area{ e->getPosition() - m_view.getSize() / 2.f, m_view.getSize() };
+		sf::Vector2f center = e->getCameraPosition(s0, s1, predT, t);
+		sf::FloatRect area{ center - m_view.getSize() / 2.f, m_view.getSize() };
 		sf::Vector2f worldSize = static_cast<sf::Vector2f>(m_map.getSize()) * static_cast<float>(m_map.getTileSize());
-		sf::Vector2f center = e->getPosition();
 		if (area.left < 0.f)
 		{
 			center.x = m_view.getSize().x / 2.f;
@@ -540,6 +535,7 @@ void PlayingScreen::render(Client & client)
 	//draw background
 	sf::RectangleShape background;
 	background.setSize(static_cast<sf::Vector2f>(m_map.getSize() * m_map.getTileSize()));
+	background.setFillColor(sf::Color(135, 206, 235));
 	window.draw(background);
 
 	//draw tile map
@@ -581,7 +577,7 @@ void PlayingScreen::render(Client & client)
 	{
 		for (auto & e : v)
 		{
-			e->render(window, client, *this);
+			e->render(window, client, *this, s0, s1, predT, t);
 		}
 	}
 

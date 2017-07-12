@@ -4,14 +4,14 @@ void Normal::startRound()
 {
 	m_state = LOADING;
 
-	m_map.loadFromFile("map/grass.xml");
+	m_map.loadFromFile("map/grass2.xml");
 
 
 	for (std::size_t i = 0; i < m_peers.size(); ++i)
 	{
 		auto & p = m_peers[i];
 
-		Human * h = m_gameWorld.createEntity<Human>(p->getId());
+		Human * h = m_gameWorld.createEntity<Human>(p->getId(), sf::Vector2f(100.f, 100.f));
 		std::cout << "created human for peer " << p->getId() << "\n";
 		p->setEntity(h);
 
@@ -49,6 +49,7 @@ void Normal::checkRound()
 	{
 		endRound(Team::NONE);
 	}
+	/*
 	else
 	{
 		if (a == b && a == 0)
@@ -58,5 +59,5 @@ void Normal::checkRound()
 		else if (b == 0 && a > b)
 			endRound(Team::A);
 
-	}
+	}*/
 }

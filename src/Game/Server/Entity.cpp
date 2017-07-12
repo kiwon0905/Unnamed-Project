@@ -1,9 +1,10 @@
 #include "Entity.h"
 
-Entity::Entity(int id, EntityType type, GameContext * context):
+Entity::Entity(int id, EntityType type, GameContext * context, const sf::Vector2f & pos):
 	m_id(id),
 	m_type(type),
-	m_context(context)
+	m_context(context),
+	m_position(pos)
 {
 }
 
