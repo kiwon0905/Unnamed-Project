@@ -5,6 +5,7 @@
 #include "Game/NetObject.h"
 #include "Game/Map.h"
 #include "Core/Server/Peer.h"
+#include "Core/Utility.h"
 
 Projectile::Projectile(int id, GameContext * context, int shooterId, Team shooterTeam):
 	Entity(id, EntityType::PROJECTILE, context),
@@ -17,6 +18,9 @@ Projectile::Projectile(int id, GameContext * context, int shooterId, Team shoote
 void Projectile::tick(float dt)
 {
 	Aabb aabb = getAabb();
+
+	m_velocity.y = Math::clampedAdd(-3000.f, 3000.f, m_velocity.y, 1000.f * dt);
+
 
 	sf::Vector2f d = m_velocity * dt;
 	

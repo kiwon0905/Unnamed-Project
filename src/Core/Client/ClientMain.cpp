@@ -12,6 +12,7 @@
 
 
 #include "Core/Utility.h"
+#include "Core/Client/Particles.h"
 int main()
 {
 #ifdef _DEBUG
@@ -19,6 +20,48 @@ int main()
 #endif
 	Client client;
 	client.run();
+
+
+	/*
+	sf::Texture texture;
+	if (!texture.loadFromFile("particle.png"))
+		std::cout << "failed to load!";
+
+	sf::RenderWindow window(sf::VideoMode(1600, 900), "hi");
+	
+	sf::Clock clock;
+	SmokeParticles particles(texture);
+	ParticleEmitter * emitter = new ParticleEmitter;
+	particles.addEmitter(emitter);
+	emitter->setEmissionRate(2000.f);
+	emitter->setParticleLifeTime(2.f);
+	emitter->setParticleVelocity(Math::circle(sf::Vector2f(), 25.f));
+	emitter->setParticleScale(Math::uniform(.005f, .01f));
+	emitter->setParticlePosition(sf::Vector2f());
+	emitter->setParticleScale(Math::uniform(.05f, .1f));
+	emitter->setParticleColor(sf::Color(231, 231, 231, 10));
+	while (window.isOpen())
+	{
+		sf::Event event;
+		float dt = clock.restart().asSeconds();
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				window.close();
+			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A)
+				particles.removeEmitter(emitter);
+		}
+		emitter->setParticlePosition(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
+		particles.update(dt);
+
+
+		window.clear(sf::Color(135, 206, 235));
+		sf::RenderStates states;
+		states.blendMode = sf::BlendAdd;
+		window.draw(particles, states);
+		window.display();
+	}
+	*/
 }
 
 

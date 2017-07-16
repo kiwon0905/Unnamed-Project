@@ -2,6 +2,7 @@
 
 #include "Screen.h"
 #include "Core/Client/Graph.h"
+#include "Core/Client/Particles.h"
 #include "Game/GameCore.h"
 #include "Game/Snapshot.h"
 #include "Game/Client/Entity.h"
@@ -83,17 +84,27 @@ private:
 
 	std::unique_ptr<Graph> m_predictionGraph;
 	std::unique_ptr<Graph> m_snapshotGraph;
-	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 
+
+	//rendering
 	Map m_map;
 	sf::Texture * m_tileTexture;
 	sf::RenderTexture m_renderTexture;
 	sf::VertexArray m_tileVertices;
 	sf::View m_view;
-
 	bool m_debugRender = false;
+
+	struct Particles
+	{
+		std::unique_ptr<SmokeParticles> smoke;
+	} m_particles;
+	//entities
 	Entity * getEntity(int id);
+	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 
 public:
 	const PlayerInfo * getPlayerInfo(int entityId);
+	const PlayerInfo & getMyPlayerInfo();
+	Particles & getParticles();
+
 };

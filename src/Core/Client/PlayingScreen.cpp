@@ -138,6 +138,9 @@ void PlayingScreen::onEnter(Client & client)
 	m_predictionGraph->setPosition({ 0.f, 600. });
 	m_snapshotGraph = std::make_unique<Graph>(-50.f, 100.f, *font, "Snapshot timing(ms)");
 	m_snapshotGraph->setPosition({ 0.f, 300.f });
+
+
+	m_particles.smoke = std::make_unique<SmokeParticles>(*client.getAssetManager().get<sf::Texture>("particle.png"));
 }
 
 void PlayingScreen::handleEvent(const sf::Event & ev, Client & client)
@@ -353,6 +356,7 @@ void PlayingScreen::update(Client & client)
 {
 	if (m_state == IN_GAME)
 	{
+		static sf::Clock clock;
 		sf::Time current = m_predictedTime.getElapsedTime();
 		sf::Time dt = current - m_prevPredictedTime;
 		m_prevPredictedTime = current;
@@ -437,6 +441,7 @@ void PlayingScreen::update(Client & client)
 
 			//std::cout << "double update!";
 		}
+		m_particles.smoke->update(clock.restart().asSeconds());
 	}
 }
 
@@ -472,13 +477,13 @@ void PlayingScreen::render(Client & client)
 			switch (p.second->getType())
 			{
 			case NetObject::HUMAN:
-				e = new Human(p.first);
+				e = new Human(p.first, client, *this);
 				break;
 			case NetObject::ZOMBIE:
-				e = new Zombie(p.first);
+				e = new Zombie(p.first, client, *this);
 				break;
 			case NetObject::PROJECTILE:
-				e = new Projectile(p.first);
+				e = new Projectile(p.first, client, *this);
 				break;
 			default:
 				break;
@@ -577,10 +582,16 @@ void PlayingScreen::render(Client & client)
 	{
 		for (auto & e : v)
 		{
-			e->render(window, client, *this, s0, s1, predT, t);
+			e->render(s0, s1, predT, t);
 		}
 	}
+	
+	sf::RenderStates states2;
+	states2.blendMode = sf::BlendAdd;
+	window.draw(*m_particles.smoke, states2);
 
+
+	//Time
 	window.setView(window.getDefaultView());
 	sf::Text timeText;
 	timeText.setFillColor(sf::Color::Blue);
@@ -635,4 +646,14 @@ const PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfo(int entityId)
 		if (p.entityId == entityId)
 			return &p;
 	return nullptr;
+}
+
+const PlayingScreen::PlayerInfo & PlayingScreen::getMyPlayerInfo()
+{
+	return m_myPlayer;
+}
+
+PlayingScreen::Particles & PlayingScreen::getParticles()
+{
+	return m_particles;
 }

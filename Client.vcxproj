@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\Client\AnimatedSprite.h" />
+    <ClInclude Include="src\Core\Client\Particles.h" />
     <ClInclude Include="src\Core\Client\SoundPlayer.h" />
     <ClInclude Include="src\Core\Client\Client.h" />
     <ClInclude Include="src\Core\Client\Graph.h" />
@@ -53,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Client\AnimatedSprite.cpp" />
+    <ClCompile Include="src\Core\Client\Particles.cpp" />
     <ClCompile Include="src\Core\Client\SoundPlayer.cpp" />
     <ClCompile Include="src\Core\Client\Client.cpp" />
     <ClCompile Include="src\Core\Client\ClientMain.cpp" />

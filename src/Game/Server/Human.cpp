@@ -26,13 +26,13 @@ void Human::tick(float dt)
 	sf::Vector2f v = input.aimDirection - center;
 	if (v == sf::Vector2f())
 		v = sf::Vector2f(0.f, -1.f);
-	m_aimAngle = atan2f(v.y, v.x) * 180.f / PI;
-	m_aimAngle = normalizedAngle(m_aimAngle);
+	m_aimAngle = atan2f(v.y, v.x) * 180.f / Math::PI;
+	m_aimAngle = Math::normalizedAngle(m_aimAngle);
 	if (input.fire)
 	{
 		if (m_fireCooldown == 0)
 		{
-			sf::Vector2f firePos = center + unit(v) * 60.f - sf::Vector2f(25.f, 25.f) / 2.f;
+			sf::Vector2f firePos = center + Math::unit(v) * 60.f - sf::Vector2f(25.f, 25.f) / 2.f;
 			//std::cout << "firePos: " <<firePos<<"\n";
 			if (m_context->getMap().getTile(firePos.x, firePos.y) == 0 &&
 				m_context->getMap().getTile(firePos.x + 25.f, firePos.y) == 0 &&
@@ -41,7 +41,7 @@ void Human::tick(float dt)
 			{
 				Projectile * p = m_context->getWorld().createEntity<Projectile>(m_id, m_context->getPeer(m_peerId)->getTeam());
 
-				p->setVelocity(unit(v) * 1500.f);
+				p->setVelocity(Math::unit(v) * 1500.f);
 				p->setPosition(firePos);
 				m_fireCooldown = 10;
 			}
@@ -61,7 +61,7 @@ void Human::snap(Snapshot & snapshot) const
 	if (h)
 	{
 		m_core.write(*h);
-		h->aimAngle = roundToInt(m_aimAngle);
+		h->aimAngle = Math::roundToInt(m_aimAngle);
 		h->health = m_health;
 	}
 }

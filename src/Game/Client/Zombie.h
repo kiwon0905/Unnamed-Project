@@ -5,12 +5,12 @@
 class Zombie : public Entity
 {
 public:
-	Zombie(int id);
+	Zombie(int id, Client & client, PlayingScreen & screen);
 	void rollback(const NetObject & e);
 	void tick(float dt, const NetInput & input, Map & map);
 
 	sf::Vector2f getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const;
-	void render(sf::RenderTarget & target, Client & client, PlayingScreen & ps, const Snapshot * from, const Snapshot * to, float predictedT, float t);
+	void render(const Snapshot * from, const Snapshot * to, float predictedT, float t);
 
 private:
 	sf::Vector2f getRenderPos(const NetZombie * from, const NetZombie * to, float predictedT, float t) const;

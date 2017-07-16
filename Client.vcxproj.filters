@@ -114,6 +114,9 @@
     <ClInclude Include="src\Core\Client\AnimatedSprite.h">
       <Filter>Core\Client</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\Client\Particles.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Client\Client.cpp">
@@ -198,6 +201,9 @@
       <Filter>Core\Shared</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Client\AnimatedSprite.cpp">
+      <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\Particles.cpp">
       <Filter>Core\Client</Filter>
     </ClCompile>
   </ItemGroup>

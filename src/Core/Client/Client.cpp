@@ -10,7 +10,7 @@
 
 bool Client::initialize()
 {
-	m_window.create(sf::VideoMode(1600, 900), "");
+	m_window.create(sf::VideoMode(1600, 900), "", sf::Style::Default, sf::ContextSettings(0, 0, 4));
 	m_window.resetGLStates();
 
 	if (!m_parser.loadFromFile("client-config.txt"))

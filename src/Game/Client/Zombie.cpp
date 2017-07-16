@@ -2,8 +2,8 @@
 #include "Core/Utility.h"
 #include "Game/Snapshot.h"
 
-Zombie::Zombie(int id):
-	Entity(id, EntityType::ZOMBIE)
+Zombie::Zombie(int id, Client & client, PlayingScreen & screen):
+	Entity(id, EntityType::ZOMBIE, client, screen)
 {
 }
 
@@ -33,8 +33,10 @@ sf::Vector2f Zombie::getCameraPosition(const Snapshot * from, const Snapshot * t
 	return getRenderPos(z0, z1, predictedT, t) + sf::Vector2f{ 69.f, 69.f };
 }
 
-void Zombie::render(sf::RenderTarget & target, Client & client, PlayingScreen & ps, const Snapshot * from, const Snapshot * to, float predictedT, float t)
+void Zombie::render(const Snapshot * from, const Snapshot * to, float predictedT, float t)
 {
+	sf::RenderTarget & target = m_client->getWindow();
+
 	const NetZombie * z0 = static_cast<const NetZombie*>(from->getEntity(m_id));
 	const NetZombie * z1 = nullptr;
 	if (to)
@@ -53,15 +55,15 @@ void Zombie::render(sf::RenderTarget & target, Client & client, PlayingScreen & 
 sf::Vector2f Zombie::getRenderPos(const NetZombie * z0, const NetZombie * z1, float predictedT, float t) const
 {
 	if (m_predicted)
-		return lerp(m_prevCore.getPosition(), m_currentCore.getPosition(), predictedT);
+		return Math::lerp(m_prevCore.getPosition(), m_currentCore.getPosition(), predictedT);
 	else
 	{
 		sf::Vector2f pos = static_cast<sf::Vector2f>(z0->pos) / 100.f;
 
 		if (z1)
 		{
-			pos.x = lerp(z0->pos.x / 100.f, z1->pos.x / 100.f, t);
-			pos.y = lerp(z0->pos.y / 100.f, z1->pos.y / 100.f, t);
+			pos.x = Math::lerp(z0->pos.x / 100.f, z1->pos.x / 100.f, t);
+			pos.y = Math::lerp(z0->pos.y / 100.f, z1->pos.y / 100.f, t);
 		}
 		return pos;
 	}

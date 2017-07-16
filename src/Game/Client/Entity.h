@@ -14,7 +14,7 @@ class PlayingScreen;
 class Entity
 {
 public:
-	Entity(int id, EntityType type);
+	Entity(int id, EntityType type, Client & client, PlayingScreen & screen);
 	virtual ~Entity() {}
 	
 	int getId() const;
@@ -30,10 +30,12 @@ public:
 
 	virtual void tick(float dt, const NetInput & input, Map & map) = 0;
 	virtual sf::Vector2f getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const = 0;
-	virtual void render(sf::RenderTarget & target, Client & client, PlayingScreen & ps, const Snapshot * from, const Snapshot * to, float predictedT, float t) = 0;
+	virtual void render(const Snapshot * from, const Snapshot * to, float predictedT, float t) = 0;
 protected:
 	int m_id;
 	EntityType m_type;
 	bool m_alive = true;
 	bool m_predicted = false;
+	Client * m_client;
+	PlayingScreen * m_screen;
 };

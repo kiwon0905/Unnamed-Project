@@ -1,8 +1,10 @@
 #include "Entity.h"
 
-Entity::Entity(int id, EntityType type):
+Entity::Entity(int id, EntityType type, Client & client, PlayingScreen & screen):
 	m_id(id),
-	m_type(type)
+	m_type(type),
+	m_client(&client),
+	m_screen(&screen)
 {
 }
 

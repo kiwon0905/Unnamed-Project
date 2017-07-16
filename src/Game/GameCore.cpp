@@ -4,14 +4,14 @@
 
 void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 {
-	Aabb aabb(m_position.x, m_position.y, 70.f, 70.f);
+	Aabb aabb(m_position.x, m_position.y, 69.f, 69.f);
 	bool grounded = map.isGrounded(aabb);
 
 	float accel = 10000.f;
 	float friction = .5f;
 	float maxSpeed = 600.f;
 
-	m_velocity.y = clampedAdd(-3000.f, 3000.f, m_velocity.y, 1300.f * dt);
+	m_velocity.y = Math::clampedAdd(-3000.f, 3000.f, m_velocity.y, 1300.f * dt);
 
 	if (!grounded)
 	{
@@ -23,9 +23,9 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 
 
 	if (input.moveDirection > 0)
-		m_velocity.x = clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, accel * dt);
+		m_velocity.x = Math::clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, accel * dt);
 	else if (input.moveDirection < 0)
-		m_velocity.x = clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, -accel * dt);
+		m_velocity.x = Math::clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, -accel * dt);
 	else
 		m_velocity.x = m_velocity.x * friction;
 
@@ -87,10 +87,10 @@ void HumanCore::read(const NetHuman & nh)
 
 void HumanCore::write(NetHuman & nh) const
 {
-	nh.vel.x = roundToInt(m_velocity.x * 100.f);
-	nh.vel.y = roundToInt(m_velocity.y * 100.f);
-	nh.pos.x = roundToInt(m_position.x * 100.f);
-	nh.pos.y = roundToInt(m_position.y * 100.f);
+	nh.vel.x = Math::roundToInt(m_velocity.x * 100.f);
+	nh.vel.y = Math::roundToInt(m_velocity.y * 100.f);
+	nh.pos.x = Math::roundToInt(m_position.x * 100.f);
+	nh.pos.y = Math::roundToInt(m_position.y * 100.f);
 	nh.groundJump = m_groundJump;
 	nh.airJump = m_airJump;
 }
@@ -107,14 +107,14 @@ void HumanCore::setPosition(const sf::Vector2f & pos)
 
 void ZombieCore::tick(float dt, const NetInput & input, const Map & map)
 {
-	Aabb aabb(m_position.x, m_position.y, 70.f, 70.f);
+	Aabb aabb(m_position.x, m_position.y, 69.f, 69.f);
 	bool grounded = map.isGrounded(aabb);
 
 	float accel = 10000.f;
 	float friction = .5f;
 	float maxSpeed = 600.f;
 
-	m_velocity.y = clampedAdd(-3000.f, 3000.f, m_velocity.y, 1000.f * dt);
+	m_velocity.y = Math::clampedAdd(-3000.f, 3000.f, m_velocity.y, 1000.f * dt);
 
 	if (!grounded)
 	{
@@ -123,9 +123,9 @@ void ZombieCore::tick(float dt, const NetInput & input, const Map & map)
 	}
 
 	if (input.moveDirection > 0)
-		m_velocity.x = clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, accel * dt);
+		m_velocity.x = Math::clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, accel * dt);
 	else if (input.moveDirection < 0)
-		m_velocity.x = clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, -accel * dt);
+		m_velocity.x = Math::clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, -accel * dt);
 	else
 		m_velocity.x = m_velocity.x * friction;
 
@@ -172,10 +172,10 @@ void ZombieCore::read(const NetZombie & nz)
 
 void ZombieCore::write(NetZombie & nz) const
 {
-	nz.vel.x = roundToInt(m_velocity.x * 100.f);
-	nz.vel.y = roundToInt(m_velocity.y * 100.f);
-	nz.pos.x = roundToInt(m_position.x * 100.f);
-	nz.pos.y = roundToInt(m_position.y * 100.f);
+	nz.vel.x = Math::roundToInt(m_velocity.x * 100.f);
+	nz.vel.y = Math::roundToInt(m_velocity.y * 100.f);
+	nz.pos.x = Math::roundToInt(m_position.x * 100.f);
+	nz.pos.y = Math::roundToInt(m_position.y * 100.f);
 }
 
 const sf::Vector2f & ZombieCore::getPosition() const
