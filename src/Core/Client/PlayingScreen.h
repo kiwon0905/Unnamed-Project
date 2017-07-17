@@ -78,7 +78,7 @@ private:
 	SnapshotContainer m_snapshots;
 	int m_numReceivedSnapshots = 0;
 	int m_startTick = -1;
-	int m_lastSnapshotTick = -1;
+	int m_lastRecvTick = -1;
 	int m_predictedTick = -1;
 	bool m_repredict = false;
 
@@ -92,7 +92,6 @@ private:
 	sf::RenderTexture m_renderTexture;
 	sf::VertexArray m_tileVertices;
 	sf::View m_view;
-	bool m_debugRender = false;
 
 	struct Particles
 	{
@@ -102,6 +101,8 @@ private:
 	Entity * getEntity(int id);
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 
+
+	void debugRender(const sf::View & playerView, sf::RenderWindow & window);
 public:
 	const PlayerInfo * getPlayerInfo(int entityId);
 	const PlayerInfo & getMyPlayerInfo();

@@ -27,6 +27,7 @@ public:
 	Gui & getGui() { return m_gui; }
 	Input & getInput() { return m_input; }
 
+	bool debugRenderEnabled() { return m_debugRender; }
 private:
 	bool initialize();
 	void finalize();
@@ -39,4 +40,5 @@ private:
 	Gui m_gui;
 	ScreenStack m_screenStack;
 	Input m_input;
+	bool m_debugRender = false;
 };

@@ -19,10 +19,10 @@ public:
 	void write(Packer & packer);
 
 	const std::unordered_map<int, std::unique_ptr<NetObject>> & getEntities() const { return m_entities; }
-	const std::vector<std::unique_ptr<NetObject>> & getEvents() const { return m_events; }
+	const std::vector<std::unique_ptr<NetObject>> & getTransientEntities() const { return m_transientEntities; }
 private:
 	std::unordered_map<int, std::unique_ptr<NetObject>> m_entities;
-	std::vector<std::unique_ptr<NetObject>> m_events;
+	std::vector<std::unique_ptr<NetObject>> m_transientEntities;
 };
 
 struct TickedSnapshot

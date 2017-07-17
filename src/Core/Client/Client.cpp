@@ -34,7 +34,7 @@ bool Client::initialize()
 
 	m_screenStack.push(new LobbyScreen);
 	m_screenStack.applyChanges(*this);
-	m_window.setVerticalSyncEnabled(true);
+	//m_window.setVerticalSyncEnabled(true);
 	//window.setFramerateLimit(300);
 	//window.setMouseCursorGrabbed(true);
 	return true;
@@ -80,6 +80,13 @@ void Client::run()
 				m_screenStack.handleEvent(event, *this);
 			}
 
+			m_input.update();
+
+			if (m_input.isActive({ sf::Keyboard::LControl, sf::Keyboard::LShift, sf::Keyboard::D }))
+			{
+				m_debugRender ^= 1;
+			}
+
 			m_gui.update(dt.asSeconds(), *this);
 
 
@@ -103,12 +110,13 @@ void Client::run()
 			m_screenStack.render(*this);
 			m_gui.render(*this);
 
-			m_window.draw(frameTimeGraph);
+			if(m_debugRender)
+				m_window.draw(frameTimeGraph);
 
 			m_window.display();
 
-			//std::this_thread::sleep_for(std::chrono::microseconds(10));
-			sf::sleep(sf::microseconds(1));
+			std::this_thread::sleep_for(std::chrono::microseconds(10));
+			//sf::sleep(sf::microseconds(1));
 			m_screenStack.applyChanges(*this);
 		}
 	}

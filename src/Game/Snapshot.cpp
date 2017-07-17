@@ -13,7 +13,7 @@ const NetObject * Snapshot::getEntity(int id) const
 
 NetObject * Snapshot::addEntity(NetObject::Type type, int id)
 {
-	if(m_entities.size() + m_events.size() >= MAX_SNAPSHOT_ITEM_SIZE)
+	if(m_entities.size() + m_transientEntities.size() >= MAX_SNAPSHOT_ITEM_SIZE)
 		return nullptr;
 	NetObject * entity = NetObject::create(type);
 	m_entities[id].reset(entity);
@@ -22,10 +22,10 @@ NetObject * Snapshot::addEntity(NetObject::Type type, int id)
 
 NetObject * Snapshot::addEvent(NetObject::Type type)
 {
-	if (m_entities.size() + m_events.size() >= MAX_SNAPSHOT_ITEM_SIZE)
+	if (m_entities.size() + m_transientEntities.size() >= MAX_SNAPSHOT_ITEM_SIZE)
 		return nullptr;
 	NetObject * event = NetObject::create(type);
-	m_events.emplace_back(event);
+	m_transientEntities.emplace_back(event);
 	return event;
 }
 
@@ -51,14 +51,14 @@ void Snapshot::read(Unpacker & unpacker)
 		else
 		{
 			item->read(unpacker);
-			m_events.emplace_back(item);
+			m_transientEntities.emplace_back(item);
 		}
 	}
 }
 
 void Snapshot::write(Packer & packer)
 {
-	packer.pack<0, MAX_SNAPSHOT_ITEM_SIZE>(m_entities.size() + m_events.size());
+	packer.pack<0, MAX_SNAPSHOT_ITEM_SIZE>(m_entities.size() + m_transientEntities.size());
 	
 	for (auto & e : m_entities)
 	{
@@ -66,7 +66,7 @@ void Snapshot::write(Packer & packer)
 		packer.pack<0, MAX_ENTITY_ID>(e.first);
 		e.second->write(packer);
 	}
-	for (auto & e : m_events)
+	for (auto & e : m_transientEntities)
 	{
 		packer.pack(e->getType());
 		e->write(packer);

@@ -28,6 +28,18 @@ public:
 	bool initialize(Client & client);
 	void finalize(Client & client);
 	NetInput getInput(const sf::RenderTarget & target, const sf::Window & window);
+
+	void addKeyCombination(std::vector<sf::Keyboard::Key> keys);
+	bool isActive(std::vector<sf::Keyboard::Key> keys);
+	void update();
 private:
 	std::unordered_map<Control, std::function<bool()>> m_controls;
+
+	struct KeyCombination
+	{
+		std::vector<sf::Keyboard::Key> keys;
+		bool last = false;
+		bool current = false;
+	};
+	std::vector<KeyCombination> m_keyCombinations;
 };

@@ -145,35 +145,7 @@ void PlayingScreen::onEnter(Client & client)
 
 void PlayingScreen::handleEvent(const sf::Event & ev, Client & client)
 {
-	static bool ctrl = false;
-	static bool shift = false;
-	static bool d = false;
-	static sf::Clock lastToggle;
-	if (ev.type == sf::Event::KeyPressed)
-	{
-		if(ev.key.control)
-			ctrl = true;
-		if (ev.key.shift)
-			shift = true;
-		if (ev.key.code == sf::Keyboard::D)
-			d = true;
 
-	}
-	else if (ev.type == sf::Event::KeyReleased)
-	{
-		if (ev.key.control)
-			ctrl = false;
-		if (ev.key.shift)
-			shift = false;
-		if (ev.key.code == sf::Keyboard::D)
-			d = false;
-	}
-	if (ctrl && shift && d && lastToggle.getElapsedTime() > sf::seconds(.2f))
-	{
-		std::cout << "enabled debug";
-		m_debugRender ^= 1;
-		lastToggle.restart();
-	}
 }
 
 void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
@@ -264,13 +236,13 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			int serverTick;
 			unpacker.unpack<0, MAX_TICK>(serverTick);
 
-			if (m_lastSnapshotTick >= serverTick)
+			if (m_lastRecvTick >= serverTick)
 				return;
 
 			Snapshot * snapshot = new Snapshot;
 			snapshot->read(unpacker);
 			m_snapshots.add(snapshot, serverTick);
-			m_lastSnapshotTick = serverTick;
+			m_lastRecvTick = serverTick;
 
 			if (m_state == ENTERING)
 			{
@@ -419,7 +391,7 @@ void PlayingScreen::update(Client & client)
 							
 							
 							
-								for (int t = m_lastSnapshotTick + 1; t <= m_predictedTick; ++t)
+								for (int t = m_lastRecvTick + 1; t <= m_predictedTick; ++t)
 								{
 									//TODO improve
 									NetInput input;
@@ -454,7 +426,10 @@ void PlayingScreen::render(Client & client)
 	sf::Time currentRenderTime = m_renderTime.getElapsedTime();
 	float renderTick = currentRenderTime.asSeconds() * TICKS_PER_SEC;
 
+	static int prevS0Tick = 1;
 	const auto & s = m_snapshots.find(renderTick);
+
+
 	Snapshot * s0 = s.first->snapshot.get();
 	Snapshot * s1 = nullptr;
 	if (s.second)
@@ -465,49 +440,63 @@ void PlayingScreen::render(Client & client)
 	float predT = m_accumulator / sf::seconds(1.f / TICKS_PER_SEC);
 	if (s1)
 		t = (renderTick - s.first->tick) / (s.second->tick - s.first->tick);
+	
+	
+	//transit snapshot
+	if (s.first->tick != prevS0Tick)
+	{
+		//create entities
+		for (auto & p : s0->getEntities())
+		{
+			Entity * e = getEntity(p.first);
+
+			if (!e)
+			{
+				switch (p.second->getType())
+				{
+				case NetObject::HUMAN:
+					e = new Human(p.first, client, *this);
+					break;
+				case NetObject::ZOMBIE:
+					e = new Zombie(p.first, client, *this);
+					break;
+				case NetObject::PROJECTILE:
+					e = new Projectile(p.first, client, *this);
+					break;
+				default:
+					break;
+				}
+				m_entitiesByType[static_cast<int>(e->getType())].emplace_back(e);
+				if (p.first == m_myPlayer.entityId)
+					e->setPrediction(true);
+			}
+		}
+
+		//handle transient entities
+		for (auto & p : s0->getTransientEntities())
+		{
+			
+		}
+
+
+		//delete entities
+		for (auto & v : m_entitiesByType)
+		{
+			for (auto & e : v)
+			{
+				if (!s0->getEntity(e->getId()))
+					e->setAlive(false);
+			}
+		}
+
+		auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
+		for (auto & v : m_entitiesByType)
+			v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
+		m_snapshots.removeUntil(s.first->tick - 1);
+	}
+	prevS0Tick = s.first->tick;
 
 	
-	//create entities
-	for (auto & p : s0->getEntities())
-	{
-		Entity * e = getEntity(p.first);
-
-		if (!e)
-		{
-			switch (p.second->getType())
-			{
-			case NetObject::HUMAN:
-				e = new Human(p.first, client, *this);
-				break;
-			case NetObject::ZOMBIE:
-				e = new Zombie(p.first, client, *this);
-				break;
-			case NetObject::PROJECTILE:
-				e = new Projectile(p.first, client, *this);
-				break;
-			default:
-				break;
-			}
-			m_entitiesByType[static_cast<int>(e->getType())].emplace_back(e);
-			if (p.first == m_myPlayer.entityId)
-				e->setPrediction(true);
-		}
-	}
-
-	//delete entities
-	for (auto & v : m_entitiesByType)
-	{
-		for (auto & e : v)
-		{
-			if (!s0->getEntity(e->getId()))
-				e->setAlive(false);
-		}
-	}
-
-	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
-	for (auto & v : m_entitiesByType)
-		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
-	m_snapshots.removeUntil(s.first->tick - 1);
 	
 	//camera
 	Entity * e = getEntity(m_myPlayer.entityId);
@@ -548,35 +537,6 @@ void PlayingScreen::render(Client & client)
 	states.texture = m_tileTexture;
 	window.draw(m_tileVertices, states);
 
-	if (m_debugRender)
-	{
-		sf::VertexArray arr;
-		arr.setPrimitiveType(sf::Lines);
-		for (int i = 0; i < m_map.getSize().x; ++i)
-		{
-			sf::Vertex v, v2;
-			v.color = sf::Color::Black;
-			v2.color = sf::Color::Black;
-			v.position = sf::Vector2f(i * m_map.getTileSize(), 0.f);
-			v2.position = sf::Vector2f(i * m_map.getTileSize(), m_map.getTileSize() * m_map.getSize().y);
-			arr.append(v);
-			arr.append(v2);
-		}
-		for (int i = 0; i < m_map.getSize().y; ++i)
-		{
-			sf::Vertex v, v2;
-			v.color = sf::Color::Black;
-			v2.color = sf::Color::Black;
-			v.position = sf::Vector2f(0.f, i * m_map.getTileSize());
-			v2.position = sf::Vector2f(m_map.getSize().x * m_map.getTileSize(), i * m_map.getTileSize());
-			arr.append(v);
-			arr.append(v2);
-		}
-		window.draw(arr);
-	}
-
-
-
 	//draw entities
 	for (auto & v : m_entitiesByType)
 	{
@@ -608,13 +568,10 @@ void PlayingScreen::render(Client & client)
 	timeText.setString(minutesString + ":" + secondsString);
 	timeText.setFont(*client.getAssetManager().get<sf::Font>("arial.ttf"));
 	timeText.setPosition(static_cast<int>(client.getWindow().getSize().x / 2.f - timeText.getLocalBounds().width / 2.f), 0.f);
-	client.getWindow().draw(timeText);
+	window.draw(timeText);
 	
-	if (m_debugRender)
-	{
-		client.getWindow().draw(*m_snapshotGraph);
-		client.getWindow().draw(*m_predictionGraph);
-	}
+	if(client.debugRenderEnabled())
+		debugRender(m_view, window);
 }
 
 void PlayingScreen::onExit(Client & client)
@@ -636,6 +593,37 @@ Entity * PlayingScreen::getEntity(int id)
 			if (e->getId() == id)
 				return e.get();
 	return nullptr;
+}
+
+void PlayingScreen::debugRender(const sf::View & playerView, sf::RenderWindow & window)
+{
+	window.setView(playerView);
+	sf::VertexArray arr;
+	arr.setPrimitiveType(sf::Lines);
+	for (int i = 0; i < m_map.getSize().x; ++i)
+	{
+		sf::Vertex v, v2;
+		v.color = sf::Color::Black;
+		v2.color = sf::Color::Black;
+		v.position = sf::Vector2f(i * m_map.getTileSize(), 0.f);
+		v2.position = sf::Vector2f(i * m_map.getTileSize(), m_map.getTileSize() * m_map.getSize().y);
+		arr.append(v);
+		arr.append(v2);
+	}
+	for (int i = 0; i < m_map.getSize().y; ++i)
+	{
+		sf::Vertex v, v2;
+		v.color = sf::Color::Black;
+		v2.color = sf::Color::Black;
+		v.position = sf::Vector2f(0.f, i * m_map.getTileSize());
+		v2.position = sf::Vector2f(m_map.getSize().x * m_map.getTileSize(), i * m_map.getTileSize());
+		arr.append(v);
+		arr.append(v2);
+	}
+	window.draw(arr);
+	window.setView(window.getDefaultView());
+	window.draw(*m_snapshotGraph);
+	window.draw(*m_predictionGraph);
 }
 
 const PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfo(int entityId)

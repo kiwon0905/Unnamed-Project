@@ -11,6 +11,8 @@ bool Input::initialize(Client & client)
 	m_controls[Control::MOVE_DOWN] = std::bind(sf::Keyboard::isKeyPressed, sf::Keyboard::S);
 	m_controls[Control::JUMP] = std::bind(sf::Keyboard::isKeyPressed, sf::Keyboard::Space);
 	m_controls[Control::PRIMARY_FIRE] = std::bind(sf::Mouse::isButtonPressed, sf::Mouse::Left);
+
+	addKeyCombination({ sf::Keyboard::LControl, sf::Keyboard::LShift, sf::Keyboard::D });
 	return true;
 }
 
@@ -47,4 +49,38 @@ NetInput Input::getInput(const sf::RenderTarget & target, const sf::Window & win
 		sendInput.fire = true;
 	prevRawInput = currentRawInput;
 	return sendInput;
+}
+
+void Input::addKeyCombination(std::vector<sf::Keyboard::Key> keys)
+{
+	KeyCombination comb;
+	comb.keys = keys;
+
+	m_keyCombinations.push_back(comb);
+}
+
+bool Input::isActive(std::vector<sf::Keyboard::Key> keys)
+{
+	for (const auto & c : m_keyCombinations)
+		if (c.keys == keys)
+			return c.current;
+
+	return false;
+}
+
+void Input::update()
+{
+	for (auto & c : m_keyCombinations)
+	{
+		bool currentActive = sf::Keyboard::isKeyPressed(c.keys[0]);
+	
+		for (auto key : c.keys)
+		{
+			currentActive = currentActive && sf::Keyboard::isKeyPressed(key);
+		}
+
+		c.current = (currentActive && !c.last);
+		c.last = currentActive;
+
+	}
 }
