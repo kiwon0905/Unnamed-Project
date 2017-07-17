@@ -140,7 +140,7 @@ void PlayingScreen::onEnter(Client & client)
 	m_snapshotGraph->setPosition({ 0.f, 300.f });
 
 
-	m_particles.smoke = std::make_unique<SmokeParticles>(*client.getAssetManager().get<sf::Texture>("particle.png"));
+	m_particles.smoke = std::make_unique<SmokeParticles>(*client.getAssetManager().get<sf::Texture>("assets/particle.png"));
 }
 
 void PlayingScreen::handleEvent(const sf::Event & ev, Client & client)

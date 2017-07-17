@@ -10,7 +10,7 @@
 	#endif
 #endif
 
-/*
+
 #include "Core/Utility.h"
 #include "Core/Client/Particles.h"
 int main()
@@ -20,9 +20,9 @@ int main()
 #endif
 	Client client;
 	client.run();
-}*/
+}
 
-
+/*
 
 #include "Core/Rle.h"
 int main()
@@ -50,4 +50,4 @@ int main()
 	packer3.p();
 	std::cin.get();
 	return 0;
-}
+}*/
