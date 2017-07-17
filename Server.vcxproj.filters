@@ -96,6 +96,9 @@
     <ClInclude Include="src\Game\Server\GameContext\Normal.h">
       <Filter>Game\Server</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\Rle.h">
+      <Filter>Core\Shared</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game\Server\GameWorld.cpp">
@@ -163,6 +166,9 @@
     </ClCompile>
     <ClCompile Include="src\Game\Server\GameContext\Normal.cpp">
       <Filter>Game\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Rle.cpp">
+      <Filter>Core\Shared</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

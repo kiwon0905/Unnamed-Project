@@ -98,6 +98,9 @@ void GameContext::onDisconnect(const ENetPeer & peer)
 		return ptr->getENetPeer() == &peer;
 	};
 	m_peers.erase(std::remove_if(m_peers.begin(), m_peers.end(), pred), m_peers.end());
+
+	if (m_peers.empty())
+		reset();
 }
 
 void GameContext::update()

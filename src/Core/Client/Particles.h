@@ -40,7 +40,6 @@ private:
 
 class Particles : public sf::Drawable
 {
-	friend class ParticleEmitter;
 public:
 	Particles(const sf::Texture & texture);
 
@@ -52,8 +51,8 @@ public:
 	
 	virtual void updateParticle(Particle & p, float dt);
 
-private:
 	Particle & emit();
+private:
 	const sf::Texture * m_texture;
 	std::vector<Particle> m_particles;
 	std::vector<std::unique_ptr<ParticleEmitter>> m_emitters;

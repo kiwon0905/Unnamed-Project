@@ -46,7 +46,6 @@ void ParticleEmitter::update(float dt, Particles & particles)
 	}
 	m_accumulator -= count;
 
-	std::cout << "dt: " << dt << "\, count: " << count << "\n";
 }
 
 Particles::Particles(const sf::Texture & texture):

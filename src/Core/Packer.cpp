@@ -184,6 +184,37 @@ void Unpacker::align()
 	}
 }
 
+void Unpacker::peek8(std::uint8_t & data, std::size_t bits)
+{
+	check(bits);
+
+	if (bits == 0)
+		return;
+	data = 0;
+	std::size_t firstBits = std::min(8 - m_bitPos, bits);
+	data = m_data[m_byteIndex] >> (8 - firstBits - m_bitPos);
+	data &= (std::uint8_t(1) << firstBits) - 1;
+
+
+	/*m_bitPos += bits;
+	if (m_bitPos >= 8)
+	{
+		m_bitPos -= 8;
+		m_byteIndex++;
+	}*/
+
+	bits -= firstBits;
+
+	if (bits > 0)
+	{
+		data <<= bits;
+		std::uint8_t secondVal = m_data[m_byteIndex];
+		secondVal &= 0xFF << (8 - bits);
+		secondVal >>= (8 - bits);
+		data |= secondVal;
+	}
+}
+
 void Unpacker::unpack8(std::uint8_t & data, std::size_t bits)
 {
 	check(bits);

@@ -61,12 +61,13 @@ public:
 			std::cout << std::bitset<8>(c) << " ";
 		std::cout << "\n";
 	}
-private:
 	void align();
 	void pack8(std::uint8_t data, std::size_t bits);
 	void pack16(std::uint16_t data, std::size_t bits);
 	void pack32(std::uint32_t data, std::size_t bits);
 	void pack64(std::uint64_t data, std::size_t bits);
+private:
+
 	std::vector<std::uint8_t> m_data;
 	std::size_t m_bitPos;
 };
@@ -101,12 +102,14 @@ public:
 
 	template <typename T>
 	std::enable_if_t<std::is_enum<T>::value> unpack(T & data);
-private:
 	void align();
+	void peek8(std::uint8_t & data, std::size_t bits);
 	void unpack8(std::uint8_t & data, std::size_t bits);
 	void unpack16(std::uint16_t & data, std::size_t bits);
 	void unpack32(std::uint32_t & data, std::size_t bits);
 	void unpack64(std::uint64_t & data, std::size_t bits);
+private:
+
 	void check(std::size_t bits);
 	const std::uint8_t * m_data;
 	std::size_t m_size;

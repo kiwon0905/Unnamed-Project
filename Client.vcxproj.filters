@@ -117,6 +117,9 @@
     <ClInclude Include="src\Core\Client\Particles.h">
       <Filter>Core\Client</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\Rle.h">
+      <Filter>Core\Shared</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Client\Client.cpp">
@@ -205,6 +208,9 @@
     </ClCompile>
     <ClCompile Include="src\Core\Client\Particles.cpp">
       <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Rle.cpp">
+      <Filter>Core\Shared</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
