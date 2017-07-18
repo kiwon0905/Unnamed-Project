@@ -426,12 +426,19 @@ void PlayingScreen::render(Client & client)
 	sf::Time currentRenderTime = m_renderTime.getElapsedTime();
 	float renderTick = currentRenderTime.asSeconds() * TICKS_PER_SEC;
 
-	static int prevS0Tick = 1;
+	static int prevTick = -1;
+	static int currentTick = -1;
+	static int nextTick = -1;
+
 	const auto & s = m_snapshots.find(renderTick);
+	const Snapshot * s0 = s.first->snapshot.get();
+	const Snapshot * s1 = nullptr;
+
+	prevTick = currentTick;
+	currentTick = s.first->tick;
+	nextTick = s.second->tick;
 
 
-	Snapshot * s0 = s.first->snapshot.get();
-	Snapshot * s1 = nullptr;
 	if (s.second)
 		s1 = s.second->snapshot.get();
 
@@ -443,7 +450,7 @@ void PlayingScreen::render(Client & client)
 	
 	
 	//transit snapshot
-	if (s.first->tick != prevS0Tick)
+	if (currentTick != prevTick)
 	{
 		//create entities
 		for (auto & p : s0->getEntities())
@@ -471,11 +478,13 @@ void PlayingScreen::render(Client & client)
 					e->setPrediction(true);
 			}
 		}
-
 		//handle transient entities
 		for (auto & p : s0->getTransientEntities())
 		{
-			
+			if (p->getType() == NetObject::EXPLOSION)
+			{
+				std::cout << "explosion!\n";
+			}
 		}
 
 
@@ -492,9 +501,9 @@ void PlayingScreen::render(Client & client)
 		auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
 		for (auto & v : m_entitiesByType)
 			v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
-		m_snapshots.removeUntil(s.first->tick - 1);
+		m_snapshots.removeUntil(prevTick);
 	}
-	prevS0Tick = s.first->tick;
+
 
 	
 	

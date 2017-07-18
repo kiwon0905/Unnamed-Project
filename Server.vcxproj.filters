@@ -19,6 +19,12 @@
     <Filter Include="Game\Shared">
       <UniqueIdentifier>{6a3e3ceb-61ef-4d1c-ab9a-ba605663631b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Server\GameContext">
+      <UniqueIdentifier>{e3aa29e4-3e46-4d15-baf0-63e2239b6a6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Server\Entity">
+      <UniqueIdentifier>{7753812d-b963-4a80-b29a-325c1348be6e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Game\Server\Entity.h">
@@ -29,9 +35,6 @@
     </ClInclude>
     <ClInclude Include="src\Core\Server\Server.h">
       <Filter>Core\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Game\Server\Human.h">
-      <Filter>Game\Server</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Server\Peer.h">
       <Filter>Core\Server</Filter>
@@ -69,14 +72,8 @@
     <ClInclude Include="src\Game\Snapshot.h">
       <Filter>Core\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\Server\Projectile.h">
-      <Filter>Game\Server</Filter>
-    </ClInclude>
     <ClInclude Include="src\Game\GameCore.h">
       <Filter>Game\Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Game\Server\Zombie.h">
-      <Filter>Game\Server</Filter>
     </ClInclude>
     <ClInclude Include="src\Game\Map.h">
       <Filter>Game\Shared</Filter>
@@ -90,14 +87,26 @@
     <ClInclude Include="src\Game\Server\GameContext.h">
       <Filter>Game\Server</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\Server\GameContext\Infection.h">
-      <Filter>Game\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Game\Server\GameContext\Normal.h">
-      <Filter>Game\Server</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\Rle.h">
       <Filter>Core\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Server\GameContext\Infection.h">
+      <Filter>Game\Server\GameContext</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Server\GameContext\Normal.h">
+      <Filter>Game\Server\GameContext</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Server\Entity\Human.h">
+      <Filter>Game\Server\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Server\Entity\Projectile.h">
+      <Filter>Game\Server\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Server\Entity\Zombie.h">
+      <Filter>Game\Server\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Server\Entity\TransientEntities.h">
+      <Filter>Game\Server\Entity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -111,9 +120,6 @@
       <Filter>Core\Server</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\Server\Entity.cpp">
-      <Filter>Game\Server</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Game\Server\Human.cpp">
       <Filter>Game\Server</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Server\Peer.cpp">
@@ -137,14 +143,8 @@
     <ClCompile Include="src\Game\Snapshot.cpp">
       <Filter>Core\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Server\Projectile.cpp">
-      <Filter>Game\Server</Filter>
-    </ClCompile>
     <ClCompile Include="src\Game\GameCore.cpp">
       <Filter>Game\Shared</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Game\Server\Zombie.cpp">
-      <Filter>Game\Server</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\Map.cpp">
       <Filter>Game\Shared</Filter>
@@ -161,14 +161,26 @@
     <ClCompile Include="src\Core\Utility.cpp">
       <Filter>Core\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Server\GameContext\Infection.cpp">
-      <Filter>Game\Server</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Game\Server\GameContext\Normal.cpp">
-      <Filter>Game\Server</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Rle.cpp">
       <Filter>Core\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Server\GameContext\Infection.cpp">
+      <Filter>Game\Server\GameContext</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Server\GameContext\Normal.cpp">
+      <Filter>Game\Server\GameContext</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Server\Entity\Human.cpp">
+      <Filter>Game\Server\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Server\Entity\Projectile.cpp">
+      <Filter>Game\Server\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Server\Entity\Zombie.cpp">
+      <Filter>Game\Server\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Server\Entity\TransientEntities.cpp">
+      <Filter>Game\Server\Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

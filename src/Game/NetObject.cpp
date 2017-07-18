@@ -11,6 +11,8 @@ NetObject * NetObject::create(Type type)
 		return new NetZombie;
 	case NetObject::PROJECTILE:
 		return new NetProjectile;
+	case NetObject::EXPLOSION:
+		return new NetExplosion;
 	default:
 		return nullptr;
 	}
@@ -81,4 +83,21 @@ void NetZombie::read(Unpacker & unpacker)
 NetObject::Type NetZombie::getType() const
 {
 	return Type::ZOMBIE;
+}
+
+void NetExplosion::write(Packer & packer) const
+{
+	packer.pack<0, 500000>(pos.x);
+	packer.pack<0, 500000>(pos.y);
+}
+
+void NetExplosion::read(Unpacker & unpacker)
+{
+	unpacker.unpack<0, 500000>(pos.x);
+	unpacker.unpack<0, 500000>(pos.y);
+}
+
+NetExplosion::Type NetExplosion::getType() const
+{
+	return NetObject::EXPLOSION;
 }

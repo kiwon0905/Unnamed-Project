@@ -13,6 +13,7 @@ struct NetObject
 		ZOMBIE,
 		PROJECTILE,
 		ENTITY_COUNT,
+		EXPLOSION,
 		COUNT
 	};
 	static NetObject * create(Type type);
@@ -48,6 +49,14 @@ struct NetZombie : public NetObject
 };
 
 struct NetProjectile : public NetObject
+{
+	void write(Packer & packer) const;
+	void read(Unpacker & unpacker);
+	Type getType() const;
+	sf::Vector2i pos;
+};
+
+struct NetExplosion : public NetObject
 {
 	void write(Packer & packer) const;
 	void read(Unpacker & unpacker);

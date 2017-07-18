@@ -1,10 +1,10 @@
 #include "Human.h"
 #include "Projectile.h"
-#include "GameWorld.h"
 #include "Game/GameConfig.h"
 #include "Game/Netinput.h"
 #include "Game/NetObject.h"
 #include "Game/Server/GameContext.h"
+#include "Game/Server/GameWorld.h"
 #include "Core/Utility.h"
 #include "Core/Server/Peer.h"
 

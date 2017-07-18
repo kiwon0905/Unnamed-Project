@@ -1,8 +1,8 @@
 #include "Zombie.h"
-#include "GameWorld.h"
+#include "Game/Server/GameContext.h"
+#include "Game/Server/GameWorld.h"
 #include "Core/Utility.h"
 #include "Core/Server/Peer.h"
-#include "Game/Server/GameContext.h"
 
 Zombie::Zombie(int id, GameContext * context, int peerId):
 	Entity(id, EntityType::ZOMBIE, context),

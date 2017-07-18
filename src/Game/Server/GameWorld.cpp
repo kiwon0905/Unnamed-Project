@@ -4,10 +4,10 @@
 #include "Core/ENetUtility.h"
 #include "Core/Logger.h"
 
-#include "Human.h"
-#include "Projectile.h"
-#include <iostream>
-#include <bitset>
+#include "Entity/Human.h"
+#include "Entity/Zombie.h"
+#include "Entity/Projectile.h"
+
 
 GameWorld::GameWorld(GameContext * context):
 	m_context(context)
@@ -31,8 +31,11 @@ void GameWorld::reset()
 
 void GameWorld::tick()
 {
-	for (Entity * e : m_newEntities)
-		m_entitiesByType[static_cast<int>(e->getType())].emplace_back(e);
+	for (auto & e : m_newEntities)
+	{
+		Entity * entity = e.release();
+		m_entitiesByType[static_cast<int>(entity->getType())].emplace_back(entity);
+	}
 	m_newEntities.clear();
 
 	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
@@ -51,6 +54,10 @@ void GameWorld::snap(Packer & packer)
 	for (const auto & v : m_entitiesByType)
 		for (const auto & e : v)
 			e->snap(snapshot);
+
+	for (const auto & e : m_transientEntities)
+		e->snap(snapshot);
+	m_transientEntities.clear();
 	snapshot.write(packer);
 }
 

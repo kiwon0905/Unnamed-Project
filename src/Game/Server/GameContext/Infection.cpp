@@ -1,5 +1,6 @@
 #include "Infection.h"
 
+#include "Game/Server/Entity/Human.h"
 void Infection::startRound()
 {
 	m_state = LOADING;

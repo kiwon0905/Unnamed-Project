@@ -36,3 +36,10 @@ protected:
 	sf::Vector2f m_size;
 	GameContext * m_context;
 };
+
+class TransientEntity
+{
+public:
+	virtual void snap(Snapshot & snapshot) const = 0;
+	virtual ~TransientEntity() {}
+};

@@ -1,7 +1,9 @@
 
 #include "Projectile.h"
-#include "GameWorld.h"
-#include "GameContext.h"
+#include "Human.h"
+#include "TransientEntities.h"
+#include "Game/Server/GameWorld.h"
+#include "Game/Server/GameContext.h"
 #include "Game/NetObject.h"
 #include "Game/Map.h"
 #include "Core/Server/Peer.h"
@@ -61,6 +63,8 @@ void Projectile::tick(float dt)
 		m_alive = false;
 		if (hitEntity)
 			hitEntity->takeDamage(10);
+
+		m_context->getWorld().createTransientEntity<Explosion>(sf::Vector2f(0.f, 0.f));
 	}
 
 	d *= minTime;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Entity.h"
+#include "Game/Server/Entity.h"
 
 class Projectile : public Entity
 {
