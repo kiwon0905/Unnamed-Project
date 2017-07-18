@@ -78,9 +78,9 @@ void Client::run()
 					m_screenStack.clear();
 				m_gui.handleEvent(event);
 				m_screenStack.handleEvent(event, *this);
+				m_input.handleEvent(event);
 			}
 
-			m_input.update();
 
 			if (m_input.isActive({ sf::Keyboard::LControl, sf::Keyboard::LShift, sf::Keyboard::D }))
 			{

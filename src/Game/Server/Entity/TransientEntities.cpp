@@ -5,7 +5,6 @@
 Explosion::Explosion(const sf::Vector2f & pos):
 	m_position(pos)
 {
-	std::cout << "hi!";
 }
 
 void Explosion::snap(Snapshot & snapshot) const

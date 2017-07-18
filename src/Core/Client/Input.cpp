@@ -5,14 +5,18 @@
  
 bool Input::initialize(Client & client)
 {
-	m_controls[Control::MOVE_LEFT] = std::bind(sf::Keyboard::isKeyPressed, sf::Keyboard::A);
-	m_controls[Control::MOVE_RIGHT] = std::bind(sf::Keyboard::isKeyPressed, sf::Keyboard::D);
-	m_controls[Control::MOVE_UP] = std::bind(sf::Keyboard::isKeyPressed, sf::Keyboard::W);
-	m_controls[Control::MOVE_DOWN] = std::bind(sf::Keyboard::isKeyPressed, sf::Keyboard::S);
-	m_controls[Control::JUMP] = std::bind(sf::Keyboard::isKeyPressed, sf::Keyboard::Space);
-	m_controls[Control::PRIMARY_FIRE] = std::bind(sf::Mouse::isButtonPressed, sf::Mouse::Left);
+
+	m_controls[Control::MOVE_LEFT] = std::bind(&Input::getKeyState, this, sf::Keyboard::A);
+	m_controls[Control::MOVE_RIGHT] = std::bind(&Input::getKeyState, this, sf::Keyboard::D);
+	m_controls[Control::MOVE_UP] = std::bind(&Input::getKeyState, this, sf::Keyboard::W);
+	m_controls[Control::MOVE_DOWN] = std::bind(&Input::getKeyState, this, sf::Keyboard::S);
+
+	m_controls[Control::JUMP] = [this]() {return isActive({ sf::Keyboard::Space }); };
+	m_controls[Control::PRIMARY_FIRE] = [this]() {return isActive({}, { sf::Mouse::Left }); };
 
 	addKeyCombination({ sf::Keyboard::LControl, sf::Keyboard::LShift, sf::Keyboard::D });
+	addKeyCombination({ sf::Keyboard::Space });
+	addKeyCombination({}, { sf::Mouse::Left });
 	return true;
 }
 
@@ -20,12 +24,11 @@ void Input::finalize(Client & client)
 {
 }
 
-NetInput Input::getInput(const sf::RenderTarget & target, const sf::Window & window)
+NetInput Input::getInput(const sf::RenderTarget & target, const sf::View & view)
 {
-	static NetInput prevRawInput;
 	NetInput currentRawInput;
-	currentRawInput.aimDirection = target.mapPixelToCoords(sf::Mouse::getPosition(window));
-	if (window.hasFocus())
+	currentRawInput.aimDirection = target.mapPixelToCoords(m_mousePosition, view);
+
 	{
 		if (m_controls[Control::MOVE_LEFT]())
 			currentRawInput.moveDirection--;
@@ -38,49 +41,76 @@ NetInput Input::getInput(const sf::RenderTarget & target, const sf::Window & win
 			currentRawInput.vMoveDirection++;
 
 
+
 		currentRawInput.jump = m_controls[Control::JUMP]();
 		currentRawInput.fire = m_controls[Control::PRIMARY_FIRE]();
 	}
-	NetInput sendInput = currentRawInput;
-	sendInput.fire = sendInput.jump = false;
-	if (currentRawInput.jump && !prevRawInput.jump)
-		sendInput.jump = true;
-	if (currentRawInput.fire && !prevRawInput.fire)
-		sendInput.fire = true;
-	prevRawInput = currentRawInput;
-	return sendInput;
+	return currentRawInput;
+
 }
 
-void Input::addKeyCombination(std::vector<sf::Keyboard::Key> keys)
+void Input::addKeyCombination(const std::unordered_set<sf::Keyboard::Key> & keys, const std::unordered_set<sf::Mouse::Button> & buttons)
 {
 	KeyCombination comb;
 	comb.keys = keys;
+	comb.buttons = buttons;
 
 	m_keyCombinations.push_back(comb);
 }
 
-bool Input::isActive(std::vector<sf::Keyboard::Key> keys)
+bool Input::isActive(const std::unordered_set<sf::Keyboard::Key> & keys, const std::unordered_set<sf::Mouse::Button> & buttons)
 {
-	for (const auto & c : m_keyCombinations)
-		if (c.keys == keys)
+	for (auto & c : m_keyCombinations)
+	{
+		if (c.keys == keys && c.buttons == buttons)
+		{
+
+			bool currentActive = true;
+			for (auto key : c.keys)
+			{
+				currentActive = currentActive && m_activeKeys[key];
+			}
+			for (auto button : c.buttons)
+			{
+				currentActive = currentActive && m_activeButtons[button];
+			}
+
+			c.current = (currentActive && !c.last);
+			c.last = currentActive;
 			return c.current;
+		}
+
+	}
 
 	return false;
 }
 
-void Input::update()
+void Input::handleEvent(const sf::Event & event)
 {
-	for (auto & c : m_keyCombinations)
+	if (event.type == sf::Event::KeyPressed)
 	{
-		bool currentActive = sf::Keyboard::isKeyPressed(c.keys[0]);
-	
-		for (auto key : c.keys)
-		{
-			currentActive = currentActive && sf::Keyboard::isKeyPressed(key);
-		}
-
-		c.current = (currentActive && !c.last);
-		c.last = currentActive;
-
+		m_activeKeys[event.key.code] = true;
 	}
+	else if (event.type == sf::Event::KeyReleased)
+	{
+		m_activeKeys[event.key.code] = false;
+	}
+	else if (event.type == sf::Event::MouseButtonPressed)
+	{
+		m_activeButtons[event.mouseButton.button] = true;
+	}
+	else if (event.type == sf::Event::MouseButtonReleased)
+	{
+		m_activeButtons[event.mouseButton.button] = false;
+	}
+	else if (event.type == sf::Event::MouseMoved)
+	{
+		m_mousePosition.x = event.mouseMove.x;
+		m_mousePosition.y = event.mouseMove.y;
+	}
+}
+
+bool Input::getKeyState(sf::Keyboard::Key key)
+{
+	return  m_activeKeys[key];
 }

@@ -14,6 +14,7 @@ enum class Msg
 	CL_LOAD_COMPLETE,
 	CL_READY,
 	CL_INPUT,
+	CL_CHAT,
 
 
 
@@ -28,18 +29,13 @@ enum class Msg
 	SV_SNAPSHOT,
 	SV_INPUT_TIMING,
 	SV_ROUND_OVER,
+	SV_CHAT,
 
 	//master -> client
 	MSV_INTERNET_SERVER_LIST,
 
 	INVALID,
 	COUNT
-};
-
-
-struct GameInfo
-{
-
 };
 
 //Master server 

@@ -334,6 +334,7 @@ void PlayingScreen::update(Client & client)
 		m_prevPredictedTime = current;
 		m_accumulator += dt;
 
+
 		int i = 0;
 		while (m_accumulator >= sf::seconds(1.f / TICKS_PER_SEC))
 		{
@@ -342,10 +343,11 @@ void PlayingScreen::update(Client & client)
 
 			m_predictedTick++;
 
+
 			//read input
-			client.getWindow().setView(m_view);
-			NetInput input = client.getInput().getInput(client.getWindow(), client.getWindow());
-			client.getWindow().setView(client.getWindow().getDefaultView());
+
+			NetInput input = client.getInput().getInput(client.getWindow(), m_view);
+
 			input.tick = m_predictedTick;
 			m_inputs[m_currentInputIndex].input = input;
 			m_inputs[m_currentInputIndex].predictedTime = current;

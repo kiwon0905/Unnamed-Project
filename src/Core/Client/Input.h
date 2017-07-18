@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include <functional>
 
+#include <unordered_set>
+
 enum Control
 {
 	JUMP = 1 << 0,
@@ -24,22 +26,30 @@ class Client;
 class Input
 {
 public:
-
 	bool initialize(Client & client);
 	void finalize(Client & client);
-	NetInput getInput(const sf::RenderTarget & target, const sf::Window & window);
+	NetInput getInput(const sf::RenderTarget & target, const sf::View & view);
 
-	void addKeyCombination(std::vector<sf::Keyboard::Key> keys);
-	bool isActive(std::vector<sf::Keyboard::Key> keys);
-	void update();
+	void addKeyCombination(const std::unordered_set<sf::Keyboard::Key> & keys, const std::unordered_set<sf::Mouse::Button> & buttons = {});
+	bool isActive(const std::unordered_set<sf::Keyboard::Key> & keys, const std::unordered_set<sf::Mouse::Button> & buttons = {});
+
+	void handleEvent(const sf::Event & event);
 private:
 	std::unordered_map<Control, std::function<bool()>> m_controls;
-
+	
+	bool getKeyState(sf::Keyboard::Key key);
+	
+	bool m_activeKeys[sf::Keyboard::KeyCount] = { false };
+	bool m_activeButtons[sf::Mouse::ButtonCount] = { false };
+	sf::Vector2i m_mousePosition;
 	struct KeyCombination
 	{
-		std::vector<sf::Keyboard::Key> keys;
+		std::unordered_set<sf::Keyboard::Key> keys;
+		std::unordered_set<sf::Mouse::Button> buttons;
 		bool last = false;
 		bool current = false;
 	};
+
 	std::vector<KeyCombination> m_keyCombinations;
+
 };
