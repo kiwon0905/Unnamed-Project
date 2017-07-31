@@ -26,26 +26,26 @@ void Input::finalize(Client & client)
 
 NetInput Input::getInput(const sf::RenderTarget & target, const sf::View & view)
 {
-	NetInput currentRawInput;
-	currentRawInput.aimDirection = target.mapPixelToCoords(m_mousePosition, view);
+	NetInput input;
+	input.aimDirection = target.mapPixelToCoords(m_mousePosition, view);
 
 	{
 		if (m_controls[Control::MOVE_LEFT]())
-			currentRawInput.moveDirection--;
+			input.moveDirection--;
 		if (m_controls[Control::MOVE_RIGHT]())
-			currentRawInput.moveDirection++;
+			input.moveDirection++;
 
 		if (m_controls[Control::MOVE_UP]())
-			currentRawInput.vMoveDirection--;
+			input.vMoveDirection--;
 		if (m_controls[Control::MOVE_DOWN]())
-			currentRawInput.vMoveDirection++;
+			input.vMoveDirection++;
 
 
 
-		currentRawInput.jump = m_controls[Control::JUMP]();
-		currentRawInput.fire = m_controls[Control::PRIMARY_FIRE]();
+		input.jump = m_controls[Control::JUMP]();
+		input.fire = m_controls[Control::PRIMARY_FIRE]();
 	}
-	return currentRawInput;
+	return input;
 
 }
 
@@ -87,27 +87,41 @@ bool Input::isActive(const std::unordered_set<sf::Keyboard::Key> & keys, const s
 
 void Input::handleEvent(const sf::Event & event)
 {
-	if (event.type == sf::Event::KeyPressed)
+
+	if (event.type == sf::Event::LostFocus)
 	{
-		m_activeKeys[event.key.code] = true;
+		m_hasFocus = false;
 	}
-	else if (event.type == sf::Event::KeyReleased)
+	else if (event.type == sf::Event::GainedFocus)
 	{
-		m_activeKeys[event.key.code] = false;
+		m_hasFocus = true;
 	}
-	else if (event.type == sf::Event::MouseButtonPressed)
+
+	if (m_hasFocus)
 	{
-		m_activeButtons[event.mouseButton.button] = true;
+		if (event.type == sf::Event::KeyPressed)
+		{
+			m_activeKeys[event.key.code] = true;
+		}
+		else if (event.type == sf::Event::KeyReleased)
+		{
+			m_activeKeys[event.key.code] = false;
+		}
+		else if (event.type == sf::Event::MouseButtonPressed)
+		{
+			m_activeButtons[event.mouseButton.button] = true;
+		}
+		else if (event.type == sf::Event::MouseButtonReleased)
+		{
+			m_activeButtons[event.mouseButton.button] = false;
+		}
+		else if (event.type == sf::Event::MouseMoved)
+		{
+			m_mousePosition.x = event.mouseMove.x;
+			m_mousePosition.y = event.mouseMove.y;
+		}
 	}
-	else if (event.type == sf::Event::MouseButtonReleased)
-	{
-		m_activeButtons[event.mouseButton.button] = false;
-	}
-	else if (event.type == sf::Event::MouseMoved)
-	{
-		m_mousePosition.x = event.mouseMove.x;
-		m_mousePosition.y = event.mouseMove.y;
-	}
+
 }
 
 bool Input::getKeyState(sf::Keyboard::Key key)

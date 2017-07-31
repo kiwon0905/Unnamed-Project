@@ -22,9 +22,6 @@ bool Client::initialize()
 	if (!m_network.initialize(*this))
 		return false;
 	
-	if (!m_gui.initialize(*this))
-		return false;
-
 	if (!m_screenStack.initialize(*this))
 		return false;
 
@@ -37,6 +34,7 @@ bool Client::initialize()
 	//m_window.setVerticalSyncEnabled(true);
 	//window.setFramerateLimit(300);
 	//window.setMouseCursorGrabbed(true);
+
 	return true;
 }
 
@@ -76,18 +74,19 @@ void Client::run()
 			{
 				if (event.type == sf::Event::Closed)
 					m_screenStack.clear();
-				m_gui.handleEvent(event);
+				m_desktop.HandleEvent(event);
 				m_screenStack.handleEvent(event, *this);
 				m_input.handleEvent(event);
-			}
 
+				
+			}
 
 			if (m_input.isActive({ sf::Keyboard::LControl, sf::Keyboard::LShift, sf::Keyboard::D }))
 			{
 				m_debugRender ^= 1;
 			}
 
-			m_gui.update(dt.asSeconds(), *this);
+			m_desktop.Update(dt.asSeconds());
 
 
 			m_network.update();
@@ -108,7 +107,8 @@ void Client::run()
 			
 			m_window.clear();
 			m_screenStack.render(*this);
-			m_gui.render(*this);
+			m_gui.Display(m_window);
+
 
 			if(m_debugRender)
 				m_window.draw(frameTimeGraph);
@@ -127,7 +127,6 @@ void Client::finalize()
 {
 	m_input.finalize(*this);
 	m_screenStack.finalize(*this);
-	m_gui.finalize(*this);
 	m_network.finalize(*this);
 }
 

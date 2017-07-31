@@ -69,7 +69,8 @@ void Human::render(const Snapshot * from, const Snapshot * to, float predictedT,
 	float aimAngle;
 	if (m_predicted)
 	{
-		sf::Vector2f aim = target.mapPixelToCoords(sf::Mouse::getPosition(target)) - (body.getPosition() + body.getSize() / 2.f);
+		sf::Vector2i mousePos = m_client->getInput().getMousePosition();
+		sf::Vector2f aim = target.mapPixelToCoords(mousePos) - (body.getPosition() + body.getSize() / 2.f);
 		aimAngle = atan2f(aim.y, aim.x) * 180.f / Math::PI;
 	}
 	else

@@ -32,7 +32,7 @@ public:
 
 	void addKeyCombination(const std::unordered_set<sf::Keyboard::Key> & keys, const std::unordered_set<sf::Mouse::Button> & buttons = {});
 	bool isActive(const std::unordered_set<sf::Keyboard::Key> & keys, const std::unordered_set<sf::Mouse::Button> & buttons = {});
-
+	sf::Vector2i getMousePosition() { return m_mousePosition; }
 	void handleEvent(const sf::Event & event);
 private:
 	std::unordered_map<Control, std::function<bool()>> m_controls;
@@ -42,6 +42,7 @@ private:
 	bool m_activeKeys[sf::Keyboard::KeyCount] = { false };
 	bool m_activeButtons[sf::Mouse::ButtonCount] = { false };
 	sf::Vector2i m_mousePosition;
+	bool m_hasFocus;
 	struct KeyCombination
 	{
 		std::unordered_set<sf::Keyboard::Key> keys;

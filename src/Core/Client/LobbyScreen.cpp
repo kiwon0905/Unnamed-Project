@@ -1,6 +1,7 @@
 #include "LobbyScreen.h"
 #include "Client.h"
 #include "RoomScreen.h"
+
 #include "Core/Logger.h"
 #include "Core/Packer.h"
 #include "Core/Protocol.h"
@@ -177,8 +178,17 @@ void LobbyScreen::loadUi(Client & client)
 	m_window->Add(m_notebook);
 
 
-	auto & desktop = client.getGui().getDesktop();
+	auto & desktop = client.getDesktop();
 	desktop.Add(m_window);
+
+
+
+
+
+
+
+
+
 }
 
 void LobbyScreen::hideUi(Client & client)

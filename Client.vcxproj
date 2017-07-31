@@ -19,12 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Core\Client\AnimatedSprite.h" />
     <ClInclude Include="src\Core\Client\Particles.h" />
     <ClInclude Include="src\Core\Client\SoundPlayer.h" />
     <ClInclude Include="src\Core\Client\Client.h" />
     <ClInclude Include="src\Core\Client\Graph.h" />
-    <ClInclude Include="src\Core\Client\Gui.h" />
     <ClInclude Include="src\Core\Client\Input.h" />
     <ClInclude Include="src\Core\Client\LobbyScreen.h" />
     <ClInclude Include="src\Core\Client\Network.h" />
@@ -54,13 +52,11 @@
     <ClInclude Include="src\Game\Snapshot.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Core\Client\AnimatedSprite.cpp" />
     <ClCompile Include="src\Core\Client\Particles.cpp" />
     <ClCompile Include="src\Core\Client\SoundPlayer.cpp" />
     <ClCompile Include="src\Core\Client\Client.cpp" />
     <ClCompile Include="src\Core\Client\ClientMain.cpp" />
     <ClCompile Include="src\Core\Client\Graph.cpp" />
-    <ClCompile Include="src\Core\Client\Gui.cpp" />
     <ClCompile Include="src\Core\Client\Input.cpp" />
     <ClCompile Include="src\Core\Client\LobbyScreen.cpp" />
     <ClCompile Include="src\Core\Client\Network.cpp" />

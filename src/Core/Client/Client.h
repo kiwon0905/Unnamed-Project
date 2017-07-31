@@ -4,14 +4,12 @@
 #include "AssetManager.h"
 #include "SoundPlayer.h"
 #include "Network.h"
-#include "Gui.h"
 #include "ScreenStack.h"
 #include "Input.h"
-
 #include "Core/Parser.h"
 #include <SFML/Graphics.hpp>
-#include <memory>
-
+#include <SFGUI/SFGUI.hpp>
+#include <SFGUI/Desktop.hpp>
 
 class Client
 {
@@ -24,7 +22,7 @@ public:
 	SoundPlayer & getSoundPlayer() { return m_soundPlayer; }
 	Network & getNetwork() { return m_network; }
 	ScreenStack & getScreenStack() { return m_screenStack; }
-	Gui & getGui() { return m_gui; }
+	sfg::Desktop & getDesktop() { return m_desktop; }
 	Input & getInput() { return m_input; }
 
 	bool debugRenderEnabled() { return m_debugRender; }
@@ -37,7 +35,8 @@ private:
 	AssetManager m_assetManager;
 	SoundPlayer m_soundPlayer;
 	Network m_network;
-	Gui m_gui;
+	sfg::Desktop m_desktop;
+	sfg::SFGUI m_gui;
 	ScreenStack m_screenStack;
 	Input m_input;
 	bool m_debugRender = false;
