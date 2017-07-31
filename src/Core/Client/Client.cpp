@@ -35,6 +35,7 @@ bool Client::initialize()
 	//window.setFramerateLimit(300);
 	//window.setMouseCursorGrabbed(true);
 
+	m_gui.setTarget(m_window);
 	return true;
 }
 
@@ -74,20 +75,15 @@ void Client::run()
 			{
 				if (event.type == sf::Event::Closed)
 					m_screenStack.clear();
-				m_desktop.HandleEvent(event);
+				m_gui.handleEvent(event);
 				m_screenStack.handleEvent(event, *this);
-				m_input.handleEvent(event);
-
-				
+				m_input.handleEvent(event);		
 			}
 
 			if (m_input.isActive({ sf::Keyboard::LControl, sf::Keyboard::LShift, sf::Keyboard::D }))
 			{
 				m_debugRender ^= 1;
 			}
-
-			m_desktop.Update(dt.asSeconds());
-
 
 			m_network.update();
 			ENetEvent * netEvent;
@@ -107,8 +103,8 @@ void Client::run()
 			
 			m_window.clear();
 			m_screenStack.render(*this);
-			m_gui.Display(m_window);
-
+			//m_gui.Display(m_window);
+			m_gui.draw();
 
 			if(m_debugRender)
 				m_window.draw(frameTimeGraph);

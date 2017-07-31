@@ -11,6 +11,7 @@
 #endif
 
 
+
 #include "Core/Utility.h"
 #include "Core/Client/Particles.h"
 int main()
@@ -21,33 +22,3 @@ int main()
 	Client client;
 	client.run();
 }
-
-/*
-
-#include "Core/Rle.h"
-int main()
-{
-	Packer packer;
-	for (int i = 0; i < 5; ++i)
-		packer.pack8(0, 3);
-
-	packer.pack8(7, 3);
-	for (int i = 0; i < 5; ++i)
-		packer.pack8(0, 3);
-	packer.pack8(3, 3);
-
-	for (int i = 0; i < 3; ++i)
-		packer.pack8(0, 3);
-	packer.pack8(1, 3);
-	packer.p();
-
-	Packer packer2;
-	encode(packer.getData(), packer.getDataSize(), packer2);
-	packer2.p();
-
-	Packer packer3;
-	decode(packer2.getData(), packer2.getDataSize(), packer3);
-	packer3.p();
-	std::cin.get();
-	return 0;
-}*/

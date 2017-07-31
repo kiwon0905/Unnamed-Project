@@ -8,8 +8,7 @@
 #include "Input.h"
 #include "Core/Parser.h"
 #include <SFML/Graphics.hpp>
-#include <SFGUI/SFGUI.hpp>
-#include <SFGUI/Desktop.hpp>
+#include <TGUI/TGUI.hpp>
 
 class Client
 {
@@ -22,8 +21,8 @@ public:
 	SoundPlayer & getSoundPlayer() { return m_soundPlayer; }
 	Network & getNetwork() { return m_network; }
 	ScreenStack & getScreenStack() { return m_screenStack; }
-	sfg::Desktop & getDesktop() { return m_desktop; }
 	Input & getInput() { return m_input; }
+	tgui::Gui & getGui() { return m_gui; }
 
 	bool debugRenderEnabled() { return m_debugRender; }
 private:
@@ -35,8 +34,7 @@ private:
 	AssetManager m_assetManager;
 	SoundPlayer m_soundPlayer;
 	Network m_network;
-	sfg::Desktop m_desktop;
-	sfg::SFGUI m_gui;
+	tgui::Gui m_gui;
 	ScreenStack m_screenStack;
 	Input m_input;
 	bool m_debugRender = false;

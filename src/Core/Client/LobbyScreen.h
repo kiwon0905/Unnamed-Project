@@ -4,8 +4,7 @@
 
 #include <vector>
 #include <SFML/Graphics.hpp>
-#include <SFGUI/Widgets.hpp>
-
+#include <TGUI/TGUI.hpp>
 class LobbyScreen : public Screen
 {
 public:
@@ -22,19 +21,8 @@ public:
 private:
 	void loadUi(Client & client);
 	void hideUi(Client & client);
-	void refresh(Client & client);
-	void turnPage(int page, Client & client);
+
 private:
-	struct ServerInfo
-	{
-		ENetAddress address;
-		sf::Uint32 id;
-		std::string name;
-	};
-	std::vector<ServerInfo> m_internetGameServers;
-	sfg::Window::Ptr m_window;
-	sfg::Notebook::Ptr m_notebook;
-	sfg::Table::Ptr m_internetTable;
-	int m_currentPage = 1;
+	tgui::EditBox::Ptr m_editBox;
 	bool m_connected = false;
 };
