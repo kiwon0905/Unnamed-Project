@@ -11,7 +11,6 @@ public:
 	virtual ~Screen() = default;
 
 	virtual void onEnter(Client & client) = 0;
-	virtual void handleEvent(const sf::Event & ev, Client & client) = 0;
 	virtual void handleNetEvent(ENetEvent & netEv, Client & client) = 0;
 	virtual void handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client) = 0;
 	virtual void update(Client & client) = 0;

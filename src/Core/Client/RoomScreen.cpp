@@ -8,10 +8,6 @@ void RoomScreen::onEnter(Client & client)
 {
 }
 
-void RoomScreen::handleEvent(const sf::Event & ev, Client & client)
-{
-}
-
 void RoomScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 {
 	if (netEv.type == ENET_EVENT_TYPE_RECEIVE)

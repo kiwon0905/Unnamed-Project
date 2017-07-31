@@ -10,11 +10,29 @@
 
 void LobbyScreen::onEnter(Client & client)
 {
-	loadUi(client);
-}
+	auto & gui = client.getGui();
+	m_editBox = tgui::EditBox::create();
+	gui.add(m_editBox);
 
-void LobbyScreen::handleEvent(const sf::Event & ev, Client & client)
-{
+	m_button = tgui::Button::create("connect");
+	m_button->setPosition({ 0, 100 });
+
+	auto connect = [this, &client]()
+	{
+		std::string text = m_editBox->getText();
+		ENetAddress addr;
+		if (enutil::toENetAddress(text, addr))
+		{
+			client.getNetwork().connect(addr);
+		}
+		else
+		{
+			std::cout << "invalid address\n";
+		}
+	};
+
+	m_button->onPress->connect(connect);
+	gui.add(m_button);
 }
 
 void LobbyScreen::handleNetEvent(ENetEvent & netEv, Client & client)
@@ -73,27 +91,18 @@ void LobbyScreen::render(Client & client)
 
 void LobbyScreen::onExit(Client & client)
 {
-	hideUi(client);
+	client.getGui().remove(m_editBox);
+	client.getGui().remove(m_button);
 }
 
 void LobbyScreen::onObscure(Client & client)
 {
-	hideUi(client);
+	m_editBox->hide();
+	m_button->hide();
 }
 
 void LobbyScreen::onReveal(Client & client)
 {
-	loadUi(client);
-}
-
-void LobbyScreen::loadUi(Client & client)
-{
-	m_editBox = tgui::EditBox::create();
-	client.getGui().add(m_editBox);
-
-}
-
-void LobbyScreen::hideUi(Client & client)
-{
-	m_editBox->hide();
+	m_editBox->show();
+	m_button->show();
 }

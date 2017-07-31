@@ -42,11 +42,6 @@ bool ScreenStack::isEmpty()
 	return m_screens.empty();
 }
 
-void ScreenStack::handleEvent(const sf::Event & ev, Client & client)
-{
-	m_screens.top()->handleEvent(ev, client);
-}
-
 void ScreenStack::handleNetEvent(ENetEvent & netEv, Client & client)
 {
 	m_screens.top()->handleNetEvent(netEv, client);

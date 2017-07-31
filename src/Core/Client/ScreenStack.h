@@ -23,7 +23,6 @@ public:
 	void clear();
 	bool isEmpty();
 	
-	void handleEvent(const sf::Event & ev, Client & client);
 	void handleNetEvent(ENetEvent & netEv, Client & client);
 	void handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client);
 	void applyChanges(Client & client);

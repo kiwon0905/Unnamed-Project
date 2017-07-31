@@ -9,6 +9,9 @@
 #include "Core/Protocol.h"
 #include "Core/Logger.h"
 #include "Core/Utility.h"
+
+#include <iostream>
+
 sf::Time SmoothClock::getElapsedTime()
 {
 /*	sf::Time dt = m_clock.getElapsedTime() - m_snap;
@@ -141,11 +144,35 @@ void PlayingScreen::onEnter(Client & client)
 
 
 	m_particles.smoke = std::make_unique<SmokeParticles>(*client.getAssetManager().get<sf::Texture>("assets/particle.png"));
-}
+	
 
-void PlayingScreen::handleEvent(const sf::Event & ev, Client & client)
-{
+	//ui
+	m_editBox = tgui::EditBox::create();
+	m_editBox->setPosition({ 0.f, client.getWindow().getSize().y - m_editBox->getSize().y });
+	m_editBox->setSize("30%", m_editBox->getSize().y);
+	m_editBox->hide();
 
+
+	auto sendChat = [&client, this]()
+	{
+		std::string chat = m_editBox->getText().toAnsiString();
+		if (chat != "")
+		{
+			Packer packer;
+			packer.pack(Msg::CL_CHAT);
+			packer.pack(m_editBox->getText().toAnsiString());
+			client.getNetwork().send(packer, true);
+			m_editBox->setText("");
+		}
+
+	};
+	m_editBox->onReturnKeyPress->connect(sendChat);
+	client.getGui().add(m_editBox);
+
+	m_chatBox = tgui::ChatBox::create();
+	m_chatBox->setPosition({ 0.f, m_editBox->getPosition().y - m_chatBox->getSize().y });
+	m_chatBox->setSize("30%", m_chatBox->getSize().y);
+	client.getGui().add(m_chatBox);
 }
 
 void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
@@ -307,6 +334,16 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 
 			client.getScreenStack().pop();
 		}
+
+		else if (msg == Msg::SV_CHAT)
+		{
+			uint8_t id;
+			std::string msg;
+			unpacker.unpack(id);
+			unpacker.unpack(msg);
+			msg = std::to_string(id) + ": " + msg;
+			m_chatBox->addLine(msg);
+		}
 	}
 
 	else if (netEv.type == ENET_EVENT_TYPE_CONNECT)
@@ -326,6 +363,19 @@ void PlayingScreen::handlePacket(Unpacker & unpacker, const ENetAddress & addr, 
 
 void PlayingScreen::update(Client & client)
 {
+	if (client.getInput().isActive({ sf::Keyboard::Return }))
+	{
+		if (m_editBox->isVisible())
+		{
+			m_editBox->hide();
+		}
+		else
+		{
+			m_editBox->show();
+			m_editBox->focus();
+		}
+	}
+
 	if (m_state == IN_GAME)
 	{
 		static sf::Clock clock;
@@ -345,8 +395,13 @@ void PlayingScreen::update(Client & client)
 
 
 			//read input
-
-			NetInput input = client.getInput().getInput(client.getWindow(), m_view);
+			
+			NetInput input;
+			
+			if(!m_editBox->isFocused())
+				input = client.getInput().getInput(client.getWindow(), m_view);
+		
+			//m_editBox->isFocused()
 
 			input.tick = m_predictedTick;
 			m_inputs[m_currentInputIndex].input = input;
@@ -595,6 +650,7 @@ void PlayingScreen::onObscure(Client & client)
 
 void PlayingScreen::onReveal(Client & client)
 {
+
 }
 
 Entity * PlayingScreen::getEntity(int id)

@@ -76,7 +76,6 @@ void Client::run()
 				if (event.type == sf::Event::Closed)
 					m_screenStack.clear();
 				m_gui.handleEvent(event);
-				m_screenStack.handleEvent(event, *this);
 				m_input.handleEvent(event);		
 			}
 
@@ -103,7 +102,6 @@ void Client::run()
 			
 			m_window.clear();
 			m_screenStack.render(*this);
-			//m_gui.Display(m_window);
 			m_gui.draw();
 
 			if(m_debugRender)

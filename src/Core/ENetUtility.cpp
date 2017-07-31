@@ -33,6 +33,47 @@ namespace enutil
 		return addr;
 	}
 
+	
+	bool toString(const ENetAddress & address, std::string & ans)
+	{
+		char ip[20];
+		if (enet_address_get_host_ip(&address, ip, 20) < 0)
+			return false;
+
+		ans = std::string(ip) + ":" + std::to_string(address.port);
+		return true;
+	}
+
+	bool toENetAddress(const std::string & addr, ENetAddress & ans)
+	{
+		std::size_t pos = addr.find(":");
+
+		if (pos == std::string::npos)
+			return false;
+
+		std::string ip = addr.substr(0, pos);
+		unsigned port = 0;
+
+		try
+		{
+			std::string sport = addr.substr(pos + 1);
+			port = std::stoi(sport);
+		}
+		catch (...)
+		{
+			return false;
+		}
+		return toENetAddress(ip, port, ans);
+	}
+
+	bool toENetAddress(const std::string & ip, unsigned port, ENetAddress & ans)
+	{
+		if (enet_address_set_host(&ans, ip.c_str()) < 0)
+			return false;
+		ans.port = port;
+		return true;
+	}
+
 	bool send(const Packer & packer, ENetPeer * peer, bool reliable)
 	{
 		ENetPacket * p = enet_packet_create(packer.getData(), packer.getDataSize(), reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED);

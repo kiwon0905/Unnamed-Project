@@ -35,7 +35,6 @@ public:
 	PlayingScreen();
 	~PlayingScreen() { std::cout << "play destroy!"; }
 	virtual void onEnter(Client & client);
-	virtual void handleEvent(const sf::Event & ev, Client & client);
 	virtual void handleNetEvent(ENetEvent & netEv, Client & client);
 	virtual void handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client);
 	virtual void update(Client & client);
@@ -103,6 +102,11 @@ private:
 
 
 	void debugRender(const sf::View & playerView, sf::RenderWindow & window);
+
+
+	//UI
+	tgui::ChatBox::Ptr m_chatBox;
+	tgui::EditBox::Ptr m_editBox;
 public:
 	const PlayerInfo * getPlayerInfo(int entityId);
 	const PlayerInfo & getMyPlayerInfo();

@@ -195,10 +195,9 @@ void Server::handleNetwork()
 			}
 			else
 			{
-				/*
+				
 				Logger::getInstance().info(enutil::toString(event.peer->address) + " disconnected");
-				Peer * peer = getPeer(event.peer);
-				m_gameWorld.onDisconnect(*peer, *this);*/
+
 
 				m_gameContext->onDisconnect(*event.peer);
 			}

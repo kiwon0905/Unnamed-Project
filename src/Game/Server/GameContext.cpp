@@ -86,6 +86,17 @@ void GameContext::onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer)
 			peer->send(packer, false);
 		}
 	}
+	else if (msg == Msg::CL_CHAT)
+	{
+		std::string chat;
+		unpacker.unpack(chat);
+		
+		Packer packer;
+		packer.pack(Msg::SV_CHAT);
+		packer.pack(uint8_t(peer->getId()));
+		packer.pack(chat);
+		broadcast(packer, true);
+	}
 }
 
 void GameContext::onDisconnect(const ENetPeer & peer)
@@ -193,6 +204,7 @@ void GameContext::endRound(Team winner)
 
 void GameContext::reset()
 {
+	Logger::getInstance().info("server reset!");
 	m_gameWorld.reset();
 	m_state = PRE_GAME;
 	m_tick = 0;
@@ -203,6 +215,7 @@ void GameContext::reset()
 		p->setState(Peer::PRE_GAME);
 		p->setEntity(nullptr);
 	}
+	m_nextPeerId = 0;
 }
 
 Peer * GameContext::getPeer(const ENetPeer * peer)

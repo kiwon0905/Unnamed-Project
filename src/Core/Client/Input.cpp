@@ -17,6 +17,7 @@ bool Input::initialize(Client & client)
 	addKeyCombination({ sf::Keyboard::LControl, sf::Keyboard::LShift, sf::Keyboard::D });
 	addKeyCombination({ sf::Keyboard::Space });
 	addKeyCombination({}, { sf::Mouse::Left });
+	addKeyCombination({ sf::Keyboard::Return });
 	return true;
 }
 
