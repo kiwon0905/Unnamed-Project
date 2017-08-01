@@ -9,6 +9,7 @@ enum class Msg
 
 	//client -> server
 	CL_REQUEST_JOIN_GAME,
+	CL_CLIENT_INFO,
 	CL_REQUEST_ROOM_INFO,
 	CL_REQUEST_GAME_INFO,
 	CL_LOAD_COMPLETE,

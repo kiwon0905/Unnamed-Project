@@ -7,19 +7,22 @@
 #include "Core/Protocol.h"
 #include "Core/ENetUtility.h"
 
-
+template <typename T>
+void setCenter(T & widget)
+{
+	
+}
 void LobbyScreen::onEnter(Client & client)
 {
+	auto & window = client.getWindow();
+
 	auto & gui = client.getGui();
-	m_editBox = tgui::EditBox::create();
-	gui.add(m_editBox);
-
-	m_button = tgui::Button::create("connect");
-	m_button->setPosition({ 0, 100 });
-
 	auto connect = [this, &client]()
 	{
-		std::string text = m_editBox->getText();
+		std::string name = m_nameBox->getText();
+		std::cout << "name is: " << name << "\n";
+
+		std::string text = m_addressBox->getText();
 		ENetAddress addr;
 		if (enutil::toENetAddress(text, addr))
 		{
@@ -31,8 +34,27 @@ void LobbyScreen::onEnter(Client & client)
 		}
 	};
 
+	m_nameBox = tgui::EditBox::create();
+	m_nameBox->setDefaultText("Nickname");
+
+	m_addressBox = tgui::EditBox::create();
+	m_addressBox->setDefaultText("Server address");
+	
+	
+	m_button = tgui::Button::create("connect");
+	m_button->setPosition({ 0, 100 });
 	m_button->onPress->connect(connect);
-	gui.add(m_button);
+
+	m_layout = tgui::VerticalLayout::create();
+	m_layout->setSize({ "30%", "20%" });
+	m_layout->setPosition("35%", "50%");
+	setCenter(m_layout);
+	m_layout->add(m_nameBox);
+	m_layout->add(m_addressBox);
+	m_layout->add(m_button);
+
+	gui.add(m_layout);
+	m_layout->getRenderer()->setSpaceBetweenWidgets(5.f);
 }
 
 void LobbyScreen::handleNetEvent(ENetEvent & netEv, Client & client)
@@ -58,6 +80,7 @@ void LobbyScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		Logger::getInstance().info("Connected to game server");
 		Packer packer;
 		packer.pack(Msg::CL_REQUEST_JOIN_GAME);
+		packer.pack(m_nameBox->getText().toAnsiString());
 		client.getNetwork().send(packer, true);
 		m_connected = true;
 	}
@@ -91,18 +114,17 @@ void LobbyScreen::render(Client & client)
 
 void LobbyScreen::onExit(Client & client)
 {
-	client.getGui().remove(m_editBox);
-	client.getGui().remove(m_button);
+
+	client.getGui().remove(m_layout);
 }
 
 void LobbyScreen::onObscure(Client & client)
 {
-	m_editBox->hide();
-	m_button->hide();
+	m_layout->hide();
+
 }
 
 void LobbyScreen::onReveal(Client & client)
 {
-	m_editBox->show();
-	m_button->show();
+	m_layout->show();
 }

@@ -27,6 +27,10 @@ public:
 
 	Peer(int id, ENetPeer * peer);
 	int getId();
+
+	const std::string & getName();
+	void setName(const std::string & name);
+
 	ENetPeer * getENetPeer() const;
 	Entity * getEntity();
 	void setEntity(Entity * e);
@@ -39,6 +43,7 @@ public:
 	NetInput popInput(int tick);
 private:
 	int m_id;
+	std::string m_name;
 	ENetPeer * m_peer;
 	Entity * m_entity = nullptr;
 	State m_state = PRE_GAME;

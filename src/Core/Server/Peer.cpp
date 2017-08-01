@@ -12,6 +12,16 @@ int Peer::getId()
 	return m_id;
 }
 
+const std::string & Peer::getName()
+{
+	return m_name;
+}
+
+void Peer::setName(const std::string & name)
+{
+	m_name = name;
+}
+
 ENetPeer * Peer::getENetPeer() const
 {
 	return m_peer;

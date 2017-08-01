@@ -168,8 +168,11 @@ void PlayingScreen::onEnter(Client & client)
 	};
 	m_editBox->onReturnKeyPress->connect(sendChat);
 	client.getGui().add(m_editBox);
+	
 
 	m_chatBox = tgui::ChatBox::create();
+	m_chatBox->getRenderer()->setBackgroundColor(sf::Color::Transparent);
+	m_chatBox->getRenderer()->setBorderColor(sf::Color::Transparent);
 	m_chatBox->setPosition({ 0.f, m_editBox->getPosition().y - m_chatBox->getSize().y });
 	m_chatBox->setSize("30%", m_chatBox->getSize().y);
 	client.getGui().add(m_chatBox);
@@ -189,25 +192,28 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			std::string mapName;
 			int numPlayer;
 			EntityType playerEntityType;
+
 			unpacker.unpack(mapName);
 			unpacker.unpack<0, MAX_PLAYER_ID>(numPlayer);
 			unpacker.unpack<0, MAX_PLAYER_ID>(m_myPlayer.id);
+			unpacker.unpack(m_myPlayer.name);
 			unpacker.unpack(m_myPlayer.team);
 			unpacker.unpack<0, MAX_ENTITY_ID>(m_myPlayer.entityId);
 			unpacker.unpack(playerEntityType);
 
 			std::cout << "map: " << mapName << "\n";
-			std::cout << "total " << numPlayer << " players.\n";
-			std::cout << "my player id: " << m_myPlayer.id << " entity id: " << m_myPlayer.entityId << " entity type: " << static_cast<int>(playerEntityType) << "\n";
+			std::cout << "total players " << numPlayer << " players.\n";
+			std::cout << m_myPlayer.name << "(" << m_myPlayer.id << ") -" << " entity id: " << m_myPlayer.entityId << " entity type: " << static_cast<int>(playerEntityType) << "\n";
 			std::cout << "my team: " << toString(m_myPlayer.team) << "\n";
 			for (int i = 0; i < numPlayer - 1; ++i)
 			{
 				PlayerInfo info;
 				unpacker.unpack<0, MAX_PLAYER_ID>(info.id);
+				unpacker.unpack(info.name);
 				unpacker.unpack(info.team);
 				unpacker.unpack<0, MAX_ENTITY_ID>(info.entityId);
 				m_players.push_back(info);
-				std::cout << "player" << info.id << " team: " <<toString(info.team) << " entity: " << info.entityId << "\n";
+				std::cout << info.name << "(" << info.id << ") - " << " team: " << toString(info.team) << " entity: " << info.entityId << "\n";
 			}
 
 			//load map
@@ -341,8 +347,17 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			std::string msg;
 			unpacker.unpack(id);
 			unpacker.unpack(msg);
-			msg = std::to_string(id) + ": " + msg;
-			m_chatBox->addLine(msg);
+
+			const PlayerInfo * info = getPlayerInfo(int(id));
+
+			std::cout << "Chat from player" << (int)id << ": " << msg << "\n";
+			if (info)
+			{
+				std::string line = info->name + ": " + msg;
+				m_chatBox->addLine(line);
+
+			}
+
 		}
 	}
 
@@ -693,7 +708,18 @@ void PlayingScreen::debugRender(const sf::View & playerView, sf::RenderWindow & 
 	window.draw(*m_predictionGraph);
 }
 
-const PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfo(int entityId)
+const PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfo(int id)
+{
+	if (id == m_myPlayer.id)
+		return &m_myPlayer;
+	for (const auto & p : m_players)
+		if (p.id == id)
+			return &p;
+	return nullptr;
+
+}
+
+const PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfoByEntityId(int entityId)
 {
 	if (entityId == m_myPlayer.entityId)
 		return &m_myPlayer;

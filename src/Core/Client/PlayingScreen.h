@@ -55,6 +55,7 @@ private:
 		int id;
 		int entityId;
 		Team team;
+		std::string name;
 	};
 	std::vector<PlayerInfo> m_players;
 	PlayerInfo m_myPlayer;
@@ -108,7 +109,8 @@ private:
 	tgui::ChatBox::Ptr m_chatBox;
 	tgui::EditBox::Ptr m_editBox;
 public:
-	const PlayerInfo * getPlayerInfo(int entityId);
+	const PlayerInfo * getPlayerInfo(int id);
+	const PlayerInfo * getPlayerInfoByEntityId(int entityId);
 	const PlayerInfo & getMyPlayerInfo();
 	Particles & getParticles();
 

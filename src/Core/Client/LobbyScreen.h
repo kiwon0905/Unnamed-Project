@@ -18,7 +18,9 @@ public:
 	void onReveal(Client & client);
 
 private:
-	tgui::EditBox::Ptr m_editBox;
+	tgui::VerticalLayout::Ptr m_layout;
+	tgui::EditBox::Ptr m_nameBox;
+	tgui::EditBox::Ptr m_addressBox;
 	tgui::Button::Ptr m_button;
 	bool m_connected = false;
 };

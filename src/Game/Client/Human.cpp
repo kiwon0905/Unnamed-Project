@@ -51,7 +51,7 @@ void Human::render(const Snapshot * from, const Snapshot * to, float predictedT,
 	//body
 	sf::RectangleShape body;
 	body.setSize({ 69.f, 69.f });
-	sf::Color teamColor = m_screen->getPlayerInfo(m_id)->team == Team::A ? sf::Color::Blue : sf::Color::Red;
+	sf::Color teamColor = m_screen->getPlayerInfoByEntityId(m_id)->team == Team::A ? sf::Color::Blue : sf::Color::Red;
 	body.setFillColor(teamColor);
 	body.setOutlineColor(sf::Color::Black);
 	body.setOutlineThickness(-3.f);

@@ -12,11 +12,14 @@ void GameContext::onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer)
 {
 	if (msg == Msg::CL_REQUEST_JOIN_GAME)
 	{
+		std::string name;
+		unpacker.unpack(name);
 		Packer packer;
 		if (m_state == PRE_GAME && m_peers.size() < MAX_PLAYER_ID + 1)
 		{
 			packer.pack(Msg::SV_ACCEPT_JOIN);
 			Peer * p = new Peer(m_nextPeerId++, enetPeer);
+			p->setName(name);
 			m_peers.emplace_back(p);
 		}
 		else
@@ -44,6 +47,7 @@ void GameContext::onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer)
 		packer.pack(m_map.getName());
 		packer.pack<0, MAX_PLAYER_ID>(m_peers.size());
 		packer.pack<0, MAX_PLAYER_ID>(peer->getId());				//my player id
+		packer.pack(peer->getName());								//my name
 		packer.pack(peer->getTeam());								//team
 		packer.pack<0, MAX_ENTITY_ID>(peer->getEntity()->getId());	//my entity id
 		packer.pack(peer->getEntity()->getType());					//my entity type
@@ -53,6 +57,7 @@ void GameContext::onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer)
 			if (p->getId() != peer->getId())
 			{
 				packer.pack<0, MAX_PLAYER_ID>(p->getId());				//player id
+				packer.pack(p->getName());							//name
 				packer.pack(p->getTeam());								//team
 				packer.pack<0, MAX_ENTITY_ID>(p->getEntity()->getId());	//entity id
 			}
