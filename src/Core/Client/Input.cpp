@@ -18,6 +18,8 @@ bool Input::initialize(Client & client)
 	addKeyCombination({ sf::Keyboard::Space });
 	addKeyCombination({}, { sf::Mouse::Left });
 	addKeyCombination({ sf::Keyboard::Return });
+
+	m_hasFocus = client.getWindow().hasFocus();
 	return true;
 }
 
