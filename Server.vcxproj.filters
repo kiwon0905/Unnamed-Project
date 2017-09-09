@@ -108,6 +108,12 @@
     <ClInclude Include="src\Game\Server\Entity\TransientEntities.h">
       <Filter>Game\Server\Entity</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\Server\Entity\Crate.h">
+      <Filter>Game\Server\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Server\Entity\Item.h">
+      <Filter>Game\Server\Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game\Server\GameWorld.cpp">
@@ -180,6 +186,12 @@
       <Filter>Game\Server\Entity</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\Server\Entity\TransientEntities.cpp">
+      <Filter>Game\Server\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Server\Entity\Crate.cpp">
+      <Filter>Game\Server\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Server\Entity\Item.cpp">
       <Filter>Game\Server\Entity</Filter>
     </ClCompile>
   </ItemGroup>

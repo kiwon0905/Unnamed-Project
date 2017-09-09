@@ -34,6 +34,8 @@ public:
 	GameWorld & getWorld();
 	int getCurrentTick();
 
+	//call this in startRound to create crates
+	void createCrates();
 	virtual void startRound() = 0;
 	virtual void checkRound() = 0;
 	void endRound(Team winner);

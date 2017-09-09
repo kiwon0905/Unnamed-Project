@@ -23,6 +23,8 @@ void Normal::startRound()
 			p->setTeam(Team::B);
 	}
 
+	createCrates();
+
 	for (auto & p : m_peers)
 	{
 		Packer packer;

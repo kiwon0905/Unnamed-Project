@@ -1,4 +1,5 @@
 #include "GameContext.h"
+#include "Game/Server/Entity/Crate.h"
 #include "Core/ENetUtility.h"
 #include "Core/Logger.h"
 
@@ -189,6 +190,14 @@ GameWorld & GameContext::getWorld()
 int GameContext::getCurrentTick()
 {
 	return m_tick;
+}
+
+void GameContext::createCrates()
+{
+	for (const auto & v : m_map.getCratePositions())
+	{
+		m_gameWorld.createEntity<Crate>(v);
+	}
 }
 
 void GameContext::endRound(Team winner)

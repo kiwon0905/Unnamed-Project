@@ -6,6 +6,8 @@ enum class EntityType
 	HUMAN,
 	ZOMBIE,
 	PROJECTILE,
+	CRATE,
+	ITEM,
 	COUNT
 };
 

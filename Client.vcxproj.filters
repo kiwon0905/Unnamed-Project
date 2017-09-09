@@ -19,6 +19,9 @@
     <Filter Include="Game\Shared">
       <UniqueIdentifier>{a07b61a3-ce00-4533-9e4f-655667542c52}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Client\Entity">
+      <UniqueIdentifier>{6ddd3315-ae23-498c-8850-54ebfa9dcde5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\Client\Client.h">
@@ -43,9 +46,6 @@
       <Filter>Core\Client</Filter>
     </ClInclude>
     <ClInclude Include="src\Game\Client\Entity.h">
-      <Filter>Game\Client</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Game\Client\Human.h">
       <Filter>Game\Client</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Client\AssetManager.h">
@@ -90,12 +90,6 @@
     <ClInclude Include="src\Game\GameCore.h">
       <Filter>Game\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\Client\Projectile.h">
-      <Filter>Game\Client</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Game\Client\Zombie.h">
-      <Filter>Game\Client</Filter>
-    </ClInclude>
     <ClInclude Include="src\Game\Enums.h">
       <Filter>Game\Shared</Filter>
     </ClInclude>
@@ -113,6 +107,21 @@
     </ClInclude>
     <ClInclude Include="src\Core\Rle.h">
       <Filter>Core\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Client\Entity\Human.h">
+      <Filter>Game\Client\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Client\Entity\Projectile.h">
+      <Filter>Game\Client\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Client\Entity\Zombie.h">
+      <Filter>Game\Client\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Client\Entity\Item.h">
+      <Filter>Game\Client\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Client\Entity\Crate.h">
+      <Filter>Game\Client\Entity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -138,9 +147,6 @@
       <Filter>Core\Client</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\Client\Entity.cpp">
-      <Filter>Game\Client</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Game\Client\Human.cpp">
       <Filter>Game\Client</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Client\AssetManager.cpp">
@@ -173,12 +179,6 @@
     <ClCompile Include="src\Game\GameCore.cpp">
       <Filter>Game\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Client\Projectile.cpp">
-      <Filter>Game\Client</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Game\Client\Zombie.cpp">
-      <Filter>Game\Client</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Client\Graph.cpp">
       <Filter>Core\Client</Filter>
     </ClCompile>
@@ -199,6 +199,21 @@
     </ClCompile>
     <ClCompile Include="src\Core\Rle.cpp">
       <Filter>Core\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Client\Entity\Human.cpp">
+      <Filter>Game\Client\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Client\Entity\Projectile.cpp">
+      <Filter>Game\Client\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Client\Entity\Zombie.cpp">
+      <Filter>Game\Client\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Client\Entity\Item.cpp">
+      <Filter>Game\Client\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Client\Entity\Crate.cpp">
+      <Filter>Game\Client\Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

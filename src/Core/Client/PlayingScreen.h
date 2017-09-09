@@ -102,7 +102,7 @@ private:
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 
 
-	void debugRender(const sf::View & playerView, sf::RenderWindow & window);
+	void debugRender(Client & client, const sf::View & playerView);
 
 
 	//UI

@@ -39,15 +39,6 @@ bool Map::loadFromFile(const std::string & s)
 	return true;
 }
 
-bool Map::loadFromTmx(const std::string & s)
-{
-	tinyxml2::XMLDocument doc;
-	doc.LoadFile(s.c_str());
-
-
-	return true;
-}
-
 const std::string & Map::getName()
 {
 	return m_name;
@@ -117,7 +108,7 @@ int Map::sweep(const Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vect
 	return minTile;
 }
 
-bool Map::slideSweep(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f & out, sf::Vector2i & norm, sf::Vector2i & tile) const
+bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f & out, sf::Vector2i & norm, sf::Vector2i & tile) const
 {
 	Aabb aabb2 = aabb;
 
@@ -276,4 +267,16 @@ int Map::getTile(float x, float y) const
 	int xt = std::floor(x / m_tileSize);
 	int yt = std::floor(y / m_tileSize);
 	return getTile(xt, yt);
+}
+
+std::vector<sf::Vector2f> Map::getCratePositions()
+{
+	std::vector<sf::Vector2f> vec;
+	vec.push_back(sf::Vector2f{ 21.f, 27.f } *static_cast<float>(m_tileSize));
+	vec.push_back(sf::Vector2f{ 31.f, 27.f } *static_cast<float>(m_tileSize));
+
+	//(21, 27)
+	//(31, 27)
+	return vec;
+
 }

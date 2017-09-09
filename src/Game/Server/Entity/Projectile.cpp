@@ -35,11 +35,11 @@ void Projectile::tick(float dt)
 
 	Human * hitEntity = nullptr;
 
-	for (auto & e : m_context->getWorld().getEntities(EntityType::HUMAN))
+	for (auto & e : m_context->getWorld().getEntitiesOfType({ EntityType::HUMAN }))
 	{
 		if (e->getId() == m_shooterId)
 			continue;
-		Human * h = static_cast<Human*>(e.get());
+		Human * h = static_cast<Human*>(e);
 
 		if (m_context->getPeer(h->getPeerId())->getTeam() != m_team)
 		{

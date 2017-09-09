@@ -62,7 +62,7 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 	sf::Vector2f out;
 	sf::Vector2i norm;
 	sf::Vector2i tile;
-	if (map.slideSweep(aabb, d, out, norm, tile))
+	if (map.sweepCharacter(aabb, d, out, norm, tile))
 	{
 		if (norm.x)
 			m_velocity.x = 0.f;
@@ -148,7 +148,7 @@ void ZombieCore::tick(float dt, const NetInput & input, const Map & map)
 	sf::Vector2f out;
 	sf::Vector2i norm;
 	sf::Vector2i tile;
-	if (map.slideSweep(aabb, d, out, norm, tile))
+	if (map.sweepCharacter(aabb, d, out, norm, tile))
 	{
 		if (norm.x)
 			m_velocity.x = 0.f;

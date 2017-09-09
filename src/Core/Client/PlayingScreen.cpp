@@ -1,7 +1,8 @@
 #include "PlayingScreen.h"
-#include "Game/Client/Human.h"
-#include "Game/Client/Zombie.h"
-#include "Game/Client/Projectile.h"
+#include "Game/Client/Entity/Human.h"
+#include "Game/Client/Entity/Zombie.h"
+#include "Game/Client/Entity/Projectile.h"
+#include "Game/Client/Entity/Crate.h"
 #include "Game/GameConfig.h"
 
 #include "Core/Client/Client.h"
@@ -500,7 +501,6 @@ void PlayingScreen::render(Client & client)
 
 	static int prevTick = -1;
 	static int currentTick = -1;
-	static int nextTick = -1;
 
 	const auto & s = m_snapshots.find(renderTick);
 	const Snapshot * s0 = s.first->snapshot.get();
@@ -508,7 +508,6 @@ void PlayingScreen::render(Client & client)
 
 	prevTick = currentTick;
 	currentTick = s.first->tick;
-	nextTick = s.second->tick;
 
 
 	if (s.second)
@@ -542,6 +541,8 @@ void PlayingScreen::render(Client & client)
 				case NetObject::PROJECTILE:
 					e = new Projectile(p.first, client, *this);
 					break;
+				case NetObject::CRATE:
+					e = new Crate(p.first, client, *this);
 				default:
 					break;
 				}
@@ -652,7 +653,7 @@ void PlayingScreen::render(Client & client)
 	window.draw(timeText);
 	
 	if(client.debugRenderEnabled())
-		debugRender(m_view, window);
+		debugRender(client, m_view);
 }
 
 void PlayingScreen::onExit(Client & client)
@@ -677,8 +678,10 @@ Entity * PlayingScreen::getEntity(int id)
 	return nullptr;
 }
 
-void PlayingScreen::debugRender(const sf::View & playerView, sf::RenderWindow & window)
+void PlayingScreen::debugRender(Client & client, const sf::View & playerView)
 {
+	//draw grid
+	sf::RenderWindow & window = client.getWindow();
 	window.setView(playerView);
 	sf::VertexArray arr;
 	arr.setPrimitiveType(sf::Lines);
@@ -703,9 +706,23 @@ void PlayingScreen::debugRender(const sf::View & playerView, sf::RenderWindow & 
 		arr.append(v2);
 	}
 	window.draw(arr);
+
+	//draw mouse world pos
+	sf::Vector2f mouseWorldPos = window.mapPixelToCoords(sf::Mouse::getPosition(window), playerView);
+	sf::Text text;
+	text.setFont(*client.getAssetManager().get<sf::Font>("arial.ttf"));
+	
+	int xt = std::floor(mouseWorldPos.x / m_map.getTileSize());
+	int yt = std::floor(mouseWorldPos.y / m_map.getTileSize());
+	std::string str = "(" + std::to_string(xt) + ", " + std::to_string(yt) + ")\n";
+	str += "(" + std::to_string(mouseWorldPos.x) + ", " + std::to_string(mouseWorldPos.y) + ")";
+	text.setString(str);
+	text.setPosition(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
+
 	window.setView(window.getDefaultView());
 	window.draw(*m_snapshotGraph);
 	window.draw(*m_predictionGraph);
+	window.draw(text);
 }
 
 const PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfo(int id)

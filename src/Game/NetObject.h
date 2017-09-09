@@ -12,6 +12,7 @@ struct NetObject
 		HUMAN,
 		ZOMBIE,
 		PROJECTILE,
+		CRATE,
 		ENTITY_COUNT,
 		EXPLOSION,
 		COUNT
@@ -56,6 +57,15 @@ struct NetProjectile : public NetObject
 	sf::Vector2i pos;
 };
 
+struct NetCrate : public NetObject
+{
+	void write(Packer & packer) const;
+	void read(Unpacker & unpacker);
+	Type getType() const;
+	sf::Vector2i pos;
+};
+
+//Transient
 struct NetExplosion : public NetObject
 {
 	void write(Packer & packer) const;

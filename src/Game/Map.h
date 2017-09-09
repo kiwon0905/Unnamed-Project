@@ -11,7 +11,6 @@ class Map
 {
 public:
 	bool loadFromFile(const std::string & s);
-	bool loadFromTmx(const std::string & s);
 	const std::string & getName();
 
 	const sf::Vector2i & getSize() const;
@@ -19,8 +18,11 @@ public:
 	int getTileSize() const;
 	int getTile(int x, int y) const;
 	int getTile(float x, float y) const;
+
+	std::vector<sf::Vector2f> getCratePositions();
+
 	int sweep(const Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vector2i & norm) const;
-	bool slideSweep(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f & out, sf::Vector2i & norm, sf::Vector2i & tile) const;
+	bool sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f & out, sf::Vector2i & norm, sf::Vector2i & tile) const;
 	bool isGrounded(const Aabb & aabb) const;
 private:
 	std::string m_name;

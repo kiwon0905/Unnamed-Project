@@ -2,13 +2,7 @@
 
 
 const std::size_t RUN_LENGTH = 3;
-constexpr std::size_t pow2(std::size_t n)
-{
-	std::size_t a = 1;
-	for (std::size_t i = 0; i < n; ++i)
-		a = a * 2;;
-	return a;
-}
+
 
 void encode(const void * data, std::size_t size, Packer & packer)
 {

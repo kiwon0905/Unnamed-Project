@@ -36,7 +36,9 @@
     <ClInclude Include="src\Game\Map.h" />
     <ClInclude Include="src\Game\NetInput.h" />
     <ClInclude Include="src\Game\NetObject.h" />
+    <ClInclude Include="src\Game\Server\Entity\Crate.h" />
     <ClInclude Include="src\Game\Server\Entity\Human.h" />
+    <ClInclude Include="src\Game\Server\Entity\Item.h" />
     <ClInclude Include="src\Game\Server\Entity\Projectile.h" />
     <ClInclude Include="src\Game\Server\Entity\TransientEntities.h" />
     <ClInclude Include="src\Game\Server\Entity\Zombie.h" />
@@ -62,7 +64,9 @@
     <ClCompile Include="src\Game\Map.cpp" />
     <ClCompile Include="src\Game\NetInput.cpp" />
     <ClCompile Include="src\Game\NetObject.cpp" />
+    <ClCompile Include="src\Game\Server\Entity\Crate.cpp" />
     <ClCompile Include="src\Game\Server\Entity\Human.cpp" />
+    <ClCompile Include="src\Game\Server\Entity\Item.cpp" />
     <ClCompile Include="src\Game\Server\Entity\Projectile.cpp" />
     <ClCompile Include="src\Game\Server\Entity\TransientEntities.cpp" />
     <ClCompile Include="src\Game\Server\Entity\Zombie.cpp" />

@@ -1,3 +1,11 @@
 1. client sends CL_REQUEST_GAME_INFO to server
 2. client receives game info and is now ready to send inputs and receive snapshots.
 3. client can start sending input data and predict world simulation
+
+
+How to create a new entity
+1. Inherit from Entity in client
+2. Inherit from Entity in server
+3. Add a corresponding EntityType
+4. Add a corresponding NetObject
+5. 
