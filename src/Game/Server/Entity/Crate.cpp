@@ -8,6 +8,7 @@ Crate::Crate(int id, GameContext * context, const sf::Vector2f & pos):
 {
 	m_position = pos;
 	m_size = { 70.f, 70.f };
+	m_health = 3;
 }
 
 void Crate::tick(float dt)
@@ -24,4 +25,11 @@ void Crate::snap(Snapshot & snapshot) const
 		c->pos.y = Math::roundToInt(m_position.y * 100.f);
 
 	}
+}
+
+void Crate::takeDamage(int dmg)
+{
+	m_health--;
+	if(m_health <= 0)
+		m_alive = false;
 }

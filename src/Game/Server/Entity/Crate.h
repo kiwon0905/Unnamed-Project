@@ -7,7 +7,7 @@ public:
 
 	void tick(float dt);
 	void snap(Snapshot & snapshot) const;
-
+	void takeDamage(int dmg);
 private:
-
+	int m_health;
 };

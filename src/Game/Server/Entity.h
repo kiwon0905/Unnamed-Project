@@ -25,9 +25,10 @@ public:
 	sf::Vector2f getSize();
 	Aabb getAabb();
 
+	
 	virtual void tick(float dt) = 0;
 	virtual void snap(Snapshot & snapshot) const = 0;
-
+	virtual void takeDamage(int dmg);
 protected:
 	int m_id;
 	EntityType m_type;

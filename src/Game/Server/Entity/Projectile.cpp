@@ -33,26 +33,35 @@ void Projectile::tick(float dt)
 	m_context->getMap().sweep(aabb, d, minTime, minNorm);
 
 
-	Human * hitEntity = nullptr;
+	Entity * hitEntity = nullptr;
 
-	for (auto & e : m_context->getWorld().getEntitiesOfType({ EntityType::HUMAN }))
+	for (auto e : m_context->getWorld().getEntitiesOfType({ EntityType::HUMAN, EntityType::CRATE }))
 	{
 		if (e->getId() == m_shooterId)
 			continue;
-		Human * h = static_cast<Human*>(e);
 
-		if (m_context->getPeer(h->getPeerId())->getTeam() != m_team)
+		//no team kill
+		if (e->getType() == EntityType::HUMAN && m_context->getPeer(static_cast<Human*>(e)->getPeerId())->getTeam() == m_team)
+			continue;
+
 		{
+			if (aabb.intersects(e->getAabb()))
+			{
+				minTime = 0.f;
+				hitEntity = e;
+				break;
+			}
+
 			float time;
 			sf::Vector2i norm;
 
-			if (aabb.sweep(d * minTime, h->getAabb(), time, norm))
+			if (aabb.sweep(d * minTime, e->getAabb(), time, norm))
 			{
 				if (time < minTime)
 				{
 					minTime = time;
 					minNorm = norm;
-					hitEntity = h;
+					hitEntity = e;
 				}
 			}
 		}
