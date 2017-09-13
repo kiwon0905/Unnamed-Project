@@ -3,7 +3,7 @@
 #include "Game/Snapshot.h"
 
 Zombie::Zombie(int id, Client & client, PlayingScreen & screen):
-	Entity(id, EntityType::ZOMBIE, client, screen)
+	PredictedEntity(id, EntityType::ZOMBIE, client, screen)
 {
 }
 
@@ -16,11 +16,8 @@ void Zombie::rollback(const NetObject & e)
 
 void Zombie::tick(float dt, const NetInput & input, Map & map)
 {
-	if (m_predicted)
-	{
-		m_prevCore = m_currentCore;
-		m_currentCore.tick(dt, input, map);
-	}
+	m_prevCore = m_currentCore;
+	m_currentCore.tick(dt, input, map);
 }
 
 sf::Vector2f Zombie::getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const
@@ -54,7 +51,7 @@ void Zombie::render(const Snapshot * from, const Snapshot * to, float predictedT
 
 sf::Vector2f Zombie::getRenderPos(const NetZombie * z0, const NetZombie * z1, float predictedT, float t) const
 {
-	if (m_predicted)
+	if (isPredicted())
 		return Math::lerp(m_prevCore.getPosition(), m_currentCore.getPosition(), predictedT);
 	else
 	{

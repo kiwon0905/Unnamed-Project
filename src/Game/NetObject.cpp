@@ -120,3 +120,16 @@ NetObject::Type NetCrate::getType() const
 {
 	return NetObject::CRATE;
 }
+
+void NetItem::write(Packer & packer) const
+{
+}
+
+void NetItem::read(Unpacker & unpacker)
+{
+}
+
+NetObject::Type NetItem::getType() const
+{
+	return Type();
+}

@@ -25,16 +25,6 @@ Projectile::~Projectile()
 	m_screen->getParticles().smoke->removeEmitter(m_emitter);
 }
 
-void Projectile::rollback(const NetObject & e)
-{
-
-}
-
-void Projectile::tick(float dt, const NetInput & input, Map & map)
-{
-
-}
-
 sf::Vector2f Projectile::getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const
 {
 	return sf::Vector2f();

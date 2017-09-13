@@ -6,7 +6,7 @@
 #include <SFML/Graphics.hpp>
 
 Human::Human(int id, Client & client, PlayingScreen & screen):
-	Entity(id, EntityType::HUMAN, client, screen)
+	PredictedEntity(id, EntityType::HUMAN, client, screen)
 {
 }
 
@@ -20,11 +20,8 @@ void Human::rollback(const NetObject & e)
 
 void Human::tick(float dt, const NetInput & input, Map & map)
 {
-	if (m_predicted)
-	{
-		m_prevCore = m_currentCore;
-		m_currentCore.tick(dt, input, map);
-	}
+	m_prevCore = m_currentCore;
+	m_currentCore.tick(dt, input, map);
 }
 
 
@@ -67,7 +64,7 @@ void Human::render(const Snapshot * from, const Snapshot * to, float predictedT,
 	gun.setOutlineThickness(-3.f);
 
 	float aimAngle;
-	if (m_predicted)
+	if (isPredicted())
 	{
 		sf::Vector2i mousePos = m_client->getInput().getMousePosition();
 		sf::Vector2f aim = target.mapPixelToCoords(mousePos) - (body.getPosition() + body.getSize() / 2.f);
@@ -109,7 +106,7 @@ void Human::render(const Snapshot * from, const Snapshot * to, float predictedT,
 
 sf::Vector2f Human::getRenderPos(const NetHuman * h0, const NetHuman * h1, float predictedT, float t) const
 {
-	if (m_predicted)
+	if (isPredicted())
 		return Math::lerp(m_prevCore.getPosition(), m_currentCore.getPosition(), predictedT);
 	else
 	{

@@ -18,16 +18,6 @@ EntityType Entity::getType() const
 	return m_type;
 }
 
-void Entity::setPrediction(bool predict)
-{
-	m_predicted = predict;
-}
-
-bool Entity::isPredicted()
-{
-	return m_predicted;
-}
-
 void Entity::setAlive(bool alive)
 {
 	m_alive = alive;

@@ -6,6 +6,7 @@
 #include "Game/GameCore.h"
 #include "Game/Snapshot.h"
 #include "Game/Client/Entity.h"
+#include "Game/Client/PredictedEntity.h"
 #include "Game/NetInput.h"
 #include <SFML/Graphics.hpp>
 
@@ -100,7 +101,7 @@ private:
 	//entities
 	Entity * getEntity(int id);
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
-
+	std::vector<PredictedEntity *> m_predictedEntities;
 
 	void debugRender(Client & client, const sf::View & playerView);
 

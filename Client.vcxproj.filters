@@ -123,6 +123,9 @@
     <ClInclude Include="src\Game\Client\Entity\Crate.h">
       <Filter>Game\Client\Entity</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\Client\PredictedEntity.h">
+      <Filter>Game\Client</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Client\Client.cpp">
@@ -214,6 +217,9 @@
     </ClCompile>
     <ClCompile Include="src\Game\Client\Entity\Crate.cpp">
       <Filter>Game\Client\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Client\PredictedEntity.cpp">
+      <Filter>Game\Client</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

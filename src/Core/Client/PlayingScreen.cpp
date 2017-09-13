@@ -435,6 +435,7 @@ void PlayingScreen::update(Client & client)
 			
 			
 			//predict
+			/*
 			for (auto & v : m_entitiesByType)
 			{
 				for (auto & e : v)
@@ -444,9 +445,44 @@ void PlayingScreen::update(Client & client)
 						e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), input, m_map);	
 					}
 				}
+			}*/
+			
+
+			//Prediction
+			for (auto p : m_predictedEntities)
+			{
+				p->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), input, m_map);
 			}
 
+			if (m_repredict)
+			{
+				Snapshot * s = m_snapshots.getLast();
+
+				for (auto e : m_predictedEntities)
+				{
+					const NetObject * obj = s->getEntity(e->getId());
+					if (obj)
+					{
+						e->rollback(*obj);
+
+
+
+						for (int t = m_lastRecvTick + 1; t <= m_predictedTick; ++t)
+						{
+							//TODO improve
+							NetInput input;
+							for (const auto & i : m_inputs)
+								if (i.input.tick == t)
+									input = i.input;
+
+							e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), input, m_map);
+						}
+					}
+					m_repredict = false;
+				}
+			}
 			//repredict
+			/*
 			if (m_repredict)
 			{
 
@@ -479,7 +515,7 @@ void PlayingScreen::update(Client & client)
 					}
 				}
 				m_repredict = false;
-			}
+			}*/
 		}
 		if (i > 1)
 		{
@@ -547,8 +583,15 @@ void PlayingScreen::render(Client & client)
 					break;
 				}
 				m_entitiesByType[static_cast<int>(e->getType())].emplace_back(e);
+
+
+
 				if (p.first == m_myPlayer.entityId)
-					e->setPrediction(true);
+				{
+					PredictedEntity * p = static_cast<PredictedEntity*>(e);
+					p->setPrediction(true);
+					m_predictedEntities.push_back(p);
+				}
 			}
 		}
 		//handle transient entities
@@ -574,6 +617,10 @@ void PlayingScreen::render(Client & client)
 		auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
 		for (auto & v : m_entitiesByType)
 			v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
+		auto isDead2 = [](Entity * e) {return !e->isAlive(); };
+		m_predictedEntities.erase(std::remove_if(m_predictedEntities.begin(), m_predictedEntities.end(), isDead2), m_predictedEntities.end());
+
+
 		m_snapshots.removeUntil(prevTick);
 	}
 

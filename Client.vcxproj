@@ -45,6 +45,7 @@
     <ClInclude Include="src\Game\Client\Entity\Item.h" />
     <ClInclude Include="src\Game\Client\Entity\Projectile.h" />
     <ClInclude Include="src\Game\Client\Entity\Zombie.h" />
+    <ClInclude Include="src\Game\Client\PredictedEntity.h" />
     <ClInclude Include="src\Game\NetInput.h" />
     <ClInclude Include="src\Game\Enums.h" />
     <ClInclude Include="src\Game\GameConfig.h" />
@@ -79,6 +80,7 @@
     <ClCompile Include="src\Game\Client\Entity\Item.cpp" />
     <ClCompile Include="src\Game\Client\Entity\Projectile.cpp" />
     <ClCompile Include="src\Game\Client\Entity\Zombie.cpp" />
+    <ClCompile Include="src\Game\Client\PredictedEntity.cpp" />
     <ClCompile Include="src\Game\NetInput.cpp" />
     <ClCompile Include="src\Game\GameCore.cpp" />
     <ClCompile Include="src\Game\Map.cpp" />

@@ -7,14 +7,6 @@ Crate::Crate(int id, Client & client, PlayingScreen & screen) :
 {
 }
 
-void Crate::rollback(const NetObject & e)
-{
-}
-
-void Crate::tick(float dt, const NetInput & input, Map & map)
-{
-}
-
 sf::Vector2f Crate::getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const
 {
 	return sf::Vector2f();

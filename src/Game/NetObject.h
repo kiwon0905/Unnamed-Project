@@ -13,6 +13,7 @@ struct NetObject
 		ZOMBIE,
 		PROJECTILE,
 		CRATE,
+		ITEM,
 		ENTITY_COUNT,
 		EXPLOSION,
 		COUNT
@@ -35,6 +36,7 @@ struct NetHuman : public NetObject
 	sf::Vector2i vel;
 	bool groundJump;
 	bool airJump;
+	///
 	int aimAngle;
 	int health;
 };
@@ -58,6 +60,14 @@ struct NetProjectile : public NetObject
 };
 
 struct NetCrate : public NetObject
+{
+	void write(Packer & packer) const;
+	void read(Unpacker & unpacker);
+	Type getType() const;
+	sf::Vector2i pos;
+};
+
+struct NetItem : public NetObject
 {
 	void write(Packer & packer) const;
 	void read(Unpacker & unpacker);

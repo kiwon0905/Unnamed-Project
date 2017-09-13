@@ -1,8 +1,8 @@
 #pragma once
-#include "Game/Client/Entity.h"
+#include "Game/Client/PredictedEntity.h"
 #include "Game/GameCore.h"
 
-class Zombie : public Entity
+class Zombie : public PredictedEntity
 {
 public:
 	Zombie(int id, Client & client, PlayingScreen & screen);
