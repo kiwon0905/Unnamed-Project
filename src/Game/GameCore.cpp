@@ -34,11 +34,16 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 	{
 		m_airJump = false;
 		m_groundJump = false;
+		m_airTick = 0;
+	}
+	else
+	{
+		m_airTick++;
 	}
 
 	if (input.jump)
 	{
-		if (grounded)
+		if (grounded || m_airTick < 10)
 		{
 			if (!m_groundJump)
 			{
@@ -83,6 +88,7 @@ void HumanCore::read(const NetHuman & nh)
 	m_velocity.y = nh.vel.y / 100.f;
 	m_airJump = nh.airJump;
 	m_groundJump = nh.groundJump;
+	m_airTick = nh.airTick;
 }
 
 void HumanCore::write(NetHuman & nh) const
@@ -93,6 +99,7 @@ void HumanCore::write(NetHuman & nh) const
 	nh.pos.y = Math::roundToInt(m_position.y * 100.f);
 	nh.groundJump = m_groundJump;
 	nh.airJump = m_airJump;
+	nh.airTick = m_airTick;
 }
 
 const sf::Vector2f & HumanCore::getPosition() const

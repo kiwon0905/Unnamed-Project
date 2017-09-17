@@ -262,14 +262,14 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			m_state = ENTERING;
 		}
 
-		else if (msg == Msg::SV_SNAPSHOT)
+		else if (msg == Msg::SV_FULL_SNAPSHOT)
 		{
 			if (m_state == LOADING)
 				return;
 			
 			int serverTick;
 			unpacker.unpack<0, MAX_TICK>(serverTick);
-
+			unpacker.align();
 			if (m_lastRecvTick >= serverTick)
 				return;
 
@@ -429,23 +429,11 @@ void PlayingScreen::update(Client & client)
 			//send to server
 			Packer packer;
 			packer.pack(Msg::CL_INPUT);
+			packer.pack<0, MAX_TICK>(m_lastRecvTick);
+			std::cout << "last revc tick: " << m_lastRecvTick << ", predictedTick: " << m_predictedTick << "\n";
 			input.write(packer);
 			client.getNetwork().send(packer, false);
 			client.getNetwork().flush();
-			
-			
-			//predict
-			/*
-			for (auto & v : m_entitiesByType)
-			{
-				for (auto & e : v)
-				{
-					if (e->isPredicted())
-					{
-						e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), input, m_map);	
-					}
-				}
-			}*/
 			
 
 			//Prediction
@@ -481,41 +469,7 @@ void PlayingScreen::update(Client & client)
 					m_repredict = false;
 				}
 			}
-			//repredict
-			/*
-			if (m_repredict)
-			{
 
-				Snapshot * s = m_snapshots.getLast();
-				for (auto & v : m_entitiesByType)
-				{
-					for (auto & e : v)
-					{
-						if (e->isPredicted())
-						{
-							const NetObject * obj = s->getEntity(e->getId());
-							if (obj)
-							{
-								e->rollback(*obj);
-							
-							
-							
-								for (int t = m_lastRecvTick + 1; t <= m_predictedTick; ++t)
-								{
-									//TODO improve
-									NetInput input;
-									for (const auto & i : m_inputs)
-										if (i.input.tick == t)
-											input = i.input;
-
-									e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), input, m_map);
-								}		
-							}
-						}
-					}
-				}
-				m_repredict = false;
-			}*/
 		}
 		if (i > 1)
 		{

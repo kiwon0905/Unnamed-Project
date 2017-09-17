@@ -278,8 +278,6 @@ std::vector<sf::Vector2f> Map::getCratePositions()
 	vec.push_back(sf::Vector2f{ 51.f, 27.f } *static_cast<float>(m_tileSize));
 	vec.push_back(sf::Vector2f{ 61.f, 27.f } *static_cast<float>(m_tileSize));
 	vec.push_back(sf::Vector2f{ 71.f, 27.f } *static_cast<float>(m_tileSize));
-	vec.push_back(sf::Vector2f{ 81.f, 27.f } *static_cast<float>(m_tileSize));
-	vec.push_back(sf::Vector2f{ 91.f, 27.f } *static_cast<float>(m_tileSize));
 	//(21, 27)
 	//(31, 27)
 	return vec;

@@ -29,6 +29,7 @@ private:
 	sf::Vector2f m_velocity;
 	bool m_groundJump = false;
 	bool m_airJump = false;
+	int m_airTick = 10;
 };
 
 class ZombieCore

@@ -78,9 +78,12 @@ void GameContext::onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer)
 	}
 	else if (msg == Msg::CL_INPUT && m_state == IN_GAME)
 	{
+		int ackTick;
+		unpacker.unpack<0, MAX_TICK>(ackTick);
 		NetInput input;
 		input.read(unpacker);
 		peer->onInput(input);
+		std::cout << peer->getName() << " acked " << ackTick << "intended tick: " << input.tick << "current tick: " << m_tick << "\n";
 		if (m_tick % 2 == 0)
 		{
 			sf::Time timeLeft = sf::seconds(input.tick / TICKS_PER_SEC) - m_clock.getElapsedTime();
@@ -147,36 +150,47 @@ void GameContext::update()
 
 
 
-			//if (m_tick % 2 == 0)
+			if (m_tick % 2 == 0)
 			{
 			
 				std::unique_ptr<Snapshot> snapshot = std::make_unique<Snapshot>();
 				m_gameWorld.snap(*snapshot);
 
 				Packer packer;
-				packer.pack(Msg::SV_SNAPSHOT);
+				packer.pack(Msg::SV_FULL_SNAPSHOT);
 				packer.pack<0, MAX_TICK>(m_tick);
+				packer.align();
 				snapshot->write(packer);
+
 				for (auto & p : m_peers)
 					p->send(packer, false);
 
 				m_snapshots.add(snapshot.release(), m_tick);
 				m_snapshots.removeUntil(m_tick - TICKS_PER_SEC * 3);
 
-				std::cout << "original size: " << packer.getDataSize() << "\n";
-				const Snapshot * s = m_snapshots.get(m_tick - TICKS_PER_SEC);
+				const Snapshot * s = m_snapshots.get(m_tick - TICKS_PER_SEC * 0.2);
+			
 				if (s)
 				{
-					Packer packer2;
-
-					m_snapshots.getLast()->writeRelativeTo(packer2, *s);
-
+					/*
+					//packer 3 contains the uncompressed  delta snapshot
 					Packer packer3;
-					packer3.pack(Msg::SV_SNAPSHOT);
-					packer3.pack<0, MAX_TICK>(m_tick);
-					encode(packer2.getData(), packer2.getDataSize(), packer3);
-					std::cout << "Compressed size: " << packer3.getDataSize() << "\n";
+					m_snapshots.getLast()->writeRelativeTo(packer3, *s);
+					std::cout << "uncompressed size: " << packer3.getDataSize() << "\n";
 
+					Packer packer4;
+					encode(packer3.getData(), packer3.getDataSize(), packer4);
+					std::cout << "compressed size: " << packer4.getDataSize() << "\n";
+
+					Packer packer5;
+					decode(packer4.getData(), packer4.getDataSize(), packer5);
+					std::cout << "decompressed size: " << packer5.getDataSize() << "\n";
+
+					if (memcmp(packer3.getData(), packer5.getData(), packer3.getDataSize()) == 0)
+					{
+						std::cout << "decompress success! compression ratio: " << (float)packer4.getDataSize() / packer5.getDataSize() << "\n\n";
+					}
+				*/
 				}
 			}	
 

@@ -37,23 +37,45 @@ void NetObject::read(Unpacker & unpacker)
 
 void NetObject::writeRelative(Packer & packer, const NetObject & o)
 {
-	std::vector<char> xord(data.size());
-	for (std::size_t i = 0; i < xord.size(); ++i)
+	/*if (o.data == data)
 	{
-		xord[i] = data[i] ^ o.data[i];
+		packer.pack(false);
 	}
-	NetHuman * h = (NetHuman *)&xord[0];
-	writeFunc(xord.data(), packer);
+	else*/
+	{
+		//packer.pack(true);
+		std::vector<char> xord(data.size());
+		for (std::size_t i = 0; i < xord.size(); ++i)
+		{
+			xord[i] = data[i] - o.data[i];
+		}
+		NetHuman * h = (NetHuman *)&xord[0];
+		writeFunc(xord.data(), packer);
+	}
+
 }
 
 void NetObject::readRelative(Unpacker & unpacker, const NetObject & o)
 {
-	std::vector<char> xord(data.size());
-	for (std::size_t i = 0; i < xord.size(); ++i)
+	/*bool changed;
+	unpacker.unpack(changed);
+	
+	if (changed)*/
 	{
-		xord[i] = data[i] ^ o.data[i];
+		std::vector<char> xord(data.size());
+		readFunc(xord.data(), unpacker);
+	
+		for (std::size_t i = 0; i < xord.size(); ++i)
+		{
+			xord[i] = data[i] + o.data[i];
+		}
 	}
-	readFunc(xord.data(), unpacker);
+/*	else
+	{
+		data = o.data;
+	}
+	
+	*/
 }
 
 NetObject * NetObject::clone() const
@@ -70,26 +92,34 @@ NetObject::Type NetHuman::getType() const
 
 void NetHuman::write(Packer & packer) const
 {
-	packer.pack<0, 500000>(pos.x);
-	packer.pack<0, 500000>(pos.y);
-	packer.pack<-500000, 500000>(vel.x);
-	packer.pack<-500000, 500000>(vel.y);
-	packer.pack<0, 360>(aimAngle);
-	packer.pack(groundJump);
-	packer.pack(airJump);
-	packer.pack<0, 100>(health);
+	packer.pack(groundJump); // 1
+	packer.pack(airJump);//1
+	packer.pack<0, MAX_TICK>(airTick);
+	packer.pack<0, 100>(health); //7
+	packer.pack<0, 500000>(pos.x); // 19
+	packer.pack<0, 500000>(pos.y); //19
+	packer.pack<-500000, 500000>(vel.x); //20
+	packer.pack<-500000, 500000>(vel.y); // 20
+
+
+
+	packer.pack<0, 360>(aimAngle); // 9
 }
 
 void NetHuman::read(Unpacker & unpacker)
 {
+	unpacker.unpack(groundJump);
+	unpacker.unpack(airJump);
+	unpacker.unpack<0, MAX_TICK>(airTick);
+	unpacker.unpack<0, 100>(health);
 	unpacker.unpack<0, 500000>(pos.x);
 	unpacker.unpack<0, 500000>(pos.y);
 	unpacker.unpack<-500000, 500000>(vel.x);
 	unpacker.unpack<-500000, 500000>(vel.y);
+
+
 	unpacker.unpack<0, 360>(aimAngle);
-	unpacker.unpack(groundJump);
-	unpacker.unpack(airJump);
-	unpacker.unpack<0, 100>(health);
+
 }
 
 NetObject::Type NetProjectile::getType() const

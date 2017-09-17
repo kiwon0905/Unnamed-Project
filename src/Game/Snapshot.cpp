@@ -75,6 +75,8 @@ void Snapshot::write(Packer & packer)
 	}
 }
 
+//delta compression can be further optimized: group unchanged entities, rle only entities, not transients, etc... 
+
 void Snapshot::readRelativeTo(Unpacker & unpacker, const Snapshot & s)
 {
 	int numItems;
@@ -134,6 +136,7 @@ void Snapshot::writeRelativeTo(Packer & packer, const Snapshot & s)
 			e.second->write(packer);
 		}
 	}
+
 	for (auto & e : m_transients)
 	{
 		packer.pack(e->getType());
