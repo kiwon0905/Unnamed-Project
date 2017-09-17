@@ -147,12 +147,19 @@ void GameContext::update()
 
 			//if (m_tick % 2 == 0)
 			{
+			
+				std::unique_ptr<Snapshot> snapshot = std::make_unique<Snapshot>();
+				m_gameWorld.snap(*snapshot);
+
 				Packer packer;
 				packer.pack(Msg::SV_SNAPSHOT);
 				packer.pack<0, MAX_TICK>(m_tick);
-				m_gameWorld.snap(packer);
+				snapshot->write(packer);
 				for (auto & p : m_peers)
 					p->send(packer, false);
+
+				m_snapshots.add(snapshot.release(), m_tick);
+				m_snapshots.removeUntil(m_tick - TICKS_PER_SEC * 3);
 			}
 
 

@@ -47,10 +47,8 @@ void GameWorld::tick()
 			e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds());
 }
 
-void GameWorld::snap(Packer & packer)
+void GameWorld::snap(Snapshot & snapshot)
 {
-	Snapshot snapshot;
-
 	for (const auto & v : m_entitiesByType)
 		for (const auto & e : v)
 			e->snap(snapshot);
@@ -58,7 +56,6 @@ void GameWorld::snap(Packer & packer)
 	for (const auto & e : m_transientEntities)
 		e->snap(snapshot);
 	m_transientEntities.clear();
-	snapshot.write(packer);
 }
 
 Entity * GameWorld::getEntity(int id, EntityType type)

@@ -56,4 +56,5 @@ protected:
 	sf::Time m_prevTime;
 	GameWorld m_gameWorld;
 	Map m_map;
+	SnapshotContainer m_snapshots;
 };

@@ -24,7 +24,7 @@ public:
 
 	void reset();
 	void tick();
-	void snap(Packer & packer);
+	void snap(Snapshot & snapshot);
 
 	template <typename T, typename... Args>
 	T * createEntity(Args &&... args);
