@@ -34,17 +34,28 @@ void NetObject::read(Unpacker & unpacker)
 {
 	readFunc(data.data(), unpacker);
 }
-NetObject * NetObject::xor(const NetObject & obj) const
-{
-	assert(getType() == obj.getType());
 
-	NetObject * o = NetObject::create(getType());
-	for (std::size_t i = 0; i < o->data.size(); ++i)
+void NetObject::writeRelative(Packer & packer, const NetObject & o)
+{
+	std::vector<char> xord(data.size());
+	for (std::size_t i = 0; i < xord.size(); ++i)
 	{
-		o->data[i] = data[i] ^ obj.data[i];
+		xord[i] = data[i] ^ o.data[i];
 	}
-	return o;
+	NetHuman * h = (NetHuman *)&xord[0];
+	writeFunc(xord.data(), packer);
 }
+
+void NetObject::readRelative(Unpacker & unpacker, const NetObject & o)
+{
+	std::vector<char> xord(data.size());
+	for (std::size_t i = 0; i < xord.size(); ++i)
+	{
+		xord[i] = data[i] ^ o.data[i];
+	}
+	readFunc(xord.data(), unpacker);
+}
+
 NetObject * NetObject::clone() const
 {
 	NetObject * o = NetObject::create(getType());

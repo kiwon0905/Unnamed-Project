@@ -2,10 +2,10 @@
 template <std::int8_t min, std::int8_t max>
 void Packer::pack(std::int8_t data)
 {
-	assert(min < max && "min must be less than max");
+/*	assert(min < max && "min must be less than max");
 	assert(data >= min && "value must be greater than or equal to min");
 	assert(data <= max && "value must be less than or equal to max");
-	const int bits = BitsRequired<min, max>::result;
+	const int bits = BitsRequired<min, max>::result;*/
 	uint8_t unsignedValue = data - min;
 	pack8(unsignedValue, bits);
 }
@@ -13,9 +13,10 @@ void Packer::pack(std::int8_t data)
 template <std::uint8_t min, std::uint8_t max>
 void Packer::pack(std::uint8_t data)
 {
-	assert(min < max && "min must be less than max");
+	/*	assert(min < max && "min must be less than max");
 	assert(data >= min && "value must be greater than or equal to min");
 	assert(data <= max && "value must be less than or equal to max");
+	const int bits = BitsRequired<min, max>::result;*/
 	const int bits = BitsRequired<min, max>::result;
 	pack32(data, bits);
 }
@@ -23,9 +24,10 @@ void Packer::pack(std::uint8_t data)
 template <std::int16_t min, std::int16_t max>
 void Packer::pack(std::int16_t data)
 {
-	assert(min < max && "min must be less than max");
+	/*	assert(min < max && "min must be less than max");
 	assert(data >= min && "value must be greater than or equal to min");
 	assert(data <= max && "value must be less than or equal to max");
+	const int bits = BitsRequired<min, max>::result;*/
 	const int bits = BitsRequired<min, max>::result;
 	uint16_t unsignedValue = data - min;
 	pack16(unsignedValue, bits);
@@ -34,9 +36,10 @@ void Packer::pack(std::int16_t data)
 template <std::uint16_t min, std::uint16_t max>
 void Packer::pack(std::uint16_t data)
 {
-	assert(min < max && "min must be less than max");
+	/*	assert(min < max && "min must be less than max");
 	assert(data >= min && "value must be greater than or equal to min");
 	assert(data <= max && "value must be less than or equal to max");
+	const int bits = BitsRequired<min, max>::result;*/
 	const int bits = BitsRequired<min, max>::result;
 	pack16(data, bits);
 }
@@ -44,9 +47,10 @@ void Packer::pack(std::uint16_t data)
 template <int32_t min, int32_t max>
 void Packer::pack(std::int32_t data)
 {
-	assert(min < max && "min must be less than max");
+	/*	assert(min < max && "min must be less than max");
 	assert(data >= min && "value must be greater than or equal to min");
 	assert(data <= max && "value must be less than or equal to max");
+	const int bits = BitsRequired<min, max>::result;*/
 	const int bits = BitsRequired<min, max>::result;
 	uint32_t unsignedValue = data - min;
 	pack32(unsignedValue, bits);
@@ -55,9 +59,10 @@ void Packer::pack(std::int32_t data)
 template <uint32_t min, uint32_t max>
 void Packer::pack(std::uint32_t data)
 {
-	assert(min < max && "min must be less than max");
+	/*	assert(min < max && "min must be less than max");
 	assert(data >= min && "value must be greater than or equal to min");
 	assert(data <= max && "value must be less than or equal to max");
+	const int bits = BitsRequired<min, max>::result;*/
 	const int bits = BitsRequired<min, max>::result;
 	pack32(data, bits);
 }
@@ -65,9 +70,10 @@ void Packer::pack(std::uint32_t data)
 template<std::int64_t min, std::int64_t max>
 inline void Packer::pack(std::int64_t data)
 {
-	assert(min < max && "min must be less than max");
+	/*	assert(min < max && "min must be less than max");
 	assert(data >= min && "value must be greater than or equal to min");
 	assert(data <= max && "value must be less than or equal to max");
+	const int bits = BitsRequired<min, max>::result;*/
 	const int bits = BitsRequired<min, max>::result;
 	uint64_t unsignedValue = data - min;
 	pack64(unsignedValue, bits);
@@ -76,9 +82,10 @@ inline void Packer::pack(std::int64_t data)
 template<std::uint64_t min, std::uint64_t max>
 inline void Packer::pack(std::uint64_t data)
 {
-	assert(min < max && "min must be less than max");
+	/*	assert(min < max && "min must be less than max");
 	assert(data >= min && "value must be greater than or equal to min");
 	assert(data <= max && "value must be less than or equal to max");
+	const int bits = BitsRequired<min, max>::result;*/
 	const int bits = BitsRequired<min, max>::result;
 	pack64(data, bits);
 }

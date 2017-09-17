@@ -30,7 +30,9 @@ public:
 	Type getType() const;
 	void write(Packer & packer) const;
 	void read(Unpacker & unpacker);
-	NetObject * xor(const NetObject & obj) const;
+
+	void writeRelative(Packer & packer, const NetObject & o);
+	void readRelative(Unpacker & unpacker, const NetObject & o);
 	NetObject * clone() const;
 
 	std::vector<char> data;

@@ -120,6 +120,8 @@ void GameContext::onDisconnect(const ENetPeer & peer)
 		reset();
 }
 
+#include "Core/Rle.h"
+
 void GameContext::update()
 {
 	if (m_state == PRE_GAME)
@@ -160,7 +162,23 @@ void GameContext::update()
 
 				m_snapshots.add(snapshot.release(), m_tick);
 				m_snapshots.removeUntil(m_tick - TICKS_PER_SEC * 3);
-			}
+
+				std::cout << "original size: " << packer.getDataSize() << "\n";
+				const Snapshot * s = m_snapshots.get(m_tick - TICKS_PER_SEC);
+				if (s)
+				{
+					Packer packer2;
+
+					m_snapshots.getLast()->writeRelativeTo(packer2, *s);
+
+					Packer packer3;
+					packer3.pack(Msg::SV_SNAPSHOT);
+					packer3.pack<0, MAX_TICK>(m_tick);
+					encode(packer2.getData(), packer2.getDataSize(), packer3);
+					std::cout << "Compressed size: " << packer3.getDataSize() << "\n";
+
+				}
+			}	
 
 
 		
