@@ -7,9 +7,9 @@ Zombie::Zombie(int id, Client & client, PlayingScreen & screen):
 {
 }
 
-void Zombie::rollback(const NetObject & e)
+void Zombie::rollback(const void * obj)
 {
-	const NetZombie & nz = static_cast<const NetZombie&>(e);
+	const NetZombie & nz = *static_cast<const NetZombie*>(obj);
 	m_prevCore.read(nz);
 	m_currentCore.read(nz);
 }

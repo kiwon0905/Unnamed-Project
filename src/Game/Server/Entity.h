@@ -38,9 +38,9 @@ protected:
 	GameContext * m_context;
 };
 
-class TransientEntity
+class Transient
 {
 public:
 	virtual void snap(Snapshot & snapshot) const = 0;
-	virtual ~TransientEntity() {}
+	virtual ~Transient() {}
 };

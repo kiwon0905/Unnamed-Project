@@ -12,7 +12,7 @@ public:
 	void setPrediction(bool predict);
 	bool isPredicted() const;
 
-	virtual void rollback(const NetObject & e) = 0;
+	virtual void rollback(const void * obj) = 0;
 	virtual void tick(float dt, const NetInput & input, Map & map) = 0;
 private:
 	bool m_predicted = false;

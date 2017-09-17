@@ -9,7 +9,7 @@ Explosion::Explosion(const sf::Vector2f & pos):
 
 void Explosion::snap(Snapshot & snapshot) const
 {
-	NetExplosion * exp = static_cast<NetExplosion*>(snapshot.addEvent(NetObject::EXPLOSION));
+	NetExplosion * exp = static_cast<NetExplosion*>(snapshot.addTransient(NetObject::EXPLOSION));
 	if (exp)
 	{
 	

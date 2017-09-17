@@ -27,6 +27,9 @@ template<uint64_t min, uint64_t max> struct BitsRequired
 class Packer
 {
 public:
+	Packer(const Packer &) = delete;
+	Packer & operator=(const Packer &) = delete;
+
 	Packer();
 	
 	const void * getData() const;
@@ -66,6 +69,8 @@ public:
 	void pack16(std::uint16_t data, std::size_t bits);
 	void pack32(std::uint32_t data, std::size_t bits);
 	void pack64(std::uint64_t data, std::size_t bits);
+
+	std::size_t getCurrentBitPos() { return m_bitPos; }
 private:
 
 	std::vector<std::uint8_t> m_data;
@@ -77,6 +82,10 @@ class Unpacker
 public:
 	Unpacker(const void * data, std::size_t size);
 	Unpacker();
+
+	Unpacker(const Unpacker &) = delete;
+	Unpacker & operator=(const Unpacker &) = delete;
+
 	void setData(const void * data, std::size_t size);
 
 	void unpack(bool & data);

@@ -12,8 +12,9 @@
 
 
 
+#include "Game/Snapshot.h"
+#include "Core/Rle.h"
 #include "Core/Utility.h"
-#include "Core/Client/Particles.h"
 int main()
 {
 #ifdef _DEBUG
@@ -21,4 +22,43 @@ int main()
 #endif
 	Client client;
 	client.run();
+
+	/*
+	float ratio = 0;
+	const int TRIAL = 100;
+	for (int i = 0; i < TRIAL; ++i)
+	{
+		Packer packer;
+		for (int j = 0; j < 5; ++j)
+		{
+			if (Math::uniform(0, 2)() < 2)
+			{
+				packer.pack(std::uint8_t(0));
+			}
+			else
+			{
+				int n = Math::uniform(0, 255)();
+				packer.pack(std::uint8_t(n));
+			}
+
+		}
+		std::cout << "original: ";
+		packer.p();
+
+
+		Packer packer2;
+		encode(packer.getData(), packer.getDataSize(), packer2);
+		std::cout << "encoded: ";
+		packer2.p();
+		
+		Packer packer3;
+		decode(packer2.getData(), packer2.getDataSize(), packer3);
+		std::cout << "decoded: ";
+
+		packer3.p();
+		std::cout << "\n";
+		ratio += (float)packer2.getDataSize() / packer.getDataSize();
+	}
+	std::cout << "avg compress ratio: " << ratio / TRIAL << "\n";
+	*/
 }

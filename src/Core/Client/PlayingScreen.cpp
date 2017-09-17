@@ -460,10 +460,10 @@ void PlayingScreen::update(Client & client)
 
 				for (auto e : m_predictedEntities)
 				{
-					const NetObject * obj = s->getEntity(e->getId());
+					const void * obj = s->getEntity(e->getId());
 					if (obj)
 					{
-						e->rollback(*obj);
+						e->rollback(obj);
 
 
 
@@ -595,7 +595,7 @@ void PlayingScreen::render(Client & client)
 			}
 		}
 		//handle transient entities
-		for (auto & p : s0->getTransientEntities())
+		for (auto & p : s0->getTransients())
 		{
 			if (p->getType() == NetObject::EXPLOSION)
 			{

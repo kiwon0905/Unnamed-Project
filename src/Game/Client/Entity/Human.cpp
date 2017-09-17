@@ -10,9 +10,9 @@ Human::Human(int id, Client & client, PlayingScreen & screen):
 {
 }
 
-void Human::rollback(const NetObject & e)
+void Human::rollback(const void * e)
 {
-	const NetHuman & nh = static_cast<const NetHuman&>(e);
+	const NetHuman & nh = *static_cast<const NetHuman*>(e);
 
 	m_prevCore.read(nh);
 	m_currentCore.read(nh);

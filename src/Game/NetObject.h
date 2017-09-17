@@ -3,10 +3,11 @@
 #include "GameConfig.h"
 #include "Core/Packer.h"
 #include <SFML/System.hpp>
+#include <functional>
 
 struct NetObject
 {
-	virtual ~NetObject() {}
+public:
 	enum Type
 	{
 		HUMAN,
@@ -18,19 +19,54 @@ struct NetObject
 		EXPLOSION,
 		COUNT
 	};
+
+private:
+	NetObject() {}
+public:
 	static NetObject * create(Type type);
-	virtual void write(Packer & packer) const = 0;
-	virtual void read(Unpacker & unpacker) = 0;
-	virtual Type getType() const = 0;
+	template <typename T>
+	static NetObject * create();
+
+	Type getType() const;
+	void write(Packer & packer) const;
+	void read(Unpacker & unpacker);
+	NetObject * xor(const NetObject & obj) const;
+	NetObject * clone() const;
+
+	std::vector<char> data;
+	Type(*getTypeFunc)(const void *);
+	void(*writeFunc)(const void *, Packer &);
+	void(*readFunc)(void *, Unpacker &);
 };
+
+template <typename T>
+NetObject * NetObject::create()
+{
+	NetObject * o = new NetObject;
+	o->data.resize(sizeof(T), 0);
+
+	o->getTypeFunc = [](const void * ptr)
+	{
+		return std::bind(&T::getType, static_cast<const T*>(ptr))();
+	};
+	o->writeFunc = [](const void * ptr, Packer & packer)
+	{
+		std::bind(&T::write, static_cast<const T*>(ptr), std::ref(packer))();
+	};
+	o->readFunc = [](void * ptr, Unpacker & unpacker)
+	{
+		std::bind(&T::read, static_cast<T*>(ptr), std::ref(unpacker))();
+	};
+	return o;
+}
 
 //////////////////////////////////////////////////////////////
 
-struct NetHuman : public NetObject
+struct NetHuman
 {
+	NetObject::Type getType() const;
 	void write(Packer & packer) const;
 	void read(Unpacker & unpacker);
-	Type getType() const;
 
 	sf::Vector2i pos;
 	sf::Vector2i vel;
@@ -41,45 +77,49 @@ struct NetHuman : public NetObject
 	int health;
 };
 
-struct NetZombie : public NetObject
+struct NetZombie
 {
+	NetObject::Type getType() const;
 	void write(Packer & packer) const;
 	void read(Unpacker & unpacker);
-	Type getType() const;
 
 	sf::Vector2i pos;
 	sf::Vector2i vel;
 };
 
-struct NetProjectile : public NetObject
+struct NetProjectile
 {
+	NetObject::Type getType() const;
 	void write(Packer & packer) const;
 	void read(Unpacker & unpacker);
-	Type getType() const;
+
 	sf::Vector2i pos;
 };
 
-struct NetCrate : public NetObject
+struct NetCrate
 {
+	NetObject::Type getType() const;
 	void write(Packer & packer) const;
 	void read(Unpacker & unpacker);
-	Type getType() const;
+
 	sf::Vector2i pos;
 };
 
-struct NetItem : public NetObject
+struct NetItem
 {
+	NetObject::Type getType() const;
 	void write(Packer & packer) const;
 	void read(Unpacker & unpacker);
-	Type getType() const;
+
 	sf::Vector2i pos;
 };
 
 //Transient
-struct NetExplosion : public NetObject
+struct NetExplosion
 {
+	NetObject::Type getType() const;
 	void write(Packer & packer) const;
 	void read(Unpacker & unpacker);
-	Type getType() const;
+
 	sf::Vector2i pos;
 };

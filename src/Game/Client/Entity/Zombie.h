@@ -6,7 +6,7 @@ class Zombie : public PredictedEntity
 {
 public:
 	Zombie(int id, Client & client, PlayingScreen & screen);
-	void rollback(const NetObject & e);
+	void rollback(const void * obj);
 	void tick(float dt, const NetInput & input, Map & map);
 
 	sf::Vector2f getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const;

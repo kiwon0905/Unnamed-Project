@@ -41,7 +41,7 @@ private:
 	
 	std::vector<std::unique_ptr<Entity>> m_newEntities;
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
-	std::vector<std::unique_ptr<TransientEntity>> m_transientEntities;
+	std::vector<std::unique_ptr<Transient>> m_transientEntities;
 	int m_nextEntityId = 0;
 };
 

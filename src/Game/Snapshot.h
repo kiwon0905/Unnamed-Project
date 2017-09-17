@@ -6,23 +6,23 @@
 #include <memory>
 #include <vector>
 
-
 class Snapshot
 {
 public:
-	const NetObject * getEntity(int id) const;
+	const void * getEntity(int id) const;
 
-	NetObject * addEntity(NetObject::Type type, int id);
-	NetObject * addEvent(NetObject::Type type);
+	void * addEntity(NetObject::Type type, int id);
+	void * addTransient(NetObject::Type type);
 
 	void read(Unpacker & unpacker);
 	void write(Packer & packer);
+	
 
 	const std::unordered_map<int, std::unique_ptr<NetObject>> & getEntities() const { return m_entities; }
-	const std::vector<std::unique_ptr<NetObject>> & getTransientEntities() const { return m_transientEntities; }
+	const std::vector<std::unique_ptr<NetObject>> & getTransients() const { return m_transients; }
 private:
 	std::unordered_map<int, std::unique_ptr<NetObject>> m_entities;
-	std::vector<std::unique_ptr<NetObject>> m_transientEntities;
+	std::vector<std::unique_ptr<NetObject>> m_transients;
 };
 
 struct TickedSnapshot

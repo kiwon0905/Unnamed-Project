@@ -2,7 +2,7 @@
 
 #include "Game/Server/Entity.h"
 
-class Explosion : public TransientEntity
+class Explosion : public Transient
 {
 public:
 	Explosion(const sf::Vector2f & pos);

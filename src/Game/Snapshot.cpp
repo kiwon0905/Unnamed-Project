@@ -2,31 +2,31 @@
 #include "GameConfig.h"
 #include "Game/NetObject.h"
 
-const NetObject * Snapshot::getEntity(int id) const
+const void * Snapshot::getEntity(int id) const
 {
 	auto iter = m_entities.find(id);
 	if(iter != m_entities.end())
-		return iter->second.get();
+		return iter->second.get()->data.data();
 	return nullptr;
 
 }
 
-NetObject * Snapshot::addEntity(NetObject::Type type, int id)
+void * Snapshot::addEntity(NetObject::Type type, int id)
 {
-	if(m_entities.size() + m_transientEntities.size() >= MAX_SNAPSHOT_ITEM_SIZE)
+	if(m_entities.size() + m_transients.size() >= MAX_SNAPSHOT_ITEM_SIZE)
 		return nullptr;
 	NetObject * entity = NetObject::create(type);
 	m_entities[id].reset(entity);
-	return entity;
+	return entity->data.data();
 }	
 
-NetObject * Snapshot::addEvent(NetObject::Type type)
+void * Snapshot::addTransient(NetObject::Type type)
 {
-	if (m_entities.size() + m_transientEntities.size() >= MAX_SNAPSHOT_ITEM_SIZE)
+	if (m_entities.size() + m_transients.size() >= MAX_SNAPSHOT_ITEM_SIZE)
 		return nullptr;
 	NetObject * event = NetObject::create(type);
-	m_transientEntities.emplace_back(event);
-	return event;
+	m_transients.emplace_back(event);
+	return event->data.data();
 }
 
 void Snapshot::read(Unpacker & unpacker)
@@ -45,20 +45,22 @@ void Snapshot::read(Unpacker & unpacker)
 		{
 			int id;
 			unpacker.unpack<0, MAX_ENTITY_ID>(id);
+
 			item->read(unpacker);
 			m_entities[id].reset(item);
 		}
 		else
 		{
 			item->read(unpacker);
-			m_transientEntities.emplace_back(item);
+			m_transients.emplace_back(item);
 		}
 	}
+
 }
 
 void Snapshot::write(Packer & packer)
 {
-	packer.pack<0, MAX_SNAPSHOT_ITEM_SIZE>(m_entities.size() + m_transientEntities.size());
+	packer.pack<0, MAX_SNAPSHOT_ITEM_SIZE>(m_entities.size() + m_transients.size());
 	
 	for (auto & e : m_entities)
 	{
@@ -66,12 +68,11 @@ void Snapshot::write(Packer & packer)
 		packer.pack<0, MAX_ENTITY_ID>(e.first);
 		e.second->write(packer);
 	}
-	for (auto & e : m_transientEntities)
+	for (auto & e : m_transients)
 	{
 		packer.pack(e->getType());
 		e->write(packer);
 	}
-
 }
 
 
