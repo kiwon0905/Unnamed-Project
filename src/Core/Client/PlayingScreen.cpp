@@ -235,17 +235,17 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					if (!m_map.getTile(x, y))
 						continue;
 					sf::Vertex a, b, c, d;
-					a.position = sf::Vector2f(x * tileSize, y * tileSize);
-					b.position = sf::Vector2f((x + 1) * tileSize, y * tileSize);
-					c.position = sf::Vector2f((x + 1) * tileSize, (y + 1) * tileSize);
-					d.position = sf::Vector2f(x * tileSize, (y + 1) * tileSize);
+					a.position = sf::Vector2f(static_cast<float>(x * tileSize), static_cast<float>(y * tileSize));
+					b.position = sf::Vector2f(static_cast<float>((x + 1) * tileSize), static_cast<float>(y * tileSize));
+					c.position = sf::Vector2f(static_cast<float>((x + 1) * tileSize), static_cast<float>((y + 1) * tileSize));
+					d.position = sf::Vector2f(static_cast<float>(x * tileSize), static_cast<float>((y + 1) * tileSize));
 					int tx = (tile - 1) % textureWidth;
 					int ty = (tile - 1) / textureHeight;
 
-					a.texCoords = sf::Vector2f(tx * tileSize, ty * tileSize) + sf::Vector2f(0.5f, 0.5f);
-					b.texCoords = sf::Vector2f((tx + 1) * tileSize, ty * tileSize) + sf::Vector2f(-0.5f, 0.5f);
-					c.texCoords = sf::Vector2f((tx + 1) * tileSize, (ty + 1) * tileSize) + sf::Vector2f(-0.5f, -0.5f);
-					d.texCoords = sf::Vector2f(tx * tileSize, (ty + 1) * tileSize) + sf::Vector2f(0.5f, -0.5f);
+					a.texCoords = sf::Vector2f(static_cast<float>(tx * tileSize), static_cast<float>(ty * tileSize)) + sf::Vector2f(0.5f, 0.5f);
+					b.texCoords = sf::Vector2f(static_cast<float>((tx + 1) * tileSize), static_cast<float>(ty * tileSize)) + sf::Vector2f(-0.5f, 0.5f);
+					c.texCoords = sf::Vector2f(static_cast<float>((tx + 1) * tileSize), static_cast<float>((ty + 1) * tileSize)) + sf::Vector2f(-0.5f, -0.5f);
+					d.texCoords = sf::Vector2f(static_cast<float>(tx * tileSize), static_cast<float>((ty + 1) * tileSize)) + sf::Vector2f(0.5f, -0.5f);
 
 					m_tileVertices.append(a);
 					m_tileVertices.append(b);
@@ -323,7 +323,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					sf::Time target = input.predictedTime + input.elapsed.getElapsedTime() - sf::milliseconds(timeLeft - 50);
 					//m_predictedTime.update(target, sf::seconds(1.f));
 					m_predictedTime.update2(target, sf::milliseconds(timeLeft), 1);
-					m_predictionGraph->addSample(timeLeft);
+					m_predictionGraph->addSample(static_cast<float>(timeLeft));
 				}
 			}
 		}
@@ -638,7 +638,7 @@ void PlayingScreen::render(Client & client)
 	window.setView(window.getDefaultView());
 	sf::Text timeText;
 	timeText.setFillColor(sf::Color::Blue);
-	int totalSeconds = currentRenderTime.asMicroseconds() / 1000000;
+	int totalSeconds = static_cast<int>(currentRenderTime.asMicroseconds()) / 1000000;
 	int minutes= totalSeconds / 60;
 	int seconds = totalSeconds % 60;
 
@@ -650,7 +650,7 @@ void PlayingScreen::render(Client & client)
 		secondsString = "0" + secondsString;
 	timeText.setString(minutesString + ":" + secondsString);
 	timeText.setFont(*client.getAssetManager().get<sf::Font>("arial.ttf"));
-	timeText.setPosition(static_cast<int>(client.getWindow().getSize().x / 2.f - timeText.getLocalBounds().width / 2.f), 0.f);
+	timeText.setPosition(static_cast<float>(client.getWindow().getSize().x / 2.f - timeText.getLocalBounds().width / 2.f), 0.f);
 	window.draw(timeText);
 	
 	if(client.debugRenderEnabled())
@@ -691,8 +691,8 @@ void PlayingScreen::debugRender(Client & client, const sf::View & playerView)
 		sf::Vertex v, v2;
 		v.color = sf::Color::Black;
 		v2.color = sf::Color::Black;
-		v.position = sf::Vector2f(i * m_map.getTileSize(), 0.f);
-		v2.position = sf::Vector2f(i * m_map.getTileSize(), m_map.getTileSize() * m_map.getSize().y);
+		v.position = sf::Vector2f(static_cast<float>(i * m_map.getTileSize()), 0.f);
+		v2.position = sf::Vector2f(static_cast<float>(i * m_map.getTileSize()), static_cast<float>(m_map.getTileSize() * m_map.getSize().y));
 		arr.append(v);
 		arr.append(v2);
 	}
@@ -701,8 +701,8 @@ void PlayingScreen::debugRender(Client & client, const sf::View & playerView)
 		sf::Vertex v, v2;
 		v.color = sf::Color::Black;
 		v2.color = sf::Color::Black;
-		v.position = sf::Vector2f(0.f, i * m_map.getTileSize());
-		v2.position = sf::Vector2f(m_map.getSize().x * m_map.getTileSize(), i * m_map.getTileSize());
+		v.position = sf::Vector2f(0.f, static_cast<float>(i * m_map.getTileSize()));
+		v2.position = sf::Vector2f(static_cast<float>(m_map.getSize().x * m_map.getTileSize()), static_cast<float>(i * m_map.getTileSize()));
 		arr.append(v);
 		arr.append(v2);
 	}
@@ -713,8 +713,8 @@ void PlayingScreen::debugRender(Client & client, const sf::View & playerView)
 	sf::Text text;
 	text.setFont(*client.getAssetManager().get<sf::Font>("arial.ttf"));
 	
-	int xt = std::floor(mouseWorldPos.x / m_map.getTileSize());
-	int yt = std::floor(mouseWorldPos.y / m_map.getTileSize());
+	int xt = static_cast<int>(std::floor(mouseWorldPos.x / m_map.getTileSize()));
+	int yt = static_cast<int>(std::floor(mouseWorldPos.y / m_map.getTileSize()));
 	std::string str = "(" + std::to_string(xt) + ", " + std::to_string(yt) + ")\n";
 	str += "(" + std::to_string(mouseWorldPos.x) + ", " + std::to_string(mouseWorldPos.y) + ")";
 	text.setString(str);

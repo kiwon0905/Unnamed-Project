@@ -166,9 +166,9 @@ void GameContext::update()
 					p->send(packer, false);
 
 				m_snapshots.add(snapshot.release(), m_tick);
-				m_snapshots.removeUntil(m_tick - TICKS_PER_SEC * 3);
+				m_snapshots.removeUntil(static_cast<int>(m_tick - TICKS_PER_SEC * 3));
 
-				const Snapshot * s = m_snapshots.get(m_tick - TICKS_PER_SEC * 0.2);
+				const Snapshot * s = m_snapshots.get(static_cast<int>(m_tick - TICKS_PER_SEC * 0.2));
 			
 				if (s)
 				{

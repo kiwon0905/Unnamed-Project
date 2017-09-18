@@ -92,9 +92,9 @@ void Human::render(const Snapshot * from, const Snapshot * to, float predictedT,
 	target.draw(total);
 
 	sf::RectangleShape health;
-	float healthVal = h0->health;
+	float healthVal = static_cast<float>(h0->health);
 	if (h1)
-		healthVal = Math::lerp<float>(h0->health, h1->health, t);
+		healthVal = Math::lerp<float>(static_cast<float>(h0->health), static_cast<float>(h1->health), t);
 	health.setFillColor(sf::Color::Red);
 	if (m_screen->getMyPlayerInfo().entityId == m_id)
 		health.setFillColor(sf::Color::Green);

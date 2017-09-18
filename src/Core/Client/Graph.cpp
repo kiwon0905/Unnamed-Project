@@ -71,7 +71,7 @@ void Graph::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	sf::VertexArray points(sf::PrimitiveType::LinesStrip, m_data.size());
 	for (std::size_t i = 0; i < m_data.size(); ++i)
 	{
-		points[i].position = sf::Vector2f(m_maxSampleSize - m_data.size() + i, m_maxValue - m_data[i]);
+		points[i].position = sf::Vector2f(static_cast<float>(m_maxSampleSize - m_data.size() + i), m_maxValue - m_data[i]);
 		points[i].color = sf::Color::Blue;
 	//	std::cout << "max sample size: " << m_maxSampleSize << "data size: " << m_data.size() << "i: " << i << "pos.x: " << points[i].position.x << "\n";
 	}
@@ -137,7 +137,7 @@ void Graph::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	//axis
 	sf::VertexArray axis(sf::PrimitiveType::Lines, 2);
 	axis[0].position = sf::Vector2f(0.f, m_maxValue);
-	axis[1].position = sf::Vector2f(m_maxSampleSize, m_maxValue);
+	axis[1].position = sf::Vector2f(static_cast<float>(m_maxSampleSize), m_maxValue);
 	target.draw(axis, states);
 
 

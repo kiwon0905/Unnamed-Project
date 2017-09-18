@@ -146,6 +146,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)extlib\include\;$(SolutionDir)src\</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4309</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalDependencies>sfml-system-d.lib;enet-d.lib;tinyxml2-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -167,6 +168,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)extlib\include\;$(SolutionDir)src\</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4309</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

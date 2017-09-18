@@ -90,7 +90,7 @@ int Map::sweep(const Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vect
 			{
 				float time;
 				sf::Vector2i norm;
-				Aabb tileAabb(x * m_tileSize, y * m_tileSize, m_tileSize, m_tileSize);
+				Aabb tileAabb(static_cast<float>(x * m_tileSize), static_cast<float>(y * m_tileSize), static_cast<float>(m_tileSize), static_cast<float>(m_tileSize));
 				if (aabb.sweep(d, tileAabb, time, norm))
 				{
 					if (time < minTime)
@@ -121,10 +121,10 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 		float minDistance = d.x + 1000.f;
 
 		//int startX = (aabb2.left + aabb2.width) / m_tileSize + 1;
-		int startX = aabb.x / m_tileSize;
-		int endX = (aabb2.x + aabb2.w + d.x) / m_tileSize;
-		int startY = aabb2.y / m_tileSize;
-		int endY = (aabb2.y + aabb2.h) / m_tileSize;
+		int startX = static_cast<int>(aabb.x / m_tileSize);
+		int endX = static_cast<int>((aabb2.x + aabb2.w + d.x) / m_tileSize);
+		int startY = static_cast<int>(aabb2.y / m_tileSize);
+		int endY = static_cast<int>((aabb2.y + aabb2.h) / m_tileSize);
 
 
 		for (int x = startX; x <= endX; ++x)
@@ -150,11 +150,10 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 	else if (d.x < 0)
 	{
 		float maxDistance = d.x - 1000.f;
-		int startX = std::floor((aabb2.x + d.x) / m_tileSize);
-		//int endX = aabb2.left / m_tileSize - 1;
-		int endX = (aabb2.x + aabb2.w) / m_tileSize;
-		int startY = aabb2.y / m_tileSize;
-		int endY = (aabb2.y + aabb2.h) / m_tileSize;
+		int startX = static_cast<int>(std::floor((aabb2.x + d.x) / m_tileSize));
+		int endX = static_cast<int>((aabb2.x + aabb2.w) / m_tileSize);
+		int startY = static_cast<int>(aabb2.y / m_tileSize);
+		int endY = static_cast<int>((aabb2.y + aabb2.h) / m_tileSize);
 
 		for (int x = startX; x <= endX; ++x)
 		{
@@ -182,10 +181,10 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 	{
 		float minDistance = d.y + 1000.f;
 		//int startY = (aabb2.top + aabb2.height) / m_tileSize + 1;
-		int startY = (aabb2.y) / m_tileSize;
-		int endY = (aabb2.y + aabb2.h + d.y) / m_tileSize;
-		int startX = aabb2.x / m_tileSize;
-		int endX = (aabb2.x + aabb2.w) / m_tileSize;
+		int startY = static_cast<int>((aabb2.y) / m_tileSize);
+		int endY = static_cast<int>((aabb2.y + aabb2.h + d.y) / m_tileSize);
+		int startX = static_cast<int>(aabb2.x / m_tileSize);
+		int endX = static_cast<int>((aabb2.x + aabb2.w) / m_tileSize);
 
 		for (int y = startY; y <= endY; ++y)
 		{
@@ -210,11 +209,10 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 	else if (d.y < 0)
 	{
 		float maxDistance = d.y - 1000.f;
-		int startY = std::floor((aabb2.y + d.y) / m_tileSize);
-		//int endY = aabb2.top / m_tileSize - 1;
-		int endY = (aabb2.y + aabb2.h) / m_tileSize;
-		int startX = aabb2.x / m_tileSize;
-		int endX = (aabb2.x + aabb2.w) / m_tileSize;
+		int startY = static_cast<int>(std::floor((aabb2.y + d.y) / m_tileSize));
+		int endY = static_cast<int>((aabb2.y + aabb2.h) / m_tileSize);
+		int startX = static_cast<int>(aabb2.x / m_tileSize);
+		int endX = static_cast<int>((aabb2.x + aabb2.w) / m_tileSize);
 		for (int y = startY; y <= endY; ++y)
 		{
 
@@ -240,10 +238,10 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 
 bool Map::isGrounded(const Aabb & aabb) const
 {
-	int startX = std::floor((aabb.x)/ m_tileSize);
-	int endX = std::floor((aabb.x + aabb.w) / m_tileSize);
+	int startX = static_cast<int>(std::floor((aabb.x)/ m_tileSize));
+	int endX = static_cast<int>(std::floor((aabb.x + aabb.w) / m_tileSize));
 
-	int y = std::floor((aabb.y + aabb.h + 1) / m_tileSize);
+	int y = static_cast<int>(std::floor((aabb.y + aabb.h + 1) / m_tileSize));
 
 	for (int x = startX; x <= endX; ++x)
 	{
@@ -264,8 +262,8 @@ int Map::getTile(int x, int y) const
 
 int Map::getTile(float x, float y) const
 {
-	int xt = std::floor(x / m_tileSize);
-	int yt = std::floor(y / m_tileSize);
+	int xt = static_cast<int>(std::floor(x / m_tileSize));
+	int yt = static_cast<int>(std::floor(y / m_tileSize));
 	return getTile(xt, yt);
 }
 

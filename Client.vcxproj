@@ -155,6 +155,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)extlib\include\;$(SolutionDir)src\</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4309</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)extlib\lib\</AdditionalLibraryDirectories>
@@ -176,6 +177,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)extlib\include\;$(SolutionDir)src\</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4309</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
