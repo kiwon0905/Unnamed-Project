@@ -430,7 +430,7 @@ void PlayingScreen::update(Client & client)
 			Packer packer;
 			packer.pack(Msg::CL_INPUT);
 			packer.pack<0, MAX_TICK>(m_lastRecvTick);
-			std::cout << "last revc tick: " << m_lastRecvTick << ", predictedTick: " << m_predictedTick << "\n";
+
 			input.write(packer);
 			client.getNetwork().send(packer, false);
 			client.getNetwork().flush();

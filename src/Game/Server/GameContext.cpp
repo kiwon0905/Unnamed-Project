@@ -83,7 +83,7 @@ void GameContext::onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer)
 		NetInput input;
 		input.read(unpacker);
 		peer->onInput(input);
-		std::cout << peer->getName() << " acked " << ackTick << "intended tick: " << input.tick << "current tick: " << m_tick << "\n";
+
 		if (m_tick % 2 == 0)
 		{
 			sf::Time timeLeft = sf::seconds(input.tick / TICKS_PER_SEC) - m_clock.getElapsedTime();
@@ -172,7 +172,7 @@ void GameContext::update()
 			
 				if (s)
 				{
-					/*
+					
 					//packer 3 contains the uncompressed  delta snapshot
 					Packer packer3;
 					m_snapshots.getLast()->writeRelativeTo(packer3, *s);
@@ -190,7 +190,7 @@ void GameContext::update()
 					{
 						std::cout << "decompress success! compression ratio: " << (float)packer4.getDataSize() / packer5.getDataSize() << "\n\n";
 					}
-				*/
+				
 				}
 			}	
 

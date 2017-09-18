@@ -27,14 +27,15 @@ template<uint64_t min, uint64_t max> struct BitsRequired
 class Packer
 {
 public:
+	Packer();
 	Packer(const Packer &) = delete;
 	Packer & operator=(const Packer &) = delete;
 
-	Packer();
-	
 	const void * getData() const;
 	std::size_t getDataSize() const;
-	void pack(bool data);
+
+	template <typename T>
+	std::enable_if_t<std::is_integral_v<T>> pack(T data, std::size_t bits);
 	template <std::int8_t min = (std::numeric_limits<std::int8_t>::min)(), std::int8_t max = (std::numeric_limits<std::int8_t>::max)()>
 	void pack(std::int8_t data);
 	template <std::uint8_t min = (std::numeric_limits<std::uint8_t>::min)(), std::uint8_t max = (std::numeric_limits<std::uint8_t>::max)()>
@@ -51,28 +52,24 @@ public:
 	void pack(std::int64_t data);
 	template <std::uint64_t min = (std::numeric_limits<std::uint64_t>::min)(), std::uint64_t max = (std::numeric_limits<std::uint64_t>::max)()>
 	void pack(std::uint64_t data);
-
+	void pack(bool data);
 	void pack(const std::string & data);
 	void pack(const void * data, std::size_t size);
-
-	//works for enum types that have LAST as its last value.
 	template <typename T>
 	std::enable_if_t<std::is_enum<T>::value> pack(T data);
+
+	void align();
+
+
+	std::size_t getCurrentBitPos() { return m_bitPos; }
 	void p()
 	{
 		for (char c : m_data)
 			std::cout << std::bitset<8>(c) << " ";
 		std::cout << "\n";
 	}
-	void align();
-	void pack8(std::uint8_t data, std::size_t bits);
-	void pack16(std::uint16_t data, std::size_t bits);
-	void pack32(std::uint32_t data, std::size_t bits);
-	void pack64(std::uint64_t data, std::size_t bits);
-
-	std::size_t getCurrentBitPos() { return m_bitPos; }
 private:
-
+	void pack8(std::uint8_t data, std::size_t bits);
 	std::vector<std::uint8_t> m_data;
 	std::size_t m_bitPos;
 };
@@ -80,15 +77,15 @@ private:
 class Unpacker
 {
 public:
-	Unpacker(const void * data, std::size_t size);
 	Unpacker();
-
+	Unpacker(const void * data, std::size_t size);
 	Unpacker(const Unpacker &) = delete;
 	Unpacker & operator=(const Unpacker &) = delete;
 
 	void setData(const void * data, std::size_t size);
 
-	void unpack(bool & data);
+	template <typename T>
+	std::enable_if_t<std::is_integral_v<T>> unpack(T & data, std::size_t bits);
 	template <std::int8_t min = (std::numeric_limits<std::int8_t>::min)(), std::int8_t max = (std::numeric_limits<std::int8_t>::max)()>
 	void unpack(std::int8_t & data);
 	template <std::uint8_t min = (std::numeric_limits<std::uint8_t>::min)(), std::uint8_t max = (std::numeric_limits<std::uint8_t>::max)()>
@@ -105,20 +102,17 @@ public:
 	void unpack(std::int64_t & data);
 	template <std::uint64_t min = (std::numeric_limits<std::uint64_t>::min)(), std::uint64_t max = (std::numeric_limits<std::uint64_t>::max)()>
 	void unpack(std::uint64_t & data);
-
+	void unpack(bool & data);
 	void unpack(std::string & data);
 	void unpack(void * data, std::size_t size);
-
 	template <typename T>
 	std::enable_if_t<std::is_enum<T>::value> unpack(T & data);
+	
+	template <typename T>
+	void peek(T & data, std::size_t bits);
 	void align();
-	void peek8(std::uint8_t & data, std::size_t bits);
-	void unpack8(std::uint8_t & data, std::size_t bits);
-	void unpack16(std::uint16_t & data, std::size_t bits);
-	void unpack32(std::uint32_t & data, std::size_t bits);
-	void unpack64(std::uint64_t & data, std::size_t bits);
 private:
-
+	void unpack8(std::uint8_t & data, std::size_t bits);
 	void check(std::size_t bits);
 	const std::uint8_t * m_data;
 	std::size_t m_size;

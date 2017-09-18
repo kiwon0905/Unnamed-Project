@@ -16,26 +16,26 @@ void encode(const void * data, std::size_t size, Packer & packer)
 	while (readBits + RUN_LENGTH <= totalBits)
 	{
 		uint8_t bits;
-		unpacker.unpack8(bits, RUN_LENGTH);
+		unpacker.unpack(bits, RUN_LENGTH);
 		readBits += RUN_LENGTH;
 
-		packer.pack8(bits, RUN_LENGTH);
+		packer.pack(bits, RUN_LENGTH);
 
 
 		if (bits == 0)
 		{
 			uint8_t next;
-			unpacker.peek8(next, RUN_LENGTH);
+			unpacker.peek(next, RUN_LENGTH);
 			std::size_t length = 1;
 			while (next == 0 && length < (1 << RUN_LENGTH) - 1 && readBits + RUN_LENGTH <= totalBits)
 			{
 				++length;
-				unpacker.unpack8(next, RUN_LENGTH);
-				unpacker.peek8(next, RUN_LENGTH);
+				unpacker.unpack(next, RUN_LENGTH);
+				unpacker.peek(next, RUN_LENGTH);
 				readBits += RUN_LENGTH;
 
 			}
-			packer.pack8(length, RUN_LENGTH);
+			packer.pack(length, RUN_LENGTH);
 		}
 	}
 
@@ -43,13 +43,13 @@ void encode(const void * data, std::size_t size, Packer & packer)
 	std::size_t remaining = totalBits - readBits;
 
 	uint8_t r;
-	unpacker.unpack8(r, remaining);
-	packer.pack8(r, remaining);
+	unpacker.unpack(r, remaining);
+	packer.pack(r, remaining);
 	std::size_t validBits = packer.getCurrentBitPos();
 	validBits = validBits == 0 ? 8 : validBits;
 
 	packer.align();
-	packer.pack8(validBits, 8);
+	packer.pack(validBits, 8);
 }
 
 void decode(const void * data, std::size_t size, Packer & packer)
@@ -64,25 +64,25 @@ void decode(const void * data, std::size_t size, Packer & packer)
 	while (readBits + RUN_LENGTH <= totalBits)
 	{
 		uint8_t bits;
-		unpacker.unpack8(bits, RUN_LENGTH);
+		unpacker.unpack(bits, RUN_LENGTH);
 		readBits += RUN_LENGTH;
 		if (bits == 0 && readBits + RUN_LENGTH <= totalBits)
 		{
 			uint8_t length;
-			unpacker.unpack8(length, RUN_LENGTH);
+			unpacker.unpack(length, RUN_LENGTH);
 			readBits += RUN_LENGTH;
 			for (std::size_t i = 0; i < length; ++i)
-				packer.pack8(0, RUN_LENGTH);
+				packer.pack(0, RUN_LENGTH);
 
 		}
 		else
 		{
-			packer.pack8(bits, RUN_LENGTH);
+			packer.pack(bits, RUN_LENGTH);
 		
 		}
 	}
 	std::size_t remaining = totalBits - readBits;
 	std::uint8_t r;
-	unpacker.unpack8(r, remaining);
-	packer.pack8(r, remaining);
+	unpacker.unpack(r, remaining);
+	packer.pack(r, remaining);
 }
