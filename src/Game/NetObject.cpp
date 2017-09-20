@@ -35,28 +35,25 @@ void NetObject::read(Unpacker & unpacker)
 	readFunc(data.data(), unpacker);
 }
 
-void NetObject::writeRelative(Packer & packer, const NetObject & o)
+void NetObject::writeRelative(Packer & packer, const NetObject & o) const
 {
 	std::vector<char> xord(data.size());
-
 	for (std::size_t i = 0; i < xord.size(); ++i)
 	{
-		xord[i] = data[i] - o.data[i];
+		xord[i] = data[i] ^ o.data[i];
 	}
 
-	NetHuman * h = (NetHuman *)xord.data();
 	writeFunc(xord.data(), packer);
 
 }
 
 void NetObject::readRelative(Unpacker & unpacker, const NetObject & o)
 {
-	std::vector<char> xord(data.size());
-	readFunc(xord.data(), unpacker);
+	readFunc(data.data(), unpacker);
 
-	for (std::size_t i = 0; i < xord.size(); ++i)
+	for (std::size_t i = 0; i < data.size(); ++i)
 	{
-		data[i] = xord[i] + o.data[i];
+		data[i] = data[i] ^ o.data[i];
 	}
 
 }

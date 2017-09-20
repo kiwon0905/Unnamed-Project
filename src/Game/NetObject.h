@@ -31,7 +31,7 @@ public:
 	void write(Packer & packer) const;
 	void read(Unpacker & unpacker);
 
-	void writeRelative(Packer & packer, const NetObject & o);
+	void writeRelative(Packer & packer, const NetObject & o) const;
 	void readRelative(Unpacker & unpacker, const NetObject & o);
 	NetObject * clone() const;
 
