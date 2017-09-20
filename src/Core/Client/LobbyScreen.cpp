@@ -20,17 +20,17 @@ void LobbyScreen::onEnter(Client & client)
 	auto connect = [this, &client]()
 	{
 		std::string name = m_nameBox->getText();
-		std::cout << "name is: " << name << "\n";
 
 		std::string text = m_addressBox->getText();
 		ENetAddress addr;
 		if (enutil::toENetAddress(text, addr))
 		{
+			Logger::getInstance().info("LobbyScreen", "connecting...");
 			client.getNetwork().connect(addr);
 		}
 		else
 		{
-			std::cout << "invalid address\n";
+			Logger::getInstance().info("LobbyScreen", "invalid address");
 		}
 	};
 
@@ -66,18 +66,18 @@ void LobbyScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		unpacker.unpack(msg);
 		if (msg == Msg::SV_ACCEPT_JOIN)
 		{
-			Logger::getInstance().info("Joined game");
+			Logger::getInstance().info("LobbyScreen", "Joined game");
 			client.getScreenStack().push(new RoomScreen);
 		}
 		else if (msg == Msg::SV_REJECT_JOIN)
 		{
-			std::cout << "rejected from joining game\n";
+			Logger::getInstance().info("LobbyScreen", "rejected from server");
 			client.getNetwork().disconnect();
 		}
 	}
 	else if (netEv.type == ENET_EVENT_TYPE_CONNECT)
 	{
-		Logger::getInstance().info("Connected to game server");
+		Logger::getInstance().info("LobbyScreen", "Connected to game server");
 		Packer packer;
 		packer.pack(Msg::CL_REQUEST_JOIN_GAME);
 		packer.pack(m_nameBox->getText().toAnsiString());
@@ -88,11 +88,11 @@ void LobbyScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 	{
 		if (m_connected)
 		{
-			Logger::getInstance().info("Disconnected from game server");
+			Logger::getInstance().info("LobbyScreen", "Disconnected from game server");
 			m_connected = false;
 		}
 		else
-			Logger::getInstance().info("Failed to connecet to game server");
+			Logger::getInstance().info("LobbyScreen", "Failed to connecet to game server");
 
 	}
 

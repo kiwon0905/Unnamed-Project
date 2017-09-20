@@ -202,10 +202,9 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			unpacker.unpack<0, MAX_ENTITY_ID>(m_myPlayer.entityId);
 			unpacker.unpack(playerEntityType);
 
-			std::cout << "map: " << mapName << "\n";
-			std::cout << "total players " << numPlayer << " players.\n";
-			std::cout << m_myPlayer.name << "(" << m_myPlayer.id << ") -" << " entity id: " << m_myPlayer.entityId << " entity type: " << static_cast<int>(playerEntityType) << "\n";
-			std::cout << "my team: " << toString(m_myPlayer.team) << "\n";
+
+			Logger::getInstance().info("PlayingScreen", "map is " + mapName);
+			Logger::getInstance().info("PlayingScreen", m_myPlayer.name + "(" + std::to_string(m_myPlayer.id) + ") - " + "entity id: " + std::to_string(m_myPlayer.entityId) + " team: " + toString(m_myPlayer.team) + " entity type: " + std::to_string(static_cast<int>(playerEntityType)));
 			for (int i = 0; i < numPlayer - 1; ++i)
 			{
 				PlayerInfo info;
@@ -214,7 +213,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 				unpacker.unpack(info.team);
 				unpacker.unpack<0, MAX_ENTITY_ID>(info.entityId);
 				m_players.push_back(info);
-				std::cout << info.name << "(" << info.id << ") - " << " team: " << toString(info.team) << " entity: " << info.entityId << "\n";
+				Logger::getInstance().info("PlayingScreen", info.name + "(" + std::to_string(info.id) + ") - " + "entity id: " + std::to_string(info.entityId) + " team: " + toString(info.team));
 			}
 
 			//load map
@@ -258,7 +257,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			Packer packer;
 			packer.pack(Msg::CL_LOAD_COMPLETE);
 			client.getNetwork().send(packer, true);
-			Logger::getInstance().info("Loading complete. Entering game...");
+			Logger::getInstance().info("PlayingScreen", "Loading complete. Entering game...");
 			m_state = ENTERING;
 		}
 
@@ -287,14 +286,12 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					m_prevPredictedTime = sf::seconds(static_cast<float>(m_startTick + 5) / TICKS_PER_SEC);
 					m_predictedTime.setAdjustSpeed(1, 1000.f);
 					m_predictedTick = m_startTick + 5;
-					std::cout << "start tick: " << m_startTick << "\n";
-					std::cout << "predicted tick: " << m_predictedTick << "\n";
+
 				}
 				else if(serverTick - 2 >= m_startTick) 
 				{
 					m_state = IN_GAME;
 					m_renderTime.reset(sf::seconds(m_startTick / TICKS_PER_SEC));
-					std::cout << "startTime: " << m_startTick / TICKS_PER_SEC << " recv server time: " << serverTick / TICKS_PER_SEC << "\n";
 				}
 			}
 			else if(m_state == IN_GAME)
@@ -351,10 +348,10 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 
 			const PlayerInfo * info = getPlayerInfo(int(id));
 
-			std::cout << "Chat from player" << (int)id << ": " << msg << "\n";
 			if (info)
 			{
 				std::string line = info->name + ": " + msg;
+				Logger::getInstance().info("Chat", line);
 				m_chatBox->addLine(line);
 
 			}

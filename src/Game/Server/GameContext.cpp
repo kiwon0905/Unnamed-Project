@@ -68,11 +68,11 @@ void GameContext::onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer)
 	else if (msg == Msg::CL_LOAD_COMPLETE && m_state == LOADING)
 	{
 		peer->setState(Peer::IN_GAME);
-		Logger::getInstance().info(std::to_string(peer->getId()) + " has loaded");
+		Logger::getInstance().info("GameContext", std::to_string(peer->getId()) + " has loaded");
 		if (ensurePlayers(Peer::IN_GAME))
 		{
 			m_state = State::IN_GAME;
-			Logger::getInstance().info("Everyone has loaded");
+			Logger::getInstance().info("GameContext", "Everyone has loaded");
 			m_clock.restart();
 		}
 	}
@@ -172,7 +172,8 @@ void GameContext::update()
 			
 				if (s)
 				{
-					
+					std::cout << "og size: " << m_snapshots.getLast()->getSize() << "\n";
+
 					//packer 3 contains the uncompressed  delta snapshot
 					Packer packer3;
 					m_snapshots.getLast()->writeRelativeTo(packer3, *s);
@@ -188,7 +189,7 @@ void GameContext::update()
 
 					if (memcmp(packer3.getData(), packer5.getData(), packer3.getDataSize()) == 0)
 					{
-						std::cout << "decompress success! compression ratio: " << (float)packer4.getDataSize() / packer5.getDataSize() << "\n\n";
+						std::cout << "decompress success! compression ratio: " << (float)packer4.getDataSize() / packer5.getDataSize() << "total compresseion ratio: " << (float)packer4.getDataSize() / m_snapshots.getLast()->getSize() << "\n\n";
 					}
 				
 				}
@@ -257,7 +258,7 @@ void GameContext::endRound(Team winner)
 
 void GameContext::reset()
 {
-	Logger::getInstance().info("server reset!");
+	Logger::getInstance().info("GameContext", "server reset!");
 	m_gameWorld.reset();
 	m_state = PRE_GAME;
 	m_tick = 0;

@@ -21,6 +21,16 @@ public:
 
 	const std::unordered_map<int, std::unique_ptr<NetObject>> & getEntities() const { return m_entities; }
 	const std::vector<std::unique_ptr<NetObject>> & getTransients() const { return m_transients; }
+
+	std::size_t getSize()
+	{
+		std::size_t size = 0;
+		for (auto & p : m_entities)
+			size += p.second->data.size();
+		for (auto & o : m_transients)
+			size += o->data.size();
+		return size;
+	}
 private:
 
 	std::unordered_map<int, std::unique_ptr<NetObject>> m_entities;

@@ -39,8 +39,6 @@ void Packer::pack(const void * data, std::size_t size)
 	std::size_t start = m_data.size();
 	m_data.resize(start + size);
 	std::memcpy(&m_data[start], data, size);
-
-	std::cout << "size: " << size << "\n";
 }
 
 void Packer::align()

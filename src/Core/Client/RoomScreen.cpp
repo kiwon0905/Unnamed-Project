@@ -24,7 +24,7 @@ void RoomScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 	}
 	else if (netEv.type == ENET_EVENT_TYPE_DISCONNECT)
 	{
-		Logger::getInstance().info("Disconnected from game server");
+		Logger::getInstance().info("RoomScreen", "Disconnected from game server");
 	}
 }
 

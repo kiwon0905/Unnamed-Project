@@ -15,19 +15,23 @@ bool Client::initialize()
 
 	if (!m_parser.loadFromFile("client-config.txt"))
 	{
-		Logger::getInstance().error("Failed to load client-config.txt");
+		Logger::getInstance().error("Client", "Failed to load client-config.txt");
 		return false;
 	}
 	
 	if (!m_network.initialize(*this))
+	{
+		Logger::getInstance().error("Client", "Failed to initialize network");
 		return false;
+	}
 	
 	if (!m_screenStack.initialize(*this))
 		return false;
 
 	if (!m_input.initialize(*this))
 		return false;
-	Logger::getInstance().info("Initialization successful");
+
+	Logger::getInstance().info("Client", "Initialization successful");
 
 	m_screenStack.push(new LobbyScreen);
 	m_screenStack.applyChanges(*this);
