@@ -261,21 +261,44 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			m_state = ENTERING;
 		}
 
-		else if (msg == Msg::SV_FULL_SNAPSHOT)
+		else if (msg == Msg::SV_FULL_SNAPSHOT || msg == Msg::SV_DELTA_SNAPSHOT)
 		{
 			if (m_state == LOADING)
 				return;
 			
 			int serverTick;
-			unpacker.unpack<0, MAX_TICK>(serverTick);
-			unpacker.align();
+			unpacker.unpack<-1, MAX_TICK>(serverTick);
 			if (m_lastRecvTick >= serverTick)
 				return;
 
-			Snapshot * snapshot = new Snapshot;
-			snapshot->read(unpacker);
-			m_snapshots.add(snapshot, serverTick);
+			if (msg == Msg::SV_DELTA_SNAPSHOT)
+			{
+				int deltaTick;
+				unpacker.unpack<-1, MAX_TICK>(deltaTick);
+				
+				const Snapshot * deltaSnapshot = m_snapshots.get(deltaTick);
+				if (!deltaSnapshot)
+				{
+					m_lastRecvTick = -1;
+					return;
+				}
+				Snapshot * snapshot = new Snapshot;
+				snapshot->readRelativeTo(unpacker, *deltaSnapshot);
+				m_snapshots.add(snapshot, serverTick);
+
+
+				std::cout << "delta snap recvd: " << deltaTick << ", " << serverTick << "\n";;
+			
+			}
+			else
+			{
+				std::cout << "full snapshot recvd: " << serverTick << "\n";
+				Snapshot * snapshot = new Snapshot;
+				snapshot->read(unpacker);
+				m_snapshots.add(snapshot, serverTick);
+			}
 			m_lastRecvTick = serverTick;
+
 
 			if (m_state == ENTERING)
 			{
@@ -311,7 +334,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		{
 			int inputTick;
 			int32_t timeLeft;
-			unpacker.unpack<0, MAX_TICK>(inputTick);
+			unpacker.unpack<-1, MAX_TICK>(inputTick);
 			unpacker.unpack(timeLeft);
 			for (const auto & input : m_inputs)
 			{
@@ -423,8 +446,8 @@ void PlayingScreen::update(Client & client)
 			//send to server
 			Packer packer;
 			packer.pack(Msg::CL_INPUT);
-			packer.pack<0, MAX_TICK>(m_predictedTick);
-			packer.pack<0, MAX_TICK>(m_lastRecvTick);
+			packer.pack<-1, MAX_TICK>(m_predictedTick);
+			packer.pack<-1, MAX_TICK>(m_lastRecvTick);
 			input.write(packer);
 
 			client.getNetwork().send(packer, false);

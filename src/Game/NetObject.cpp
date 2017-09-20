@@ -37,45 +37,28 @@ void NetObject::read(Unpacker & unpacker)
 
 void NetObject::writeRelative(Packer & packer, const NetObject & o)
 {
-	/*if (o.data == data)
+	std::vector<char> xord(data.size());
+
+	for (std::size_t i = 0; i < xord.size(); ++i)
 	{
-		packer.pack(false);
+		xord[i] = data[i] - o.data[i];
 	}
-	else*/
-	{
-		//packer.pack(true);
-		std::vector<char> xord(data.size());
-		for (std::size_t i = 0; i < xord.size(); ++i)
-		{
-			xord[i] = data[i] - o.data[i];
-		}
-		NetHuman * h = (NetHuman *)&xord[0];
-		writeFunc(xord.data(), packer);
-	}
+
+	NetHuman * h = (NetHuman *)xord.data();
+	writeFunc(xord.data(), packer);
 
 }
 
 void NetObject::readRelative(Unpacker & unpacker, const NetObject & o)
 {
-	/*bool changed;
-	unpacker.unpack(changed);
-	
-	if (changed)*/
+	std::vector<char> xord(data.size());
+	readFunc(xord.data(), unpacker);
+
+	for (std::size_t i = 0; i < xord.size(); ++i)
 	{
-		std::vector<char> xord(data.size());
-		readFunc(xord.data(), unpacker);
-	
-		for (std::size_t i = 0; i < xord.size(); ++i)
-		{
-			xord[i] = data[i] + o.data[i];
-		}
+		data[i] = xord[i] + o.data[i];
 	}
-/*	else
-	{
-		data = o.data;
-	}
-	
-	*/
+
 }
 
 NetObject * NetObject::clone() const
@@ -94,7 +77,7 @@ void NetHuman::write(Packer & packer) const
 {
 	packer.pack(groundJump); // 1
 	packer.pack(airJump);//1
-	packer.pack<0, MAX_TICK>(airTick);
+	packer.pack<-1, MAX_TICK>(airTick);
 	packer.pack<0, 100>(health); //7
 	packer.pack<0, 500000>(pos.x); // 19
 	packer.pack<0, 500000>(pos.y); //19
@@ -102,7 +85,7 @@ void NetHuman::write(Packer & packer) const
 	packer.pack<-500000, 500000>(vel.y); // 20
 
 
-
+	std::cout << "write pos: " << pos.x << ", " << pos.y << "\n";
 	packer.pack<0, 360>(aimAngle); // 9
 }
 
@@ -110,13 +93,14 @@ void NetHuman::read(Unpacker & unpacker)
 {
 	unpacker.unpack(groundJump);
 	unpacker.unpack(airJump);
-	unpacker.unpack<0, MAX_TICK>(airTick);
+	unpacker.unpack<-1, MAX_TICK>(airTick);
 	unpacker.unpack<0, 100>(health);
 	unpacker.unpack<0, 500000>(pos.x);
 	unpacker.unpack<0, 500000>(pos.y);
 	unpacker.unpack<-500000, 500000>(vel.x);
 	unpacker.unpack<-500000, 500000>(vel.y);
 
+	std::cout << "read pos: " << pos.x << ", " << pos.y << "\n";
 
 	unpacker.unpack<0, 360>(aimAngle);
 

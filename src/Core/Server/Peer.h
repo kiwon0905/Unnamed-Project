@@ -47,6 +47,9 @@ public:
 	void setTeam(Team team);
 	void onInput(int tick, const NetInput & input);
 	NetInput popInput(int tick);
+
+	void setAckTick(int tick);
+	int getAckTick();
 private:
 	int m_id;
 	std::string m_name;
@@ -54,6 +57,6 @@ private:
 	Entity * m_entity = nullptr;
 	State m_state = PRE_GAME;
 	Team m_team = Team::NONE;
-
+	int m_ackTick = -1;
 	std::priority_queue<Input, std::vector<Input>, InputComparator> m_inputs;
 };

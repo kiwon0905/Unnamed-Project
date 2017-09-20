@@ -84,3 +84,13 @@ NetInput Peer::popInput(int tick)
 	return i.input;
 }
 
+void Peer::setAckTick(int tick)
+{
+	m_ackTick = tick;
+}
+
+int Peer::getAckTick()
+{
+	return m_ackTick;
+}
+

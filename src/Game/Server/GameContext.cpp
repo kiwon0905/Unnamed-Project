@@ -2,6 +2,7 @@
 #include "Game/Server/Entity/Crate.h"
 #include "Core/ENetUtility.h"
 #include "Core/Logger.h"
+#include "Core/Rle.h"
 
 
 GameContext::GameContext():
@@ -80,19 +81,19 @@ void GameContext::onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer)
 	{
 		int predictedTick;
 		int ackTick;
-		unpacker.unpack<0, MAX_TICK>(predictedTick);
-		unpacker.unpack<0, MAX_TICK>(ackTick);
+		unpacker.unpack<-1, MAX_TICK>(predictedTick);
+		unpacker.unpack<-1, MAX_TICK>(ackTick);
 		NetInput input;
 		input.read(unpacker);
 		peer->onInput(predictedTick, input);
-
+		peer->setAckTick(ackTick);
 		if (m_tick % 2 == 0)
 		{
 			sf::Time timeLeft = sf::seconds(predictedTick / TICKS_PER_SEC) - m_clock.getElapsedTime();
 
 			Packer packer;
 			packer.pack(Msg::SV_INPUT_TIMING);
-			packer.pack<0, MAX_TICK>(predictedTick);
+			packer.pack<-1, MAX_TICK>(predictedTick);
 			packer.pack(timeLeft.asMilliseconds());
 			peer->send(packer, false);
 		}
@@ -125,8 +126,6 @@ void GameContext::onDisconnect(const ENetPeer & peer)
 		reset();
 }
 
-#include "Core/Rle.h"
-
 void GameContext::update()
 {
 	if (m_state == PRE_GAME)
@@ -158,43 +157,31 @@ void GameContext::update()
 				std::unique_ptr<Snapshot> snapshot = std::make_unique<Snapshot>();
 				m_gameWorld.snap(*snapshot);
 
-				Packer packer;
-				packer.pack(Msg::SV_FULL_SNAPSHOT);
-				packer.pack<0, MAX_TICK>(m_tick);
-				packer.align();
-				snapshot->write(packer);
+
 
 				for (auto & p : m_peers)
+				{
+					Packer packer;
+					Snapshot * delta = m_snapshots.get(p->getAckTick());
+					if (delta)
+					{
+						packer.pack(Msg::SV_DELTA_SNAPSHOT);
+						packer.pack<-1, MAX_TICK>(m_tick);
+						packer.pack<-1, MAX_TICK>(p->getAckTick());
+						snapshot->writeRelativeTo(packer, *delta);
+					}
+					else
+					{
+						packer.pack(Msg::SV_FULL_SNAPSHOT);
+						packer.pack<-1, MAX_TICK>(m_tick);
+						snapshot->write(packer);
+					}
 					p->send(packer, false);
+				}
 
 				m_snapshots.add(snapshot.release(), m_tick);
 				m_snapshots.removeUntil(static_cast<int>(m_tick - TICKS_PER_SEC * 3));
 
-				const Snapshot * s = m_snapshots.get(static_cast<int>(m_tick - TICKS_PER_SEC * 0.2));
-			
-				if (s)
-				{
-					std::cout << "og size: " << m_snapshots.getLast()->getSize() << "\n";
-
-					//packer 3 contains the uncompressed  delta snapshot
-					Packer packer3;
-					m_snapshots.getLast()->writeRelativeTo(packer3, *s);
-					std::cout << "uncompressed size: " << packer3.getDataSize() << "\n";
-
-					Packer packer4;
-					encode(packer3.getData(), packer3.getDataSize(), packer4);
-					std::cout << "compressed size: " << packer4.getDataSize() << "\n";
-
-					Packer packer5;
-					decode(packer4.getData(), packer4.getDataSize(), packer5);
-					std::cout << "decompressed size: " << packer5.getDataSize() << "\n";
-
-					if (memcmp(packer3.getData(), packer5.getData(), packer3.getDataSize()) == 0)
-					{
-						std::cout << "decompress success! compression ratio: " << (float)packer4.getDataSize() / packer5.getDataSize() << "total compresseion ratio: " << (float)packer4.getDataSize() / m_snapshots.getLast()->getSize() << "\n\n";
-					}
-				
-				}
 			}	
 
 

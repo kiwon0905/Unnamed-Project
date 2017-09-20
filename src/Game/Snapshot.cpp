@@ -120,7 +120,7 @@ void Snapshot::readRelativeTo(Unpacker & unpacker, const Snapshot & s)
 void Snapshot::writeRelativeTo(Packer & packer, const Snapshot & s)
 {
 	packer.pack<0, MAX_SNAPSHOT_ITEM_SIZE>(m_entities.size() + m_transients.size());
-
+	
 	for (auto & e : m_entities)
 	{
 		packer.pack(e.second->getType());
