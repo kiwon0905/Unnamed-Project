@@ -62,9 +62,12 @@ void Peer::setTeam(Team team)
 	m_team = team;
 }
 
-void Peer::onInput(const NetInput & input)
+void Peer::onInput(int tick, const NetInput & input)
 {
-	m_inputs.push(input);
+	Input i;
+	i.tick = tick;
+	i.input = input;
+	m_inputs.push(i);
 }
 
 NetInput Peer::popInput(int tick)
@@ -72,12 +75,12 @@ NetInput Peer::popInput(int tick)
 	while (!m_inputs.empty() && m_inputs.top().tick < tick)
 		m_inputs.pop();
 
-	NetInput i;
+	Input i;
 	if (!m_inputs.empty() && m_inputs.top().tick == tick)
 	{
 		i = m_inputs.top();
 		m_inputs.pop();
 	}
-	return i;
+	return i.input;
 }
 

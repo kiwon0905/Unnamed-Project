@@ -78,19 +78,21 @@ void GameContext::onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer)
 	}
 	else if (msg == Msg::CL_INPUT && m_state == IN_GAME)
 	{
+		int predictedTick;
 		int ackTick;
+		unpacker.unpack<0, MAX_TICK>(predictedTick);
 		unpacker.unpack<0, MAX_TICK>(ackTick);
 		NetInput input;
 		input.read(unpacker);
-		peer->onInput(input);
+		peer->onInput(predictedTick, input);
 
 		if (m_tick % 2 == 0)
 		{
-			sf::Time timeLeft = sf::seconds(input.tick / TICKS_PER_SEC) - m_clock.getElapsedTime();
+			sf::Time timeLeft = sf::seconds(predictedTick / TICKS_PER_SEC) - m_clock.getElapsedTime();
 
 			Packer packer;
 			packer.pack(Msg::SV_INPUT_TIMING);
-			packer.pack<0, MAX_TICK>(input.tick);
+			packer.pack<0, MAX_TICK>(predictedTick);
 			packer.pack(timeLeft.asMilliseconds());
 			peer->send(packer, false);
 		}

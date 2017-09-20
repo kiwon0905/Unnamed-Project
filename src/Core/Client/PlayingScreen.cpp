@@ -315,7 +315,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			unpacker.unpack(timeLeft);
 			for (const auto & input : m_inputs)
 			{
-				if (input.input.tick == inputTick)
+				if (input.tick == inputTick)
 				{
 					sf::Time target = input.predictedTime + input.elapsed.getElapsedTime() - sf::milliseconds(timeLeft - 50);
 					//m_predictedTime.update(target, sf::seconds(1.f));
@@ -408,15 +408,12 @@ void PlayingScreen::update(Client & client)
 
 
 			//read input
-			
 			NetInput input;
-			
 			if(!m_editBox->isFocused())
 				input = client.getInput().getInput(client.getWindow(), m_view);
 		
-			//m_editBox->isFocused()
-
-			input.tick = m_predictedTick;
+			//save the input
+			m_inputs[m_currentInputIndex].tick = m_predictedTick;
 			m_inputs[m_currentInputIndex].input = input;
 			m_inputs[m_currentInputIndex].predictedTime = current;
 			m_inputs[m_currentInputIndex].elapsed.restart();
@@ -426,9 +423,10 @@ void PlayingScreen::update(Client & client)
 			//send to server
 			Packer packer;
 			packer.pack(Msg::CL_INPUT);
+			packer.pack<0, MAX_TICK>(m_predictedTick);
 			packer.pack<0, MAX_TICK>(m_lastRecvTick);
-
 			input.write(packer);
+
 			client.getNetwork().send(packer, false);
 			client.getNetwork().flush();
 			
@@ -457,7 +455,7 @@ void PlayingScreen::update(Client & client)
 							//TODO improve
 							NetInput input;
 							for (const auto & i : m_inputs)
-								if (i.input.tick == t)
+								if (i.tick == t)
 									input = i.input;
 
 							e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), input, m_map);

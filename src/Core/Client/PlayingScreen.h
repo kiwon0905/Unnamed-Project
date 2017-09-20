@@ -67,6 +67,7 @@ private:
 		sf::Time predictedTime;
 		sf::Clock elapsed;
 		NetInput input;
+		int tick;
 	};
 	Input m_inputs[200];
 	std::size_t m_currentInputIndex = 0;

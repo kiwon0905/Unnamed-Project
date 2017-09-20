@@ -4,7 +4,7 @@
 
 struct NetInput
 {
-	int tick = 0;
+	//int tick = 0;
 
 	sf::Vector2f aimDirection;
 	int  moveDirection = 0;

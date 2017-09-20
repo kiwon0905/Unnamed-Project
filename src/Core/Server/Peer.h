@@ -7,9 +7,15 @@
 #include <queue>
 class Entity;
 
+struct Input
+{
+	int tick;
+	NetInput input;
+};
+
 struct InputComparator
 {
-	bool operator()(const NetInput & i, const NetInput & j)
+	bool operator()(const Input & i, const Input & j)
 	{
 		return i.tick > j.tick;
 	}
@@ -39,7 +45,7 @@ public:
 	void setState(State state);
 	Team getTeam();
 	void setTeam(Team team);
-	void onInput(const NetInput & input);
+	void onInput(int tick, const NetInput & input);
 	NetInput popInput(int tick);
 private:
 	int m_id;
@@ -48,5 +54,6 @@ private:
 	Entity * m_entity = nullptr;
 	State m_state = PRE_GAME;
 	Team m_team = Team::NONE;
-	std::priority_queue<NetInput, std::vector<NetInput>, InputComparator> m_inputs;
+
+	std::priority_queue<Input, std::vector<Input>, InputComparator> m_inputs;
 };
