@@ -81,9 +81,7 @@ void Packer::pack8(std::uint8_t data, std::size_t bits)
 Unpacker::Unpacker(const void * data, std::size_t size) :
 	m_data(static_cast<const std::uint8_t*>(data)),
 	m_size(size),
-	m_byteIndex(0),
-	m_bitsRead(0),
-	m_bitPos(0)
+	m_bitsRead(0)
 {
 }
 
@@ -96,9 +94,7 @@ void Unpacker::setData(const void * data, std::size_t size)
 {
 	m_data = static_cast<const std::uint8_t*>(data);
 	m_size = size;
-	m_byteIndex = 0;
 	m_bitsRead = 0;
-	m_bitPos = 0;
 }
 
 void Unpacker::unpack(bool & data)
@@ -121,17 +117,17 @@ void Unpacker::unpack(void * data, std::size_t size)
 {
 	align();
 	check(8 * size);
-	std::memcpy(data, &m_data[m_byteIndex], size);
+	std::memcpy(data, &m_data[m_bitsRead / 8], size);
 	m_bitsRead += 8 * size;
-	m_byteIndex += size;
+
 }
 
 void Unpacker::align()
 {
-	if (m_bitPos)
+	if (m_bitsRead % 8)
 	{
 		std::uint8_t a;
-		unpack8(a, 8 - m_bitPos);
+		unpack8(a, 8 - m_bitsRead % 8);
 	}
 }
 
@@ -144,27 +140,23 @@ void Unpacker::unpack8(std::uint8_t & data, std::size_t bits)
 	check(bits);
 
 	data = 0;
-	std::size_t firstBits = std::min(8 - m_bitPos, bits);
-	data = m_data[m_byteIndex] >> (8 - firstBits - m_bitPos);
+	std::size_t firstBits = std::min(8 - m_bitsRead % 8, bits);
+	data = m_data[m_bitsRead / 8] >> (8 - firstBits - m_bitsRead % 8);
 	data &= (std::uint8_t(1) << firstBits) - 1;
 	
 
-	m_bitPos += bits;
-	if (m_bitPos >= 8)
-	{
-		m_bitPos -= 8;
-		m_byteIndex++;
-	}
+	m_bitsRead += firstBits;
 
 	bits -= firstBits;
 
 	if (bits > 0)
 	{
 		data <<= bits;
-		std::uint8_t secondVal = m_data[m_byteIndex];
+		std::uint8_t secondVal = m_data[m_bitsRead / 8];
 		secondVal &= 0xFF << (8 - bits);
 		secondVal >>= (8 - bits);
 		data |= secondVal;
+		m_bitsRead += bits;
 	}
 }
 

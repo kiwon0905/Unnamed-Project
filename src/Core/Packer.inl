@@ -177,11 +177,7 @@ inline std::enable_if_t<std::is_enum<T>::value> Unpacker::unpack(T & data)
 template <typename T>
 inline void Unpacker::peek(T & data, std::size_t bits)
 {
-	std::size_t prevByteIndex = m_byteIndex;
 	std::size_t prevBitsRead = m_bitsRead;
-	std::size_t prevBitPos = m_bitPos;
 	unpack(data, bits);
-	m_byteIndex = prevByteIndex;
 	m_bitsRead = prevBitsRead;
-	m_bitPos = prevBitPos;
 }

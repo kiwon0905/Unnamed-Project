@@ -111,14 +111,14 @@ public:
 	template <typename T>
 	void peek(T & data, std::size_t bits);
 	void align();
+
+	std::size_t getRemainingBits() { return 8 * m_size - m_bitsRead; }
 private:
 	void unpack8(std::uint8_t & data, std::size_t bits);
 	void check(std::size_t bits);
 	const std::uint8_t * m_data;
 	std::size_t m_size;
-	std::size_t m_byteIndex;
 	std::size_t m_bitsRead;
-	std::size_t m_bitPos;
 };
 
 
