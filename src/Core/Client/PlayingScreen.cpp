@@ -15,7 +15,7 @@
 
 sf::Time SmoothClock::getElapsedTime()
 {
-/*	sf::Time dt = m_clock.getElapsedTime() - m_snap;
+	sf::Time dt = m_clock.getElapsedTime() - m_snap;
 
 	if (dt >= m_converge)
 		return m_target + dt;
@@ -23,25 +23,7 @@ sf::Time SmoothClock::getElapsedTime()
 	{
 		float progress = dt / m_converge;
 		return m_current + (m_target + m_converge - m_current) * progress;
-	}*/
-
-	
-	sf::Time dt = m_clock.getElapsedTime() - m_snap;
-
-
-	sf::Time c = m_current + dt;
-	sf::Time t = m_target + dt;
-
-	float adjustSpeed = m_adjustSpeed[0];
-	if (t > c)
-		adjustSpeed = m_adjustSpeed[1];
-
-	float a = dt.asSeconds() * adjustSpeed;
-	if (a > 1.0f)
-		a = 1.0f;
-
-	sf::Time r = c + (t - c)*a;
-	return r;
+	}
 }
 void SmoothClock::reset(sf::Time target)
 {
@@ -50,9 +32,6 @@ void SmoothClock::reset(sf::Time target)
 	m_current = target;
 	m_target = target;
 	m_converge = sf::Time::Zero;
-
-	m_adjustSpeed[0] = 0.3f;
-	m_adjustSpeed[1] = 0.3f;
 }
 
 void SmoothClock::update(sf::Time target, sf::Time converge)
@@ -65,59 +44,6 @@ void SmoothClock::update(sf::Time target, sf::Time converge)
 	if (delta < sf::Time::Zero && converge < -delta)
 		converge = -delta;
 	m_converge = converge;
-}
-
-void SmoothClock::update2(sf::Time target, sf::Time timeLeft, int adjustDirection)
-{
-	bool needUpdate = true;
-	if (timeLeft < sf::Time::Zero)
-	{
-		bool isSpike = false;
-		if (timeLeft < sf::milliseconds(-50))
-		{
-			isSpike = true;
-
-			m_spikeCounter += 5;
-			if (m_spikeCounter > 50)
-				m_spikeCounter = 50;
-		}
-
-		if (isSpike && m_spikeCounter < 15)
-		{
-			needUpdate = false;
-		}
-		else
-		{
-			if (m_adjustSpeed[adjustDirection] < 30.0f)
-				m_adjustSpeed[adjustDirection] *= 2.0f;
-		}
-	}
-	else
-	{
-		if (m_spikeCounter)
-		{
-			m_spikeCounter--;
-			if (m_spikeCounter < 0)
-				m_spikeCounter = 0;
-		}
-
-
-		m_adjustSpeed[adjustDirection] *= 0.95f;
-		if (m_adjustSpeed[adjustDirection] < 2.0f)
-			m_adjustSpeed[adjustDirection] = 2.0f;
-	}
-
-	if (needUpdate)
-	{
-		m_current = getElapsedTime();
-		m_target = target;
-		m_snap = m_clock.getElapsedTime();
-	}
-}
-
-void SmoothClock::setAdjustSpeed(int direction, float speed)
-{
-	m_adjustSpeed[direction] = speed;
 }
 
 PlayingScreen::PlayingScreen()
@@ -307,7 +233,6 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					m_startTick = serverTick;
 					m_predictedTime.reset(sf::seconds(static_cast<float>(m_startTick + 5) / TICKS_PER_SEC));
 					m_prevPredictedTime = sf::seconds(static_cast<float>(m_startTick + 5) / TICKS_PER_SEC);
-					m_predictedTime.setAdjustSpeed(1, 1000.f);
 					m_predictedTick = m_startTick + 5;
 
 				}
@@ -321,8 +246,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			{
 				sf::Time target = sf::seconds((serverTick - 2) / TICKS_PER_SEC);
 				sf::Time timeLeft = sf::seconds(serverTick / TICKS_PER_SEC) - m_renderTime.getElapsedTime();
-				m_renderTime.update2(target, timeLeft, 0);
-				//m_renderTime.update(target, sf::seconds(1.f));
+				m_renderTime.update(target, sf::seconds(1.f));
 				m_repredict = true;
 
 				m_snapshotGraph->addSample(timeLeft.asMicroseconds() / 1000.f);
@@ -341,8 +265,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 				if (input.tick == inputTick)
 				{
 					sf::Time target = input.predictedTime + input.elapsed.getElapsedTime() - sf::milliseconds(timeLeft - 50);
-					//m_predictedTime.update(target, sf::seconds(1.f));
-					m_predictedTime.update2(target, sf::milliseconds(timeLeft), 1);
+					m_predictedTime.update(target, sf::seconds(1.f));
 					m_predictionGraph->addSample(static_cast<float>(timeLeft));
 				}
 			}
