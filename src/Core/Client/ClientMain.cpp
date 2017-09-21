@@ -20,9 +20,10 @@ int main()
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
-	//Client client;
-//	client.run();
+	Client client;
+	client.run();
 
+	/*
 
 	
 	float ratio = 0;
@@ -65,4 +66,5 @@ int main()
 	std::cout << "avg compress ratio: " << ratio / TRIAL << "\n";
 	
 	std::cin.get();
+	*/
 }

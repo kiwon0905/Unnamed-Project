@@ -82,7 +82,6 @@ void NetHuman::write(Packer & packer) const
 	packer.pack<-500000, 500000>(vel.y); // 20
 
 
-	std::cout << "write pos: " << pos.x << ", " << pos.y << "\n";
 	packer.pack<0, 360>(aimAngle); // 9
 }
 
@@ -97,7 +96,6 @@ void NetHuman::read(Unpacker & unpacker)
 	unpacker.unpack<-500000, 500000>(vel.x);
 	unpacker.unpack<-500000, 500000>(vel.y);
 
-	std::cout << "read pos: " << pos.x << ", " << pos.y << "\n";
 
 	unpacker.unpack<0, 360>(aimAngle);
 

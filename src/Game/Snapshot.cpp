@@ -1,6 +1,8 @@
 #include "Snapshot.h"
 #include "GameConfig.h"
 #include "Game/NetObject.h"
+#include "Core/Rle.h"
+
 
 const void * Snapshot::getEntity(int id) const
 {
@@ -82,66 +84,75 @@ void Snapshot::readRelativeTo(Unpacker & unpacker, const Snapshot & s)
 	int numItems;
 	unpacker.unpack<0, MAX_SNAPSHOT_ITEM_SIZE>(numItems);
 	
+	Packer buf;
+	decode(unpacker, buf);
+	Unpacker temp(buf.getData(), buf.getDataSize());
+
 	for (int i = 0; i < numItems; ++i)
 	{
 		NetObject::Type type;
-		unpacker.unpack(type);
+		temp.unpack(type);
 
 		NetObject * item = NetObject::create(type);
 
 		if (type < NetObject::ENTITY_COUNT)
 		{
 			int id;
-			unpacker.unpack<0, MAX_ENTITY_ID>(id);
+			temp.unpack<0, MAX_ENTITY_ID>(id);
 
 			//check if 
 			auto iter = s.m_entities.find(id);
 			if (iter != s.m_entities.end())
 			{
 				NetObject * o = iter->second.get();
-				item->readRelative(unpacker, *o);
+				item->readRelative(temp, *o);
 			}
 			else
 			{
-				item->read(unpacker);
+				item->read(temp);
 
 			}
 			m_entities[id].reset(item);
 		}
 		else
 		{
-			item->read(unpacker);
+			item->read(temp);
 			m_transients.emplace_back(item);
 		}
 	}
 
 }
 
+
 void Snapshot::writeRelativeTo(Packer & packer, const Snapshot & s)
 {
 	packer.pack<0, MAX_SNAPSHOT_ITEM_SIZE>(m_entities.size() + m_transients.size());
 	
+	Packer temp;
 	for (auto & e : m_entities)
 	{
-		packer.pack(e.second->getType());
-		packer.pack<0, MAX_ENTITY_ID>(e.first);
+		temp.pack(e.second->getType());
+		temp.pack<0, MAX_ENTITY_ID>(e.first);
 		auto iter = s.m_entities.find(e.first);
 		if (iter != s.m_entities.end())
 		{
 			NetObject * o = iter->second.get();
-			e.second->writeRelative(packer, *o);
+			e.second->writeRelative(temp, *o);
 		}
 		else
 		{
-			e.second->write(packer);
+			e.second->write(temp);
 		}
 	}
 
+
 	for (auto & e : m_transients)
 	{
-		packer.pack(e->getType());
-		e->write(packer);
+		temp.pack(e->getType());
+		e->write(temp);
 	}
+	Unpacker unpacker(temp.getData(), temp.getDataSize());
+	encode(unpacker, packer);
 }
 
 

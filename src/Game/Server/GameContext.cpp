@@ -163,6 +163,7 @@ void GameContext::update()
 				{
 					Packer packer;
 					Snapshot * delta = m_snapshots.get(p->getAckTick());
+					//delta = 0;
 					if (delta)
 					{
 						packer.pack(Msg::SV_DELTA_SNAPSHOT);

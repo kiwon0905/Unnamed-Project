@@ -73,7 +73,6 @@ void decode(Unpacker & unpacker, Packer & packer)
 	}
 
 	int remaining = unpacker.getRemainingBits() - 8 + finalValidBits;
-	std::cout << "remaining bits: " << remaining << "\n";
 	if (remaining)
 	{
 		unsigned r;

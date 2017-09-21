@@ -212,13 +212,10 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 				snapshot->readRelativeTo(unpacker, *deltaSnapshot);
 				m_snapshots.add(snapshot, serverTick);
 
-
-				std::cout << "delta snap recvd: " << deltaTick << ", " << serverTick << "\n";;
 			
 			}
 			else
 			{
-				std::cout << "full snapshot recvd: " << serverTick << "\n";
 				Snapshot * snapshot = new Snapshot;
 				snapshot->read(unpacker);
 				m_snapshots.add(snapshot, serverTick);
