@@ -4,85 +4,80 @@
 const std::size_t RUN_LENGTH = 3;
 
 
-void encode(const void * data, std::size_t size, Packer & packer)
+void encode(Unpacker & unpacker, Packer & packer)
 {
-	Unpacker unpacker;
-	unpacker.setData(data, size);
-
-	std::size_t totalBits = 8 * size;
-	std::size_t readBits = 0;
-	
-
-	while (readBits + RUN_LENGTH <= totalBits)
+	Packer temp;
+	while (unpacker.getRemainingBits() >= RUN_LENGTH)
 	{
-		uint8_t bits;
-		unpacker.unpack(bits, RUN_LENGTH);
-		readBits += RUN_LENGTH;
-
-		packer.pack(bits, RUN_LENGTH);
-
-
-		if (bits == 0)
+		int count = 0;
+		unsigned bits = 0;
+		do
 		{
-			uint8_t next;
-			unpacker.peek(next, RUN_LENGTH);
-			std::size_t length = 1;
-			while (next == 0 && length < (1 << RUN_LENGTH) - 1 && readBits + RUN_LENGTH <= totalBits)
-			{
-				++length;
-				unpacker.unpack(next, RUN_LENGTH);
-				unpacker.peek(next, RUN_LENGTH);
-				readBits += RUN_LENGTH;
+			unpacker.unpack(bits, RUN_LENGTH);
+			count++;
+		} while (bits == 0 && unpacker.getRemainingBits() >= RUN_LENGTH && count < (1 << RUN_LENGTH));
 
-			}
-			packer.pack(length, RUN_LENGTH);
+		if (count > 1)
+		{
+			unpacker.ununpack(RUN_LENGTH);
+			temp.pack(0, RUN_LENGTH);
+			temp.pack(count - 1, RUN_LENGTH);
+		}
+		else
+		{
+			temp.pack(bits, RUN_LENGTH);
 		}
 	}
 
-
-	std::size_t remaining = totalBits - readBits;
-
-	uint8_t r;
-	unpacker.unpack(r, remaining);
-	packer.pack(r, remaining);
-	std::size_t validBits = packer.getCurrentBitPos();
-	validBits = validBits == 0 ? 8 : validBits;
-
-	packer.align();
-	packer.pack(validBits, 8);
+	int remaining = unpacker.getRemainingBits();
+	if (remaining)
+	{
+		int a;
+		unpacker.unpack(a, remaining);
+		temp.pack(a, remaining);
+	}
+	std::size_t finalValidBits = temp.getCurrentBitPos();
+	packer.pack(finalValidBits, 7);
+	packer.pack(temp.getData(), temp.getDataSize(), true);
 }
 
-void decode(const void * data, std::size_t size, Packer & packer)
+void decode(Unpacker & unpacker, Packer & packer)
 {
-	Unpacker unpacker;
-	unpacker.setData(data, size);
-
-	unsigned validFinalBits = static_cast<const unsigned char*>(data)[size - 1];
-	std::size_t totalBits = 8 * (size - 1) - (8 - validFinalBits);
-	std::size_t readBits = 0;
-
-	while (readBits + RUN_LENGTH <= totalBits)
+	int finalValidBits;
+	unpacker.unpack(finalValidBits, 7);
+	unpacker.align();
+	if (finalValidBits == 0)
+		finalValidBits = 8;
+	while (unpacker.getRemainingBits() - 8 + finalValidBits >= RUN_LENGTH)
 	{
-		uint8_t bits;
+		unsigned bits;
 		unpacker.unpack(bits, RUN_LENGTH);
-		readBits += RUN_LENGTH;
-		if (bits == 0 && readBits + RUN_LENGTH <= totalBits)
-		{
-			uint8_t length;
-			unpacker.unpack(length, RUN_LENGTH);
-			readBits += RUN_LENGTH;
-			for (std::size_t i = 0; i < length; ++i)
-				packer.pack(0, RUN_LENGTH);
 
+		if (bits == 0)
+		{
+			packer.pack(0, RUN_LENGTH);
+			if (unpacker.getRemainingBits() - 8 + finalValidBits >= RUN_LENGTH)
+			{
+				int count;
+				unpacker.unpack(count, RUN_LENGTH);
+				for (int i = 0; i < count - 1; ++i)
+				{
+					packer.pack(0, RUN_LENGTH);
+				}
+			}
 		}
 		else
 		{
 			packer.pack(bits, RUN_LENGTH);
-		
 		}
 	}
-	std::size_t remaining = totalBits - readBits;
-	std::uint8_t r;
-	unpacker.unpack(r, remaining);
-	packer.pack(r, remaining);
+
+	int remaining = unpacker.getRemainingBits() - 8 + finalValidBits;
+	std::cout << "remaining bits: " << remaining << "\n";
+	if (remaining)
+	{
+		unsigned r;
+		unpacker.unpack(r, remaining);
+		packer.pack(r, remaining);
+	}
 }

@@ -20,11 +20,11 @@ int main()
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
-	Client client;
-	client.run();
+	//Client client;
+//	client.run();
 
 
-	/*
+	
 	float ratio = 0;
 	const int TRIAL = 100;
 	for (int i = 0; i < TRIAL; ++i)
@@ -32,7 +32,7 @@ int main()
 		Packer packer;
 		for (int j = 0; j < 5; ++j)
 		{
-			if (Math::uniform(0, 2)() < 2)
+			if (Math::uniform(0, 3)() < 3)
 			{
 				packer.pack(std::uint8_t(0));
 			}
@@ -48,12 +48,14 @@ int main()
 
 
 		Packer packer2;
-		encode(packer.getData(), packer.getDataSize(), packer2);
+		Unpacker unpacker(packer.getData(), packer.getDataSize());
+		encode(unpacker, packer2);
 		std::cout << "encoded: ";
 		packer2.p();
 		
 		Packer packer3;
-		decode(packer2.getData(), packer2.getDataSize(), packer3);
+		Unpacker unpacker2(packer2.getData(), packer2.getDataSize());
+		decode(unpacker2, packer3);
 		std::cout << "decoded: ";
 
 		packer3.p();
@@ -61,5 +63,6 @@ int main()
 		ratio += (float)packer2.getDataSize() / packer.getDataSize();
 	}
 	std::cout << "avg compress ratio: " << ratio / TRIAL << "\n";
-	*/
+	
+	std::cin.get();
 }

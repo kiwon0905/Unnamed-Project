@@ -54,7 +54,7 @@ public:
 	void pack(std::uint64_t data);
 	void pack(bool data);
 	void pack(const std::string & data);
-	void pack(const void * data, std::size_t size);
+	void pack(const void * data, std::size_t size, bool alignFirst = true);
 	template <typename T>
 	std::enable_if_t<std::is_enum<T>::value> pack(T data);
 
@@ -104,7 +104,7 @@ public:
 	void unpack(std::uint64_t & data);
 	void unpack(bool & data);
 	void unpack(std::string & data);
-	void unpack(void * data, std::size_t size);
+	void unpack(void * data, std::size_t size, bool alignFirst = true);
 	template <typename T>
 	std::enable_if_t<std::is_enum<T>::value> unpack(T & data);
 	
@@ -113,6 +113,7 @@ public:
 	void align();
 
 	std::size_t getRemainingBits() { return 8 * m_size - m_bitsRead; }
+	void ununpack(std::size_t bits) { m_bitsRead -= bits; }
 private:
 	void unpack8(std::uint8_t & data, std::size_t bits);
 	void check(std::size_t bits);

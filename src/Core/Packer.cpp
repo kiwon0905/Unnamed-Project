@@ -33,12 +33,23 @@ void Packer::pack(const std::string & data)
 
 }
 
-void Packer::pack(const void * data, std::size_t size)
+void Packer::pack(const void * data, std::size_t size, bool alignFirst)
 {
-	align();
-	std::size_t start = m_data.size();
-	m_data.resize(start + size);
-	std::memcpy(&m_data[start], data, size);
+	if (alignFirst)
+	{
+		align();
+		std::size_t start = m_data.size();
+		m_data.resize(start + size);
+		std::memcpy(&m_data[start], data, size);
+	}
+	else
+	{
+		const std::uint8_t * d = static_cast<const std::uint8_t*>(data);
+		for (std::size_t i = 0; i < size; ++i)
+		{
+			pack8(d[i], 8);
+		}
+	}
 }
 
 void Packer::align()
@@ -113,12 +124,23 @@ void Unpacker::unpack(std::string & data)
 	unpack(reinterpret_cast<std::uint8_t*>(&data[0]), length);
 }
 
-void Unpacker::unpack(void * data, std::size_t size)
+void Unpacker::unpack(void * data, std::size_t size, bool alignFirst)
 {
-	align();
-	check(8 * size);
-	std::memcpy(data, &m_data[m_bitsRead / 8], size);
-	m_bitsRead += 8 * size;
+	if (alignFirst)
+	{
+		align();
+		check(8 * size);
+		std::memcpy(data, &m_data[m_bitsRead / 8], size);
+		m_bitsRead += 8 * size;
+	}
+	else
+	{
+		std::uint8_t * d = static_cast<std::uint8_t *>(data);
+		for (std::size_t i = 0; i < size; ++i)
+		{
+			unpack8(d[i], 8);
+		}
+	}
 
 }
 
