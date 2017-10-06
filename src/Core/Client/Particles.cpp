@@ -1,5 +1,13 @@
 #include "Particles.h"
 
+void Particle::update(float dt)
+{
+	float t = dt / (lifeTime - time);
+	time += dt;
+
+	pos += vel * dt;
+}
+
 void ParticleEmitter::setParticleVelocity(Math::DistributionFunc<sf::Vector2f> fn)
 {
 	m_velocity = fn;
@@ -25,6 +33,11 @@ void ParticleEmitter::setParticleColor(Math::DistributionFunc<sf::Color> color)
 	m_color = color;
 }
 
+void ParticleEmitter::setParticleType(Math::DistributionFunc<ParticleType> type)
+{
+	m_type = type;
+}
+
 void ParticleEmitter::setEmissionRate(float t)
 {
 	m_emissionRate = t;
@@ -38,20 +51,25 @@ void ParticleEmitter::update(float dt, Particles & particles)
 	for (std::size_t i = 0; i < count; ++i)
 	{
 		Particle & p = particles.emit();
-		p.vel = m_velocity();
 		p.pos = m_position();
+		p.vel = m_velocity();
 		p.scale = m_scale();
 		p.lifeTime = m_lifeTime();
 		p.color = m_color();
+		p.type = m_type();
 	}
 	m_accumulator -= count;
 
 }
 
-Particles::Particles(const sf::Texture & texture):
-	m_texture(&texture)
+Particles::Particles()
 {
 	m_vertices.setPrimitiveType(sf::PrimitiveType::Quads);
+}
+
+void Particles::setTexture(const sf::Texture & texture)
+{
+	m_texture = &texture;
 }
 
 void Particles::addEmitter(ParticleEmitter * emitter)
@@ -75,7 +93,7 @@ void Particles::update(float dt)
 
 
 	for (auto & p : m_particles)
-		updateParticle(p, dt);
+		p.update(dt);
 
 	auto dead = [](const Particle & p)
 	{
@@ -127,32 +145,8 @@ void Particles::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	target.draw(m_vertices, states);
 }
 
-void Particles::updateParticle(Particle & p, float dt)
-{
-	p.pos += p.vel * dt;
-	p.time += dt;
-}
-
 Particle & Particles::emit()
 {
 	m_particles.emplace_back();
 	return m_particles.back();
-}
-
-SmokeParticles::SmokeParticles(const sf::Texture & texture):
-	Particles(texture)
-{
-}
-
-void SmokeParticles::updateParticle(Particle & p, float dt)
-{
-	Particles::updateParticle(p, dt);
-
-	float t = p.time / p.lifeTime;
-	//p.color.a = Math::lerp(255, 0, t);
-//	p.scale += dt * .0001f;
-
-	float speed = Math::length(p.vel);
-	speed = Math::clampedAdd(0.f, speed, speed, -dt * 10.f);
-	p.vel = Math::unit(p.vel) * speed;
 }

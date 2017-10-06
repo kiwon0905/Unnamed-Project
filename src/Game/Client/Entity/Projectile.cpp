@@ -13,16 +13,15 @@ Projectile::Projectile(int id, Client & client, PlayingScreen & screen):
 	m_emitter->setEmissionRate(200.f);
 	m_emitter->setParticleLifeTime(1.f);
 	m_emitter->setParticleVelocity(Math::circle(sf::Vector2f(), 25.f));
-	m_emitter->setParticleScale(Math::uniform(.005f, .01f));
 	m_emitter->setParticlePosition(sf::Vector2f());
 	m_emitter->setParticleScale(Math::uniform(.05f, .1f));
 	m_emitter->setParticleColor(sf::Color(231, 231, 231, 10));
-	m_screen->getParticles().smoke->addEmitter(m_emitter);
+	m_screen->getParticles().addEmitter(m_emitter);
 }
 
 Projectile::~Projectile()
 {
-	m_screen->getParticles().smoke->removeEmitter(m_emitter);
+	m_screen->getParticles().removeEmitter(m_emitter);
 }
 
 sf::Vector2f Projectile::getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const

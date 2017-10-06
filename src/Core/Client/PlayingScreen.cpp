@@ -70,7 +70,7 @@ void PlayingScreen::onEnter(Client & client)
 	m_snapshotGraph->setPosition({ 0.f, 300.f });
 
 
-	m_particles.smoke = std::make_unique<SmokeParticles>(*client.getAssetManager().get<sf::Texture>("assets/particle.png"));
+	m_particles.setTexture(*client.getAssetManager().get<sf::Texture>("assets/particle.png"));
 	
 
 	//ui
@@ -414,7 +414,7 @@ void PlayingScreen::update(Client & client)
 
 			//std::cout << "double update!";
 		}
-		m_particles.smoke->update(clock.restart().asSeconds());
+		m_particles.update(clock.restart().asSeconds());
 	}
 }
 
@@ -569,7 +569,7 @@ void PlayingScreen::render(Client & client)
 	
 	sf::RenderStates states2;
 	states2.blendMode = sf::BlendAdd;
-	window.draw(*m_particles.smoke, states2);
+	window.draw(m_particles, states2);
 
 
 	//Time
@@ -690,7 +690,7 @@ const PlayingScreen::PlayerInfo & PlayingScreen::getMyPlayerInfo()
 	return m_myPlayer;
 }
 
-PlayingScreen::Particles & PlayingScreen::getParticles()
+Particles & PlayingScreen::getParticles()
 {
 	return m_particles;
 }

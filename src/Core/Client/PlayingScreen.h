@@ -91,11 +91,8 @@ private:
 	sf::RenderTexture m_renderTexture;
 	sf::VertexArray m_tileVertices;
 	sf::View m_view;
+	Particles m_particles;
 
-	struct Particles
-	{
-		std::unique_ptr<SmokeParticles> smoke;
-	} m_particles;
 	//entities
 	Entity * getEntity(int id);
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
