@@ -85,47 +85,18 @@ namespace Math
 	}
 
 	template<typename T>
-	typename std::enable_if_t<std::is_integral<T>::value, T> rand(T min, T max)
+	typename std::enable_if_t<std::is_integral<T>::value, T> uniform(T min, T max)
 	{
 		return std::uniform_int_distribution<T>(min, max)(generator);
 	}
 
 	template<typename T>
-	typename std::enable_if_t<std::is_floating_point<T>::value, T> rand(T min, T max)
+	typename std::enable_if_t<std::is_floating_point<T>::value, T> uniform(T min, T max)
 	{
 		return std::uniform_real_distribution<T>(min, max)(generator);
+	}	
 
-	}
-
-	template<typename T>
-	struct DistributionFunc
-	{
-		DistributionFunc(T constant)
-		{
-			m_function = [constant]()
-			{
-				return constant;
-			};
-		}
-
-		DistributionFunc(std::function<T()> fn)
-		{
-			m_function = fn;
-		}
-
-		T operator()() const
-		{
-			return m_function();
-		}
-	private:
-		std::function<T()> m_function;
-	};
-
-
-	DistributionFunc<int> uniform(int min, int max);
-	DistributionFunc<float> uniform(float min, float max);
-	DistributionFunc<sf::Vector2f> circle(const sf::Vector2f & center, float radius);
-	
+	sf::Vector2f uniformCircle(const sf::Vector2f & center, float radius);
 }
 
 

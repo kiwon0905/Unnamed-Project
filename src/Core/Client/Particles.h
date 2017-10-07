@@ -20,7 +20,7 @@ struct Particle
 	sf::Vector2f endVel;
 
 	float scale = 1.f;
-	float endScale;
+	float endScale = 1.f;
 
 	float time = 0.f;
 	float lifeTime;
@@ -34,37 +34,23 @@ struct Particle
 class ParticleEmitter
 {
 public:
-	void setParticlePosition(Math::DistributionFunc<sf::Vector2f> fn);
-	
-	void setParticleVelocity(Math::DistributionFunc<sf::Vector2f> fn);
-	
-	void setParticleScale(Math::DistributionFunc<float> fn);
-	
-	void setParticleLifeTime(Math::DistributionFunc<float> fn);
-	
-	void setParticleColor(Math::DistributionFunc<sf::Color> color);
-	
-	void setParticleType(Math::DistributionFunc<ParticleType> type);
-	
-	
-	void setEmissionRate(float t);
+	ParticleEmitter(float emissionRate);
+	virtual ~ParticleEmitter() = default;
+	virtual void onEmit(Particle & p) = 0;
+
 	void update(float dt, class Particles & particles);
 private:
-	Math::DistributionFunc<sf::Vector2f> m_position = sf::Vector2f();
-
-	Math::DistributionFunc<sf::Vector2f> m_velocity = sf::Vector2f();
-
-	Math::DistributionFunc<float> m_scale = 1.f;
-
-	Math::DistributionFunc<float> m_lifeTime = 1.f;
-
-	Math::DistributionFunc<sf::Color> m_color = sf::Color(255, 255, 255, 255);
-	Math::DistributionFunc<ParticleType> m_type = ParticleType::CIRCLE;
-
-	float m_emissionRate = 1.f;
+	float m_emissionRate;
 	float m_accumulator = 0.f;
 };
 
+class SmokeTrailEmitter : public ParticleEmitter
+{
+public:
+	SmokeTrailEmitter();
+	void onEmit(Particle & p);
+	sf::Vector2f pos;
+};
 
 class Particles : public sf::Drawable
 {
@@ -85,3 +71,5 @@ private:
 
 	sf::VertexArray m_vertices;
 };
+
+void createExplosion(Particles & p, const sf::Vector2f & pos);

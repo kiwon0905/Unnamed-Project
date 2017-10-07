@@ -491,7 +491,8 @@ void PlayingScreen::render(Client & client)
 		{
 			if (p->getType() == NetObject::EXPLOSION)
 			{
-				std::cout << "explosion!\n";
+				NetExplosion * ne = reinterpret_cast<NetExplosion*>(p->data.data());
+				createExplosion(m_particles, static_cast<sf::Vector2f>(ne->pos) / 100.f);
 			}
 		}
 

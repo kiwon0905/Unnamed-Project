@@ -48,6 +48,9 @@ private:
 		IN_GAME,
 		POST_GAME
 	};
+	State m_state = LOADING;
+
+
 	struct PlayerInfo
 	{
 		int id;
@@ -57,7 +60,6 @@ private:
 	};
 	std::vector<PlayerInfo> m_players;
 	PlayerInfo m_myPlayer;
-	State m_state = LOADING;
 
 	struct Input
 	{

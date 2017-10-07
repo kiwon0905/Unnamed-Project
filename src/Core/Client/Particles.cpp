@@ -3,44 +3,17 @@
 void Particle::update(float dt)
 {
 	float t = dt / (lifeTime - time);
+	scale = Math::lerp(scale, endScale, t);
+	vel = Math::lerp(vel, endVel, t);
+
 	time += dt;
 
 	pos += vel * dt;
 }
 
-void ParticleEmitter::setParticleVelocity(Math::DistributionFunc<sf::Vector2f> fn)
+ParticleEmitter::ParticleEmitter(float emissionRate):
+	m_emissionRate(emissionRate)
 {
-	m_velocity = fn;
-}
-
-void ParticleEmitter::setParticlePosition(Math::DistributionFunc<sf::Vector2f> fn)
-{
-	m_position = fn;
-}
-
-void ParticleEmitter::setParticleScale(Math::DistributionFunc<float> fn)
-{
-	m_scale = fn;
-}
-
-void ParticleEmitter::setParticleLifeTime(Math::DistributionFunc<float> fn)
-{
-	m_lifeTime = fn;
-}
-
-void ParticleEmitter::setParticleColor(Math::DistributionFunc<sf::Color> color)
-{
-	m_color = color;
-}
-
-void ParticleEmitter::setParticleType(Math::DistributionFunc<ParticleType> type)
-{
-	m_type = type;
-}
-
-void ParticleEmitter::setEmissionRate(float t)
-{
-	m_emissionRate = t;
 }
 
 void ParticleEmitter::update(float dt, Particles & particles)
@@ -51,16 +24,31 @@ void ParticleEmitter::update(float dt, Particles & particles)
 	for (std::size_t i = 0; i < count; ++i)
 	{
 		Particle & p = particles.emit();
-		p.pos = m_position();
-		p.vel = m_velocity();
-		p.scale = m_scale();
-		p.lifeTime = m_lifeTime();
-		p.color = m_color();
-		p.type = m_type();
+		onEmit(p);
+
 	}
 	m_accumulator -= count;
-
 }
+
+
+SmokeTrailEmitter::SmokeTrailEmitter():
+	ParticleEmitter(200.f)
+{
+}
+
+void SmokeTrailEmitter::onEmit(Particle & p)
+{
+
+	p.lifeTime = 1.f;
+	p.vel = Math::uniformCircle(sf::Vector2f(), 25.f);
+	p.endVel = sf::Vector2f();
+	p.pos = pos;
+	p.scale = Math::uniform(.05f, .1f);
+	p.endScale = 0.f;
+	p.color = sf::Color(231, 231, 231, 10);
+	
+}
+
 
 Particles::Particles()
 {
@@ -149,4 +137,14 @@ Particle & Particles::emit()
 {
 	m_particles.emplace_back();
 	return m_particles.back();
+}
+
+void createExplosion(Particles & p, const sf::Vector2f & pos)
+{
+	Particle & core = p.emit();
+	core.pos = pos;
+	core.lifeTime = 4.f;
+	core.color = sf::Color::Red;
+	core.scale = .5f;
+	core.endScale = .5f;
 }

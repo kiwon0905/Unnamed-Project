@@ -73,7 +73,7 @@ void Projectile::tick(float dt)
 		if (hitEntity)
 			hitEntity->takeDamage(10);
 
-		m_context->getWorld().createTransientEntity<Explosion>(sf::Vector2f(0.f, 0.f));
+		m_context->getWorld().createTransientEntity<Explosion>(m_position + m_size / 2.f);
 	}
 
 	d *= minTime;
