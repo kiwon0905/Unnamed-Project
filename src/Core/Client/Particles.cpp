@@ -38,21 +38,23 @@ SmokeTrailEmitter::SmokeTrailEmitter():
 
 void SmokeTrailEmitter::onEmit(Particle & p)
 {
-
 	p.lifeTime = 1.f;
-	p.vel = Math::uniformCircle(sf::Vector2f(), 25.f);
+	p.vel = Math::uniformCircle(sf::Vector2f(), 55.f);
 	p.endVel = sf::Vector2f();
 	p.pos = pos;
 	p.scale = Math::uniform(.05f, .1f);
 	p.endScale = 0.f;
-	p.color = sf::Color(231, 231, 231, 10);
-	
+	p.type = ParticleType::CIRCLE;
 }
 
 
 Particles::Particles()
 {
 	m_vertices.setPrimitiveType(sf::PrimitiveType::Quads);
+
+	m_textureRects[ParticleType::EXPLOSION] = sf::IntRect(0, 0, 390, 400);
+	m_textureRects[ParticleType::CIRCLE] = sf::IntRect(463, 34, 169, 155);
+
 }
 
 void Particles::setTexture(const sf::Texture & texture)
@@ -99,14 +101,16 @@ void Particles::update(float dt)
 		t.translate(p.pos);
 		t.scale({ p.scale, p.scale });
 
-		sf::Vector2f size = static_cast<sf::Vector2f>(m_texture->getSize());
+		sf::IntRect rect = m_textureRects[p.type];
+		sf::Vector2f pos = sf::Vector2f(rect.left, rect.top);
+		sf::Vector2f size = sf::Vector2f(rect.width, rect.height);
 		//a b 
 		//c d 
 		sf::Vertex a, b, c, d;
-		a.texCoords = sf::Vector2f(0.f, 0.f);
-		b.texCoords = sf::Vector2f(size.x, 0.f);
-		c.texCoords = sf::Vector2f(size.x, size.y);
-		d.texCoords = sf::Vector2f(0.f, size.y);
+		a.texCoords = sf::Vector2f(pos.x, pos.y);
+		b.texCoords = sf::Vector2f(pos.x + size.x, pos.y);
+		c.texCoords = sf::Vector2f(pos.x + size.x, pos.y + size.y);
+		d.texCoords = sf::Vector2f(pos.x, pos.y + size.y);
 	
 		a.position = t.transformPoint(-size / 2.f);
 		b.position = t.transformPoint(sf::Vector2f(size.x, -size.y) / 2.f);
@@ -141,10 +145,29 @@ Particle & Particles::emit()
 
 void createExplosion(Particles & p, const sf::Vector2f & pos)
 {
-	Particle & core = p.emit();
-	core.pos = pos;
-	core.lifeTime = 4.f;
-	core.color = sf::Color::Red;
-	core.scale = .5f;
-	core.endScale = .5f;
+
+
+	for (int i = 0; i < 24; ++i)
+	{
+		Particle & smoke = p.emit();
+		smoke.pos = pos;
+		smoke.vel = Math::uniformCircle(sf::Vector2f(), 1050.f);
+		smoke.lifeTime = .5f;
+		smoke.scale = .4f;
+		smoke.endScale = 0.f;
+		smoke.color = sf::Color(232, 232, 232);
+		smoke.type = ParticleType::CIRCLE;
+	}
+
+	for (int i = 0; i < 1; ++i)
+	{
+		Particle & core = p.emit();
+		core.pos = pos;
+		core.lifeTime = .5f;
+		core.scale = .4f;
+		core.endScale = .0f;
+		core.endVel = core.vel = Math::uniformCircle(sf::Vector2f(), 40.f);
+		core.type = ParticleType::EXPLOSION;
+	}
+
 }

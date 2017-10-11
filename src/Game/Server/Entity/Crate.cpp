@@ -1,5 +1,6 @@
 #include "Crate.h"
 #include "Game/NetObject.h"
+#include "Game/Server/GameContext.h"
 #include "Core/Utility.h"
 
 
@@ -32,4 +33,5 @@ void Crate::takeDamage(int dmg)
 	m_health--;
 	if(m_health <= 0)
 		m_alive = false;
+
 }

@@ -260,6 +260,7 @@ void GameContext::reset()
 		p->setEntity(nullptr);
 	}
 	m_nextPeerId = 0;
+	m_snapshots.clear();
 }
 
 Peer * GameContext::getPeer(const ENetPeer * peer)

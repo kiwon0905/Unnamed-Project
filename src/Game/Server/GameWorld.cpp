@@ -26,6 +26,7 @@ void GameWorld::reset()
 	for (auto & v : m_entitiesByType)
 		v.clear();
 	m_newEntities.clear();
+	m_transientEntities.clear();
 	m_nextEntityId = 0;
 }
 

@@ -76,7 +76,6 @@ void Human::render(const Snapshot * from, const Snapshot * to, float predictedT,
 		if (h1)
 			aimAngle = Math::lerp(static_cast<float>(h0->aimAngle), static_cast<float>(h1->aimAngle), t);
 	}
-
 	gun.setRotation(aimAngle);
 	target.draw(gun);
 

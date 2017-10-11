@@ -3,7 +3,7 @@
 #include "Core/Utility.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
-
+#include <unordered_map>
 
 enum ParticleType
 {
@@ -25,8 +25,8 @@ struct Particle
 	float time = 0.f;
 	float lifeTime;
 	
-	sf::Color color;	
-	ParticleType type;
+	sf::Color color = sf::Color::White;
+	ParticleType type = ParticleType::CIRCLE;
 
 	void update(float dt);
 };
@@ -68,7 +68,7 @@ private:
 	const sf::Texture * m_texture;
 	std::vector<Particle> m_particles;
 	std::vector<std::unique_ptr<ParticleEmitter>> m_emitters;
-
+	std::unordered_map<ParticleType, sf::IntRect> m_textureRects;
 	sf::VertexArray m_vertices;
 };
 

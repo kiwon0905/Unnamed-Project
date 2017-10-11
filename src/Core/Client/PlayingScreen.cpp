@@ -70,7 +70,7 @@ void PlayingScreen::onEnter(Client & client)
 	m_snapshotGraph->setPosition({ 0.f, 300.f });
 
 
-	m_particles.setTexture(*client.getAssetManager().get<sf::Texture>("assets/particle.png"));
+	m_particles.setTexture(*client.getAssetManager().get<sf::Texture>("assets/Untitled.png"));
 	
 
 	//ui
@@ -569,7 +569,7 @@ void PlayingScreen::render(Client & client)
 	}
 	
 	sf::RenderStates states2;
-	states2.blendMode = sf::BlendAdd;
+	//states2.blendMode = sf::BlendAdd;
 	window.draw(m_particles, states2);
 
 
