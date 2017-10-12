@@ -24,7 +24,23 @@ private:
 	sf::Time m_current;
 	sf::Time m_target;
 	sf::Time m_converge;
+};
 
+class Announcer : public sf::Drawable
+{
+public:
+	void setFont(const sf::Font & font);
+	void announce(const std::string & s, const sf::Color & fill = sf::Color::White, const sf::Color & outline = sf::Color::Black);
+	void update(float dt);
+	void draw(sf::RenderTarget & target, sf::RenderStates states) const;
+private:
+	const sf::Font * m_font;
+	struct Info
+	{
+		sf::Text text;
+		float time = 0.f;
+	};
+	std::deque<Info> m_infos;
 };
 
 class PlayingScreen : public Screen
@@ -94,6 +110,7 @@ private:
 	sf::VertexArray m_tileVertices;
 	sf::View m_view;
 	Particles m_particles;
+	Announcer m_announcer;
 
 	//entities
 	Entity * getEntity(int id);

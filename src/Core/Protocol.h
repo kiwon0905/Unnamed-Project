@@ -32,6 +32,9 @@ enum class Msg
 	SV_INPUT_TIMING,
 	SV_ROUND_OVER,
 	SV_CHAT,
+	
+	//game related
+	SV_KILL_FEED,
 
 	//master -> client
 	MSV_INTERNET_SERVER_LIST,

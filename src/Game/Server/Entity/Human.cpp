@@ -66,11 +66,16 @@ void Human::snap(Snapshot & snapshot) const
 	}
 }
 
-void Human::takeDamage(int dmg)
+void Human::takeDamage(int dmg, int from, const sf::Vector2f & impulse)
 {
 	m_health -= dmg;
 	if (m_health <= 0)
+	{
 		m_alive = false;
+		m_context->announceDeath(m_id, from);
+	}
+
+
 }
 
 int Human::getPeerId()

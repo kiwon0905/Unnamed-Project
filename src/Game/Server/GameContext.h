@@ -40,8 +40,13 @@ public:
 	virtual void checkRound() = 0;
 	void endRound(Team winner);
 	void reset();
+
+
+	//
+	void announceDeath(int killedEntity, int killerEntity);
 protected:
 	Peer * getPeer(const ENetPeer * peer);
+	Peer * getPeerByEntityId(int id);
 	bool ensurePlayers(Peer::State state);
 	void broadcast(const Packer & packer, bool reliable, const Peer * exclude = nullptr);
 

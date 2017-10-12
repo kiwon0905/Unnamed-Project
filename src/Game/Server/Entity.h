@@ -28,7 +28,7 @@ public:
 	
 	virtual void tick(float dt) = 0;
 	virtual void snap(Snapshot & snapshot) const = 0;
-	virtual void takeDamage(int dmg);
+	virtual void takeDamage(int dmg, int from, const sf::Vector2f & impulse);
 protected:
 	int m_id;
 	EntityType m_type;

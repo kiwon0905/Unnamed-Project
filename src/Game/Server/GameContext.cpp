@@ -263,11 +263,35 @@ void GameContext::reset()
 	m_snapshots.clear();
 }
 
+void GameContext::announceDeath(int killedEntity, int killerEntity)
+{
+	Peer * killedPeer = getPeerByEntityId(killedEntity);
+	Peer * killerPeer = getPeerByEntityId(killerEntity);
+
+	Packer packer;
+	packer.pack(Msg::SV_KILL_FEED);
+	int killedPeerId = killedPeer ? killedPeer->getId() : -1;
+	int killerPeerId = killerPeer ? killerPeer->getId() : -1;
+	packer.pack<-1, MAX_PLAYER_ID>(killedPeerId);
+	packer.pack<-1, MAX_PLAYER_ID>(killerPeerId);
+	broadcast(packer, true);
+}
+
 Peer * GameContext::getPeer(const ENetPeer * peer)
 {
 	for (auto & p : m_peers)
 		if (p->getENetPeer() == peer)
 			return p.get();
+	return nullptr;
+}
+
+Peer * GameContext::getPeerByEntityId(int id)
+{
+	for (const auto & p : m_peers)
+	{
+		if (p->getEntity() && p->getEntity()->getId() == id)
+			return p.get();
+	}
 	return nullptr;
 }
 

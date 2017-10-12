@@ -28,7 +28,7 @@ void Crate::snap(Snapshot & snapshot) const
 	}
 }
 
-void Crate::takeDamage(int dmg)
+void Crate::takeDamage(int dmg, int from, const sf::Vector2f & impulse)
 {
 	m_health--;
 	if(m_health <= 0)

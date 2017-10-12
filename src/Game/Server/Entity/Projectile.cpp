@@ -71,7 +71,7 @@ void Projectile::tick(float dt)
 	{
 		m_alive = false;
 		if (hitEntity)
-			hitEntity->takeDamage(10);
+			hitEntity->takeDamage(10, m_shooterId, { 0.f, 0.f });
 
 		m_context->getWorld().createTransientEntity<Explosion>(m_position + m_size / 2.f);
 	}

@@ -46,6 +46,53 @@ void SmoothClock::update(sf::Time target, sf::Time converge)
 	m_converge = converge;
 }
 
+void Announcer::setFont(const sf::Font & font)
+{
+	m_font = &font;
+}
+
+void Announcer::announce(const std::string & s, const sf::Color & fill, const sf::Color & outline)
+{
+	m_infos.emplace_back();
+	m_infos.back().text.setFont(*m_font);
+	m_infos.back().text.setFillColor(fill);
+	m_infos.back().text.setOutlineColor(outline);
+	m_infos.back().text.setOutlineThickness(3.f);
+	m_infos.back().text.setString(s);
+}
+
+void Announcer::update(float dt)
+{
+	if (!m_infos.empty())
+	{
+		m_infos[0].time += dt;
+		if (m_infos[0].time > 1.f)
+		{
+			float t = (m_infos[0].time - 1.f);
+			int alpha = Math::lerp(255, 0, t);
+			sf::Color c = m_infos[0].text.getFillColor();
+			c.a = alpha;
+			m_infos[0].text.setFillColor(c);
+			c = m_infos[0].text.getOutlineColor();
+			c.a = alpha;
+			m_infos[0].text.setOutlineColor(c);
+		}
+		if (m_infos[0].time > 2.f)
+			m_infos.pop_front();
+	}
+}
+
+void Announcer::draw(sf::RenderTarget & target, sf::RenderStates states) const
+{
+	if (!m_infos.empty())
+	{
+		sf::Vector2f pos = sf::Vector2f((target.getSize().x - m_infos[0].text.getLocalBounds().width) / 2.f, target.getSize().y * 0.2f);
+		states.transform.translate(pos);
+		target.draw(m_infos[0].text, states);
+	}
+}
+
+
 PlayingScreen::PlayingScreen()
 {
 	m_entitiesByType.resize(static_cast<std::size_t>(EntityType::COUNT));
@@ -71,7 +118,7 @@ void PlayingScreen::onEnter(Client & client)
 
 
 	m_particles.setTexture(*client.getAssetManager().get<sf::Texture>("assets/Untitled.png"));
-	
+	m_announcer.setFont(*client.getAssetManager().get<sf::Font>("arial.ttf"));
 
 	//ui
 	m_editBox = tgui::EditBox::create();
@@ -300,6 +347,22 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			}
 
 		}
+
+		else if (msg == Msg::SV_KILL_FEED)
+		{
+			int killedPeerId, killerPeerId;
+			unpacker.unpack<-1, MAX_PLAYER_ID>(killedPeerId);
+			unpacker.unpack<-1, MAX_PLAYER_ID>(killerPeerId);
+
+
+			const PlayerInfo * killedPeerInfo = getPlayerInfo(killedPeerId);
+			const PlayerInfo * killerPeerInfo = getPlayerInfo(killerPeerId);
+			
+			std::string killedPeerName = killedPeerInfo ? killedPeerInfo->name : "Unknown player";
+			std::string killerPeerName = killerPeerInfo ? killerPeerInfo->name : "Unknown player";
+			std::string str = killerPeerName + " killed " + killedPeerName;
+			m_announcer.announce(str);
+		}
 	}
 
 	else if (netEv.type == ENET_EVENT_TYPE_CONNECT)
@@ -414,7 +477,9 @@ void PlayingScreen::update(Client & client)
 
 			//std::cout << "double update!";
 		}
-		m_particles.update(clock.restart().asSeconds());
+		sf::Time timeSinceLastUpdate = clock.restart();
+		m_particles.update(timeSinceLastUpdate.asSeconds());
+		m_announcer.update(timeSinceLastUpdate.asSeconds());
 	}
 }
 
@@ -567,10 +632,10 @@ void PlayingScreen::render(Client & client)
 			e->render(s0, s1, predT, t);
 		}
 	}
-	
-	sf::RenderStates states2;
-	//states2.blendMode = sf::BlendAdd;
-	window.draw(m_particles, states2);
+
+
+	//particles
+	window.draw(m_particles);
 
 
 	//Time
@@ -594,6 +659,9 @@ void PlayingScreen::render(Client & client)
 	
 	if(client.debugRenderEnabled())
 		debugRender(client, m_view);
+
+	//announcer
+	window.draw(m_announcer);
 }
 
 void PlayingScreen::onExit(Client & client)
@@ -695,3 +763,4 @@ Particles & PlayingScreen::getParticles()
 {
 	return m_particles;
 }
+
