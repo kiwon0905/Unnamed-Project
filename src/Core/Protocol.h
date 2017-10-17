@@ -17,8 +17,6 @@ enum class Msg
 	CL_INPUT,
 	CL_CHAT,
 
-
-
 	//server -> masterserver
 	SV_REGISTER_SERVER,
 
@@ -32,7 +30,7 @@ enum class Msg
 	SV_INPUT_TIMING,
 	SV_ROUND_OVER,
 	SV_CHAT,
-	
+	SV_PLAYER_LEFT,
 	//game related
 	SV_KILL_FEED,
 

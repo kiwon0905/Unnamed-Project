@@ -343,9 +343,22 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 				std::string line = info->name + ": " + msg;
 				Logger::getInstance().info("Chat", line);
 				m_chatBox->addLine(line);
-
 			}
 
+		}
+
+		else if (msg == Msg::SV_PLAYER_LEFT)
+		{
+			int id;
+			unpacker.unpack<-1, MAX_PLAYER_ID>(id);
+			const PlayerInfo * info = getPlayerInfo(id);
+			if (info)
+			{
+				std::string line = info->name + " has left the game.";
+				m_chatBox->addLine(line, sf::Color::Red);
+			
+				//m_players.erase(std::remove_if(m_players.begin(), m_players.end(), [id](const PlayerInfo & info) {return info.id == id; }), m_players.end());
+			}
 		}
 
 		else if (msg == Msg::SV_KILL_FEED)
@@ -362,6 +375,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			std::string killerPeerName = killerPeerInfo ? killerPeerInfo->name : "Unknown player";
 			std::string str = killerPeerName + " killed " + killedPeerName;
 			m_announcer.announce(str);
+			m_chatBox->addLine(str, sf::Color::Red);
 		}
 	}
 

@@ -114,8 +114,17 @@ void GameContext::onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer)
 void GameContext::onDisconnect(const ENetPeer & peer)
 {
 	Peer * p = getPeer(&peer);
+
+
+
 	if (p)
+	{
+		Packer packer;
+		packer.pack(Msg::SV_PLAYER_LEFT);
+		packer.pack<-1, MAX_PLAYER_ID>(p->getId());
+		broadcast(packer, true, p);
 		m_gameWorld.onDisconnect(*p);
+	}
 	auto pred = [&peer](const auto & ptr)
 	{
 		return ptr->getENetPeer() == &peer;
