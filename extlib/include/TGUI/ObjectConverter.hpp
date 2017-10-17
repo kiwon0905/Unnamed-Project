@@ -32,7 +32,12 @@
 #include <TGUI/Texture.hpp>
 #include <TGUI/Color.hpp>
 #include <TGUI/Font.hpp>
-#include <TGUI/Any.hpp>
+
+#ifdef TGUI_USE_VARIANT
+    #include <variant>
+#else
+    #include <TGUI/Any.hpp>
+#endif
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -50,11 +55,11 @@ namespace tgui
         enum class Type
         {
             None,
+            Bool,
             Font,
             Color,
             String,
             Number,
-            Layout,
             Outline,
             Texture,
             TextStyle,
@@ -76,9 +81,30 @@ namespace tgui
         /// @brief Stores a string for later retrieval
         ///
         /// @param string  String to store
-        ///
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ObjectConverter(const sf::String& string)  :
+        ObjectConverter(const char* string) :
+            ObjectConverter{sf::String{string}}
+        {
+        }
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Stores a string for later retrieval
+        ///
+        /// @param string  String to store
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ObjectConverter(const std::string& string) :
+            ObjectConverter{sf::String{string}}
+        {
+        }
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Stores a string for later retrieval
+        ///
+        /// @param string  String to store
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ObjectConverter(const sf::String& string) :
             m_type      {Type::String},
             m_value     {string},
             m_serialized{true},
@@ -107,7 +133,7 @@ namespace tgui
         ///
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ObjectConverter(sf::Color color) :
-            ObjectConverter(Color(color))
+            ObjectConverter(Color{color})
         {
         }
 
@@ -126,27 +152,27 @@ namespace tgui
 
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Stores a number for later retrieval
+        /// @brief Stores a boolean for later retrieval
         ///
-        /// @param number  Number to store
-        ///
+        /// @param value  Boolean to store
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ObjectConverter(float number) :
-            m_type {Type::Number},
-            m_value{number}
+        ObjectConverter(bool value) :
+            m_type {Type::Bool},
+            m_value{value}
         {
         }
 
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Stores a layout object for later retrieval
+        /// @brief Stores a number for later retrieval
         ///
-        /// @param layout  Layout to store
+        /// @param number  Number to store
         ///
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ObjectConverter(const Layout& layout) :
-            m_type {Type::Layout},
-            m_value{layout}
+        template <typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+        ObjectConverter(T number) :
+            m_type {Type::Number},
+            m_value{static_cast<float>(number)}
         {
         }
 
@@ -256,18 +282,17 @@ namespace tgui
         /// This function will assert when something other than a outline was saved
         ///
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        const Layout& getLayout();
-
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Retrieves the saved outline
-        ///
-        /// @return The saved outline
-        ///
-        /// This function will assert when something other than a outline was saved
-        ///
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         const Outline& getOutline();
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Retrieves the saved boolean
+        ///
+        /// @return The saved boolean
+        ///
+        /// This function will assert when something other than a boolean was saved
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        bool getBool();
 
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -324,9 +349,30 @@ namespace tgui
 
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Check if the object equals another one
+        ///
+        /// Objects with different types will always be considered as different, even if using them would have the same outcome
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        bool operator==(const ObjectConverter& right) const;
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Check if the object differs from another one
+        ///
+        /// Objects with different types will always be considered as different, even if using them would have the same outcome
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        bool operator!=(const ObjectConverter& right) const;
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private:
         Type m_type = Type::None;
+
+    #ifdef TGUI_USE_VARIANT
+        std::variant<sf::String, Font, Color, Outline, bool, float, Texture, TextStyle, std::shared_ptr<RendererData>> m_value;
+    #else
         Any  m_value;
+    #endif
 
         bool m_serialized = false;
         sf::String m_string;

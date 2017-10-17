@@ -65,6 +65,8 @@ namespace tgui
                 Fade = 4
             };
 
+            virtual ~Animation() = default;
+
             Type getType() const;
 
             virtual bool update(sf::Time elapsedTime) = 0;
@@ -86,15 +88,15 @@ namespace tgui
         class TGUI_API MoveAnimation : public Animation
         {
         public:
-            MoveAnimation(Widget::Ptr widget, sf::Vector2f start, sf::Vector2f end, sf::Time duration, std::function<void()> finishedCallback = nullptr);
+            MoveAnimation(Widget::Ptr widget, Vector2f start, Vector2f end, sf::Time duration, std::function<void()> finishedCallback = nullptr);
 
-            virtual bool update(sf::Time elapsedTime) override;
+            bool update(sf::Time elapsedTime) override;
 
-            virtual void finish() override;
+            void finish() override;
 
         private:
-            sf::Vector2f m_startPos;
-            sf::Vector2f m_endPos;
+            Vector2f m_startPos;
+            Vector2f m_endPos;
         };
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,15 +104,15 @@ namespace tgui
         class TGUI_API ResizeAnimation : public Animation
         {
         public:
-            ResizeAnimation(Widget::Ptr widget, sf::Vector2f start, sf::Vector2f end, sf::Time duration, std::function<void()> finishedCallback = nullptr);
+            ResizeAnimation(Widget::Ptr widget, Vector2f start, Vector2f end, sf::Time duration, std::function<void()> finishedCallback = nullptr);
 
-            virtual bool update(sf::Time elapsedTime) override;
+            bool update(sf::Time elapsedTime) override;
 
-            virtual void finish() override;
+            void finish() override;
 
         private:
-            sf::Vector2f m_startSize;
-            sf::Vector2f m_endSize;
+            Vector2f m_startSize;
+            Vector2f m_endSize;
         };
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,9 +122,9 @@ namespace tgui
         public:
             FadeAnimation(Widget::Ptr widget, float start, float end, sf::Time duration, std::function<void()> finishedCallback = nullptr);
 
-            virtual bool update(sf::Time elapsedTime) override;
+            bool update(sf::Time elapsedTime) override;
 
-            virtual void finish() override;
+            void finish() override;
 
         private:
             float m_startOpacity;

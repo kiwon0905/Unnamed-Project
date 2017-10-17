@@ -43,7 +43,7 @@ void LobbyScreen::onEnter(Client & client)
 	
 	m_button = tgui::Button::create("connect");
 	m_button->setPosition({ 0, 100 });
-	m_button->onPress->connect(connect);
+	m_button->onPress.connect(connect);
 
 	m_layout = tgui::VerticalLayout::create();
 	m_layout->setSize({ "30%", "20%" });
@@ -55,6 +55,7 @@ void LobbyScreen::onEnter(Client & client)
 
 	gui.add(m_layout);
 	m_layout->getRenderer()->setSpaceBetweenWidgets(5.f);
+
 }
 
 void LobbyScreen::handleNetEvent(ENetEvent & netEv, Client & client)

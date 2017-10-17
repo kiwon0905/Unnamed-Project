@@ -140,7 +140,7 @@ void PlayingScreen::onEnter(Client & client)
 		}
 
 	};
-	m_editBox->onReturnKeyPress->connect(sendChat);
+	m_editBox->onReturnKeyPress.connect(sendChat);
 	client.getGui().add(m_editBox);
 	
 

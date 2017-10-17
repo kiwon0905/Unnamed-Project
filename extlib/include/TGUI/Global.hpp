@@ -30,13 +30,26 @@
 #include <TGUI/Config.hpp>
 #include <TGUI/Exception.hpp>
 #include <iostream>
+#include <cstdint>
 #include <string>
+#include <memory>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Namespace that contains all TGUI functions and classes
 namespace tgui
 {
+#ifdef TGUI_NO_CPP14
+    template<typename T, typename... Args>
+    std::unique_ptr<T> make_unique(Args&&... args)
+    {
+        return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+    }
+#else
+    using std::make_unique;
+#endif
+
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// @brief While tab key usage is enabled (default), pressing tab will focus another widget
     ///
@@ -84,7 +97,7 @@ namespace tgui
     /// @internal
     // Checks if a character is a whitespace character.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TGUI_API bool isWhitespace(char character);
+    TGUI_API bool isWhitespace(std::uint32_t character);
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -27,7 +27,14 @@
 
 #include <SFML/Config.hpp>
 
-#ifndef SFML_STATIC
+// TGUI will link in the same way as SFML, unless TGUI_DYNAMIC or TGUI_STATIC is defined
+#if !defined(TGUI_DYNAMIC) && !defined(TGUI_STATIC)
+    #ifdef SFML_STATIC
+        #define TGUI_STATIC
+    #endif
+#endif
+
+#ifndef TGUI_STATIC
 
     #ifdef SFML_SYSTEM_WINDOWS
 
@@ -63,11 +70,55 @@
 #define TGUI_VERSION_MINOR 8
 #define TGUI_VERSION_PATCH 0
 
-// The constexpr keyword is not widely supported enough to be enabled by default
-#ifdef TGUI_ENABLE_CONSTEXPR
-    #define TGUI_CONSTEXPR constexpr
+// Disable c++14 code when using -std=c++11, which is needed for android when using NDK 12b.
+// This technically results in undefined behavior because the std::function ambiguity was only fixed in c++14 (http://cplusplus.github.io/LWG/lwg-defects.html#2132).
+// TGUI relies on a fix for LWG 2132 to be implemented, even when compiling with -std=c++11 (which is the case in supported gcc and clang compilers).
+// The TGUI_NO_CPP14 macro thus does not provide support for all compilers with c++11 support, it just allows some compilers to work even with -std=c++11.
+#ifndef _MSC_VER
+    #if __cplusplus <= 201103L
+        #define TGUI_NO_CPP14
+    #endif
+#endif
+
+// The signal system detects whether it can provide unbound parameters by checking the arguments of the function at runtime.
+// This comparion is made by checking the typeid of the parameters with the typeid of the value which the widget can transmit.
+// Although typeid returns a unique value and the operator== is guarenteed to only be true for the same type, it may not always work correctly.
+// Dynamically linked libraries may have a different type_info internally than in the code using the library. In such case the comparison will always be false.
+// This behavior has so far only been seen on android (using NDK 12b), so the alternative is currently only used when compiling on android.
+// The alternative that is used on android is to compare the strings returned by type_info.name(). This is however considered undefined behavior since the compiler
+// is not guarenteed to have unique names for different types. The names will however be the same inside and outside the library so this method solves the issue.
+// I am also not aware of any supported compiler that does not create unique names.
+#ifdef __ANDROID__
+    #define TGUI_UNSAFE_TYPE_INFO_COMPARISON
+#endif
+
+// Enable constexpr when using Clang or at least GCC 5 or MSVC++ 14.1 (VS2017)
+#if defined(_MSC_VER)
+    #if _MSC_VER >= 1910
+        #define TGUI_CONSTEXPR constexpr
+    #else
+        #define TGUI_CONSTEXPR
+    #endif
+#elif defined(__GNUC__)
+    #if __cpp_constexpr >= 201304
+        #define TGUI_CONSTEXPR constexpr
+    #else
+        #define TGUI_CONSTEXPR
+    #endif
 #else
-    #define TGUI_CONSTEXPR
+    #define TGUI_CONSTEXPR constexpr
+#endif
+
+#ifndef TGUI_NO_DEPRECATED_WARNINGS
+    #define TGUI_DEPRECATED(msg) [[deprecated(msg)]]
+#else
+    #define TGUI_DEPRECATED(msg)
+#endif
+
+#ifndef TGUI_NO_RUNTIME_WARNINGS
+    #define TGUI_PRINT_WARNING(msg) sf::err() << "TGUI Warning: " << msg << std::endl;
+#else
+    #define TGUI_PRINT_WARNING(msg)
 #endif
 
 #endif // TGUI_CONFIG_HPP

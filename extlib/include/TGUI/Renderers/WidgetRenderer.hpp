@@ -29,6 +29,7 @@
 
 #include <TGUI/Config.hpp>
 #include <TGUI/ObjectConverter.hpp>
+#include <TGUI/Loading/DataIO.hpp>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -48,8 +49,28 @@ namespace tgui
             return data;
         }
 
+        /// @internal
+        static std::shared_ptr<RendererData> createFromDataIONode(const DataIO::Node* rendererNode)
+        {
+            auto rendererData = std::make_shared<RendererData>();
+            rendererData->shared = false;
+
+            for (const auto& pair : rendererNode->propertyValuePairs)
+                rendererData->propertyValuePairs[pair.first] = ObjectConverter(pair.second->value); // Did not compile with VS2015 Update 2 when using braces
+
+            for (const auto& nestedProperty : rendererNode->children)
+            {
+                std::stringstream ss;
+                DataIO::emit(nestedProperty, ss);
+                rendererData->propertyValuePairs[toLower(nestedProperty->name)] = {sf::String{"{\n" + ss.str() + "}"}};
+            }
+
+            return rendererData;
+        };
+
         std::map<std::string, ObjectConverter> propertyValuePairs;
-        std::map<void*, std::function<void(const std::string& property)>> observers;
+        std::map<const void*, std::function<void(const std::string& property)>> observers;
+        bool shared = true;
     };
 
 
@@ -82,7 +103,7 @@ namespace tgui
         /// @brief Virtual destructor
         ///
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        virtual ~WidgetRenderer() {};
+        virtual ~WidgetRenderer() = default;
 
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -128,19 +149,6 @@ namespace tgui
         ///
         /// @param property  The property that you would like to change
         /// @param value     The new value that you like to assign to the property.
-        ///                  The value can either be a string value or a serialized string
-        ///
-        /// @throw Exception for unknown properties or when value was of a wrong type
-        ///
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        void setProperty(const std::string& property, const std::string& value);
-
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Changes a property of the renderer
-        ///
-        /// @param property  The property that you would like to change
-        /// @param value     The new value that you like to assign to the property.
         ///                  The ObjectConverter is implicitly constructed from the possible value types
         ///
         /// @throw Exception for unknown properties or when value was of a wrong type
@@ -177,7 +185,7 @@ namespace tgui
         /// @param function Callback function to call when the renderer changes
         ///
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        void subscribe(void* id, const std::function<void(const std::string& property)>& function);
+        void subscribe(const void* id, const std::function<void(const std::string& property)>& function);
 
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,7 +194,7 @@ namespace tgui
         /// @param id  Unique identifier used when subscribing the callback function
         ///
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        void unsubscribe(void* id);
+        void unsubscribe(const void* id);
 
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
