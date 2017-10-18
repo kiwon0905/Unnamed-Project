@@ -14,7 +14,9 @@ void MasterServer::run()
 			{
 				if(event.type == ENET_EVENT_TYPE_CONNECT)
 				{
-					Logger::getInstance().info("MasterServer", enutil::toString(event.peer->address) + " connected");
+					std::string addr;
+					enutil::toString(event.peer->address, addr);
+					Logger::getInstance().info("MasterServer", addr + " connected");
 					enet_peer_timeout(event.peer, ENET_PEER_TIMEOUT_LIMIT, 500, 1000);
 					break;
 				}
@@ -27,8 +29,9 @@ void MasterServer::run()
 				}
 				else if(event.type == ENET_EVENT_TYPE_DISCONNECT)
 				{
-
-					Logger::getInstance().info("MasterServer", enutil::toString(event.peer->address) + " removed");
+					std::string addr;
+					enutil::toString(event.peer->address, addr);
+					Logger::getInstance().info("MasterServer", addr + " removed");
 					m_idPool.checkIn(m_games[event.peer].id);
 					m_games.erase(event.peer);
 				}
@@ -52,21 +55,26 @@ bool MasterServer::initialize()
 		return false;
 	}
 	std::string clientAddr;
-	std::string gameServerAddr;
-	if (!parser.get("clientAddr", clientAddr))
-	{
-		Logger::getInstance().error("MasterServer", "Failed to read clientAddr");
-		return false;
-	}
-	if (!parser.get("gameServerAddr", gameServerAddr))
-	{
-		Logger::getInstance().error("MasterServer", "Failed to read gameServerAddr");
-		return false;
-	}
+	std::string serverAddr;
+	ENetAddress enetClientAddr;
+	ENetAddress enetServerAddr;
+
 
 	if (enet_initialize() != 0)
 	{
 		Logger::getInstance().error("MasterServer", "Failed to initialize enet");
+		return false;
+	}
+
+	//read address
+	if (!parser.get("clientAddr", clientAddr) || !enutil::toENetAddress(clientAddr, enetClientAddr))
+	{
+		Logger::getInstance().error("MasterServer", "Failed to read clientAddr");
+		return false;
+	}
+	if (!parser.get("gameServerAddr", serverAddr) || !enutil::toENetAddress(serverAddr, enetServerAddr))
+	{
+		Logger::getInstance().error("MasterServer", "Failed to read gameServerAddr");
 		return false;
 	}
 
@@ -82,15 +90,16 @@ bool MasterServer::initialize()
 		Logger::getInstance().error("MasterServer", "Failed to set socekt opt");
 		return false;
 	}
-	if (enet_socket_bind(m_socket, &enutil::toENetAddress(clientAddr)) < 0)
+
+
+	if (enet_socket_bind(m_socket, &enetClientAddr) < 0)
 	{
 		Logger::getInstance().error("MasterServer", "Failed to bind socket");
 		return false;
 	}
 	
 	//Create connection
-	ENetAddress address = enutil::toENetAddress(gameServerAddr);
-	m_server = enet_host_create(&address, 100, 2, 0, 0);
+	m_server = enet_host_create(&enetServerAddr, 100, 2, 0, 0);
 
 	if (!m_server)
 	{
@@ -105,7 +114,9 @@ bool MasterServer::initialize()
 	}
 
 	m_running = true;
-	Logger::getInstance().info("MasterServer", "Succesfully initialized server at " + enutil::toString(m_server->address));
+	std::string masterServerAddr;
+	enutil::toString(m_server->address, masterServerAddr);
+	Logger::getInstance().info("MasterServer", "Succesfully initialized server at " + masterServerAddr);
 	m_parsingThread = std::make_unique<std::thread>(&MasterServer::parseCommands, this);
 
 
@@ -133,20 +144,21 @@ void MasterServer::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 		std::string serverName;
 		unpacker.unpack(serverName);
 
-		ENetAddress addr = peer->address;
+//		ENetAddress addr = peer->address;
 
 		if (m_games.count(peer))
 			Logger::getInstance().error("MasterServer", "Server already exists!");
 		else
 		{
-
 			GameInfo info;
 			info.id = m_idPool.checkOut();
 			info.name = serverName + std::to_string(info.id);
 
 			m_games[peer] = info;
 
-			Logger::getInstance().info("MasterServer", "Server " + enutil::toString(peer->address) + " succesfully registerd with name: " + serverName + "(" + std::to_string(info.id) + ")");
+			std::string addr;
+			enutil::toString(peer->address, addr);
+			Logger::getInstance().info("MasterServer", "Server " + addr + " succesfully registerd with name: " + serverName + "(" + std::to_string(info.id) + ")");
 		}
 
 		break;
@@ -162,7 +174,9 @@ void MasterServer::handlePacket(Unpacker & unpacker, const ENetAddress & addr)
 	unpacker.unpack(msg);
 	if (msg == Msg::CL_REQUEST_INTERNET_SERVER_LIST)
 	{
-		Logger::getInstance().info("MasterServer", "Received request for internet server list from: " + enutil::toString(addr));
+		std::string stringAddr;
+		enutil::toString(addr, stringAddr);
+		Logger::getInstance().info("MasterServer", "Received request for internet server list from: " + stringAddr);
 
 		Packer packer;
 		packer.pack(Msg::MSV_INTERNET_SERVER_LIST);
@@ -191,7 +205,9 @@ void MasterServer::parseCommands()
 		{
 			for (const auto & games : m_games)
 			{
-				Logger::getInstance().info("MasterServer", enutil::toString(games.first->address) + " " + games.second.name);
+				std::string addr;
+				enutil::toString(games.first->address, addr);
+				Logger::getInstance().info("MasterServer", addr + " " + games.second.name);
 			}
 		}
 	}

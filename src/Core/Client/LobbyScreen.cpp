@@ -103,7 +103,7 @@ void LobbyScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 
 }
 
-void LobbyScreen::handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client)
+void LobbyScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & addr, Client & client)
 {
 
 }

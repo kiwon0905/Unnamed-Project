@@ -2,37 +2,6 @@
 
 namespace enutil
 {
-	std::string toString(const ENetAddress & address)
-	{
-		char ip[20];
-		enet_address_get_host_ip(&address, ip, 20);
-		return std::string(ip) + ":" + std::to_string(address.port);
-	}
-
-	ENetAddress toENetAddress(const std::string & addr)
-	{
-		std::size_t pos = addr.find(":");
-		std::string ip = addr.substr(0, pos);
-		std::string port = addr.substr(pos + 1);
-		unsigned uport = 0;
-		try
-		{
-			uport = std::stoi(port);
-		}
-		catch (...)
-		{
-		}
-		return toENetAddress(ip, uport);
-	}
-
-	ENetAddress toENetAddress(const std::string & ip, unsigned port)
-	{
-		ENetAddress addr;
-		enet_address_set_host(&addr, ip.c_str());
-		addr.port = port;
-		return addr;
-	}
-
 	
 	bool toString(const ENetAddress & address, std::string & ans)
 	{

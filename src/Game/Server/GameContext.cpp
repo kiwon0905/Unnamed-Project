@@ -87,7 +87,7 @@ void GameContext::onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer)
 		input.read(unpacker);
 		peer->onInput(predictedTick, input);
 		peer->setAckTick(ackTick);
-		if (m_tick % 2 == 0)
+		//if (m_tick % 2 == 0)
 		{
 			sf::Time timeLeft = sf::seconds(predictedTick / TICKS_PER_SEC) - m_clock.getElapsedTime();
 
@@ -105,6 +105,7 @@ void GameContext::onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer)
 		
 		Packer packer;
 		packer.pack(Msg::SV_CHAT);
+		packer.pack<-1, MAX_TICK>(m_tick);
 		packer.pack(uint8_t(peer->getId()));
 		packer.pack(chat);
 		broadcast(packer, true);

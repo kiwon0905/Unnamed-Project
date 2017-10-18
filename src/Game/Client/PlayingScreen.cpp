@@ -13,6 +13,21 @@
 
 #include <iostream>
 
+
+std::string getStringFromTime(int totalSeconds)
+{
+	int minutes = totalSeconds / 60;
+	int seconds = totalSeconds % 60;
+
+	std::string minutesString = std::to_string(minutes);
+	std::string secondsString = std::to_string(seconds);
+	if (minutes < 10)
+		minutesString = "0" + minutesString;
+	if (seconds < 10)
+		secondsString = "0" + secondsString;
+	return minutesString + ":" + secondsString;
+}
+
 sf::Time SmoothClock::getElapsedTime()
 {
 	sf::Time dt = m_clock.getElapsedTime() - m_snap;
@@ -349,8 +364,10 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 
 		else if (msg == Msg::SV_CHAT)
 		{
+			int tick;
 			uint8_t id;
 			std::string msg;
+			unpacker.unpack<-1, MAX_TICK>(tick);
 			unpacker.unpack(id);
 			unpacker.unpack(msg);
 
@@ -358,7 +375,10 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 
 			if (info)
 			{
-				std::string line = info->name + ": " + msg;
+				float s = tick / TICKS_PER_SEC;
+				std::string time = getStringFromTime(static_cast<int>(s));
+
+				std::string line = "[" + time + "] " + info->name + ": " + msg;
 				Logger::getInstance().info("Chat", line);
 				m_chatBox->addLine(line);
 			}
@@ -407,7 +427,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 	}
 }
 
-void PlayingScreen::handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client)
+void PlayingScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & addr, Client & client)
 {
 
 }
@@ -681,16 +701,7 @@ void PlayingScreen::render(Client & client)
 	sf::Text timeText;
 	timeText.setFillColor(sf::Color::Blue);
 	int totalSeconds = static_cast<int>(currentRenderTime.asMicroseconds()) / 1000000;
-	int minutes= totalSeconds / 60;
-	int seconds = totalSeconds % 60;
-
-	std::string minutesString = std::to_string(minutes);
-	std::string secondsString = std::to_string(seconds);
-	if (minutes < 10)
-		minutesString = "0" + minutesString;
-	if (seconds < 10)
-		secondsString = "0" + secondsString;
-	timeText.setString(minutesString + ":" + secondsString);
+	timeText.setString(getStringFromTime(totalSeconds));
 	timeText.setFont(*client.getAssetManager().get<sf::Font>("arial.ttf"));
 	timeText.setPosition(static_cast<float>(client.getWindow().getSize().x / 2.f - timeText.getLocalBounds().width / 2.f), 0.f);
 	window.draw(timeText);

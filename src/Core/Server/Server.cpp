@@ -36,21 +36,19 @@ bool Server::initialize()
 	if (m_config.mode == "internet")
 	{
 		std::string addr;
-		if (!parser.get("masterAddr", addr))
+		if (!parser.get("masterAddr", addr) || !enutil::toENetAddress(addr, m_config.masterAddress)) 
 		{
 			Logger::getInstance().error("Server", "Failed to read masterAddr");
 			return false;
 		}
-		m_config.masterAddress = enutil::toENetAddress(addr);
 	}
 
 	std::string addr;
-	if (!parser.get("gameServerAddr", addr))
+	if (!parser.get("gameServerAddr", addr) || !enutil::toENetAddress(addr, m_config.address))
 	{
 		Logger::getInstance().error("Server", "Failed to read gameServerAddr");
 		return false;
 	}
-	m_config.address = enutil::toENetAddress(addr);
 
 
 
@@ -98,7 +96,9 @@ bool Server::initialize()
 		enutil::send(packer, m_masterServer, true);
 	}
 
-	Logger::getInstance().info("Server", "Succesfully initialized server at " + enutil::toString(m_server->address));
+	std::string serverAddr;
+	enutil::toString(m_server->address, serverAddr);
+	Logger::getInstance().info("Server", "Succesfully initialized server at " + serverAddr);
 	m_running = true;
 	m_parsingThread.reset(new std::thread(&Server::handleCommands, this));
 
@@ -172,7 +172,9 @@ void Server::handleNetwork()
 	{
 		if (event.type == ENET_EVENT_TYPE_CONNECT)
 		{
-			Logger::getInstance().info("Server", enutil::toString(event.peer->address) + " connected");
+			std::string peerString;
+			enutil::toString(event.peer->address, peerString);
+			Logger::getInstance().info("Server", peerString + " connected");
 			enet_peer_timeout(event.peer, ENET_PEER_TIMEOUT_LIMIT, 500, 3000);
 		}
 		else if (event.type == ENET_EVENT_TYPE_RECEIVE)
@@ -195,8 +197,9 @@ void Server::handleNetwork()
 			}
 			else
 			{
-				
-				Logger::getInstance().info("Server", enutil::toString(event.peer->address) + " disconnected");
+				std::string peerString;
+				enutil::toString(event.peer->address, peerString);
+				Logger::getInstance().info("Server", peerString + " disconnected");
 
 
 				m_gameContext->onDisconnect(*event.peer);

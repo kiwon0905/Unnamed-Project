@@ -53,9 +53,9 @@ void ScreenStack::handleNetEvent(ENetEvent & netEv, Client & client)
 	m_screens.top()->handleNetEvent(netEv, client);
 }
 
-void ScreenStack::handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client)
+void ScreenStack::handleUdpPacket(Unpacker & unpacker, const ENetAddress & addr, Client & client)
 {
-	m_screens.top()->handlePacket(unpacker, addr, client);
+	m_screens.top()->handleUdpPacket(unpacker, addr, client);
 }
 
 void ScreenStack::applyChanges(Client & client)

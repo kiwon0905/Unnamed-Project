@@ -5,10 +5,6 @@
 
 namespace enutil
 {
-	std::string toString(const ENetAddress & address);
-	ENetAddress toENetAddress(const std::string & addr);
-	ENetAddress toENetAddress(const std::string & ip, unsigned port);
-
 	bool toString(const ENetAddress & address, std::string & ans);
 	bool toENetAddress(const std::string & addr, ENetAddress & ans);
 	bool toENetAddress(const std::string & ip, unsigned port, ENetAddress & ans);

@@ -97,10 +97,10 @@ void Client::run()
 				m_network.popEvent();
 			}
 
-			/*	Unpacker unpacker;
+			Unpacker unpacker;
 			ENetAddress addr;
 			while (m_network.receive(unpacker, addr))
-			m_screenStack.handlePacket(unpacker, addr, *this);*/
+				m_screenStack.handleUdpPacket(unpacker, addr, *this);
 
 			m_screenStack.update(*this);
 

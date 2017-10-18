@@ -32,7 +32,7 @@ void RoomScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 	}
 }
 
-void RoomScreen::handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client)
+void RoomScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & addr, Client & client)
 {
 }
 
