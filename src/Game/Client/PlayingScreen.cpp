@@ -150,6 +150,24 @@ void PlayingScreen::onEnter(Client & client)
 	m_chatBox->setPosition({ 0.f, m_editBox->getPosition().y - m_chatBox->getSize().y });
 	m_chatBox->setSize("30%", m_chatBox->getSize().y);
 	client.getGui().add(m_chatBox);
+
+	m_scoreBoard = tgui::Panel::create({ "30%", "60%" });
+	m_scoreBoard->getRenderer()->setBackgroundColor(sf::Color(128, 128, 128, 128));
+	m_scoreBoard->setPosition({ "35%", "20%" });
+	client.getGui().add(m_scoreBoard);
+	m_scoreBoard->hide();
+}
+
+void PlayingScreen::handleEvent(const sf::Event & event, Client & client)
+{
+	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Tab)
+	{
+		m_scoreBoard->show();
+	}
+	else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Tab)
+	{
+		m_scoreBoard->hide();
+	}
 }
 
 void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
@@ -533,8 +551,14 @@ void PlayingScreen::render(Client & client)
 		//create entities
 		for (auto & p : s0->getEntities())
 		{
-			Entity * e = getEntity(p.first);
+			if (p.second->getType() == NetObject::PLAYER_INFO)
+			{
+			
 
+				continue;
+			}
+
+			Entity * e = getEntity(p.first);
 			if (!e)
 			{
 				switch (p.second->getType())

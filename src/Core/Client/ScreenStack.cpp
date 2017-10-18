@@ -10,6 +10,7 @@ bool ScreenStack::initialize(Client & client)
 
 void ScreenStack::finalize(Client & client)
 {
+
 }
 
 void ScreenStack::update(Client & client)
@@ -40,6 +41,11 @@ void ScreenStack::clear()
 bool ScreenStack::isEmpty()
 {
 	return m_screens.empty();
+}
+
+void ScreenStack::handleEvent(const sf::Event & event, Client & client)
+{
+	m_screens.top()->handleEvent(event, client);
 }
 
 void ScreenStack::handleNetEvent(ENetEvent & netEv, Client & client)

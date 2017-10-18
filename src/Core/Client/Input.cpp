@@ -129,5 +129,5 @@ void Input::handleEvent(const sf::Event & event)
 
 bool Input::getKeyState(sf::Keyboard::Key key)
 {
-	return  m_activeKeys[key];
+	return m_activeKeys[key];
 }

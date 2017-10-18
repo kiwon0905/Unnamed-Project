@@ -15,7 +15,9 @@ public:
 		PROJECTILE,
 		CRATE,
 		ITEM,
+		PLAYER_INFO,
 		ENTITY_COUNT,
+		//Transient
 		EXPLOSION,
 		COUNT
 	};
@@ -117,6 +119,16 @@ struct NetItem
 	sf::Vector2i pos;
 };
 
+struct NetPlayerInfo
+{
+	NetObject::Type getType() const;
+	void write(Packer & packer) const;
+	void read(Unpacker & unpacker);
+
+	int id;
+	int score;
+};
+
 //Transient
 struct NetExplosion
 {
@@ -126,3 +138,4 @@ struct NetExplosion
 
 	sf::Vector2i pos;
 };
+

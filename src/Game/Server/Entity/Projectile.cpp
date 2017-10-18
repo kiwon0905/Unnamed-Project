@@ -6,7 +6,7 @@
 #include "Game/Server/GameContext.h"
 #include "Game/NetObject.h"
 #include "Game/Map.h"
-#include "Core/Server/Peer.h"
+#include "Game/Server/Peer.h"
 #include "Core/Utility.h"
 
 Projectile::Projectile(int id, GameContext * context, int shooterId, Team shooterTeam):

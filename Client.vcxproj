@@ -26,7 +26,6 @@
     <ClInclude Include="src\Core\Client\Input.h" />
     <ClInclude Include="src\Core\Client\LobbyScreen.h" />
     <ClInclude Include="src\Core\Client\Network.h" />
-    <ClInclude Include="src\Core\Client\PlayingScreen.h" />
     <ClInclude Include="src\Core\Client\AssetManager.h" />
     <ClInclude Include="src\Core\Client\RoomScreen.h" />
     <ClInclude Include="src\Core\Client\Screen.h" />
@@ -45,6 +44,7 @@
     <ClInclude Include="src\Game\Client\Entity\Item.h" />
     <ClInclude Include="src\Game\Client\Entity\Projectile.h" />
     <ClInclude Include="src\Game\Client\Entity\Zombie.h" />
+    <ClInclude Include="src\Game\Client\PlayingScreen.h" />
     <ClInclude Include="src\Game\Client\PredictedEntity.h" />
     <ClInclude Include="src\Game\NetInput.h" />
     <ClInclude Include="src\Game\Enums.h" />
@@ -63,7 +63,6 @@
     <ClCompile Include="src\Core\Client\Input.cpp" />
     <ClCompile Include="src\Core\Client\LobbyScreen.cpp" />
     <ClCompile Include="src\Core\Client\Network.cpp" />
-    <ClCompile Include="src\Core\Client\PlayingScreen.cpp" />
     <ClCompile Include="src\Core\Client\AssetManager.cpp" />
     <ClCompile Include="src\Core\Client\RoomScreen.cpp" />
     <ClCompile Include="src\Core\Client\ScreenStack.cpp" />
@@ -80,6 +79,7 @@
     <ClCompile Include="src\Game\Client\Entity\Item.cpp" />
     <ClCompile Include="src\Game\Client\Entity\Projectile.cpp" />
     <ClCompile Include="src\Game\Client\Entity\Zombie.cpp" />
+    <ClCompile Include="src\Game\Client\PlayingScreen.cpp" />
     <ClCompile Include="src\Game\Client\PredictedEntity.cpp" />
     <ClCompile Include="src\Game\NetInput.cpp" />
     <ClCompile Include="src\Game\GameCore.cpp" />

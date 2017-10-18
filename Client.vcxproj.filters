@@ -33,9 +33,6 @@
     <ClInclude Include="src\Core\Client\Network.h">
       <Filter>Core\Client</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Client\PlayingScreen.h">
-      <Filter>Core\Client</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\Client\Screen.h">
       <Filter>Core\Client</Filter>
     </ClInclude>
@@ -126,6 +123,9 @@
     <ClInclude Include="src\Game\Client\PredictedEntity.h">
       <Filter>Game\Client</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\Client\PlayingScreen.h">
+      <Filter>Game\Client</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Client\Client.cpp">
@@ -138,9 +138,6 @@
       <Filter>Core\Client</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Client\Network.cpp">
-      <Filter>Core\Client</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Client\PlayingScreen.cpp">
       <Filter>Core\Client</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Client\ScreenStack.cpp">
@@ -219,6 +216,9 @@
       <Filter>Game\Client\Entity</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\Client\PredictedEntity.cpp">
+      <Filter>Game\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Client\PlayingScreen.cpp">
       <Filter>Game\Client</Filter>
     </ClCompile>
   </ItemGroup>

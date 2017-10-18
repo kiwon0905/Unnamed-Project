@@ -79,6 +79,7 @@ void Client::run()
 			{
 				if (event.type == sf::Event::Closed)
 					m_screenStack.clear();
+				m_screenStack.handleEvent(event, *this);
 				m_gui.handleEvent(event);
 				m_input.handleEvent(event);		
 			}

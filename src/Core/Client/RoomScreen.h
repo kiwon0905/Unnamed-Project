@@ -5,13 +5,14 @@
 class RoomScreen : public Screen
 {
 public:
-	virtual void onEnter(Client & client);
-	virtual void handleNetEvent(ENetEvent & netEv, Client & client);
-	virtual void handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client);
-	virtual void update(Client & client);
-	virtual void render(Client & client);
-	virtual void onExit(Client & client);
-	virtual void onObscure(Client & client);
-	virtual void onReveal(Client & client);
+	void onEnter(Client & client);
+	void handleEvent(const sf::Event & event, Client & client);
+	void handleNetEvent(ENetEvent & netEv, Client & client);
+	void handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client);
+	void update(Client & client);
+	void render(Client & client);
+	void onExit(Client & client);
+	void onObscure(Client & client);
+	void onReveal(Client & client);
 private:
 };

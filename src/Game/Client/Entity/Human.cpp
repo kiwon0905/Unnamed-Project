@@ -1,7 +1,7 @@
 #include "Human.h"
 #include "Game/Snapshot.h"
+#include "Game/Client/PlayingScreen.h"
 #include "Core/Utility.h"
-#include "Core/Client/PlayingScreen.h"
 
 #include <SFML/Graphics.hpp>
 

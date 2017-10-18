@@ -5,8 +5,8 @@
 #include "Game/NetObject.h"
 #include "Game/Server/GameContext.h"
 #include "Game/Server/GameWorld.h"
+#include "Game/Server/Peer.h"
 #include "Core/Utility.h"
-#include "Core/Server/Peer.h"
 
 Human::Human(int id, GameContext * context, int peerId, const sf::Vector2f & pos) :
 	Entity(id, EntityType::HUMAN, context, pos),

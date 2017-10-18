@@ -62,6 +62,21 @@ void Peer::setTeam(Team team)
 	m_team = team;
 }
 
+int Peer::getScore()
+{
+	return m_score;
+}
+
+void Peer::setScore(int score)
+{
+	m_score = score;
+}
+
+void Peer::addScore(int score)
+{
+	m_score += score;
+}
+
 void Peer::onInput(int tick, const NetInput & input)
 {
 	Input i;

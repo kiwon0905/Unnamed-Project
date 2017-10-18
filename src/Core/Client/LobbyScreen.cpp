@@ -58,6 +58,10 @@ void LobbyScreen::onEnter(Client & client)
 
 }
 
+void LobbyScreen::handleEvent(const sf::Event & event, Client & client)
+{
+}
+
 void LobbyScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 {
 	if (netEv.type == ENET_EVENT_TYPE_RECEIVE)

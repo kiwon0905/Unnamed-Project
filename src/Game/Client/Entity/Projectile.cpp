@@ -1,8 +1,8 @@
 #include "Projectile.h"
 #include "Game/NetObject.h"
 #include "Game/Snapshot.h"
+#include "Game/Client/PlayingScreen.h"
 #include "Core/Utility.h"
-#include "Core/Client/PlayingScreen.h"
 #include "Core/Client/Particles.h"
 #include <SFML/Graphics.hpp>
 

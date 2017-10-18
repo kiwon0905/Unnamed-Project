@@ -36,9 +36,6 @@
     <ClInclude Include="src\Core\Server\Server.h">
       <Filter>Core\Server</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Server\Peer.h">
-      <Filter>Core\Server</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\Protocol.h">
       <Filter>Core\Shared</Filter>
     </ClInclude>
@@ -114,6 +111,9 @@
     <ClInclude Include="src\Game\Server\Entity\Item.h">
       <Filter>Game\Server\Entity</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\Server\Peer.h">
+      <Filter>Game\Server</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game\Server\GameWorld.cpp">
@@ -127,9 +127,6 @@
     </ClCompile>
     <ClCompile Include="src\Game\Server\Entity.cpp">
       <Filter>Game\Server</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Server\Peer.cpp">
-      <Filter>Core\Server</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Parser.cpp">
       <Filter>Core\Shared</Filter>
@@ -193,6 +190,9 @@
     </ClCompile>
     <ClCompile Include="src\Game\Server\Entity\Item.cpp">
       <Filter>Game\Server\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Server\Peer.cpp">
+      <Filter>Game\Server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

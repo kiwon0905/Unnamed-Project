@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Screen.h"
+#include "Core/Client/Screen.h"
 #include "Core/Client/Graph.h"
 #include "Core/Client/Particles.h"
 #include "Game/GameCore.h"
@@ -48,14 +48,15 @@ class PlayingScreen : public Screen
 public:
 	PlayingScreen();
 	~PlayingScreen() { std::cout << "play destroy!"; }
-	virtual void onEnter(Client & client);
-	virtual void handleNetEvent(ENetEvent & netEv, Client & client);
-	virtual void handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client);
-	virtual void update(Client & client);
-	virtual void render(Client & client);
-	virtual void onExit(Client & client);
-	virtual void onObscure(Client & client);
-	virtual void onReveal(Client & client);
+	void onEnter(Client & client);
+	void handleEvent(const sf::Event & event, Client & client);
+	void handleNetEvent(ENetEvent & netEv, Client & client);
+	void handlePacket(Unpacker & unpacker, const ENetAddress & addr, Client & client);
+	void update(Client & client);
+	void render(Client & client);
+	void onExit(Client & client);
+	void onObscure(Client & client);
+	void onReveal(Client & client);
 private:
 	enum State
 	{
@@ -111,7 +112,6 @@ private:
 	sf::View m_view;
 	Particles m_particles;
 	Announcer m_announcer;
-
 	//entities
 	Entity * getEntity(int id);
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
@@ -123,6 +123,8 @@ private:
 	//UI
 	tgui::ChatBox::Ptr m_chatBox;
 	tgui::EditBox::Ptr m_editBox;
+	tgui::Panel::Ptr m_scoreBoard;
+
 public:
 	const PlayerInfo * getPlayerInfo(int id);
 	const PlayerInfo * getPlayerInfoByEntityId(int entityId);

@@ -1,9 +1,8 @@
 #pragma once
 #include "Core/Packer.h"
-#include "Core/Server/Peer.h"
 #include "Core/Protocol.h"
 
-#include "Core/Server/Peer.h"
+#include "Game/Server/Peer.h"
 
 #include "Game/Server/GameWorld.h"
 #include "Game/Enums.h"

@@ -2,7 +2,6 @@
 
 #include "Core/Parser.h"
 #include "Core/Packer.h"
-#include "Core/Server/Peer.h"
 #include "Core/Protocol.h"
 #include "Core/IdPool.h"
 

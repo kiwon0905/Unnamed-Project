@@ -1,10 +1,14 @@
 #include "RoomScreen.h"
-#include "PlayingScreen.h"
+#include "Game/Client/PlayingScreen.h"
 #include "Core/Protocol.h"
 #include "Core/Logger.h"
 #include "Core/Client/Client.h"
 
 void RoomScreen::onEnter(Client & client)
+{
+}
+
+void RoomScreen::handleEvent(const sf::Event & event, Client & client)
 {
 }
 

@@ -139,23 +139,6 @@ void NetZombie::read(Unpacker & unpacker)
 	unpacker.unpack<-500000, 500000>(vel.y);
 }
 
-NetObject::Type NetExplosion::getType() const
-{
-	return NetObject::EXPLOSION;
-}
-
-void NetExplosion::write(Packer & packer) const
-{
-	packer.pack<0, 500000>(pos.x);
-	packer.pack<0, 500000>(pos.y);
-}
-
-void NetExplosion::read(Unpacker & unpacker)
-{
-	unpacker.unpack<0, 500000>(pos.x);
-	unpacker.unpack<0, 500000>(pos.y);
-}
-
 NetObject::Type NetCrate::getType() const
 {
 	return NetObject::CRATE;
@@ -187,3 +170,32 @@ void NetItem::read(Unpacker & unpacker)
 {
 }
 
+NetObject::Type NetPlayerInfo::getType() const
+{
+	return NetObject::PLAYER_INFO;
+}
+
+void NetPlayerInfo::write(Packer & packer) const
+{
+}
+
+void NetPlayerInfo::read(Unpacker & unpacker)
+{
+}
+
+NetObject::Type NetExplosion::getType() const
+{
+	return NetObject::EXPLOSION;
+}
+
+void NetExplosion::write(Packer & packer) const
+{
+	packer.pack<0, 500000>(pos.x);
+	packer.pack<0, 500000>(pos.y);
+}
+
+void NetExplosion::read(Unpacker & unpacker)
+{
+	unpacker.unpack<0, 500000>(pos.x);
+	unpacker.unpack<0, 500000>(pos.y);
+}
