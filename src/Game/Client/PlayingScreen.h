@@ -98,6 +98,8 @@ private:
 	int m_startTick = -1;
 	int m_lastRecvTick = -1;
 	int m_predictedTick = -1;
+	int m_prevRenderTick = -1;
+	int m_currentRenderTick = -1;
 	bool m_repredict = false;
 
 	std::unique_ptr<Graph> m_predictionGraph;

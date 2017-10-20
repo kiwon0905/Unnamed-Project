@@ -1,21 +1,25 @@
 #include "Infection.h"
 
 #include "Game/Server/Entity/Human.h"
+#include "Core/Server/Server.h"
+
+Infection::Infection(Server * server) :
+	GameContext(server)
+{
+
+}
+
 std::string Infection::getName()
 {
 	return "Infection";
 }
-void Infection::startRound()
+void Infection::prepareRound()
 {
-	m_state = LOADING;
-
 	m_map.loadFromFile("map/grass.xml");
 
 
-	for (std::size_t i = 0; i < m_peers.size(); ++i)
+	for (auto & p : m_server->getPeers())
 	{
-		auto & p = m_peers[i];
-
 		Human * h = m_gameWorld.createEntity<Human>(p->getId(), sf::Vector2f(100.f, 100.f));
 		p->setEntity(h);
 
@@ -23,18 +27,14 @@ void Infection::startRound()
 		//p->setEntity(z);
 	}
 
-	for (auto & p : m_peers)
-	{
-		Packer packer;
-		packer.pack(Msg::SV_LOAD_GAME);
-		p->send(packer, true);
-	}
 }
 
-void Infection::checkRound()
+bool Infection::checkRound(Team & team)
 {
-	if (m_tick > 15000)
+	if (m_tick > 150)
 	{
-		endRound(Team::A);
+		team = Team::NONE;
+		return true;
 	}
+	return false;
 }

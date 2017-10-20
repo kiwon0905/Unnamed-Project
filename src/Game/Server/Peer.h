@@ -33,20 +33,24 @@ public:
 
 	Peer(int id, ENetPeer * peer);
 	int getId();
+	
 	const std::string & getName();
 	void setName(const std::string & name);
+	
 	ENetPeer * getENetPeer() const;
+	
 	State getState() const;
 	void setState(State state);
 
 	Entity * getEntity();
 	void setEntity(Entity * e);	
+	
 	Team getTeam();
 	void setTeam(Team team);
+	
 	int getScore();
 	void setScore(int score);
 	void addScore(int score);
-
 
 	void onInput(int tick, const NetInput & input);
 	NetInput popInput(int tick);
@@ -54,6 +58,7 @@ public:
 	void setAckTick(int tick);
 	int getAckTick();
 	
+	void reset();
 	bool send(const Packer & packer, bool reliable);
 private:
 	int m_id;

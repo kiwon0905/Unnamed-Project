@@ -272,15 +272,19 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			if (m_state == LOADING)
 				return;
 			
+
 			int serverTick;
 			unpacker.unpack<-1, MAX_TICK>(serverTick);
 			if (m_lastRecvTick >= serverTick)
 				return;
 
+			std::cout << "snapshot tick: " << serverTick << "\n";
+
 			if (msg == Msg::SV_DELTA_SNAPSHOT)
 			{
 				int deltaTick;
 				unpacker.unpack<-1, MAX_TICK>(deltaTick);
+				std::cout << "delta tick: " << deltaTick << "\n";
 				
 				const Snapshot * deltaSnapshot = m_snapshots.get(deltaTick);
 				if (!deltaSnapshot)
@@ -312,6 +316,9 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					m_prevPredictedTime = sf::seconds(static_cast<float>(m_startTick + 5) / TICKS_PER_SEC);
 					m_predictedTick = m_startTick + 5;
 
+
+					std::cout << "start tick: " << m_startTick << "\n";
+					std::cout << "predicted tick: " << m_predictedTick << "\n";
 				}
 				else if(serverTick - 2 >= m_startTick) 
 				{
@@ -544,16 +551,14 @@ void PlayingScreen::render(Client & client)
 	sf::Time currentRenderTime = m_renderTime.getElapsedTime();
 	float renderTick = currentRenderTime.asSeconds() * TICKS_PER_SEC;
 
-	static int prevTick = -1;
-	static int currentTick = -1;
+
 
 	const auto & s = m_snapshots.find(renderTick);
 	const Snapshot * s0 = s.first->snapshot.get();
 	const Snapshot * s1 = nullptr;
 
-	prevTick = currentTick;
-	currentTick = s.first->tick;
-
+	m_prevRenderTick = m_currentRenderTick;
+	m_currentRenderTick = s.first->tick;
 
 	if (s.second)
 		s1 = s.second->snapshot.get();
@@ -566,15 +571,13 @@ void PlayingScreen::render(Client & client)
 	
 	
 	//transit snapshot
-	if (currentTick != prevTick)
+	if (m_currentRenderTick != m_prevRenderTick)
 	{
 		//create entities
 		for (auto & p : s0->getEntities())
 		{
 			if (p.second->getType() == NetObject::PLAYER_INFO)
 			{
-			
-
 				continue;
 			}
 
@@ -637,7 +640,7 @@ void PlayingScreen::render(Client & client)
 		m_predictedEntities.erase(std::remove_if(m_predictedEntities.begin(), m_predictedEntities.end(), isDead2), m_predictedEntities.end());
 
 
-		m_snapshots.removeUntil(prevTick);
+		m_snapshots.removeUntil(m_prevRenderTick);
 	}
 
 

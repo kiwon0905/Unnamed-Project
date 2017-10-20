@@ -35,7 +35,7 @@ void Snapshot::read(Unpacker & unpacker)
 {
 	int numItems;
 	unpacker.unpack<0, MAX_SNAPSHOT_ITEM_SIZE>(numItems);
-	
+
 	for (int i = 0; i < numItems; ++i)
 	{
 		NetObject::Type type;
@@ -83,7 +83,7 @@ void Snapshot::readRelativeTo(Unpacker & unpacker, const Snapshot & s)
 {
 	int numItems;
 	unpacker.unpack<0, MAX_SNAPSHOT_ITEM_SIZE>(numItems);
-	
+
 	Packer buf;
 	decode(unpacker, buf);
 	Unpacker temp(buf.getData(), buf.getDataSize());
@@ -127,7 +127,7 @@ void Snapshot::readRelativeTo(Unpacker & unpacker, const Snapshot & s)
 void Snapshot::writeRelativeTo(Packer & packer, const Snapshot & s)
 {
 	packer.pack<0, MAX_SNAPSHOT_ITEM_SIZE>(m_entities.size() + m_transients.size());
-	
+
 	Packer temp;
 	for (auto & e : m_entities)
 	{

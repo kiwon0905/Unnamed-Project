@@ -7,6 +7,7 @@
 #include "Game/NetObject.h"
 #include "Game/Map.h"
 #include "Game/Server/Peer.h"
+#include "Core/Server/Server.h"
 #include "Core/Utility.h"
 
 Projectile::Projectile(int id, GameContext * context, int shooterId, Team shooterTeam):
@@ -41,7 +42,7 @@ void Projectile::tick(float dt)
 			continue;
 
 		//no team kill
-		if (e->getType() == EntityType::HUMAN && m_context->getPeer(static_cast<Human*>(e)->getPeerId())->getTeam() == m_team)
+		if (e->getType() == EntityType::HUMAN && m_context->getServer()->getPeer(static_cast<Human*>(e)->getPeerId())->getTeam() == m_team)
 			continue;
 
 		{

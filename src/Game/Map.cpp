@@ -39,7 +39,7 @@ bool Map::loadFromFile(const std::string & s)
 	return true;
 }
 
-const std::string & Map::getName()
+const std::string & Map::getName() const
 {
 	return m_name;
 }

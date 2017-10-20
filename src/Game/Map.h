@@ -11,7 +11,7 @@ class Map
 {
 public:
 	bool loadFromFile(const std::string & s);
-	const std::string & getName();
+	const std::string & getName() const;
 
 	const sf::Vector2i & getSize() const;
 	const std::string & getTilesetFile() const;

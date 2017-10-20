@@ -37,6 +37,16 @@ void Peer::setEntity(Entity * e)
 	m_entity = e;
 }
 
+void Peer::reset()
+{
+	m_entity = nullptr;
+	m_team = Team::NONE;
+	m_score = 0;
+	m_ackTick = -1;
+	while (!m_inputs.empty())
+		m_inputs.pop();
+}
+
 bool Peer::send(const Packer & packer, bool reliable)
 {
 	return enutil::send(packer, m_peer, reliable);

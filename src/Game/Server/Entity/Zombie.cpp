@@ -2,6 +2,7 @@
 #include "Game/Server/GameContext.h"
 #include "Game/Server/GameWorld.h"
 #include "Game/Server/Peer.h"
+#include "Core/Server/Server.h"
 #include "Core/Utility.h"
 
 Zombie::Zombie(int id, GameContext * context, int peerId):
@@ -14,7 +15,7 @@ Zombie::Zombie(int id, GameContext * context, int peerId):
 void Zombie::tick(float dt)
 {
 	
-	NetInput input = m_context->getPeer(m_peerId)->popInput(m_context->getCurrentTick());
+	NetInput input = m_context->getServer()->getPeer(m_peerId)->popInput(m_context->getCurrentTick());
 
 	m_core.tick(dt, input, m_context->getMap());
 	m_position = m_core.getPosition();

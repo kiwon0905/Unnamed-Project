@@ -64,7 +64,7 @@ bool Server::initialize()
 		return false;
 	}
 
-	m_gameContext.reset(new Normal);
+	m_gameContext.reset(new Normal(this));
 
 	//Register server
 	if (m_config.mode == "internet")
@@ -136,6 +136,60 @@ void Server::flushPackets()
 	enet_host_flush(m_server);
 }
 
+const std::vector<std::unique_ptr<Peer>>& Server::getPeers()
+{
+	return m_peers;
+}
+
+Peer * Server::getPeer(int id)
+{
+	for (auto & p : m_peers)
+		if (p->getId() == id)
+			return p.get();
+	return nullptr;
+}
+
+Peer * Server::getPeer(const ENetPeer * peer)
+{
+	for (auto & p : m_peers)
+		if (p->getENetPeer() == peer)
+			return p.get();
+	return nullptr;
+}
+
+Peer * Server::getPeerByEntityId(int id)
+{
+	for (const auto & p : m_peers)
+	{
+		if (p->getEntity() && p->getEntity()->getId() == id)
+			return p.get();
+	}
+	return nullptr;
+}
+
+bool Server::ensurePlayers(Peer::State state)
+{
+	if (m_peers.empty())
+		return false;
+	for (auto & p : m_peers)
+	{
+		if (p->getState() != state)
+			return false;
+	}
+	return true;
+}
+
+void Server::broadcast(const Packer & packer, bool reliable, const Peer * exclude)
+{
+	for (auto & p : m_peers)
+	{
+		if (p.get() != exclude)
+		{
+			p->send(packer, reliable);
+		}
+	}
+}
+
 void Server::handleCommands()
 {
 	while (m_running)
@@ -146,8 +200,11 @@ void Server::handleCommands()
 			m_running = false;
 		else if (line == "start_dev")
 		{
-			m_gameContext->startRound();
-		
+			m_gameContext->prepareRound();
+			m_state = LOADING;
+			Packer packer;
+			packer.pack(Msg::SV_LOAD_GAME);
+			broadcast(packer, true);
 		}
 	}
 
@@ -165,6 +222,7 @@ void Server::handleNetwork()
 			Logger::getInstance().info("Server", peerString + " connected");
 			enet_peer_timeout(event.peer, ENET_PEER_TIMEOUT_LIMIT, 500, 3000);
 		}
+
 		else if (event.type == ENET_EVENT_TYPE_RECEIVE)
 		{
 			Unpacker unpacker;
@@ -172,9 +230,106 @@ void Server::handleNetwork()
 			Msg msg;
 			unpacker.unpack(msg);
 
+			if (msg == Msg::CL_REQUEST_JOIN_GAME)
+			{
+				std::string name;
+				unpacker.unpack(name);
+				Packer packer;
+				if (m_state == PRE_GAME && m_peers.size() < MAX_PLAYER_ID + 1)
+				{
+					packer.pack(Msg::SV_ACCEPT_JOIN);
+					Peer * p = new Peer(m_nextPeerId++, event.peer);
+					p->setName(name);
+					m_peers.emplace_back(p);
+				}
+				else
+				{
+					packer.pack(Msg::SV_REJECT_JOIN);
+				}
+				enutil::send(packer, event.peer, true);
+			}
 
-			if(event.peer != m_masterServer)
-				m_gameContext->onMsg(msg, unpacker, event.peer);
+			Peer * peer = getPeer(event.peer);
+			if (!peer)
+				return;
+
+
+			if (msg == Msg::CL_REQUEST_ROOM_INFO)
+			{
+
+			}
+			//Client will ask for info after the round has been asked to be prepared
+			else if (msg == Msg::CL_REQUEST_GAME_INFO && m_state == LOADING)
+			{
+				peer->setState(Peer::LOADING);
+
+				Packer packer;
+				packer.pack(Msg::SV_GAME_INFO);
+				packer.pack(m_gameContext->getMap().getName());				//map name
+				packer.pack<0, MAX_PLAYER_ID>(m_peers.size());				//num peer
+				packer.pack<0, MAX_PLAYER_ID>(peer->getId());				//my player id
+				packer.pack(peer->getName());								//my name
+				packer.pack(peer->getTeam());								//team
+				packer.pack<0, MAX_ENTITY_ID>(peer->getEntity()->getId());	//my entity id
+				packer.pack(peer->getEntity()->getType());					//my entity type
+
+				for (const auto & p : m_peers)
+				{
+					if (p->getId() != peer->getId())
+					{
+						packer.pack<0, MAX_PLAYER_ID>(p->getId());				//player id
+						packer.pack(p->getName());								//name
+						packer.pack(p->getTeam());								//team
+						packer.pack<0, MAX_ENTITY_ID>(p->getEntity()->getId());	//entity id
+					}
+				}
+				peer->send(packer, true);
+			}
+			else if (msg == Msg::CL_LOAD_COMPLETE && m_state == LOADING)
+			{
+				peer->setState(Peer::IN_GAME);
+				Logger::getInstance().info("GameContext", std::to_string(peer->getId()) + " has loaded");
+				if (ensurePlayers(Peer::IN_GAME))
+				{
+					m_state = State::IN_GAME;
+					Logger::getInstance().info("GameContext", "Everyone has loaded");
+					m_gameContext->startRound();
+				}
+			}
+			else if (msg == Msg::CL_INPUT && m_state == IN_GAME)
+			{
+				int predictedTick;
+				int ackTick;
+				unpacker.unpack<-1, MAX_TICK>(predictedTick);
+				unpacker.unpack<-1, MAX_TICK>(ackTick);
+				NetInput input;
+				input.read(unpacker);
+				peer->onInput(predictedTick, input);
+				peer->setAckTick(ackTick);
+				if (m_gameContext->getCurrentTick() % 2 == 0)
+				{
+					sf::Time timeLeft = sf::seconds(predictedTick / TICKS_PER_SEC) - m_gameContext->getCurrentTime();
+
+					Packer packer;
+					packer.pack(Msg::SV_INPUT_TIMING);
+					packer.pack<-1, MAX_TICK>(predictedTick);
+					packer.pack(timeLeft.asMilliseconds());
+					peer->send(packer, false);
+				}
+			}
+			else if (msg == Msg::CL_CHAT)
+			{
+				std::string chat;
+				unpacker.unpack(chat);
+
+				Packer packer;
+				packer.pack(Msg::SV_CHAT);
+				packer.pack<-1, MAX_TICK>(m_gameContext->getCurrentTick());
+				packer.pack(uint8_t(peer->getId()));
+				packer.pack(chat);
+				broadcast(packer, true);
+			}
+
 			enet_packet_destroy(event.packet);
 		}
 		else if (event.type == ENET_EVENT_TYPE_DISCONNECT)
@@ -188,7 +343,25 @@ void Server::handleNetwork()
 				std::string peerString;
 				enutil::toString(event.peer->address, peerString);
 				Logger::getInstance().info("Server", peerString + " disconnected");
-				m_gameContext->onDisconnect(*event.peer);
+
+				Peer * p = getPeer(event.peer);
+				if (p)
+				{
+					Packer packer;
+					packer.pack(Msg::SV_PLAYER_LEFT);
+					packer.pack<-1, MAX_PLAYER_ID>(p->getId());
+					broadcast(packer, true, p);
+					if (p->getEntity())
+						p->getEntity()->setAlive(false);
+				}
+				auto pred = [p](const auto & ptr)
+				{
+					return ptr.get() == p;
+				};
+				m_peers.erase(std::remove_if(m_peers.begin(), m_peers.end(), pred), m_peers.end());
+
+				if (m_peers.empty())
+					reset();
 			}
 		}
 	}
@@ -196,7 +369,25 @@ void Server::handleNetwork()
 
 void Server::update()
 {
-	m_gameContext->update();
+	if (m_state == IN_GAME)
+	{
+		if (!m_gameContext->update())
+			reset();
+
+	}
+}
+
+void Server::reset()
+{
+	Logger::getInstance().info("Server", "server reset!");
+
+	m_state = PRE_GAME;
+	for (auto & p : m_peers)
+	{
+		p->reset();
+
+	}
+	m_gameContext->reset();
 }
 
 void Server::sendServerInfoToMasterServer()
@@ -207,7 +398,7 @@ void Server::sendServerInfoToMasterServer()
 	packer.pack(Msg::SV_SERVER_INFO);
 	packer.pack(std::string("Fun game"));
 	packer.pack(m_gameContext->getName());
-	packer.pack(m_gameContext->getState());
-	packer.pack(int32_t(m_gameContext->getPeers().size()));
+	packer.pack(m_state);
+	packer.pack(int32_t(m_peers.size()));
 	enutil::send(packer, m_masterServer, true);
 }

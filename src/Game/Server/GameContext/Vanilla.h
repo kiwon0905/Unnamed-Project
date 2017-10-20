@@ -3,9 +3,10 @@
 class Normal : public GameContext
 {
 public:
+	Normal(Server * server);
 	std::string getName();
-	void startRound();
-	void checkRound();
+	void prepareRound();
+	bool checkRound(Team & team);
 private:
 
 };

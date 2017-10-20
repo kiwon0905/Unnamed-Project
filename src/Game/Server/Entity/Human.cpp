@@ -6,6 +6,7 @@
 #include "Game/Server/GameContext.h"
 #include "Game/Server/GameWorld.h"
 #include "Game/Server/Peer.h"
+#include "Core/Server/Server.h"
 #include "Core/Utility.h"
 
 Human::Human(int id, GameContext * context, int peerId, const sf::Vector2f & pos) :
@@ -18,7 +19,7 @@ Human::Human(int id, GameContext * context, int peerId, const sf::Vector2f & pos
 
 void Human::tick(float dt)
 {
-	NetInput input = m_context->getPeer(m_peerId)->popInput(m_context->getCurrentTick());
+	NetInput input = m_context->getServer()->getPeer(m_peerId)->popInput(m_context->getCurrentTick());
 
 	m_core.tick(dt, input, m_context->getMap());
 
@@ -39,7 +40,7 @@ void Human::tick(float dt)
 				m_context->getMap().getTile(firePos.x + 25.f, firePos.y + 25.f) == 0 &&
 				m_context->getMap().getTile(firePos.x, firePos.y + 25.f) == 0)
 			{
-				Projectile * p = m_context->getWorld().createEntity<Projectile>(m_id, m_context->getPeer(m_peerId)->getTeam());
+				Projectile * p = m_context->getWorld().createEntity<Projectile>(m_id, m_context->getServer()->getPeer(m_peerId)->getTeam());
 
 				p->setVelocity(Math::unit(v) * 1500.f);
 				p->setPosition(firePos);
