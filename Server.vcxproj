@@ -44,7 +44,7 @@
     <ClInclude Include="src\Game\Server\GameContext.h" />
     <ClInclude Include="src\Game\Server\Entity.h" />
     <ClInclude Include="src\Game\Server\GameContext\Infection.h" />
-    <ClInclude Include="src\Game\Server\GameContext\Normal.h" />
+    <ClInclude Include="src\Game\Server\GameContext\Vanilla.h" />
     <ClInclude Include="src\Game\Server\GameWorld.h" />
     <ClInclude Include="src\Game\Server\Peer.h" />
     <ClInclude Include="src\Game\Snapshot.h" />
@@ -72,7 +72,7 @@
     <ClCompile Include="src\Game\Server\GameContext.cpp" />
     <ClCompile Include="src\Game\Server\Entity.cpp" />
     <ClCompile Include="src\Game\Server\GameContext\Infection.cpp" />
-    <ClCompile Include="src\Game\Server\GameContext\Normal.cpp" />
+    <ClCompile Include="src\Game\Server\GameContext\Vanilla.cpp" />
     <ClCompile Include="src\Game\Server\GameWorld.cpp" />
     <ClCompile Include="src\Game\Server\Peer.cpp" />
     <ClCompile Include="src\Game\Snapshot.cpp" />

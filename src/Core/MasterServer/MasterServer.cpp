@@ -142,9 +142,9 @@ void MasterServer::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 	case Msg::SV_REGISTER_SERVER:
 	{
 		std::string serverName;
+		std::string modeName;
 		unpacker.unpack(serverName);
-
-//		ENetAddress addr = peer->address;
+		unpacker.unpack(modeName);
 
 		if (m_games.count(peer))
 			Logger::getInstance().error("MasterServer", "Server already exists!");
@@ -152,7 +152,9 @@ void MasterServer::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 		{
 			GameInfo info;
 			info.id = m_idPool.checkOut();
-			info.name = serverName + std::to_string(info.id);
+			info.name = serverName + " (" + std::to_string(info.id) +")";
+			info.modeName = modeName;
+			info.status = GameInfo::WAITING;
 
 			m_games[peer] = info;
 
@@ -161,6 +163,33 @@ void MasterServer::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 			Logger::getInstance().info("MasterServer", "Server " + addr + " succesfully registerd with name: " + serverName + "(" + std::to_string(info.id) + ")");
 		}
 
+		break;
+	}
+	case Msg::SV_SERVER_INFO:
+	{
+		std::string name;
+		std::string modeName;
+		GameInfo::Status status;
+		int numPlayers;
+
+		unpacker.unpack(name);
+		unpacker.unpack(modeName);
+		unpacker.unpack(status);
+		unpacker.unpack(int32_t(numPlayers));
+		
+		if (m_games.count(peer) == 0)
+		{
+			m_games[peer].id = m_idPool.checkOut();
+			std::string addr;
+			enutil::toString(peer->address, addr);
+			Logger::getInstance().info("MasterServer", "Server " + addr + " succesfully registerd with name: " + name + "(" + std::to_string(m_games[peer].id) + ")");
+		}
+
+		GameInfo & info = m_games[peer];
+		info.name = name + " (" + std::to_string(info.id) + ")";
+		info.modeName = modeName;
+		info.status = status;
+		info.numPlayers = numPlayers;
 		break;
 	}
 	default:
@@ -172,14 +201,14 @@ void MasterServer::handlePacket(Unpacker & unpacker, const ENetAddress & addr)
 {
 	Msg msg;
 	unpacker.unpack(msg);
-	if (msg == Msg::CL_REQUEST_INTERNET_SERVER_LIST)
+	if (msg == Msg::CL_REQUEST_INTERNET_SERVER_INFO)
 	{
 		std::string stringAddr;
 		enutil::toString(addr, stringAddr);
 		Logger::getInstance().info("MasterServer", "Received request for internet server list from: " + stringAddr);
 
 		Packer packer;
-		packer.pack(Msg::MSV_INTERNET_SERVER_LIST);
+		packer.pack(Msg::MSV_INTERNET_SERVER_INFO);
 		packer.pack(std::uint32_t(m_games.size()));
 
 		for (const auto & game : m_games)
@@ -188,6 +217,8 @@ void MasterServer::handlePacket(Unpacker & unpacker, const ENetAddress & addr)
 			packer.pack(game.first->address.port);
 			packer.pack(game.second.id);
 			packer.pack(game.second.name);
+			packer.pack(game.second.modeName);
+			packer.pack(game.second.status);
 		}
 		enutil::send(packer, addr, m_socket);
 	}

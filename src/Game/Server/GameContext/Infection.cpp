@@ -1,6 +1,10 @@
 #include "Infection.h"
 
 #include "Game/Server/Entity/Human.h"
+std::string Infection::getName()
+{
+	return "Infection";
+}
 void Infection::startRound()
 {
 	m_state = LOADING;

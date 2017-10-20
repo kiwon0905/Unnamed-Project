@@ -90,9 +90,6 @@
     <ClInclude Include="src\Game\Server\GameContext\Infection.h">
       <Filter>Game\Server\GameContext</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\Server\GameContext\Normal.h">
-      <Filter>Game\Server\GameContext</Filter>
-    </ClInclude>
     <ClInclude Include="src\Game\Server\Entity\Human.h">
       <Filter>Game\Server\Entity</Filter>
     </ClInclude>
@@ -113,6 +110,9 @@
     </ClInclude>
     <ClInclude Include="src\Game\Server\Peer.h">
       <Filter>Game\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Server\GameContext\Vanilla.h">
+      <Filter>Game\Server\GameContext</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -170,9 +170,6 @@
     <ClCompile Include="src\Game\Server\GameContext\Infection.cpp">
       <Filter>Game\Server\GameContext</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Server\GameContext\Normal.cpp">
-      <Filter>Game\Server\GameContext</Filter>
-    </ClCompile>
     <ClCompile Include="src\Game\Server\Entity\Human.cpp">
       <Filter>Game\Server\Entity</Filter>
     </ClCompile>
@@ -193,6 +190,9 @@
     </ClCompile>
     <ClCompile Include="src\Game\Server\Peer.cpp">
       <Filter>Game\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Server\GameContext\Vanilla.cpp">
+      <Filter>Game\Server\GameContext</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

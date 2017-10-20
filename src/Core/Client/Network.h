@@ -30,7 +30,7 @@ public:
 	}
 	ENetEvent * peekEvent();
 	void popEvent();
-	bool send(Packer & packer, ENetAddress & addr);
+	bool send(const Packer & packer, const ENetAddress & addr);
 	bool receive(Unpacker & unpacker, ENetAddress & addr);
 private:
 	ENetHost * m_client = nullptr;

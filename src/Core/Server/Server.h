@@ -29,11 +29,17 @@ private:
 		ENetAddress address;
 		ENetAddress masterAddress;
 	};
-
+	enum Status
+	{
+		WAITING,
+		IN_GAME,
+		COUNT
+	};
 	void handleCommands();
 	void handleNetwork();
 	void update();
 
+	void sendServerInfoToMasterServer();
 
 	std::unique_ptr<std::thread> m_parsingThread;
 	std::atomic<bool> m_running = false;

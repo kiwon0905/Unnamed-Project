@@ -3,9 +3,9 @@
 enum class Msg
 {
 	//client -> masterserver 
-	CL_REQUEST_INTERNET_SERVER_LIST,
+	CL_REQUEST_INTERNET_SERVER_INFO,
 	//client -> lan
-	CL_REVEAL_LAN_SERVER,
+	CL_REQUEST_LAN_SERVER_INFO,
 
 	//client -> server
 	CL_REQUEST_JOIN_GAME,
@@ -19,7 +19,10 @@ enum class Msg
 
 	//server -> masterserver
 	SV_REGISTER_SERVER,
-
+	SV_SERVER_INFO,
+	//server -> client
+	SV_LAN_SERVER_INFO,
+	
 	//server -> client
 	SV_ACCEPT_JOIN,
 	SV_REJECT_JOIN,
@@ -35,7 +38,7 @@ enum class Msg
 	SV_KILL_FEED,
 
 	//master -> client
-	MSV_INTERNET_SERVER_LIST,
+	MSV_INTERNET_SERVER_INFO,
 
 	INVALID,
 	COUNT

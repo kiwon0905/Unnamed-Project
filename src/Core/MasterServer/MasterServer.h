@@ -28,8 +28,18 @@ private:
 private:
 	struct GameInfo
 	{
+		enum Status
+		{
+			WAITING,
+			IN_GAME,
+			COUNT
+		};
+		
 		int id;
 		std::string name;
+		std::string modeName;
+		Status status;
+		int numPlayers;
 	};
 	ENetHost * m_server;		//maintain connection with game servers
 	ENetSocket m_socket;		//communicate with players

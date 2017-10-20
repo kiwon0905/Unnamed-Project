@@ -115,9 +115,6 @@ void GameContext::onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer)
 void GameContext::onDisconnect(const ENetPeer & peer)
 {
 	Peer * p = getPeer(&peer);
-
-
-
 	if (p)
 	{
 		Packer packer;
@@ -202,6 +199,11 @@ void GameContext::update()
 		}
 
 	}
+}
+
+GameContext::State GameContext::getState()
+{
+	return m_state;
 }
 
 const std::vector<std::unique_ptr<Peer>>& GameContext::getPeers()

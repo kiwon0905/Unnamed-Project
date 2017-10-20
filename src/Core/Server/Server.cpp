@@ -6,7 +6,7 @@
 
 
 #include "Game/Server/GameContext/Infection.h"
-#include "Game/Server/GameContext/Normal.h"
+#include "Game/Server/GameContext/Vanilla.h"
 #include <iostream>
 #include <string>
 
@@ -43,14 +43,13 @@ bool Server::initialize()
 		}
 	}
 
+	//init network
 	std::string addr;
 	if (!parser.get("gameServerAddr", addr) || !enutil::toENetAddress(addr, m_config.address))
 	{
 		Logger::getInstance().error("Server", "Failed to read gameServerAddr");
 		return false;
 	}
-
-
 
 	m_server = enet_host_create(&m_config.address, 32, 1, 0, 0);
 	if (!m_server)
@@ -65,7 +64,9 @@ bool Server::initialize()
 		return false;
 	}
 
+	m_gameContext.reset(new Normal);
 
+	//Register server
 	if (m_config.mode == "internet")
 	{
 		m_masterServer = enet_host_connect(m_server, &m_config.masterAddress, 1, 1);
@@ -88,12 +89,9 @@ bool Server::initialize()
 			enet_peer_reset(m_masterServer);
 			return false;
 		}
-		//Register game
-		Packer packer;
-		packer.pack(Msg::SV_REGISTER_SERVER);
-		packer.pack(std::string("Fun"));
 
-		enutil::send(packer, m_masterServer, true);
+
+		sendServerInfoToMasterServer();
 	}
 
 	std::string serverAddr;
@@ -102,7 +100,6 @@ bool Server::initialize()
 	m_running = true;
 	m_parsingThread.reset(new std::thread(&Server::handleCommands, this));
 
-	m_gameContext.reset(new Normal);
 	return true;
 }
 
@@ -151,15 +148,6 @@ void Server::handleCommands()
 		{
 			m_gameContext->startRound();
 		
-			/*if (m_players.size() > 0)
-			{
-				m_gameWorld.load(*this);
-				m_state = LOADING;
-			}
-			else
-			{
-				Logger::getInstance().info("Need one or more player to start");
-			}*/
 		}
 	}
 
@@ -200,8 +188,6 @@ void Server::handleNetwork()
 				std::string peerString;
 				enutil::toString(event.peer->address, peerString);
 				Logger::getInstance().info("Server", peerString + " disconnected");
-
-
 				m_gameContext->onDisconnect(*event.peer);
 			}
 		}
@@ -210,18 +196,19 @@ void Server::handleNetwork()
 
 void Server::update()
 {
-	/**
-	if (m_state == PRE_GAME)
-	{
-
-	}
-	else if (m_state == LOADING)
-	{
-		//TODO: loading timeouts, etc...
-	}
-	else if (m_state == IN_GAME)
-	{
-		m_gameWorld.update(*this);
-	}*/
 	m_gameContext->update();
+}
+
+void Server::sendServerInfoToMasterServer()
+{
+	//game: Name, mode, status, players
+
+	Packer packer;
+	packer.pack(Msg::SV_SERVER_INFO);
+	packer.pack(std::string("Fun game"));
+	packer.pack(m_gameContext->getName());
+	Status status = m_gameContext->getState() == GameContext::PRE_GAME ? Status::WAITING : Status::IN_GAME;
+	packer.pack(status);
+	packer.pack(int32_t(m_gameContext->getPeers().size()));
+	enutil::send(packer, m_masterServer, true);
 }

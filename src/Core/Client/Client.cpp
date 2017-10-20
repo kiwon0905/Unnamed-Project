@@ -18,13 +18,27 @@ bool Client::initialize()
 		Logger::getInstance().error("Client", "Failed to load client-config.txt");
 		return false;
 	}
-	
+
 	if (!m_network.initialize(*this))
 	{
 		Logger::getInstance().error("Client", "Failed to initialize network");
 		return false;
 	}
+
 	
+	std::string masterAddr;
+	ENetAddress enetMasterAddr;
+	if (!m_parser.get("masterAddr", masterAddr) || !enutil::toENetAddress(masterAddr, enetMasterAddr))
+	{
+		Logger::getInstance().warn("Client", "Failed to read master server address. Internet servers are unavailable");
+	}
+	else
+	{
+		Logger::getInstance().info("Client", "Master server address: " + masterAddr);
+		m_masterServerAddress.reset(new ENetAddress);
+		*m_masterServerAddress = enetMasterAddr;
+	}
+
 	if (!m_screenStack.initialize(*this))
 		return false;
 
@@ -105,7 +119,7 @@ void Client::run()
 			m_screenStack.update(*this);
 
 			
-			m_window.clear();
+			m_window.clear(sf::Color::Cyan);
 			m_screenStack.render(*this);
 			m_gui.draw();
 

@@ -1,6 +1,11 @@
-#include "Normal.h"
+#include "Vanilla.h"
 #include "Game/Server/Entity/Human.h"
 
+
+std::string Normal::getName()
+{
+	return "Vanilla";
+}
 
 void Normal::startRound()
 {

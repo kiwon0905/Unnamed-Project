@@ -99,7 +99,7 @@ void Network::popEvent()
 	}
 }
 
-bool Network::send(Packer & packer, ENetAddress & addr)
+bool Network::send(const Packer & packer, const ENetAddress & addr)
 {
 	return enutil::send(packer, addr, m_socket);
 }

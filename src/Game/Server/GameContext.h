@@ -27,6 +27,7 @@ public:
 	void onDisconnect(const ENetPeer & peer);
 	void update();
 
+	State getState();
 	const std::vector<std::unique_ptr<Peer>> & getPeers();
 	Peer * getPeer(int id);
 	const Map & getMap();
@@ -35,6 +36,7 @@ public:
 
 	//call this in startRound to create crates
 	void createCrates();
+	virtual std::string getName() = 0;
 	virtual void startRound() = 0;
 	virtual void checkRound() = 0;
 	void endRound(Team winner);

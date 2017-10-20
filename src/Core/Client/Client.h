@@ -15,6 +15,7 @@ class Client
 public:
 	void run();
 
+	const ENetAddress * getMasterServerAddress() { return m_masterServerAddress.get(); }
 	Parser & getParser() { return m_parser; }
 	sf::RenderWindow & getWindow() { return m_window; }
 	AssetManager & getAssetManager() { return m_assetManager; }
@@ -29,6 +30,7 @@ private:
 	bool initialize();
 	void finalize();
 private:
+	std::unique_ptr<ENetAddress> m_masterServerAddress;
 	Parser m_parser;
 	sf::RenderWindow m_window;
 	AssetManager m_assetManager;
