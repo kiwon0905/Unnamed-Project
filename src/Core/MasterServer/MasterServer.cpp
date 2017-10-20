@@ -165,6 +165,9 @@ void MasterServer::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 		info.modeName = modeName;
 		info.status = status;
 		info.numPlayers = numPlayers;
+
+
+		std::cout << "recvd server info: " << name << ", " << modeName << ", " << status << ", " << numPlayers << "\n";
 		break;
 	}
 	default:
@@ -194,6 +197,7 @@ void MasterServer::handlePacket(Unpacker & unpacker, const ENetAddress & addr)
 			packer.pack(game.second.name);
 			packer.pack(game.second.modeName);
 			packer.pack(game.second.status);
+			packer.pack(game.second.numPlayers);
 		}
 		enutil::send(packer, addr, m_socket);
 	}

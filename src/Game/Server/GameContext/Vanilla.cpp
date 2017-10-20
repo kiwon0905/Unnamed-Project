@@ -2,18 +2,18 @@
 #include "Core/Server/Server.h"
 #include "Game/Server/Entity/Human.h"
 
-Normal::Normal(Server * server):
+Vanilla::Vanilla(Server * server):
 	GameContext(server)
 {
 
 }
 
-std::string Normal::getName()
+std::string Vanilla::getName()
 {
 	return "Vanilla";
 }
 
-void Normal::prepareRound()
+void Vanilla::prepareRound()
 {
 	m_map.loadFromFile("map/grass2.xml");
 
@@ -34,12 +34,8 @@ void Normal::prepareRound()
 	createCrates();
 }
 
-bool Normal::checkRound(Team & team)
+bool Vanilla::checkRound(Team & team)
 {
-	if (m_tick > 150)
-	{
-		team = Team::NONE;
-		return true;
-	}
+
 	return false;
 }

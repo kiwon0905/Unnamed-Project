@@ -64,7 +64,7 @@ bool Server::initialize()
 		return false;
 	}
 
-	m_gameContext.reset(new Normal(this));
+	m_gameContext.reset(new Vanilla(this));
 
 	//Register server
 	if (m_config.mode == "internet")
@@ -241,6 +241,8 @@ void Server::handleNetwork()
 					Peer * p = new Peer(m_nextPeerId++, event.peer);
 					p->setName(name);
 					m_peers.emplace_back(p);
+
+					sendServerInfoToMasterServer();
 				}
 				else
 				{
@@ -294,6 +296,8 @@ void Server::handleNetwork()
 					m_state = State::IN_GAME;
 					Logger::getInstance().info("GameContext", "Everyone has loaded");
 					m_gameContext->startRound();
+
+					sendServerInfoToMasterServer();
 				}
 			}
 			else if (msg == Msg::CL_INPUT && m_state == IN_GAME)
@@ -363,6 +367,8 @@ void Server::handleNetwork()
 				if (m_peers.empty())
 					reset();
 			}
+
+			sendServerInfoToMasterServer();
 		}
 	}
 }

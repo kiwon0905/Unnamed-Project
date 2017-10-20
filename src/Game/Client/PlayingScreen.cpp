@@ -278,13 +278,11 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			if (m_lastRecvTick >= serverTick)
 				return;
 
-			std::cout << "snapshot tick: " << serverTick << "\n";
 
 			if (msg == Msg::SV_DELTA_SNAPSHOT)
 			{
 				int deltaTick;
 				unpacker.unpack<-1, MAX_TICK>(deltaTick);
-				std::cout << "delta tick: " << deltaTick << "\n";
 				
 				const Snapshot * deltaSnapshot = m_snapshots.get(deltaTick);
 				if (!deltaSnapshot)
@@ -316,9 +314,6 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					m_prevPredictedTime = sf::seconds(static_cast<float>(m_startTick + 5) / TICKS_PER_SEC);
 					m_predictedTick = m_startTick + 5;
 
-
-					std::cout << "start tick: " << m_startTick << "\n";
-					std::cout << "predicted tick: " << m_predictedTick << "\n";
 				}
 				else if(serverTick - 2 >= m_startTick) 
 				{
@@ -353,7 +348,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					m_predictionGraph->addSample(static_cast<float>(timeLeft));
 				}
 			}
-		}
+		} 
 
 		else if (msg == Msg::SV_ROUND_OVER)
 		{

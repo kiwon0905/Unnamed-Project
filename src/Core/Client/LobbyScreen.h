@@ -38,6 +38,7 @@ private:
 		std::string name;
 		std::string modeName;
 		Status status;
+		int numPlayers;
 	};
 	std::vector<GameInfo> m_internetGames;
 

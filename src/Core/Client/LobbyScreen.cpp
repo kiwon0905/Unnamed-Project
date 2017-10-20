@@ -227,6 +227,7 @@ void LobbyScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & addr,
 				unpacker.unpack(info.name);
 				unpacker.unpack(info.modeName);
 				unpacker.unpack(info.status);
+				unpacker.unpack(info.numPlayers);
 
 				std::string addr;
 				enutil::toString(info.addr, addr);
@@ -324,7 +325,8 @@ void LobbyScreen::updateInternetGamesUi(Client & client)
 			name->setText(info.name);
 			mode->setText(info.modeName);
 			status->setText(info.status == GameInfo::IN_GAME ? "In game" : "Waiting");
-			players->setText("0/0");
+			
+			players->setText(std::to_string(info.numPlayers));
 			ping->setText("0");
 
 			auto connectFunc = [&info, &client]()

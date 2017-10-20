@@ -1,9 +1,9 @@
 #include "Game/Server/GameContext.h"
 
-class Normal : public GameContext
+class Vanilla : public GameContext
 {
 public:
-	Normal(Server * server);
+	Vanilla(Server * server);
 	std::string getName();
 	void prepareRound();
 	bool checkRound(Team & team);
