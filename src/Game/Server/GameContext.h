@@ -20,7 +20,8 @@ public:
 		PRE_GAME,
 		LOADING,
 		IN_GAME,
-		POST_GAME
+		POST_GAME,
+		COUNT
 	};
 	
 	void onMsg(Msg msg, Unpacker & unpacker, ENetPeer * enetPeer);

@@ -29,12 +29,7 @@ private:
 		ENetAddress address;
 		ENetAddress masterAddress;
 	};
-	enum Status
-	{
-		WAITING,
-		IN_GAME,
-		COUNT
-	};
+
 	void handleCommands();
 	void handleNetwork();
 	void update();

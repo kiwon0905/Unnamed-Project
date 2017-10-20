@@ -207,8 +207,7 @@ void Server::sendServerInfoToMasterServer()
 	packer.pack(Msg::SV_SERVER_INFO);
 	packer.pack(std::string("Fun game"));
 	packer.pack(m_gameContext->getName());
-	Status status = m_gameContext->getState() == GameContext::PRE_GAME ? Status::WAITING : Status::IN_GAME;
-	packer.pack(status);
+	packer.pack(m_gameContext->getState());
 	packer.pack(int32_t(m_gameContext->getPeers().size()));
 	enutil::send(packer, m_masterServer, true);
 }

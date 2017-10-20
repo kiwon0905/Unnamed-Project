@@ -27,8 +27,10 @@ private:
 	{
 		enum Status
 		{
-			WAITING = 0,
+			PRE_GAME,
+			LOADING,
 			IN_GAME,
+			POST_GAME,
 			COUNT
 		};
 		int id;

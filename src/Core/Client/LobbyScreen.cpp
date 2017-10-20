@@ -323,7 +323,7 @@ void LobbyScreen::updateInternetGamesUi(Client & client)
 
 			name->setText(info.name);
 			mode->setText(info.modeName);
-			status->setText(info.status == GameInfo::WAITING ? "Waiting" : "In Game");
+			status->setText(info.status == GameInfo::IN_GAME ? "In game" : "Waiting");
 			players->setText("0/0");
 			ping->setText("0");
 

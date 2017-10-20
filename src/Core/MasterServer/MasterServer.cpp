@@ -139,32 +139,7 @@ void MasterServer::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 	unpacker.unpack(msg);
 	switch (msg)
 	{
-	case Msg::SV_REGISTER_SERVER:
-	{
-		std::string serverName;
-		std::string modeName;
-		unpacker.unpack(serverName);
-		unpacker.unpack(modeName);
 
-		if (m_games.count(peer))
-			Logger::getInstance().error("MasterServer", "Server already exists!");
-		else
-		{
-			GameInfo info;
-			info.id = m_idPool.checkOut();
-			info.name = serverName + " (" + std::to_string(info.id) +")";
-			info.modeName = modeName;
-			info.status = GameInfo::WAITING;
-
-			m_games[peer] = info;
-
-			std::string addr;
-			enutil::toString(peer->address, addr);
-			Logger::getInstance().info("MasterServer", "Server " + addr + " succesfully registerd with name: " + serverName + "(" + std::to_string(info.id) + ")");
-		}
-
-		break;
-	}
 	case Msg::SV_SERVER_INFO:
 	{
 		std::string name;

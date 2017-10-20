@@ -30,8 +30,10 @@ private:
 	{
 		enum Status
 		{
-			WAITING,
+			PRE_GAME,
+			LOADING,
 			IN_GAME,
+			POST_GAME,
 			COUNT
 		};
 		
