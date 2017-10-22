@@ -8,8 +8,7 @@
 #include <enet/enet.h>
 #include <iostream>
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
+#include <map>
 #include <thread>
 #include <atomic>
 
@@ -46,7 +45,7 @@ private:
 	ENetHost * m_server;		//maintain connection with game servers
 	ENetSocket m_socket;		//communicate with players
 	std::unique_ptr<std::thread> m_parsingThread;
-	std::unordered_map<ENetPeer *, GameInfo> m_games;
+	std::map<ENetPeer *, GameInfo> m_games;
 
 	std::atomic<bool> m_running = false;
 	IdPool<std::int32_t> m_idPool;
