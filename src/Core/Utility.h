@@ -25,6 +25,8 @@ namespace Math
 	template <typename T>
 	sf::Vector2<T> unit(const sf::Vector2<T> & v)
 	{
+		if(v == sf::Vector2<T>())
+			return sf::Vector2f();
 		return v / length(v);
 	}
 

@@ -235,7 +235,7 @@ void Server::handleNetwork()
 				std::string name;
 				unpacker.unpack(name);
 				Packer packer;
-				if (m_state == PRE_GAME && m_peers.size() < MAX_PLAYER_ID + 1)
+				if (m_state == PRE_GAME && m_peers.size() < 16 && m_nextPeerId < MAX_PEER_ID)
 				{
 					packer.pack(Msg::SV_ACCEPT_JOIN);
 					Peer * p = new Peer(m_nextPeerId++, event.peer);
@@ -268,8 +268,8 @@ void Server::handleNetwork()
 				Packer packer;
 				packer.pack(Msg::SV_GAME_INFO);
 				packer.pack(m_gameContext->getMap().getName());				//map name
-				packer.pack<0, MAX_PLAYER_ID>(m_peers.size());				//num peer
-				packer.pack<0, MAX_PLAYER_ID>(peer->getId());				//my player id
+				packer.pack<0, MAX_PEER_ID>(m_peers.size());				//num peer
+				packer.pack<0, MAX_PEER_ID>(peer->getId());				//my player id
 				packer.pack(peer->getName());								//my name
 				packer.pack(peer->getTeam());								//team
 				packer.pack<0, MAX_ENTITY_ID>(peer->getEntity()->getId());	//my entity id
@@ -279,7 +279,7 @@ void Server::handleNetwork()
 				{
 					if (p->getId() != peer->getId())
 					{
-						packer.pack<0, MAX_PLAYER_ID>(p->getId());				//player id
+						packer.pack<0, MAX_PEER_ID>(p->getId());				//player id
 						packer.pack(p->getName());								//name
 						packer.pack(p->getTeam());								//team
 						packer.pack<0, MAX_ENTITY_ID>(p->getEntity()->getId());	//entity id
@@ -353,7 +353,7 @@ void Server::handleNetwork()
 				{
 					Packer packer;
 					packer.pack(Msg::SV_PLAYER_LEFT);
-					packer.pack<-1, MAX_PLAYER_ID>(p->getId());
+					packer.pack<-1, MAX_PEER_ID>(p->getId());
 					broadcast(packer, true, p);
 					if (p->getEntity())
 						p->getEntity()->setAlive(false);

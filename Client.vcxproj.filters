@@ -206,9 +206,6 @@
     <ClCompile Include="src\Game\Client\Entity\Projectile.cpp">
       <Filter>Game\Client\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Client\Entity\Zombie.cpp">
-      <Filter>Game\Client\Entity</Filter>
-    </ClCompile>
     <ClCompile Include="src\Game\Client\Entity\Item.cpp">
       <Filter>Game\Client\Entity</Filter>
     </ClCompile>
@@ -220,6 +217,9 @@
     </ClCompile>
     <ClCompile Include="src\Game\Client\PlayingScreen.cpp">
       <Filter>Game\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Client\Entity\Zombie.cpp">
+      <Filter>Game\Client\Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

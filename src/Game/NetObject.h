@@ -99,6 +99,8 @@ struct NetProjectile
 	void read(Unpacker & unpacker);
 
 	sf::Vector2i pos;
+	sf::Vector2i vel;
+
 };
 
 struct NetCrate
@@ -125,7 +127,6 @@ struct NetPlayerInfo
 	void write(Packer & packer) const;
 	void read(Unpacker & unpacker);
 
-	int id;
 	int score;
 };
 

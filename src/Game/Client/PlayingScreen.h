@@ -46,6 +46,15 @@ private:
 class PlayingScreen : public Screen
 {
 public:
+
+	struct PlayerInfo
+	{
+		int id;
+		int entityId;
+		Team team;
+		std::string name;
+	};
+
 	PlayingScreen();
 	~PlayingScreen() { std::cout << "play destroy!"; }
 	void onEnter(Client & client);
@@ -68,13 +77,6 @@ private:
 	State m_state = LOADING;
 
 
-	struct PlayerInfo
-	{
-		int id;
-		int entityId;
-		Team team;
-		std::string name;
-	};
 	std::vector<PlayerInfo> m_players;
 	PlayerInfo m_myPlayer;
 
@@ -114,6 +116,8 @@ private:
 	sf::View m_view;
 	Particles m_particles;
 	Announcer m_announcer;
+	const sf::Font * m_font;
+
 	//entities
 	Entity * getEntity(int id);
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
@@ -132,5 +136,6 @@ public:
 	const PlayerInfo * getPlayerInfoByEntityId(int entityId);
 	const PlayerInfo & getMyPlayerInfo();
 	Particles & getParticles();
+	const sf::Font * getFont();
 
 };

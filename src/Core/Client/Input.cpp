@@ -43,8 +43,6 @@ NetInput Input::getInput(const sf::RenderTarget & target, const sf::View & view)
 		if (m_controls[Control::MOVE_DOWN]())
 			input.vMoveDirection++;
 
-
-
 		input.jump = m_controls[Control::JUMP]();
 		input.fire = m_controls[Control::PRIMARY_FIRE]();
 	}
@@ -94,10 +92,15 @@ void Input::handleEvent(const sf::Event & event)
 	if (event.type == sf::Event::LostFocus)
 	{
 		m_hasFocus = false;
+		memset(m_activeButtons, 0, sizeof(bool) * sf::Mouse::ButtonCount);
+		memset(m_activeKeys, 0, sizeof(bool) * sf::Keyboard::KeyCount);
+		for (auto & c : m_keyCombinations)
+			c.current = c.last = false;
 	}
 	else if (event.type == sf::Event::GainedFocus)
 	{
 		m_hasFocus = true;
+
 	}
 
 	if (m_hasFocus)

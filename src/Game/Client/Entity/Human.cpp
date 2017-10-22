@@ -45,10 +45,12 @@ void Human::render(const Snapshot * from, const Snapshot * to, float predictedT,
 
 	sf::Vector2f pos = getRenderPos(h0, h1, predictedT, t);
 
+	const PlayingScreen::PlayerInfo * info = m_screen->getPlayerInfoByEntityId(m_id);
+
 	//body
 	sf::RectangleShape body;
 	body.setSize({ 69.f, 69.f });
-	sf::Color teamColor = m_screen->getPlayerInfoByEntityId(m_id)->team == Team::A ? sf::Color::Blue : sf::Color::Red;
+	sf::Color teamColor = info->team == Team::A ? sf::Color::Blue : sf::Color::Red;
 	body.setFillColor(teamColor);
 	body.setOutlineColor(sf::Color::Black);
 	body.setOutlineThickness(-3.f);
@@ -86,7 +88,6 @@ void Human::render(const Snapshot * from, const Snapshot * to, float predictedT,
 	total.setFillColor(sf::Color(112, 128, 144));
 	total.setOutlineColor(sf::Color::Black);
 	total.setOutlineThickness(-2.f);
-
 	total.setPosition({ pos.x + 69.f / 2.f - 35.f, pos.y - 45.f });
 	target.draw(total);
 
@@ -99,8 +100,18 @@ void Human::render(const Snapshot * from, const Snapshot * to, float predictedT,
 		health.setFillColor(sf::Color::Green);
 	health.setSize(sf::Vector2f(healthVal / 100.f * (70.f + 2 * total.getOutlineThickness()), total.getSize().y + total.getOutlineThickness() * 2));
 	health.setPosition(total.getPosition() - sf::Vector2f{ total.getOutlineThickness(), total.getOutlineThickness() });
-
 	target.draw(health);
+
+
+	sf::Text name;
+	name.setFont(*m_screen->getFont());
+	name.setString(info->name);
+	name.setOrigin(name.getLocalBounds().left, name.getLocalBounds().top);
+	if (m_screen->getMyPlayerInfo().entityId == m_id)
+		name.setFillColor(sf::Color::Yellow);
+	name.setPosition(pos);
+	name.setPosition({ pos.x + 69.f / 2.f - name.getLocalBounds().width / 2.f, total.getPosition().y - name.getLocalBounds().height - name.getFont()->getLineSpacing(name.getCharacterSize())});
+	target.draw(name);
 }
 
 sf::Vector2f Human::getRenderPos(const NetHuman * h0, const NetHuman * h1, float predictedT, float t) const

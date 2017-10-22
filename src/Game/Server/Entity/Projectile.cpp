@@ -91,6 +91,8 @@ void Projectile::snap(Snapshot & snapshot) const
 	{
 		np->pos.x = (int)std::round(m_position.x * 100.f);
 		np->pos.y = (int)std::round(m_position.y * 100.f);
+		np->vel.x = (int)std::round(m_velocity.x * 100.f);
+		np->vel.y = (int)std::round(m_velocity.y * 100.f);
 	}
 }
 

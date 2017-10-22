@@ -34,9 +34,11 @@ void Projectile::render(const Snapshot * from, const Snapshot * to, float predic
 
 
 	sf::Vector2f pos = static_cast<sf::Vector2f>(p0->pos) / 100.f;
+	sf::Vector2f vel = static_cast<sf::Vector2f>(p0->vel) / 100.f;
 	if (p1)
 	{
 		pos = Math::lerp(static_cast<sf::Vector2f>(p0->pos) / 100.f, static_cast<sf::Vector2f>(p1->pos) / 100.f, t);
+		vel = Math::lerp(static_cast<sf::Vector2f>(p0->vel) / 100.f, static_cast<sf::Vector2f>(p1->vel) / 100.f, t);
 	}
 
 	sf::CircleShape c;
@@ -45,6 +47,10 @@ void Projectile::render(const Snapshot * from, const Snapshot * to, float predic
 	c.setRadius(12.5f);
 	target.draw(c);
 	
-	m_emitter->pos = pos + sf::Vector2f(25.f, 25.f) / 2.f;
+
+	sf::Vector2f smokeOffset = sf::Vector2f(25.f, 25.f) / 2.f;
+	smokeOffset -= Math::unit(vel) * 25.f;
+
+	m_emitter->pos = pos + smokeOffset;
 	
 }

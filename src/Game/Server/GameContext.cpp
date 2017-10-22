@@ -142,7 +142,7 @@ void GameContext::announceDeath(int killedEntity, int killerEntity)
 	packer.pack(Msg::SV_KILL_FEED);
 	int killedPeerId = killedPeer ? killedPeer->getId() : -1;
 	int killerPeerId = killerPeer ? killerPeer->getId() : -1;
-	packer.pack<-1, MAX_PLAYER_ID>(killedPeerId);
-	packer.pack<-1, MAX_PLAYER_ID>(killerPeerId);
+	packer.pack<-1, MAX_PEER_ID>(killedPeerId);
+	packer.pack<-1, MAX_PEER_ID>(killerPeerId);
 	m_server->broadcast(packer, true);
 }

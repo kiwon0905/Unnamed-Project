@@ -102,8 +102,8 @@ void Particles::update(float dt)
 		t.scale({ p.scale, p.scale });
 
 		sf::IntRect rect = m_textureRects[p.type];
-		sf::Vector2f pos = sf::Vector2f(rect.left, rect.top);
-		sf::Vector2f size = sf::Vector2f(rect.width, rect.height);
+		sf::Vector2f pos = sf::Vector2f(static_cast<float>(rect.left), static_cast<float>(rect.top));
+		sf::Vector2f size = sf::Vector2f(static_cast<float>(rect.width), static_cast<float>(rect.height));
 		//a b 
 		//c d 
 		sf::Vertex a, b, c, d;

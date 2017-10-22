@@ -125,10 +125,10 @@ void PlayingScreen::onEnter(Client & client)
 	
 	sf::Vector2u windowSize = client.getWindow().getSize();
 
-	const sf::Font * font = client.getAssetManager().get<sf::Font>("arial.ttf");
-	m_predictionGraph = std::make_unique<Graph>(-150.f, 150.f, *font, "Prediction timing(ms)");
+	m_font = client.getAssetManager().get<sf::Font>("arial.ttf");
+	m_predictionGraph = std::make_unique<Graph>(-150.f, 150.f, *m_font, "Prediction timing(ms)");
 	m_predictionGraph->setPosition({ 0.f, 600. });
-	m_snapshotGraph = std::make_unique<Graph>(-50.f, 100.f, *font, "Snapshot timing(ms)");
+	m_snapshotGraph = std::make_unique<Graph>(-50.f, 100.f, *m_font, "Snapshot timing(ms)");
 	m_snapshotGraph->setPosition({ 0.f, 300.f });
 
 
@@ -201,8 +201,8 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			EntityType playerEntityType;
 
 			unpacker.unpack(mapName);
-			unpacker.unpack<0, MAX_PLAYER_ID>(numPlayer);
-			unpacker.unpack<0, MAX_PLAYER_ID>(m_myPlayer.id);
+			unpacker.unpack<0, MAX_PEER_ID>(numPlayer);
+			unpacker.unpack<0, MAX_PEER_ID>(m_myPlayer.id);
 			unpacker.unpack(m_myPlayer.name);
 			unpacker.unpack(m_myPlayer.team);
 			unpacker.unpack<0, MAX_ENTITY_ID>(m_myPlayer.entityId);
@@ -214,7 +214,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			for (int i = 0; i < numPlayer - 1; ++i)
 			{
 				PlayerInfo info;
-				unpacker.unpack<0, MAX_PLAYER_ID>(info.id);
+				unpacker.unpack<0, MAX_PEER_ID>(info.id);
 				unpacker.unpack(info.name);
 				unpacker.unpack(info.team);
 				unpacker.unpack<0, MAX_ENTITY_ID>(info.entityId);
@@ -390,7 +390,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		else if (msg == Msg::SV_PLAYER_LEFT)
 		{
 			int id;
-			unpacker.unpack<-1, MAX_PLAYER_ID>(id);
+			unpacker.unpack<-1, MAX_PEER_ID>(id);
 			const PlayerInfo * info = getPlayerInfo(id);
 			if (info)
 			{
@@ -404,8 +404,8 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		else if (msg == Msg::SV_KILL_FEED)
 		{
 			int killedPeerId, killerPeerId;
-			unpacker.unpack<-1, MAX_PLAYER_ID>(killedPeerId);
-			unpacker.unpack<-1, MAX_PLAYER_ID>(killerPeerId);
+			unpacker.unpack<-1, MAX_PEER_ID>(killedPeerId);
+			unpacker.unpack<-1, MAX_PEER_ID>(killerPeerId);
 
 
 			const PlayerInfo * killedPeerInfo = getPlayerInfo(killedPeerId);
@@ -809,5 +809,10 @@ const PlayingScreen::PlayerInfo & PlayingScreen::getMyPlayerInfo()
 Particles & PlayingScreen::getParticles()
 {
 	return m_particles;
+}
+
+const sf::Font * PlayingScreen::getFont()
+{
+	return m_font;
 }
 
