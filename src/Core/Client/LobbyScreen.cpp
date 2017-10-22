@@ -7,6 +7,8 @@
 #include "Core/Protocol.h"
 #include "Core/ENetUtility.h"
 
+#include <filesystem>
+
 
 LobbyScreen::LobbyScreen()
 {
@@ -15,6 +17,8 @@ LobbyScreen::LobbyScreen()
 
 void LobbyScreen::onEnter(Client & client)
 {
+	requestInternetGamesInfo(client);
+
 	auto & window = client.getWindow();
 	auto & gui = client.getGui();
 
@@ -116,7 +120,96 @@ void LobbyScreen::onEnter(Client & client)
 		bottomPanel->add(grid, "grid");
 		
 	m_panels[INTERNET]->add(bottomPanel, "bottomPanel");
-	requestInternetGamesInfo(client);
+
+	m_musicPanel = tgui::Panel::create({ "20%", "10%" });
+	m_musicPanel->setPosition({ "40%", "70%" });
+	auto horizontalLayout = tgui::HorizontalLayout::create();
+	m_musicPanel->add(horizontalLayout);
+
+	m_prevTexture.load("assets/prev.png", {}, {}, true);
+	m_pauseTexture.load("assets/pause.png", {}, {}, true);
+	m_playTexture.load("assets/play.png", {}, {}, true);
+	m_nextTexture.load("assets/next.png", {}, {}, true);
+
+	
+	auto prev = tgui::Picture::create(m_prevTexture);
+	auto play = tgui::Picture::create(m_playTexture);
+	auto pause = tgui::Picture::create(m_pauseTexture);
+	auto next = tgui::Picture::create(m_nextTexture);
+
+	auto onPrevClick = [this]()
+	{
+		loadPrevMusic();
+	};
+	prev->onClick.connect(onPrevClick);
+
+
+	auto onPlayClick = [this, horizontalLayout, prev, pause, next]()
+	{
+		std::cout << "play\n";
+		horizontalLayout->removeAllWidgets();
+		horizontalLayout->add(prev);
+		horizontalLayout->addSpace(.3f);
+		horizontalLayout->add(pause, "pause");
+		horizontalLayout->addSpace(.3f);
+		horizontalLayout->add(next);
+		m_music.play();
+
+	};
+	play->onClick.connect(onPlayClick);
+
+
+	auto onPauseClick = [this, horizontalLayout, prev, play, next]()
+	{
+		std::cout << "pause\n";
+		horizontalLayout->removeAllWidgets();
+		horizontalLayout->add(prev);
+		horizontalLayout->addSpace(.3f);
+		horizontalLayout->add(play, "play");
+		horizontalLayout->addSpace(.3f);
+		horizontalLayout->add(next);
+		m_music.pause();
+		
+	};
+	pause->onClick.connect(onPauseClick);
+
+
+	auto onNextClick = [this]()
+	{
+		loadNextMusic();
+	};
+	next->onClick.connect(onNextClick);
+	
+	horizontalLayout->add(prev);
+	horizontalLayout->addSpace(.3f);
+	horizontalLayout->add(pause, "pause");
+	horizontalLayout->addSpace(.3f);
+	horizontalLayout->add(next);
+
+	gui.add(m_musicPanel);
+
+
+	//music
+	std::unordered_set<std::string> supportedFormats = { "ogg", "wav", "flac", "aiff", "au", "raw",
+		"paf", "svx", "nist", "voc", "ircam", "w64", "mat4", "mat5", "pvf", "htk", "sds", "avr", "sd2", "caf", "wve", "mpc2k", "rf64" };
+	for (auto & p : std::experimental::filesystem::directory_iterator("assets/audio"))
+	{
+		std::string file = p.path().string();
+		auto dot = file.find_last_of('.');
+		if (dot == std::string::npos)
+			continue;
+		std::string ext = file.substr(dot + 1);
+		std::cout << "ext: " << ext << "\n";
+		if (supportedFormats.count(ext))
+		{
+			m_musics.push_back(file);
+		}
+	}
+	for (auto & s : m_musics)
+	{
+		std::cout << s << "\n";
+	}
+	loadNextMusic();
 }
 
 void LobbyScreen::handleEvent(const sf::Event & event, Client & client)
@@ -207,7 +300,16 @@ void LobbyScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & addr,
 
 void LobbyScreen::update(Client & client)
 {
+	if (!m_musics.empty())
+	{
+		sf::Music::Status status = m_music.getStatus();
+		if (status == sf::Music::Stopped && m_prevStatus == sf::Music::Playing)
+		{
+			loadNextMusic();
+		}
+		m_prevStatus = status;
 
+	}
 }
 
 void LobbyScreen::render(Client & client)
@@ -233,6 +335,21 @@ void LobbyScreen::onObscure(Client & client)
 	m_tabs->hide();
 	for (auto & p : m_panels)
 		p->hide();
+	m_musicPanel->hide();
+	auto fadeOut = [this]()
+	{
+		sf::Clock clock;
+		while (m_music.getVolume() > 5)
+		{
+			float dv = clock.restart().asSeconds() * 50.f;
+			m_music.setVolume(m_music.getVolume() - dv);
+		}
+		m_music.stop();
+		m_music.setVolume(100.f);
+
+	};
+	std::thread th(fadeOut);
+	th.detach();
 }
 
 void LobbyScreen::onReveal(Client & client)
@@ -373,3 +490,29 @@ void LobbyScreen::updateInternetGamesUi(Client & client)
 
 	
 }
+
+void LobbyScreen::loadPrevMusic()
+{
+	if (m_musics.empty())
+		return;
+
+	bool wasPaused = m_music.getStatus() == sf::Music::Paused;
+	m_currentMusicIndex = (m_currentMusicIndex - 1) % m_musics.size();
+	m_music.openFromFile(m_musics[m_currentMusicIndex]);
+	if(!wasPaused)
+		m_music.play();
+	std::cout << "prev\n";
+}
+
+void LobbyScreen::loadNextMusic()
+{
+	if (m_musics.empty())
+		return;
+	bool wasPaused = m_music.getStatus() == sf::Music::Paused;
+	m_currentMusicIndex = (m_currentMusicIndex + 1) % m_musics.size();
+	m_music.openFromFile(m_musics[m_currentMusicIndex]);
+	if(!wasPaused)
+		m_music.play();
+	std::cout << "next\n";
+}
+

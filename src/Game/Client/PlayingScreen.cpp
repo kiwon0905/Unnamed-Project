@@ -125,7 +125,7 @@ void PlayingScreen::onEnter(Client & client)
 	
 	sf::Vector2u windowSize = client.getWindow().getSize();
 
-	m_font = client.getAssetManager().get<sf::Font>("arial.ttf");
+	m_font = client.getAssetManager().get<sf::Font>("assets/font/arial.ttf");
 	m_predictionGraph = std::make_unique<Graph>(-150.f, 150.f, *m_font, "Prediction timing(ms)");
 	m_predictionGraph->setPosition({ 0.f, 600. });
 	m_snapshotGraph = std::make_unique<Graph>(-50.f, 100.f, *m_font, "Snapshot timing(ms)");
@@ -133,7 +133,7 @@ void PlayingScreen::onEnter(Client & client)
 
 
 	m_particles.setTexture(*client.getAssetManager().get<sf::Texture>("assets/Untitled.png"));
-	m_announcer.setFont(*client.getAssetManager().get<sf::Font>("arial.ttf"));
+	m_announcer.setFont(*m_font);
 
 	//ui
 	m_editBox = tgui::EditBox::create();
@@ -700,7 +700,7 @@ void PlayingScreen::render(Client & client)
 	timeText.setFillColor(sf::Color::Blue);
 	int totalSeconds = static_cast<int>(currentRenderTime.asMicroseconds()) / 1000000;
 	timeText.setString(getStringFromTime(totalSeconds));
-	timeText.setFont(*client.getAssetManager().get<sf::Font>("arial.ttf"));
+	timeText.setFont(*client.getAssetManager().get<sf::Font>("assets/font/arial.ttf"));
 	timeText.setPosition(static_cast<float>(client.getWindow().getSize().x / 2.f - timeText.getLocalBounds().width / 2.f), 0.f);
 	window.draw(timeText);
 	
@@ -765,7 +765,7 @@ void PlayingScreen::debugRender(Client & client, const sf::View & playerView)
 	//draw mouse world pos
 	sf::Vector2f mouseWorldPos = window.mapPixelToCoords(sf::Mouse::getPosition(window), playerView);
 	sf::Text text;
-	text.setFont(*client.getAssetManager().get<sf::Font>("arial.ttf"));
+	text.setFont(*client.getAssetManager().get<sf::Font>("assets/font/arial.ttf"));
 	
 	int xt = static_cast<int>(std::floor(mouseWorldPos.x / m_map.getTileSize()));
 	int yt = static_cast<int>(std::floor(mouseWorldPos.y / m_map.getTileSize()));

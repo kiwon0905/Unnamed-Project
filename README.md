@@ -1,6 +1,8 @@
 Unnamed-Project
 ===============
-Unnamed-Project is a 2d realtime online multiplayer platformer game.
+Unnamed-Project is a 2d realtime online multiplayer platformer game made in C++.
+
+Unnamed-Project depends on ENet, SFML, TGUI, and tinyxml2.
 
 Development footage: 
 https://www.youtube.com/playlist?list=PLY_TcxKB1PhSDL1xvZnPSymCJ-Lbk5xCs
@@ -8,8 +10,10 @@ https://www.youtube.com/playlist?list=PLY_TcxKB1PhSDL1xvZnPSymCJ-Lbk5xCs
 Client
 --------
 You can browse and play available games.
-![enter image description here](https://i.imgur.com/Xgm36mc.png?1)
-![enter image description here](https://i.imgur.com/4kJnZmK.png?1)
+
+Put music of your choice in "assets/audio" to listen to them while in lobby.
+![enter image description here](https://i.imgur.com/IRHznTX.png)
+![enter image description here](https://i.imgur.com/Kzhgpe1.png)
 
 Server
 ---------

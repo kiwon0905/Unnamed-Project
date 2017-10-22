@@ -5,6 +5,7 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include <TGUI/TGUI.hpp>
+#include <SFML/Audio.hpp>
 class LobbyScreen : public Screen
 {
 public:
@@ -22,6 +23,8 @@ public:
 private:
 	void requestInternetGamesInfo(Client & client);
 	void updateInternetGamesUi(Client & client);
+	void loadPrevMusic();
+	void loadNextMusic();
 
 	struct GameInfo
 	{
@@ -40,9 +43,6 @@ private:
 		Status status;
 		int numPlayers;
 	};
-	std::vector<GameInfo> m_internetGames;
-
-	tgui::Tabs::Ptr m_tabs;
 	enum
 	{
 		INTERNET = 0,
@@ -51,9 +51,25 @@ private:
 		SETTINGS,
 		COUNT
 	};
+
+	std::vector<GameInfo> m_internetGames;
+	bool m_connected = false;
+
 	sf::Sprite m_background;
 	sf::FloatRect m_backgroundTextureRect;
 	sf::Clock m_clock;
+
+	sf::Music m_music;
+	std::vector<std::string> m_musics;
+	std::size_t m_currentMusicIndex = -1;
+	sf::Music::Status m_prevStatus = sf::Music::Stopped;
+
+	tgui::Tabs::Ptr m_tabs;
 	std::vector<tgui::Panel::Ptr> m_panels;
-	bool m_connected = false;
+	tgui::Panel::Ptr m_musicPanel;
+	tgui::Texture m_prevTexture;
+	tgui::Texture m_pauseTexture;
+	tgui::Texture m_playTexture;
+
+	tgui::Texture m_nextTexture;
 };

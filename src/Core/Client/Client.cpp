@@ -10,7 +10,7 @@
 
 bool Client::initialize()
 {
-	m_window.create(sf::VideoMode(1600, 900), "", sf::Style::Default, sf::ContextSettings(0, 0, 4));
+	m_window.create(sf::VideoMode(1600, 900), "", sf::Style::Default, sf::ContextSettings(0, 0, 8));
 	m_window.resetGLStates();
 
 	if (!m_parser.loadFromFile("client-config.txt"))
@@ -67,7 +67,7 @@ void Client::run()
 		sf::Time fpsAccumulator;
 		int numFrames = 0;
 
-		const sf::Font * font = m_assetManager.get<sf::Font>("arial.ttf");
+		const sf::Font * font = m_assetManager.get<sf::Font>("assets/font/arial.ttf");
 		Graph frameTimeGraph(0.f, 20.f, *font, "Frame time(ms)");
 		frameTimeGraph.setSize({ 200.f, 100.f });
 		
