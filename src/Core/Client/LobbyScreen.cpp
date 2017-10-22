@@ -18,6 +18,14 @@ void LobbyScreen::onEnter(Client & client)
 	auto & window = client.getWindow();
 	auto & gui = client.getGui();
 
+	sf::Texture * backgroundTexture = client.getAssetManager().get<sf::Texture>("assets/colored_talltrees.png");
+	backgroundTexture->setRepeated(true);
+
+	m_background.setTexture(*backgroundTexture);
+	m_backgroundTextureRect.width = static_cast<float>(client.getWindow().getSize().x);
+	m_backgroundTextureRect.height = static_cast<float>(client.getWindow().getSize().y);
+
+
 	m_tabs = tgui::Tabs::create();
 	gui.add(m_tabs);
 	m_tabs->setPosition({ "10%", "8.5%" });
@@ -55,12 +63,10 @@ void LobbyScreen::onEnter(Client & client)
 	{
 		p = tgui::Panel::create({ "80%", "50%" });
 		p->setPosition({ tgui::bindLeft(m_tabs), tgui::bindBottom(m_tabs) + 2 });
-		p->getRenderer()->setBackgroundColor(sf::Color::White);
 		p->hide();
 		gui.add(p);
 	}
 	m_panels[INTERNET]->show();
-
 
 	auto topPanel = tgui::Panel::create({ "100%", "10%" });
 		topPanel->getRenderer()->setBackgroundColor(sf::Color::Green);
@@ -102,55 +108,13 @@ void LobbyScreen::onEnter(Client & client)
 	m_panels[INTERNET]->add(topPanel);
 
 	
-	auto bottomPanel = tgui::Panel::create({ "100%", "90% - 2" });
+	auto bottomPanel = tgui::ScrollablePanel::create({ "100%", "90% - 2" });
 		bottomPanel->setPosition({ "0%", "10% + 2" });
 		bottomPanel->getRenderer()->setBorders(2);
 	
-		for (std::size_t i = 0; i < 10; ++i)
-		{
-			auto line = tgui::Panel::create({ "100%", "10%" });
-				if (i % 2)
-					line->getRenderer()->setBackgroundColor(sf::Color(173, 216, 230));
-				else
-					line->getRenderer()->setBackgroundColor(sf::Color(176, 224, 230));
-
-				line->setPosition({ "0%", std::to_string(i * 10) + "%" });
-
-				auto name = tgui::Label::create();
-				name->setSize("50%", "100%");
-				name->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Left);
-				name->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-				line->add(name, "name");
-
-				auto mode = tgui::Label::create();
-				mode->setPosition({ tgui::bindRight(name), tgui::bindTop(name) });
-				mode->setSize({ "12.5%", "100%" });
-				mode->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Left);
-				mode->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-				line->add(mode, "mode");
-
-				auto status = tgui::Label::create();
-				status->setPosition({ tgui::bindRight(mode), tgui::bindTop(mode) });
-				status->setSize({ "12.5%", "100%" });
-				status->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Left);
-				status->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-				line->add(status, "status");
-
-				auto players = tgui::Label::create();
-				players->setPosition({ tgui::bindRight(status), tgui::bindTop(status) });
-				players->setSize({ "12.5%", "100%" });
-				players->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Left);
-				players->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-				line->add(players, "players");
-
-				auto ping = tgui::Label::create();
-				ping->setSize({ "12.5%", "100%" });
-				ping->setPosition({ tgui::bindRight(players), tgui::bindTop(mode) });
-				ping->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Left);
-				ping->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-				line->add(ping, "ping");
-			bottomPanel->add(line);
-		}
+		auto grid = tgui::Grid::create();
+		bottomPanel->add(grid, "grid");
+		
 	m_panels[INTERNET]->add(bottomPanel, "bottomPanel");
 	requestInternetGamesInfo(client);
 }
@@ -243,10 +207,19 @@ void LobbyScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & addr,
 
 void LobbyScreen::update(Client & client)
 {
+
 }
 
 void LobbyScreen::render(Client & client)
 {
+	float dx = m_clock.restart().asSeconds() * 100.f;
+	m_backgroundTextureRect.left -= dx;
+
+	sf::IntRect r = static_cast<sf::IntRect>(m_backgroundTextureRect);
+	m_background.setTextureRect(r);
+
+
+	client.getWindow().draw(m_background);
 }
 
 
@@ -301,42 +274,102 @@ void LobbyScreen::requestInternetGamesInfo(Client & client)
 
 void LobbyScreen::updateInternetGamesUi(Client & client)
 {
-	auto bottomPanel = m_panels[INTERNET]->get<tgui::Panel>("bottomPanel");
+	auto bottomPanel = m_panels[INTERNET]->get<tgui::ScrollablePanel>("bottomPanel");
 	std::size_t i = 0;
-	for (auto & linePanel : bottomPanel->getWidgets())
+	
+	auto grid = bottomPanel->get<tgui::Grid>("grid");
+	grid->removeAllWidgets();
+
+	for (const auto & info : m_internetGames)
 	{
-		auto l = std::static_pointer_cast<tgui::Panel>(linePanel);
-		auto name = std::static_pointer_cast<tgui::Label>(l->get("name"));
-		auto mode = std::static_pointer_cast<tgui::Label>(l->get("mode"));
-		auto status = std::static_pointer_cast<tgui::Label>(l->get("status"));
-		auto players = std::static_pointer_cast<tgui::Label>(l->get("players"));
-		auto ping = std::static_pointer_cast<tgui::Label>(l->get("ping"));
-
-		name->setText("");
-		mode->setText("");
-		status->setText("");
-		players->setText("");
-		ping->setText("");
-		l->onClick.disconnectAll();
-		if (i < m_internetGames.size())
+		float scrollbarWidth = 0.f;
+		if (m_internetGames.size() * bottomPanel->getSize().y / 10 > bottomPanel->getSize().y)
+			scrollbarWidth = bottomPanel->getScrollbarWidth();
+		auto line = tgui::Panel::create({ tgui::bindWidth(bottomPanel) - scrollbarWidth - 4, tgui::bindHeight(bottomPanel) / 10 });
+		
+		auto onEnter = [line]()
 		{
-			const GameInfo & info = m_internetGames[i];
+			line->getRenderer()->setOpacity(1.f);
 
-			name->setText(info.name);
-			mode->setText(info.modeName);
-			status->setText(info.status == GameInfo::IN_GAME ? "In game" : "Waiting");
-			
-			players->setText(std::to_string(info.numPlayers));
-			ping->setText("0");
-
-			auto connectFunc = [&info, &client]()
+			for (auto & w : line->getWidgets())
 			{
-				std::cout << "connecting to: " << info.id << " - " << info.name << "\n";
-				client.getNetwork().connect(info.addr);
-			};
-			l->onClick.connect(connectFunc);
+				w->setInheritedOpacity(1.f);
+				std::static_pointer_cast<tgui::Label>(w)->getRenderer()->setTextColor(sf::Color::Black);
+			}
+		};
 
-		}
+		auto onLeave = [line]()
+		{
+			line->getRenderer()->setOpacity(.6f);
+			for (auto & w : line->getWidgets())
+			{
+				w->setInheritedOpacity(1.f);
+				std::static_pointer_cast<tgui::Label>(w)->getRenderer()->setTextColor(sf::Color::Black);
+			}
+
+		};
+
+		auto onClick = [&info, &client]()
+		{
+			client.getNetwork().connect(info.addr);
+		};
+		line->onMouseEnter.connect(onEnter);
+		line->onMouseLeave.connect(onLeave);
+		line->onClick.connect(onClick);
+		line->getRenderer()->setOpacity(.6f);
+
+		if (i % 2)
+			line->getRenderer()->setBackgroundColor(sf::Color(173, 216, 230));
+		else
+			line->getRenderer()->setBackgroundColor(sf::Color(176, 224, 230));
+
+		auto name = tgui::Label::create(info.name);
+		name->setSize("50%", "100%");
+		name->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Left);
+		name->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		line->add(name, "name");
+		name->setInheritedOpacity(1.f);
+		name->getRenderer()->setTextColor(sf::Color::Black);
+
+		auto mode = tgui::Label::create(info.modeName);
+		mode->setPosition({ tgui::bindRight(name), tgui::bindTop(name) });
+		mode->setSize({ "12.5%", "100%" });
+		mode->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Left);
+		mode->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		line->add(mode, "mode");
+		mode->setInheritedOpacity(1.f);
+		mode->getRenderer()->setTextColor(sf::Color::Black);
+
+		auto status = tgui::Label::create(info.status == GameInfo::Status::IN_GAME ? "In game" : "Waiting");
+		status->setPosition({ tgui::bindRight(mode), tgui::bindTop(mode) });
+		status->setSize({ "12.5%", "100%" });
+		status->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Left);
+		status->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		line->add(status, "status");
+		status->setInheritedOpacity(1.f);
+		status->getRenderer()->setTextColor(sf::Color::Black);
+
+		auto players = tgui::Label::create(std::to_string(info.numPlayers));
+		players->setPosition({ tgui::bindRight(status), tgui::bindTop(status) });
+		players->setSize({ "12.5%", "100%" });
+		players->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Left);
+		players->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		line->add(players, "players");	
+		players->setInheritedOpacity(1.f);
+		players->getRenderer()->setTextColor(sf::Color::Black);
+
+		auto ping = tgui::Label::create("10");
+		ping->setSize({ "12.5%", "100%" });
+		ping->setPosition({ tgui::bindRight(players), tgui::bindTop(mode) });
+		ping->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Left);
+		ping->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		line->add(ping, "ping");
+		ping->setInheritedOpacity(1.f);
+		ping->getRenderer()->setTextColor(sf::Color::Black);
+
+		grid->addWidget(line, i, 0);
 		++i;
 	}
+
+	
 }

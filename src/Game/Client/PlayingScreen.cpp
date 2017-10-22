@@ -138,7 +138,7 @@ void PlayingScreen::onEnter(Client & client)
 	//ui
 	m_editBox = tgui::EditBox::create();
 	m_editBox->setPosition({ 0.f, client.getWindow().getSize().y - m_editBox->getSize().y });
-	m_editBox->setSize("30%", m_editBox->getSize().y);
+	m_editBox->setSize("50%", m_editBox->getSize().y);
 	m_editBox->hide();
 
 
@@ -163,7 +163,7 @@ void PlayingScreen::onEnter(Client & client)
 	m_chatBox->getRenderer()->setBackgroundColor(sf::Color::Transparent);
 	m_chatBox->getRenderer()->setBorderColor(sf::Color::Transparent);
 	m_chatBox->setPosition({ 0.f, m_editBox->getPosition().y - m_chatBox->getSize().y });
-	m_chatBox->setSize("30%", m_chatBox->getSize().y);
+	m_chatBox->setSize("50%", m_chatBox->getSize().y);
 	client.getGui().add(m_chatBox);
 
 	m_scoreBoard = tgui::Panel::create({ "30%", "60%" });

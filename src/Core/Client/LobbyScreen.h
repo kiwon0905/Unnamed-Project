@@ -51,7 +51,9 @@ private:
 		SETTINGS,
 		COUNT
 	};
-
+	sf::Sprite m_background;
+	sf::FloatRect m_backgroundTextureRect;
+	sf::Clock m_clock;
 	std::vector<tgui::Panel::Ptr> m_panels;
 	bool m_connected = false;
 };
