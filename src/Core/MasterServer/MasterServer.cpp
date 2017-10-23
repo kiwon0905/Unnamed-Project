@@ -90,8 +90,6 @@ bool MasterServer::initialize()
 		Logger::getInstance().error("MasterServer", "Failed to set socekt opt");
 		return false;
 	}
-
-
 	if (enet_socket_bind(m_socket, &enetClientAddr) < 0)
 	{
 		Logger::getInstance().error("MasterServer", "Failed to bind socket");
@@ -142,11 +140,13 @@ void MasterServer::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 
 	case Msg::SV_SERVER_INFO:
 	{
+		uint16_t pingCheckPort;
 		std::string name;
 		std::string modeName;
 		GameInfo::Status status;
 		int numPlayers;
-
+		
+		unpacker.unpack(pingCheckPort);
 		unpacker.unpack(name);
 		unpacker.unpack(modeName);
 		unpacker.unpack(status);
@@ -161,13 +161,11 @@ void MasterServer::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 		}
 
 		GameInfo & info = m_games[peer];
+		info.pingCheckPort = pingCheckPort;
 		info.name = name + " (" + std::to_string(info.id) + ")";
 		info.modeName = modeName;
 		info.status = status;
 		info.numPlayers = numPlayers;
-
-
-		std::cout << "recvd server info: " << name << ", " << modeName << ", " << status << ", " << numPlayers << "\n";
 		break;
 	}
 	default:
@@ -192,7 +190,8 @@ void MasterServer::handlePacket(Unpacker & unpacker, const ENetAddress & addr)
 		for (const auto & game : m_games)
 		{
 			packer.pack(game.first->address.host);
-			packer.pack(game.first->address.port);
+			packer.pack(game.first->address.port);	//game server port
+			packer.pack(game.second.pingCheckPort); //ping check port
 			packer.pack(game.second.id);
 			packer.pack(game.second.name);
 			packer.pack(game.second.modeName);

@@ -25,6 +25,7 @@ private:
 	void updateInternetGamesUi(Client & client);
 	void loadPrevMusic();
 	void loadNextMusic();
+	void checkPing(Client & client);
 
 	struct GameInfo
 	{
@@ -38,10 +39,13 @@ private:
 		};
 		int id;
 		ENetAddress addr;
+		uint16_t pingCheckPort;
 		std::string name;
 		std::string modeName;
 		Status status;
 		int numPlayers;
+		int ping = 0;
+		sf::Clock lastPingReq;
 	};
 	enum
 	{
@@ -70,6 +74,5 @@ private:
 	tgui::Texture m_prevTexture;
 	tgui::Texture m_pauseTexture;
 	tgui::Texture m_playTexture;
-
 	tgui::Texture m_nextTexture;
 };

@@ -8,6 +8,7 @@
 #include "Core/ENetUtility.h"
 
 #include <filesystem>
+#include <random>
 
 
 LobbyScreen::LobbyScreen()
@@ -17,18 +18,16 @@ LobbyScreen::LobbyScreen()
 
 void LobbyScreen::onEnter(Client & client)
 {
-	requestInternetGamesInfo(client);
-
 	auto & window = client.getWindow();
 	auto & gui = client.getGui();
 
 	sf::Texture * backgroundTexture = client.getAssetManager().get<sf::Texture>("assets/colored_talltrees.png");
 	backgroundTexture->setRepeated(true);
+	backgroundTexture->setSmooth(true);
 
+	m_backgroundTextureRect.width = static_cast<float>(client.getWindow().getSize().x) / client.getWindow().getSize().y * backgroundTexture->getSize().y;
+	m_backgroundTextureRect.height = static_cast<float>(backgroundTexture->getSize().y);
 	m_background.setTexture(*backgroundTexture);
-	m_backgroundTextureRect.width = static_cast<float>(client.getWindow().getSize().x);
-	m_backgroundTextureRect.height = static_cast<float>(client.getWindow().getSize().y);
-
 
 	m_tabs = tgui::Tabs::create();
 	gui.add(m_tabs);
@@ -118,14 +117,14 @@ void LobbyScreen::onEnter(Client & client)
 	
 		auto grid = tgui::Grid::create();
 		bottomPanel->add(grid, "grid");
-		
 	m_panels[INTERNET]->add(bottomPanel, "bottomPanel");
 
-	m_musicPanel = tgui::Panel::create({ "20%", "10%" });
+	m_musicPanel = tgui::Panel::create({ "parent.width * .2", "parent.width * .05" });
 	m_musicPanel->setPosition({ "40%", "70%" });
 	auto horizontalLayout = tgui::HorizontalLayout::create();
 	m_musicPanel->add(horizontalLayout);
 
+	
 	m_prevTexture.load("assets/prev.png", {}, {}, true);
 	m_pauseTexture.load("assets/pause.png", {}, {}, true);
 	m_playTexture.load("assets/play.png", {}, {}, true);
@@ -189,7 +188,7 @@ void LobbyScreen::onEnter(Client & client)
 	gui.add(m_musicPanel);
 
 
-	//music
+	//load music
 	std::unordered_set<std::string> supportedFormats = { "ogg", "wav", "flac", "aiff", "au", "raw",
 		"paf", "svx", "nist", "voc", "ircam", "w64", "mat4", "mat5", "pvf", "htk", "sds", "avr", "sd2", "caf", "wve", "mpc2k", "rf64" };
 	for (auto & p : std::experimental::filesystem::directory_iterator("assets/audio"))
@@ -199,17 +198,18 @@ void LobbyScreen::onEnter(Client & client)
 		if (dot == std::string::npos)
 			continue;
 		std::string ext = file.substr(dot + 1);
-		std::cout << "ext: " << ext << "\n";
 		if (supportedFormats.count(ext))
 		{
 			m_musics.push_back(file);
 		}
 	}
-	for (auto & s : m_musics)
-	{
-		std::cout << s << "\n";
-	}
+
+	//shuffle music
+	auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::shuffle(m_musics.begin(), m_musics.end(), std::default_random_engine(static_cast<unsigned>(seed)));
+
 	loadNextMusic();
+	requestInternetGamesInfo(client);
 }
 
 void LobbyScreen::handleEvent(const sf::Event & event, Client & client)
@@ -218,6 +218,11 @@ void LobbyScreen::handleEvent(const sf::Event & event, Client & client)
 	{
 		requestInternetGamesInfo(client);
 
+	}
+	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P && event.key.control)
+	{
+		checkPing(client);
+		std::cout << "checking ping\n";
 	}
 }
 
@@ -279,7 +284,8 @@ void LobbyScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & addr,
 			{
 				GameInfo info;
 				unpacker.unpack(info.addr.host);
-				unpacker.unpack(info.addr.port);
+				unpacker.unpack(info.addr.port);	//game server port
+				unpacker.unpack(info.pingCheckPort); // ping check port
 				unpacker.unpack(info.id);
 				unpacker.unpack(info.name);
 				unpacker.unpack(info.modeName);
@@ -293,7 +299,27 @@ void LobbyScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & addr,
 
 			}
 			updateInternetGamesUi(client);
+			//checkPing(client);
+		}
+	}
 
+	else if (msg == Msg::SV_PING_REPLY)
+	{
+
+		for (auto & g : m_internetGames)
+		{
+			if (g.addr.host == addr.host && g.pingCheckPort == addr.port)
+			{
+				auto bottomPanel = m_panels[INTERNET]->get<tgui::ScrollablePanel>("bottomPanel");
+				auto grid = bottomPanel->get<tgui::Grid>("grid");
+				std::string s;
+				enutil::toString(g.addr, s);
+				auto line = grid->get<tgui::Panel>(s);
+
+				g.ping = g.lastPingReq.getElapsedTime().asMilliseconds();
+				line->get<tgui::Label>("ping")->setText(std::to_string(g.ping));
+				break;
+			}
 		}
 	}
 }
@@ -317,11 +343,20 @@ void LobbyScreen::render(Client & client)
 	float dx = m_clock.restart().asSeconds() * 100.f;
 	m_backgroundTextureRect.left -= dx;
 
-	sf::IntRect r = static_cast<sf::IntRect>(m_backgroundTextureRect);
+	sf::IntRect r = sf::IntRect(static_cast<int>(m_backgroundTextureRect.left + .5f), 
+								static_cast<int>(m_backgroundTextureRect.top + .5f),
+								static_cast<int>(m_backgroundTextureRect.width + .5f),
+								static_cast<int>(m_backgroundTextureRect.height + .5f));
 	m_background.setTextureRect(r);
 
-
+	sf::View view;
+	view.setSize(m_backgroundTextureRect.width + .5f, m_backgroundTextureRect.height + .5f);
+	view.setCenter(view.getSize() / 2.f);
+	sf::View temp = client.getWindow().getView();
+	client.getWindow().setView(view);
+	
 	client.getWindow().draw(m_background);
+	client.getWindow().setView(temp);
 }
 
 
@@ -382,7 +417,6 @@ void LobbyScreen::requestInternetGamesInfo(Client & client)
 	const ENetAddress * masterAddr = client.getMasterServerAddress();
 	if (masterAddr)
 	{
-		std::cout << "sent request!\n";
 		Packer packer;
 		packer.pack(Msg::CL_REQUEST_INTERNET_SERVER_INFO);
 		client.getNetwork().send(packer, *masterAddr);
@@ -396,7 +430,7 @@ void LobbyScreen::updateInternetGamesUi(Client & client)
 	
 	auto grid = bottomPanel->get<tgui::Grid>("grid");
 	grid->removeAllWidgets();
-
+	
 	for (const auto & info : m_internetGames)
 	{
 		float scrollbarWidth = 0.f;
@@ -475,7 +509,7 @@ void LobbyScreen::updateInternetGamesUi(Client & client)
 		players->setInheritedOpacity(1.f);
 		players->getRenderer()->setTextColor(sf::Color::Black);
 
-		auto ping = tgui::Label::create("10");
+		auto ping = tgui::Label::create("-");
 		ping->setSize({ "12.5%", "100%" });
 		ping->setPosition({ tgui::bindRight(players), tgui::bindTop(mode) });
 		ping->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Left);
@@ -485,7 +519,12 @@ void LobbyScreen::updateInternetGamesUi(Client & client)
 		ping->getRenderer()->setTextColor(sf::Color::Black);
 
 		grid->addWidget(line, i, 0);
+
+		std::string s;
+		enutil::toString(info.addr, s);
+		grid->setWidgetName(line, s);
 		++i;
+
 	}
 
 	
@@ -514,5 +553,20 @@ void LobbyScreen::loadNextMusic()
 	if(!wasPaused)
 		m_music.play();
 	std::cout << "next\n";
+}
+
+void LobbyScreen::checkPing(Client & client)
+{
+	Packer packer;
+	packer.pack(Msg::CL_PING);
+	for (auto & g : m_internetGames)
+	{
+		ENetAddress addr = g.addr;
+		addr.port = g.pingCheckPort;
+		if (!client.getNetwork().send(packer, addr))
+			std::cout << "failed to chekc ping\n";
+		g.lastPingReq.restart();
+
+	}
 }
 

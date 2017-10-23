@@ -45,22 +45,45 @@ bool Server::initialize()
 
 	//init network
 	std::string addr;
+
+	//game server
 	if (!parser.get("gameServerAddr", addr) || !enutil::toENetAddress(addr, m_config.address))
 	{
 		Logger::getInstance().error("Server", "Failed to read gameServerAddr");
 		return false;
 	}
-
 	m_server = enet_host_create(&m_config.address, 32, 1, 0, 0);
 	if (!m_server)
 	{
 		Logger::getInstance().error("Server", "Failed to create server");
 		return false;
 	}
-
 	if (enet_host_compress_with_range_coder(m_server) < 0)
 	{
 		Logger::getInstance().error("Server", "Failed on enet_host_compress_with_range_coder");
+		return false;
+	}
+
+	//ping check socket
+	if (!parser.get("pingCheckAddr", addr) || !enutil::toENetAddress(addr, m_config.pingCheckAddr))
+	{
+		Logger::getInstance().error("Server", "Failed to read pingCheckAddr");
+		return false;
+	}
+	m_socket = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM);
+	if (m_socket < 0)
+	{
+		Logger::getInstance().error("Server", "Failed to create a socket");
+		return false;
+	}
+	if (enet_socket_set_option(m_socket, ENET_SOCKOPT_NONBLOCK, 1) < 0)
+	{
+		Logger::getInstance().error("Server", "Failed to set socket option");
+		return false;
+	}
+	if (enet_socket_bind(m_socket, &m_config.pingCheckAddr) < 0)
+	{
+		Logger::getInstance().error("MasterServer", "Failed to bind socket");
 		return false;
 	}
 
@@ -128,6 +151,7 @@ void Server::finalize()
 		m_parsingThread->join();
 	if (m_server)
 		enet_host_destroy(m_server);
+	enet_socket_destroy(m_socket);
 	enet_deinitialize();
 }
 
@@ -371,6 +395,21 @@ void Server::handleNetwork()
 			sendServerInfoToMasterServer();
 		}
 	}
+
+
+	Unpacker unpacker;
+	ENetAddress addr;
+	while (enutil::receive(unpacker, addr, m_socket))
+	{
+		Msg msg;
+		unpacker.unpack(msg);
+		if (msg == Msg::CL_PING)
+		{
+			Packer packer;
+			packer.pack(Msg::SV_PING_REPLY);
+			enutil::send(packer, addr, m_socket);
+		}
+	}
 }
 
 void Server::update()
@@ -398,10 +437,16 @@ void Server::reset()
 
 void Server::sendServerInfoToMasterServer()
 {
-	//game: Name, mode, status, players
+	//game: pingCheckPort, Name, mode, status, players
+
+	ENetAddress pingCheckAddr;
+	enet_socket_get_address(m_socket, &pingCheckAddr);
+
 
 	Packer packer;
 	packer.pack(Msg::SV_SERVER_INFO);
+	
+	packer.pack(pingCheckAddr.port);
 	packer.pack(std::string("Fun game"));
 	packer.pack(m_gameContext->getName());
 	packer.pack(m_state);

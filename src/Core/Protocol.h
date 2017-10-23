@@ -8,6 +8,7 @@ enum class Msg
 	CL_REQUEST_LAN_SERVER_INFO,
 
 	//client -> server
+	CL_PING,
 	CL_REQUEST_JOIN_GAME,
 	CL_CLIENT_INFO,
 	CL_REQUEST_ROOM_INFO,
@@ -24,6 +25,7 @@ enum class Msg
 	SV_LAN_SERVER_INFO,
 	
 	//server -> client
+	SV_PING_REPLY,
 	SV_ACCEPT_JOIN,
 	SV_REJECT_JOIN,
 	SV_LOAD_GAME,

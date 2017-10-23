@@ -35,6 +35,7 @@ private:
 		std::string mode;
 		ENetAddress address;
 		ENetAddress masterAddress;
+		ENetAddress pingCheckAddr;
 	};
 	enum State
 	{
@@ -55,6 +56,7 @@ private:
 	std::atomic<bool> m_running = false;
 	ENetHost * m_server = nullptr;
 	ENetPeer * m_masterServer = nullptr;
+	ENetSocket m_socket;
 	Config m_config;
 
 	State m_state = PRE_GAME;
