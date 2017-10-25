@@ -222,7 +222,6 @@ void LobbyScreen::handleEvent(const sf::Event & event, Client & client)
 	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P && event.key.control)
 	{
 		checkPing(client);
-		std::cout << "checking ping\n";
 	}
 }
 
@@ -275,7 +274,6 @@ void LobbyScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & addr,
 	{
 		if (msg == Msg::MSV_INTERNET_SERVER_INFO)
 		{
-			std::cout << "master server info received\n";
 			m_internetGames.clear();
 			uint32_t count;
 			unpacker.unpack(count);
@@ -291,10 +289,6 @@ void LobbyScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & addr,
 				unpacker.unpack(info.modeName);
 				unpacker.unpack(info.status);
 				unpacker.unpack(info.numPlayers);
-
-				std::string addr;
-				enutil::toString(info.addr, addr);
-				std::cout << info.id << " - " << info.name << ": " << addr << "\n";
 				m_internetGames.push_back(info);
 
 			}
@@ -316,8 +310,7 @@ void LobbyScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & addr,
 				enutil::toString(g.addr, s);
 				auto line = grid->get<tgui::Panel>(s);
 
-				g.ping = g.lastPingReq.getElapsedTime().asMilliseconds();
-				line->get<tgui::Label>("ping")->setText(std::to_string(g.ping));
+				line->get<tgui::Label>("ping")->setText(std::to_string(g.lastPingReq.getElapsedTime().asMilliseconds()));
 				break;
 			}
 		}
@@ -540,7 +533,6 @@ void LobbyScreen::loadPrevMusic()
 	m_music.openFromFile(m_musics[m_currentMusicIndex]);
 	if(!wasPaused)
 		m_music.play();
-	std::cout << "prev\n";
 }
 
 void LobbyScreen::loadNextMusic()
@@ -552,7 +544,6 @@ void LobbyScreen::loadNextMusic()
 	m_music.openFromFile(m_musics[m_currentMusicIndex]);
 	if(!wasPaused)
 		m_music.play();
-	std::cout << "next\n";
 }
 
 void LobbyScreen::checkPing(Client & client)
@@ -563,8 +554,7 @@ void LobbyScreen::checkPing(Client & client)
 	{
 		ENetAddress addr = g.addr;
 		addr.port = g.pingCheckPort;
-		if (!client.getNetwork().send(packer, addr))
-			std::cout << "failed to chekc ping\n";
+		client.getNetwork().send(packer, addr);
 		g.lastPingReq.restart();
 
 	}

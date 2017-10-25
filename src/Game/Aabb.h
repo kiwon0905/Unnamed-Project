@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/System.hpp>
+#include <vector>
 
 class Aabb
 {
@@ -14,7 +15,11 @@ public:
 	bool intersects(const Aabb & aabb) const;
 	bool intersects(const Aabb & aabb, Aabb & intersection) const;
 
+	//move this aabb against the other
 	bool sweep(const sf::Vector2f & velocity, const Aabb & aabb, float & time, sf::Vector2i & norm) const;
+	bool testLine(const sf::Vector2f & p, const sf::Vector2f & q, float & t);
+	bool sweepPoints(const std::vector<sf::Vector2f> & points, const sf::Vector2f & d, float & t);
+
 	float x;   ///< Left coordinate of the Aabb
 	float y;    ///< Top coordinate of the Aabb
 	float w;  ///< Width of the Aabb

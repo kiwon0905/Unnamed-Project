@@ -20,64 +20,61 @@ Projectile::Projectile(int id, GameContext * context, int shooterId, Team shoote
 
 void Projectile::tick(float dt)
 {
-	Aabb aabb = getAabb();
 
-	m_velocity.y = Math::clampedAdd(-3000.f, 3000.f, m_velocity.y, 1000.f * dt);
+	//m_velocity.y = Math::clampedAdd(-3000.f, 3000.f, m_velocity.y, 1000.f * dt);
+	float angle = atan2f(m_velocity.y, m_velocity.x);
+
+	sf::Vector2f a = m_position + Math::rotatePoint({ 12.5f, 12.5f }, angle);
+	sf::Vector2f b = m_position + Math::rotatePoint({ 12.5f, 0.f }, angle);
+	sf::Vector2f c = m_position + Math::rotatePoint({ 12.5f, -12.5f }, angle);
 
 
 	sf::Vector2f d = m_velocity * dt;
 	
 	float minTime = 1.f;
-	sf::Vector2i minNorm;
+	bool collided = false;
+	Entity * hitEntity = nullptr;
 
 	//tile
-	m_context->getMap().sweep(aabb, d, minTime, minNorm);
-
-
-	Entity * hitEntity = nullptr;
+	if (m_context->getMap().sweepPoints({ a, b, c }, d, minTime))
+	{
+		collided = true;
+	}
 
 	for (auto e : m_context->getWorld().getEntitiesOfType({ EntityType::HUMAN, EntityType::CRATE }))
 	{
 		if (e->getId() == m_shooterId)
 			continue;
-
-		//no team kill
 		if (e->getType() == EntityType::HUMAN && m_context->getServer()->getPeer(static_cast<Human*>(e)->getPeerId())->getTeam() == m_team)
 			continue;
 
+		Aabb aabb{ e->getPosition(), e->getSize() };
+		float t;
+
+		if (aabb.sweepPoints({ a, b, c }, d, t))
 		{
-			if (aabb.intersects(e->getAabb()))
+			collided = true;
+			if (t < minTime)
 			{
-				minTime = 0.f;
+				minTime = t;
 				hitEntity = e;
-				break;
-			}
-
-			float time;
-			sf::Vector2i norm;
-
-			if (aabb.sweep(d * minTime, e->getAabb(), time, norm))
-			{
-				if (time < minTime)
-				{
-					minTime = time;
-					minNorm = norm;
-					hitEntity = e;
-				}
 			}
 		}
+		
 	}
 
-	if (minTime != 1.f)
+	
+	if (collided)
 	{
 		m_alive = false;
 		if (hitEntity)
-			hitEntity->takeDamage(10, m_shooterId, { 0.f, 0.f });
+		{
+			sf::Vector2f entCenter = hitEntity->getPosition() + hitEntity->getSize() / 2.f;
+			hitEntity->takeDamage(10, m_shooterId, Math::unit(entCenter - m_position) * 500.f);
+		}
 
 		m_context->getWorld().createTransientEntity<Explosion>(m_position + m_size / 2.f);
 	}
-
-	d *= minTime;
 
 	m_position += d;
 }

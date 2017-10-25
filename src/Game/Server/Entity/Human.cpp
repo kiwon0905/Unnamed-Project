@@ -33,7 +33,7 @@ void Human::tick(float dt)
 	{
 		if (m_fireCooldown == 0)
 		{
-			sf::Vector2f firePos = center + Math::unit(v) * 60.f - sf::Vector2f(25.f, 25.f) / 2.f;
+			sf::Vector2f firePos = center + Math::unit(v) * 60.f;// -sf::Vector2f(25.f, 25.f) / 2.f;
 			//std::cout << "firePos: " <<firePos<<"\n";
 			if (m_context->getMap().getTile(firePos.x, firePos.y) == 0 &&
 				m_context->getMap().getTile(firePos.x + 25.f, firePos.y) == 0 &&
@@ -76,7 +76,7 @@ void Human::takeDamage(int dmg, int from, const sf::Vector2f & impulse)
 		m_context->announceDeath(m_id, from);
 	}
 
-
+	m_core.setVelocity(m_core.getVelocity() + impulse);
 }
 
 int Human::getPeerId()

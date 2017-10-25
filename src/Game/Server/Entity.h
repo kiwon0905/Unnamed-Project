@@ -23,8 +23,6 @@ public:
 
 	sf::Vector2f getPosition();
 	sf::Vector2f getSize();
-	Aabb getAabb();
-
 	
 	virtual void tick(float dt) = 0;
 	virtual void snap(Snapshot & snapshot) const = 0;

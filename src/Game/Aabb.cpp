@@ -1,4 +1,5 @@
 #include "Aabb.h"
+#include "Core/Utility.h"
 #include <iostream>
 Aabb::Aabb():
 	x(0.f),
@@ -172,4 +173,116 @@ bool Aabb::sweep(const sf::Vector2f & displacement, const Aabb & aabb, float & t
 		return true;
 	}
 
+}
+
+
+bool lineLine(const sf::Vector2f & a, const sf::Vector2f & b,
+	const sf::Vector2f & c, const sf::Vector2f & d,
+	sf::Vector2f & intersection)
+{
+	float uA = ((d.x - c.x)*(a.y - c.y) - (d.y - c.y)*(a.x - c.x)) / ((d.y - c.y)*(b.x - a.x) - (d.x - c.x)*(b.y - a.y));
+	float uB = ((b.x - a.x)*(a.y - c.y) - (b.y - a.y)*(a.x - c.x)) / ((d.y - c.y)*(b.x - a.x) - (d.x - c.x)*(b.y - a.y));
+
+	if (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1)
+	{
+		intersection.x = a.x + (uA * (b.x - a.x));
+		intersection.y = a.y + (uA * (b.y - a.y));
+
+		return true;
+	}
+	return false;
+}
+
+bool Aabb::testLine(const sf::Vector2f & p, const sf::Vector2f & q, float & t)
+{
+	sf::Vector2f minIntersection;
+	float minDistance = std::numeric_limits<float>::max();
+
+	bool collided = false;
+
+	float minX = (std::min)(x, (x + w));
+	float maxX = (std::max)(x, (x + w));
+	float minY = (std::min)(y, (y + h));
+	float maxY = (std::max)(y, (y + h));
+
+
+	//left
+	sf::Vector2f intersection;
+	if (lineLine(p, q, { minX, minY }, { minX, maxY }, intersection))
+	{
+		float d = Math::length(p - intersection);
+		if (d < minDistance)
+		{
+			minDistance = d;
+			minIntersection = intersection;
+		}
+		collided = true;
+	}
+	//right
+	if (lineLine(p, q, { maxX, minY }, { maxX, maxY }, intersection))
+	{
+		float d = Math::length(p - intersection);
+		if (d < minDistance)
+		{
+			minDistance = d;
+			minIntersection = intersection;
+		}
+		collided = true;		
+
+	}
+	//up
+	if (lineLine(p, q, { minX, minY }, { maxX, minY }, intersection))
+	{
+		float d = Math::length(p - intersection);
+		if (d < minDistance)
+		{
+			minDistance = d;
+			minIntersection = intersection;
+		}
+		collided = true;
+
+	}
+	//down
+	if (lineLine(p, q, { minX, maxY }, { maxX, maxY }, intersection))
+	{
+		float d = Math::length(p - intersection);
+		if (d < minDistance)
+		{
+		
+			minDistance = d;
+			minIntersection = intersection;
+		}
+		collided = true;
+
+	}
+	if (collided)
+	{
+		t = minDistance / Math::length(q - p);
+	}
+	
+
+	return collided;
+}
+
+bool Aabb::sweepPoints(const std::vector<sf::Vector2f>& points, const sf::Vector2f & d, float & t)
+{
+	bool collided = false;
+
+	float minTime = std::numeric_limits<float>::max();
+
+	for (const auto & p : points)
+	{
+		float temp;
+		if (testLine(p, p + d, temp))
+		{
+			collided = true;
+			if (temp < minTime)
+				minTime = temp;
+		}
+	}
+	if (collided)
+	{
+		t = minTime;
+	}
+	return collided;
 }

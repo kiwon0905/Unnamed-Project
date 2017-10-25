@@ -59,6 +59,50 @@ int Map::getTileSize() const
 	return m_tileSize;
 }
 
+bool Map::sweepPoints(const std::vector<sf::Vector2f>& points, const sf::Vector2f d, float & time) const
+{
+	bool collided = false;
+	float minTime = std::numeric_limits<float>::max();
+	for (const auto & p : points)
+	{
+		float minX = std::min(p.x, p.x + d.x);
+		float maxX = std::max(p.x, p.x + d.x);
+		float minY = std::min(p.y, p.y + d.y);
+		float maxY = std::max(p.y, p.y + d.y);
+
+		int startX = static_cast<int>(std::floor(minX / m_tileSize));
+		int endX = static_cast<int>(std::floor(maxX / m_tileSize));
+		int startY = static_cast<int>(std::floor(minY / m_tileSize));
+		int endY = static_cast<int>(std::floor(maxY / m_tileSize));
+
+
+		for (int x = startX; x <= endX; ++x)
+		{
+			for (int y = startY; y <= endY; ++y)
+			{
+				int tile = getTile(x, y);
+				Aabb tileAabb(static_cast<float>(x * m_tileSize), static_cast<float>(y * m_tileSize), static_cast<float>(m_tileSize), static_cast<float>(m_tileSize));
+
+				if (tile)
+				{
+					float t;
+					if (tileAabb.testLine(p, p + d, t))
+					{
+						collided = true;
+						if (t < minTime)
+						{
+							minTime = t;
+						}
+					}
+				}
+			}
+		}
+	}
+	if (collided)
+		time = minTime;
+	return collided;
+}
+
 int Map::sweep(const Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vector2i & norm) const
 {
 	//   x0    x1

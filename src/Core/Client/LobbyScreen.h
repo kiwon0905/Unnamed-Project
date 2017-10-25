@@ -44,7 +44,6 @@ private:
 		std::string modeName;
 		Status status;
 		int numPlayers;
-		int ping = 0;
 		sf::Clock lastPingReq;
 	};
 	enum

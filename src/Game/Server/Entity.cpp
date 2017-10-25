@@ -38,11 +38,6 @@ sf::Vector2f Entity::getSize()
 	return m_size;
 }
 
-Aabb Entity::getAabb()
-{
-	return Aabb(m_position, m_size);
-}
-
 void Entity::takeDamage(int dmg, int from, const sf::Vector2f & impulse)
 {
 }

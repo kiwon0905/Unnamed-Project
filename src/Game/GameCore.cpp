@@ -112,6 +112,16 @@ void HumanCore::setPosition(const sf::Vector2f & pos)
 	m_position = pos;
 }
 
+const sf::Vector2f & HumanCore::getVelocity() const
+{
+	return m_velocity;
+}
+
+void HumanCore::setVelocity(const sf::Vector2f & vel)
+{
+	m_velocity = vel;
+}
+
 void ZombieCore::tick(float dt, const NetInput & input, const Map & map)
 {
 	Aabb aabb(m_position.x, m_position.y, 69.f, 69.f);

@@ -13,6 +13,7 @@
 
 #include <iostream>
 
+sf::Vector2f g_pos;
 
 std::string getStringFromTime(int totalSeconds)
 {
@@ -182,6 +183,11 @@ void PlayingScreen::handleEvent(const sf::Event & event, Client & client)
 	else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Tab)
 	{
 		m_scoreBoard->hide();
+	}
+
+	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Z)
+	{
+		g_pos = client.getWindow().mapPixelToCoords(sf::Mouse::getPosition(client.getWindow()), m_view);
 	}
 }
 
@@ -766,7 +772,6 @@ void PlayingScreen::debugRender(Client & client, const sf::View & playerView)
 	sf::Vector2f mouseWorldPos = window.mapPixelToCoords(sf::Mouse::getPosition(window), playerView);
 	sf::Text text;
 	text.setFont(*client.getAssetManager().get<sf::Font>("assets/font/arial.ttf"));
-	
 	int xt = static_cast<int>(std::floor(mouseWorldPos.x / m_map.getTileSize()));
 	int yt = static_cast<int>(std::floor(mouseWorldPos.y / m_map.getTileSize()));
 	std::string str = "(" + std::to_string(xt) + ", " + std::to_string(yt) + ")\n";
@@ -774,10 +779,36 @@ void PlayingScreen::debugRender(Client & client, const sf::View & playerView)
 	text.setString(str);
 	text.setPosition(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
 
+	sf::VertexArray arr2{ sf::PrimitiveType::Lines, 2 };
+	sf::Vertex v0;
+	v0.position = g_pos;
+	v0.color = sf::Color::Yellow;
+	sf::Vertex v1;
+	v1.position = mouseWorldPos;
+	v1.color = sf::Color::Yellow;
+	arr2.append(v0);
+	arr2.append(v1);
+	window.draw(arr2);
+
+	float t;
+	if (m_map.sweepPoints({ v0.position }, v1.position - v0.position, t))
+	{
+		sf::Vector2f intersectionPoint = v0.position + (v1.position - v0.position) * t;
+		sf::CircleShape c;
+		c.setRadius(10.f);
+		c.setOrigin(10.f, 10.f);
+		c.setPosition(intersectionPoint);
+		window.draw(c);
+	}
+	
+
 	window.setView(window.getDefaultView());
 	window.draw(*m_snapshotGraph);
 	window.draw(*m_predictionGraph);
 	window.draw(text);
+
+
+
 }
 
 const PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfo(int id)

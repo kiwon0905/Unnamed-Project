@@ -81,6 +81,8 @@ namespace Math
 		return x;
 	}
 
+	sf::Vector2f rotatePoint(const sf::Vector2f & p, float angle);
+
 	namespace
 	{
 		extern std::default_random_engine generator(static_cast<unsigned int>(time(nullptr)));

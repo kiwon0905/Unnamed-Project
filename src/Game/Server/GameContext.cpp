@@ -28,7 +28,7 @@ bool GameContext::update()
 
 
 
-		if (m_tick % 2 == 0)
+		//if (m_tick % 2 == 0)
 		{
 
 			std::unique_ptr<Snapshot> snapshot = std::make_unique<Snapshot>();
