@@ -180,7 +180,7 @@ Peer * Server::getPeer(const ENetPeer * peer)
 			return p.get();
 	return nullptr;
 }
-
+/*
 Peer * Server::getPeerByEntityId(int id)
 {
 	for (const auto & p : m_peers)
@@ -189,7 +189,7 @@ Peer * Server::getPeerByEntityId(int id)
 			return p.get();
 	}
 	return nullptr;
-}
+}*/
 
 bool Server::ensurePlayers(Peer::State state)
 {

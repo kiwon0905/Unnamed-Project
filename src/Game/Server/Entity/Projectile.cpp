@@ -6,13 +6,13 @@
 #include "Game/Server/GameContext.h"
 #include "Game/NetObject.h"
 #include "Game/Map.h"
-#include "Game/Server/Peer.h"
+#include "Core/Server/Peer.h"
 #include "Core/Server/Server.h"
 #include "Core/Utility.h"
 
-Projectile::Projectile(int id, GameContext * context, int shooterId, Team shooterTeam):
+Projectile::Projectile(int id, GameContext * context, int shooterPeerId, Team shooterTeam):
 	Entity(id, EntityType::PROJECTILE, context),
-	m_shooterId(shooterId),
+	m_shooterPeerId(shooterPeerId),
 	m_team(shooterTeam)
 {
 	m_size = { 25.f, 25.f };
@@ -21,7 +21,7 @@ Projectile::Projectile(int id, GameContext * context, int shooterId, Team shoote
 void Projectile::tick(float dt)
 {
 
-	//m_velocity.y = Math::clampedAdd(-3000.f, 3000.f, m_velocity.y, 1000.f * dt);
+	m_velocity.y = Math::clampedAdd(-3000.f, 3000.f, m_velocity.y, 1000.f * dt);
 	float angle = atan2f(m_velocity.y, m_velocity.x);
 
 	sf::Vector2f a = m_position + Math::rotatePoint({ 12.5f, 12.5f }, angle);
@@ -43,7 +43,7 @@ void Projectile::tick(float dt)
 
 	for (auto e : m_context->getWorld().getEntitiesOfType({ EntityType::HUMAN, EntityType::CRATE }))
 	{
-		if (e->getId() == m_shooterId)
+		if (e->getId() == m_shooterPeerId)
 			continue;
 		if (e->getType() == EntityType::HUMAN && m_context->getServer()->getPeer(static_cast<Human*>(e)->getPeerId())->getTeam() == m_team)
 			continue;
@@ -70,7 +70,7 @@ void Projectile::tick(float dt)
 		if (hitEntity)
 		{
 			sf::Vector2f entCenter = hitEntity->getPosition() + hitEntity->getSize() / 2.f;
-			hitEntity->takeDamage(10, m_shooterId, Math::unit(entCenter - m_position) * 500.f);
+			hitEntity->takeDamage(10, m_shooterPeerId, Math::unit(entCenter - m_position) * 500.f);
 		}
 
 		m_context->getWorld().createTransientEntity<Explosion>(m_position + m_size / 2.f);

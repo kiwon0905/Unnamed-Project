@@ -5,7 +5,7 @@
 #include "Game/NetObject.h"
 #include "Game/Server/GameContext.h"
 #include "Game/Server/GameWorld.h"
-#include "Game/Server/Peer.h"
+#include "Core/Server/Peer.h"
 #include "Core/Server/Server.h"
 #include "Core/Utility.h"
 
@@ -73,7 +73,8 @@ void Human::takeDamage(int dmg, int from, const sf::Vector2f & impulse)
 	if (m_health <= 0)
 	{
 		m_alive = false;
-		m_context->announceDeath(m_id, from);
+		m_context->announceDeath(m_peerId, from);
+		m_context->addScore(from, 5);
 	}
 
 	m_core.setVelocity(m_core.getVelocity() + impulse);

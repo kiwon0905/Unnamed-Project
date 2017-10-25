@@ -5,7 +5,7 @@
 class Projectile : public Entity
 {
 public:
-	Projectile(int id, GameContext * context, int shooterEntityId, Team shooterTeam);
+	Projectile(int id, GameContext * context, int shooterPeerId, Team shooterTeam);
 
 	void tick(float dt);
 	void snap(Snapshot & snapshot) const;
@@ -14,6 +14,6 @@ public:
 	void setVelocity(sf::Vector2f v);
 private:
 	sf::Vector2f m_velocity;
-	int m_shooterId;
+	int m_shooterPeerId;
 	Team m_team;
 };

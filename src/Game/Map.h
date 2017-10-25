@@ -22,7 +22,7 @@ public:
 	std::vector<sf::Vector2f> getCratePositions();
 
 	bool sweepPoints(const std::vector<sf::Vector2f> & points, const sf::Vector2f d, float & time) const;
-	int sweep(const Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vector2i & norm) const;
+	//int sweep(const Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vector2i & norm) const;
 	bool sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f & out, sf::Vector2i & norm, sf::Vector2i & tile) const;
 	bool isGrounded(const Aabb & aabb) const;
 private:

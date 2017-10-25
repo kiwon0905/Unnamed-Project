@@ -102,7 +102,7 @@ bool Map::sweepPoints(const std::vector<sf::Vector2f>& points, const sf::Vector2
 		time = minTime;
 	return collided;
 }
-
+/*
 int Map::sweep(const Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vector2i & norm) const
 {
 	//   x0    x1
@@ -150,7 +150,7 @@ int Map::sweep(const Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vect
 	time = minTime;
 	norm = minNorm;
 	return minTile;
-}
+}*/
 
 bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f & out, sf::Vector2i & norm, sf::Vector2i & tile) const
 {

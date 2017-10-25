@@ -26,7 +26,7 @@ public:
 	const std::vector<std::unique_ptr<Peer>> & getPeers();
 	Peer * getPeer(int id);
 	Peer * getPeer(const ENetPeer * peer);
-	Peer * getPeerByEntityId(int id);
+	//Peer * getPeerByEntityId(int id);
 	bool ensurePlayers(Peer::State state);
 	void broadcast(const Packer & packer, bool reliable, const Peer * exclude = nullptr);
 private:

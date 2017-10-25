@@ -2,7 +2,7 @@
 #include "Core/Packer.h"
 #include "Core/Protocol.h"
 
-#include "Game/Server/Peer.h"
+#include "Core/Server/Peer.h"
 
 #include "Game/Server/GameWorld.h"
 #include "Game/Enums.h"
@@ -39,7 +39,8 @@ public:
 	void createCrates();
 
 	//
-	void announceDeath(int killedEntity, int killerEntity);
+	void announceDeath(int killedPeer, int killerPeer);
+	void addScore(int peerId, int score);
 protected:
 	Server * m_server;
 

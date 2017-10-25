@@ -1,7 +1,7 @@
 #include "Zombie.h"
 #include "Game/Server/GameContext.h"
 #include "Game/Server/GameWorld.h"
-#include "Game/Server/Peer.h"
+#include "Core/Server/Peer.h"
 #include "Core/Server/Server.h"
 #include "Core/Utility.h"
 

@@ -108,11 +108,11 @@
     <ClInclude Include="src\Game\Server\Entity\Item.h">
       <Filter>Game\Server\Entity</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\Server\Peer.h">
-      <Filter>Game\Server</Filter>
-    </ClInclude>
     <ClInclude Include="src\Game\Server\GameContext\Vanilla.h">
       <Filter>Game\Server\GameContext</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Server\Peer.h">
+      <Filter>Core\Server</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -188,11 +188,11 @@
     <ClCompile Include="src\Game\Server\Entity\Item.cpp">
       <Filter>Game\Server\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Server\Peer.cpp">
-      <Filter>Game\Server</Filter>
-    </ClCompile>
     <ClCompile Include="src\Game\Server\GameContext\Vanilla.cpp">
       <Filter>Game\Server\GameContext</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Server\Peer.cpp">
+      <Filter>Core\Server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

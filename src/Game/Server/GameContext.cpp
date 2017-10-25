@@ -133,16 +133,27 @@ void GameContext::reset()
 	m_snapshots.clear();
 }
 
-void GameContext::announceDeath(int killedEntity, int killerEntity)
+void GameContext::announceDeath(int killedPeer, int killerPeer)
 {
-	Peer * killedPeer = m_server->getPeerByEntityId(killedEntity);
-	Peer * killerPeer = m_server->getPeerByEntityId(killerEntity);
+	Peer * killed = m_server->getPeer(killedPeer);
+	Peer * killer = m_server->getPeer(killerPeer);
 
 	Packer packer;
 	packer.pack(Msg::SV_KILL_FEED);
-	int killedPeerId = killedPeer ? killedPeer->getId() : -1;
-	int killerPeerId = killerPeer ? killerPeer->getId() : -1;
+
+	//necessary??
+	int killedPeerId = killed ? killed->getId() : -1;
+	int killerPeerId = killer ? killer->getId() : -1;
 	packer.pack<-1, MAX_PEER_ID>(killedPeerId);
 	packer.pack<-1, MAX_PEER_ID>(killerPeerId);
 	m_server->broadcast(packer, true);
+}
+
+void GameContext::addScore(int peerId, int score)
+{
+	Peer * peer = m_server->getPeer(peerId);
+	if (peer)
+	{
+		peer->addScore(score);
+	}
 }

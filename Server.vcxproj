@@ -26,6 +26,7 @@
     <ClInclude Include="src\Core\Parser.h" />
     <ClInclude Include="src\Core\Protocol.h" />
     <ClInclude Include="src\Core\Rle.h" />
+    <ClInclude Include="src\Core\Server\Peer.h" />
     <ClInclude Include="src\Core\Server\Server.h" />
     <ClInclude Include="src\Core\Utility.h" />
     <ClInclude Include="src\Game\Aabb.h" />
@@ -46,7 +47,6 @@
     <ClInclude Include="src\Game\Server\GameContext\Infection.h" />
     <ClInclude Include="src\Game\Server\GameContext\Vanilla.h" />
     <ClInclude Include="src\Game\Server\GameWorld.h" />
-    <ClInclude Include="src\Game\Server\Peer.h" />
     <ClInclude Include="src\Game\Snapshot.h" />
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +55,7 @@
     <ClCompile Include="src\Core\Packer.cpp" />
     <ClCompile Include="src\Core\Parser.cpp" />
     <ClCompile Include="src\Core\Rle.cpp" />
+    <ClCompile Include="src\Core\Server\Peer.cpp" />
     <ClCompile Include="src\Core\Server\Server.cpp" />
     <ClCompile Include="src\Core\Server\ServerMain.cpp" />
     <ClCompile Include="src\Core\Utility.cpp" />
@@ -74,7 +75,6 @@
     <ClCompile Include="src\Game\Server\GameContext\Infection.cpp" />
     <ClCompile Include="src\Game\Server\GameContext\Vanilla.cpp" />
     <ClCompile Include="src\Game\Server\GameWorld.cpp" />
-    <ClCompile Include="src\Game\Server\Peer.cpp" />
     <ClCompile Include="src\Game\Snapshot.cpp" />
   </ItemGroup>
   <ItemGroup>
