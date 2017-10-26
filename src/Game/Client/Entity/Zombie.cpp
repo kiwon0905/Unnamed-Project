@@ -3,7 +3,7 @@
 #include "Game/Snapshot.h"
 
 Zombie::Zombie(int id, Client & client, PlayingScreen & screen):
-	PredictedEntity(id, EntityType::ZOMBIE, client, screen)
+	PredictedEntity(id, NetObject::ZOMBIE, client, screen)
 {
 }
 

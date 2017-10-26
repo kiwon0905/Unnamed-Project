@@ -5,7 +5,7 @@
 
 
 Crate::Crate(int id, GameContext * context, const sf::Vector2f & pos):
-	Entity(id, EntityType::CRATE, context)
+	Entity(id, NetObject::CRATE, context)
 {
 	m_position = pos;
 	m_size = { 70.f, 70.f };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Game/Server/Entity.h"
+#include "Game/Enums.h"
 
 class Projectile : public Entity
 {

@@ -3,7 +3,7 @@
 
 
 Crate::Crate(int id, Client & client, PlayingScreen & screen) :
-	Entity(id, EntityType::CRATE, client, screen)
+	Entity(id, NetObject::CRATE, client, screen)
 {
 }
 

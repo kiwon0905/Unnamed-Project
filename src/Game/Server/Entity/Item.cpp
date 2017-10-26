@@ -1,7 +1,7 @@
 #include "Item.h"
 
 Item::Item(int id, GameContext * context):
-	Entity(id, EntityType::ITEM, context)
+	Entity(id, NetObject::ITEM, context)
 {
 }
 

@@ -1,5 +1,4 @@
 #pragma once
-#include "Game/Enums.h"
 #include "Game/Snapshot.h"
 #include "Game/Aabb.h"
 
@@ -12,11 +11,11 @@ class Peer;
 class Entity
 {
 public:
-	Entity(int id, EntityType type, GameContext * context, const sf::Vector2f & pos = sf::Vector2f());
+	Entity(int id, NetObject::Type type, GameContext * context, const sf::Vector2f & pos = sf::Vector2f());
 	virtual ~Entity() {}
 	
 	int getId();
-	EntityType getType();
+	NetObject::Type getType();
 
 	bool isAlive();
 	void setAlive(bool alive);
@@ -29,7 +28,7 @@ public:
 	virtual void takeDamage(int dmg, int from, const sf::Vector2f & impulse);
 protected:
 	int m_id;
-	EntityType m_type;
+	NetObject::Type m_type;
 	bool m_alive = true;
 	sf::Vector2f m_position;
 	sf::Vector2f m_size;

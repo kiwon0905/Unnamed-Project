@@ -1,15 +1,5 @@
 #pragma once
 #include <string>
-enum class EntityType
-{
-	NONE,
-	HUMAN,
-	ZOMBIE,
-	PROJECTILE,
-	CRATE,
-	ITEM,
-	COUNT
-};
 
 enum class Team
 {

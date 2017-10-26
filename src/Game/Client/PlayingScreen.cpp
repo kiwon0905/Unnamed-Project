@@ -111,7 +111,7 @@ void Announcer::draw(sf::RenderTarget & target, sf::RenderStates states) const
 
 PlayingScreen::PlayingScreen()
 {
-	m_entitiesByType.resize(static_cast<std::size_t>(EntityType::COUNT));
+	m_entitiesByType.resize(static_cast<std::size_t>(NetObject::ENTITY_COUNT));
 }
 
 void PlayingScreen::onEnter(Client & client)
@@ -204,7 +204,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		{
 			std::string mapName;
 			int numPlayer;
-			EntityType playerEntityType;
+			NetObject::Type playerEntityType;
 
 			unpacker.unpack(mapName);
 			unpacker.unpack<0, MAX_PEER_ID>(numPlayer);

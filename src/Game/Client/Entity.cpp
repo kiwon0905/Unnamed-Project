@@ -1,6 +1,6 @@
 #include "Entity.h"
 
-Entity::Entity(int id, EntityType type, Client & client, PlayingScreen & screen):
+Entity::Entity(int id, NetObject::Type type, Client & client, PlayingScreen & screen):
 	m_id(id),
 	m_type(type),
 	m_client(&client),
@@ -13,7 +13,7 @@ int Entity::getId() const
 	return m_id;
 }
 
-EntityType Entity::getType() const
+NetObject::Type Entity::getType() const
 {
 	return m_type;
 }

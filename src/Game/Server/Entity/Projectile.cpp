@@ -11,7 +11,7 @@
 #include "Core/Utility.h"
 
 Projectile::Projectile(int id, GameContext * context, int shooterPeerId, Team shooterTeam):
-	Entity(id, EntityType::PROJECTILE, context),
+	Entity(id, NetObject::PROJECTILE, context),
 	m_shooterPeerId(shooterPeerId),
 	m_team(shooterTeam)
 {
@@ -41,11 +41,11 @@ void Projectile::tick(float dt)
 		collided = true;
 	}
 
-	for (auto e : m_context->getWorld().getEntitiesOfType({ EntityType::HUMAN, EntityType::CRATE }))
+	for (auto e : m_context->getWorld().getEntitiesOfType({ NetObject::HUMAN, NetObject::CRATE }))
 	{
 		if (e->getId() == m_shooterPeerId)
 			continue;
-		if (e->getType() == EntityType::HUMAN && m_context->getServer()->getPeer(static_cast<Human*>(e)->getPeerId())->getTeam() == m_team)
+		if (e->getType() == NetObject::HUMAN && m_context->getServer()->getPeer(static_cast<Human*>(e)->getPeerId())->getTeam() == m_team)
 			continue;
 
 		Aabb aabb{ e->getPosition(), e->getSize() };

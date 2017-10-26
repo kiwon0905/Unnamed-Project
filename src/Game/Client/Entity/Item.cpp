@@ -1,7 +1,7 @@
 #include "Item.h"
 
 Item::Item(int id, Client & client, PlayingScreen & screen):
-	Entity(id, EntityType::ITEM, client, screen)
+	Entity(id, NetObject::ITEM, client, screen)
 {
 }
 

@@ -10,7 +10,7 @@
 #include "Core/Utility.h"
 
 Human::Human(int id, GameContext * context, int peerId, const sf::Vector2f & pos) :
-	Entity(id, EntityType::HUMAN, context, pos),
+	Entity(id, NetObject::HUMAN, context, pos),
 	m_peerId(peerId)
 {
 	m_size = { 69.f, 69.f };

@@ -1,6 +1,6 @@
 #include "Entity.h"
 
-Entity::Entity(int id, EntityType type, GameContext * context, const sf::Vector2f & pos):
+Entity::Entity(int id, NetObject::Type type, GameContext * context, const sf::Vector2f & pos):
 	m_id(id),
 	m_type(type),
 	m_context(context),
@@ -13,7 +13,7 @@ int Entity::getId()
 	return m_id;
 }
 
-EntityType Entity::getType()
+NetObject::Type Entity::getType()
 {
 	return m_type;
 }

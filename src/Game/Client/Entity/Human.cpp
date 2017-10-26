@@ -6,7 +6,7 @@
 #include <SFML/Graphics.hpp>
 
 Human::Human(int id, Client & client, PlayingScreen & screen):
-	PredictedEntity(id, EntityType::HUMAN, client, screen)
+	PredictedEntity(id, NetObject::HUMAN, client, screen)
 {
 }
 

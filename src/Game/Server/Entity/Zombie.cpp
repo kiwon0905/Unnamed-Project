@@ -6,7 +6,7 @@
 #include "Core/Utility.h"
 
 Zombie::Zombie(int id, GameContext * context, int peerId):
-	Entity(id, EntityType::ZOMBIE, context),
+	Entity(id, NetObject::ZOMBIE, context),
 	m_peerId(peerId)
 {
 	m_size = { 69.f, 69.f };

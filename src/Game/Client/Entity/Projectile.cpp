@@ -7,7 +7,7 @@
 #include <SFML/Graphics.hpp>
 
 Projectile::Projectile(int id, Client & client, PlayingScreen & screen):
-	Entity(id, EntityType::PROJECTILE, client, screen)
+	Entity(id, NetObject::PROJECTILE, client, screen)
 {
 	m_emitter = new SmokeTrailEmitter;
 	m_screen->getParticles().addEmitter(m_emitter);
