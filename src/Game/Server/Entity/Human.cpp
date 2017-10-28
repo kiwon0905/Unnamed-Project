@@ -75,6 +75,7 @@ void Human::takeDamage(int dmg, int from, const sf::Vector2f & impulse)
 		m_alive = false;
 		m_context->announceDeath(m_peerId, from);
 		m_context->addScore(from, 5);
+		m_context->getServer()->getPeer(m_peerId)->setEntity(nullptr);
 	}
 
 	m_core.setVelocity(m_core.getVelocity() + impulse);

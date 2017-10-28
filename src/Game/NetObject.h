@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Enums.h"
 #include "GameConfig.h"
 #include "Core/Packer.h"
 #include <SFML/System.hpp>
@@ -127,7 +128,11 @@ struct NetPlayerInfo
 	void write(Packer & packer) const;
 	void read(Unpacker & unpacker);
 
+	NetObject::Type type;
+	int id;
+	int ping;
 	int score;
+	Team team;
 };
 
 //Transient

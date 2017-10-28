@@ -13,6 +13,8 @@ NetObject * NetObject::create(Type type)
 		return NetObject::create<NetProjectile>();
 	case NetObject::CRATE:
 		return NetObject::create<NetCrate>();
+	case NetObject::PLAYER_INFO:
+		return NetObject::create<NetPlayerInfo>();
 	case NetObject::EXPLOSION:
 		return NetObject::create<NetExplosion>();
 	default:
@@ -181,11 +183,18 @@ NetObject::Type NetPlayerInfo::getType() const
 
 void NetPlayerInfo::write(Packer & packer) const
 {
-
+	packer.pack(type);
+	packer.pack<0, MAX_ENTITY_ID>(id);
+	packer.pack<0, 1023>(score);
+	packer.pack(team);
 }
 
 void NetPlayerInfo::read(Unpacker & unpacker)
 {
+	unpacker.unpack(type);
+	unpacker.unpack<0, MAX_ENTITY_ID>(id);
+	unpacker.unpack<0, 1023>(score);
+	unpacker.unpack(team);
 }
 
 NetObject::Type NetExplosion::getType() const

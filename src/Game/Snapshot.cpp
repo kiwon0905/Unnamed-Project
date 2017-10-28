@@ -3,10 +3,22 @@
 #include "Game/NetObject.h"
 #include "Core/Rle.h"
 
-
-const void * Snapshot::getEntity(int id) const
+bool Snapshot::Key::operator==(const Key & key) const
 {
-	auto iter = m_entities.find(id);
+	return id == key.id && type == key.type;
+}
+
+std::size_t Snapshot::KeyHasher::operator()(const Key & key) const
+{
+	return key.id + 31 * key.type;
+}
+
+const void * Snapshot::getEntity(NetObject::Type type, int id) const
+{
+	Key key;
+	key.id = id;
+	key.type = type;
+	auto iter = m_entities.find(key);
 	if(iter != m_entities.end())
 		return iter->second.get()->data.data();
 	return nullptr;
@@ -17,8 +29,13 @@ void * Snapshot::addEntity(NetObject::Type type, int id)
 {
 	if(m_entities.size() + m_transients.size() >= MAX_SNAPSHOT_ITEM_SIZE)
 		return nullptr;
+
+	Key key;
+	key.id = id;
+	key.type = type;
+
 	NetObject * entity = NetObject::create(type);
-	m_entities[id].reset(entity);
+	m_entities[key].reset(entity);
 	return entity->data.data();
 }	
 
@@ -48,8 +65,12 @@ void Snapshot::read(Unpacker & unpacker)
 			int id;
 			unpacker.unpack<0, MAX_ENTITY_ID>(id);
 
+			Key key;
+			key.id = id;
+			key.type = type;
+
 			item->read(unpacker);
-			m_entities[id].reset(item);
+			m_entities[key].reset(item);
 		}
 		else
 		{
@@ -66,8 +87,8 @@ void Snapshot::write(Packer & packer)
 	
 	for (auto & e : m_entities)
 	{
-		packer.pack(e.second->getType());
-		packer.pack<0, MAX_ENTITY_ID>(e.first);
+		packer.pack(e.first.type);
+		packer.pack<0, MAX_ENTITY_ID>(e.first.id);
 		e.second->write(packer);
 	}
 	for (auto & e : m_transients)
@@ -78,7 +99,6 @@ void Snapshot::write(Packer & packer)
 }
 
 //delta compression can be further optimized: group unchanged entities, rle only entities, not transients, etc... 
-
 void Snapshot::readRelativeTo(Unpacker & unpacker, const Snapshot & s)
 {
 	int numItems;
@@ -100,8 +120,12 @@ void Snapshot::readRelativeTo(Unpacker & unpacker, const Snapshot & s)
 			int id;
 			temp.unpack<0, MAX_ENTITY_ID>(id);
 
+			Key key;
+			key.id = id;
+			key.type = type;
+
 			//check if 
-			auto iter = s.m_entities.find(id);
+			auto iter = s.m_entities.find(key);
 			if (iter != s.m_entities.end())
 			{
 				NetObject * o = iter->second.get();
@@ -112,7 +136,7 @@ void Snapshot::readRelativeTo(Unpacker & unpacker, const Snapshot & s)
 				item->read(temp);
 
 			}
-			m_entities[id].reset(item);
+			m_entities[key].reset(item);
 		}
 		else
 		{
@@ -131,8 +155,8 @@ void Snapshot::writeRelativeTo(Packer & packer, const Snapshot & s)
 	Packer temp;
 	for (auto & e : m_entities)
 	{
-		temp.pack(e.second->getType());
-		temp.pack<0, MAX_ENTITY_ID>(e.first);
+		temp.pack(e.first.type);
+		temp.pack<0, MAX_ENTITY_ID>(e.first.id);
 		auto iter = s.m_entities.find(e.first);
 		if (iter != s.m_entities.end())
 		{

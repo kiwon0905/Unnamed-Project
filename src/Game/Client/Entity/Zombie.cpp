@@ -22,10 +22,10 @@ void Zombie::tick(float dt, const NetInput & input, Map & map)
 
 sf::Vector2f Zombie::getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const
 {
-	const NetZombie * z0 = static_cast<const NetZombie*>(from->getEntity(m_id));
+	const NetZombie * z0 = static_cast<const NetZombie*>(from->getEntity(NetObject::ZOMBIE, m_id));
 	const NetZombie * z1 = nullptr;
 	if (to)
-		z1 = static_cast<const NetZombie*>(to->getEntity(m_id));
+		z1 = static_cast<const NetZombie*>(to->getEntity(NetObject::ZOMBIE, m_id));
 
 	return getRenderPos(z0, z1, predictedT, t) + sf::Vector2f{ 69.f, 69.f };
 }
@@ -34,10 +34,10 @@ void Zombie::render(const Snapshot * from, const Snapshot * to, float predictedT
 {
 	sf::RenderTarget & target = m_client->getWindow();
 
-	const NetZombie * z0 = static_cast<const NetZombie*>(from->getEntity(m_id));
+	const NetZombie * z0 = static_cast<const NetZombie*>(from->getEntity(NetObject::ZOMBIE, m_id));
 	const NetZombie * z1 = nullptr;
 	if (to)
-		z1 = static_cast<const NetZombie*>(to->getEntity(m_id));
+		z1 = static_cast<const NetZombie*>(to->getEntity(NetObject::ZOMBIE, m_id));
 
 	sf::Vector2f pos = getRenderPos(z0, z1, predictedT, t);
 	sf::RectangleShape body;

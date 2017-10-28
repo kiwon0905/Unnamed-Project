@@ -27,10 +27,10 @@ void Human::tick(float dt, const NetInput & input, Map & map)
 
 sf::Vector2f Human::getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const
 {
-	const NetHuman * h0 = static_cast<const NetHuman*>(from->getEntity(m_id));
+	const NetHuman * h0 = static_cast<const NetHuman*>(from->getEntity(NetObject::HUMAN, m_id));
 	const NetHuman * h1 = nullptr;
 	if (to)
-		h1 = static_cast<const NetHuman*>(to->getEntity(m_id));
+		h1 = static_cast<const NetHuman*>(to->getEntity(NetObject::HUMAN, m_id));
 	return getRenderPos(h0, h1, predictedT, t) + sf::Vector2f{ 69.f, 69.f } / 2.f;
 
 }
@@ -38,14 +38,15 @@ sf::Vector2f Human::getCameraPosition(const Snapshot * from, const Snapshot * to
 void Human::render(const Snapshot * from, const Snapshot * to, float predictedT, float t)
 {
 	sf::RenderWindow & target = m_client->getWindow();
-	const NetHuman * h0 = static_cast<const NetHuman*>(from->getEntity(m_id));
+	const NetHuman * h0 = static_cast<const NetHuman*>(from->getEntity(NetObject::HUMAN, m_id));
 	const NetHuman * h1 = nullptr;
 	if (to)
-		h1 = static_cast<const NetHuman*>(to->getEntity(m_id));
+		h1 = static_cast<const NetHuman*>(to->getEntity(NetObject::HUMAN, m_id));
 
 	sf::Vector2f pos = getRenderPos(h0, h1, predictedT, t);
 
-	const PlayingScreen::PlayerInfo * info = m_screen->getPlayerInfoByEntityId(m_id);
+	//const PlayingScreen::PlayerInfo * info = m_screen->getPlayerInfoByEntityId(m_id);
+	const PlayingScreen::PlayerInfo * info = m_screen->getPlayerInfoByEntity(m_id, NetObject::HUMAN);
 
 	//body
 	sf::RectangleShape body;
@@ -82,7 +83,6 @@ void Human::render(const Snapshot * from, const Snapshot * to, float predictedT,
 	target.draw(gun);
 
 	//health
-
 	sf::RectangleShape total;
 	total.setSize({ 70.f, 15.f });
 	total.setFillColor(sf::Color(112, 128, 144));
@@ -96,18 +96,21 @@ void Human::render(const Snapshot * from, const Snapshot * to, float predictedT,
 	if (h1)
 		healthVal = Math::lerp<float>(static_cast<float>(h0->health), static_cast<float>(h1->health), t);
 	health.setFillColor(sf::Color::Red);
-	if (m_screen->getMyPlayerInfo().entityId == m_id)
+	
+
+	if (m_screen->getMyPlayerId() == info->id)
 		health.setFillColor(sf::Color::Green);
 	health.setSize(sf::Vector2f(healthVal / 100.f * (70.f + 2 * total.getOutlineThickness()), total.getSize().y + total.getOutlineThickness() * 2));
 	health.setPosition(total.getPosition() - sf::Vector2f{ total.getOutlineThickness(), total.getOutlineThickness() });
 	target.draw(health);
 
 
+	//name
 	sf::Text name;
 	name.setFont(*m_screen->getFont());
 	name.setString(info->name);
 	name.setOrigin(name.getLocalBounds().left, name.getLocalBounds().top);
-	if (m_screen->getMyPlayerInfo().entityId == m_id)
+	if (m_screen->getMyPlayerId() == info->id)
 		name.setFillColor(sf::Color::Yellow);
 	name.setPosition(pos);
 	name.setPosition({ pos.x + 69.f / 2.f - name.getLocalBounds().width / 2.f, total.getPosition().y - name.getLocalBounds().height - name.getFont()->getLineSpacing(name.getCharacterSize())});

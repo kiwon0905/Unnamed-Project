@@ -284,6 +284,22 @@ void Server::handleNetwork()
 			{
 
 			}
+
+			else if (msg == Msg::CL_REQUEST_PLAYER_INFO && m_state == LOADING)
+			{
+				peer->setState(Peer::LOADING);
+
+				Packer packer;
+				packer.pack(Msg::SV_PLAYER_INFO);
+				packer.pack<0, MAX_PEER_ID>(m_peers.size());
+				packer.pack<0, MAX_PEER_ID>(peer->getId());
+				for (const auto & p : m_peers)
+				{
+					packer.pack<0, MAX_PEER_ID>(p->getId());
+					packer.pack(p->getName());
+				}
+				peer->send(packer, true);
+			}
 			//Client will ask for info after the round has been asked to be prepared
 			else if (msg == Msg::CL_REQUEST_GAME_INFO && m_state == LOADING)
 			{
@@ -292,7 +308,9 @@ void Server::handleNetwork()
 				Packer packer;
 				packer.pack(Msg::SV_GAME_INFO);
 				packer.pack(m_gameContext->getMap().getName());				//map name
-				packer.pack<0, MAX_PEER_ID>(m_peers.size());				//num peer
+				peer->send(packer, true);
+				
+				/*packer.pack<0, MAX_PEER_ID>(m_peers.size());				//num peer
 				packer.pack<0, MAX_PEER_ID>(peer->getId());				//my player id
 				packer.pack(peer->getName());								//my name
 				packer.pack(peer->getTeam());								//team
@@ -309,7 +327,7 @@ void Server::handleNetwork()
 						packer.pack<0, MAX_ENTITY_ID>(p->getEntity()->getId());	//entity id
 					}
 				}
-				peer->send(packer, true);
+				peer->send(packer, true);*/
 			}
 			else if (msg == Msg::CL_LOAD_COMPLETE && m_state == LOADING)
 			{
@@ -389,7 +407,10 @@ void Server::handleNetwork()
 				m_peers.erase(std::remove_if(m_peers.begin(), m_peers.end(), pred), m_peers.end());
 
 				if (m_peers.empty())
+				{
+					//m_nextPeerId = 0;
 					reset();
+				}
 			}
 
 			sendServerInfoToMasterServer();

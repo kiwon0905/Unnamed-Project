@@ -9,7 +9,18 @@
 class Snapshot
 {
 public:
-	const void * getEntity(int id) const;
+	struct Key
+	{
+		int id;
+		NetObject::Type type;
+		bool operator==(const Key & key) const;
+	};
+	struct KeyHasher
+	{
+		std::size_t operator()(const Key & key) const;
+	};
+
+	const void * getEntity(NetObject::Type type, int id) const;
 
 	void * addEntity(NetObject::Type type, int id);
 	void * addTransient(NetObject::Type type);
@@ -19,7 +30,7 @@ public:
 	void readRelativeTo(Unpacker & unpacker, const Snapshot & s);
 	void writeRelativeTo(Packer & packer, const Snapshot & s);
 
-	const std::unordered_map<int, std::unique_ptr<NetObject>> & getEntities() const { return m_entities; }
+	const std::unordered_map<Key, std::unique_ptr<NetObject>, KeyHasher> & getEntities() const { return m_entities; }
 	const std::vector<std::unique_ptr<NetObject>> & getTransients() const { return m_transients; }
 
 	std::size_t getSize()
@@ -32,8 +43,7 @@ public:
 		return size;
 	}
 private:
-
-	std::unordered_map<int, std::unique_ptr<NetObject>> m_entities;
+	std::unordered_map<Key, std::unique_ptr<NetObject>, KeyHasher> m_entities;
 	std::vector<std::unique_ptr<NetObject>> m_transients;
 };
 

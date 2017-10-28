@@ -1,5 +1,8 @@
 #include "Peer.h"
+#include "Game/Snapshot.h"
+#include "Game/Server/Entity.h"
 #include "Core/ENetUtility.h"
+
 
 Peer::Peer(int id, ENetPeer * peer) :
 	m_id(id),
@@ -119,3 +122,22 @@ int Peer::getAckTick()
 	return m_ackTick;
 }
 
+
+void Peer::snap(Snapshot & snapshot)
+{
+	if (m_entity)
+	{
+		NetPlayerInfo * info = reinterpret_cast<NetPlayerInfo*>(snapshot.addEntity(NetObject::PLAYER_INFO, m_id));
+		if (info)
+		{
+			info->score = m_score;
+			info->team = m_team;
+
+			info->type = m_entity->getType();
+			info->id = m_entity->getId();
+
+
+		}
+	}
+
+}

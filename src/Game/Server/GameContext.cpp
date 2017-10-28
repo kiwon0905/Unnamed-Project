@@ -32,6 +32,8 @@ bool GameContext::update()
 		{
 
 			std::unique_ptr<Snapshot> snapshot = std::make_unique<Snapshot>();
+			for (auto & p : m_server->getPeers())
+				p->snap(*snapshot);
 			m_gameWorld.snap(*snapshot);
 
 
@@ -140,7 +142,7 @@ void GameContext::announceDeath(int killedPeer, int killerPeer)
 
 	Packer packer;
 	packer.pack(Msg::SV_KILL_FEED);
-
+	std::cout << "killed at: " << m_tick << "\n";
 	//necessary??
 	int killedPeerId = killed ? killed->getId() : -1;
 	int killerPeerId = killer ? killer->getId() : -1;

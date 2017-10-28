@@ -42,7 +42,7 @@ void GameWorld::tick()
 	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
 	for (auto & v : m_entitiesByType)
 		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
-
+	
 	for (auto & v : m_entitiesByType)
 		for (auto & e : v)
 			e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds());

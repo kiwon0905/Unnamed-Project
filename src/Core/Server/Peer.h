@@ -60,6 +60,8 @@ public:
 	
 	void reset();
 	bool send(const Packer & packer, bool reliable);
+
+	void snap(class Snapshot & snapshot);
 private:
 	int m_id;
 	std::string m_name;

@@ -117,8 +117,12 @@ PlayingScreen::PlayingScreen()
 void PlayingScreen::onEnter(Client & client)
 {
 	Packer packer;
-	packer.pack(Msg::CL_REQUEST_GAME_INFO);
+	packer.pack(Msg::CL_REQUEST_PLAYER_INFO);
 	client.getNetwork().send(packer, true);
+
+	Packer packer2;
+	packer2.pack(Msg::CL_REQUEST_GAME_INFO);
+	client.getNetwork().send(packer2, true);
 
 	float verticleCameraSize = 2000.f;
 	float horizontalCameraSize = verticleCameraSize / client.getWindow().getSize().x * client.getWindow().getSize().y;
@@ -199,15 +203,34 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 
 		Msg msg;
 		unpacker.unpack(msg);
+		
+		if (msg == Msg::SV_PLAYER_INFO)
+		{
+			std::size_t numPlayers;
+			unpacker.unpack<0, MAX_PEER_ID>(numPlayers);
+			unpacker.unpack<0, MAX_PEER_ID>(m_myPlayerId);
+			std::cout << "total " << numPlayers << " players\n";
+			std::cout << "my player id: " << m_myPlayerId << "\n";
 
-		if (msg == Msg::SV_GAME_INFO)
+			for (std::size_t i = 0; i < numPlayers; ++i)
+			{
+				PlayerInfo info;
+				unpacker.unpack<0, MAX_PEER_ID>(info.id);
+				unpacker.unpack(info.name);
+				m_players.push_back(info);
+				std::cout << info.id << ": " << info.name << "\n";
+			}
+		}
+
+		else if (msg == Msg::SV_GAME_INFO)
 		{
 			std::string mapName;
-			int numPlayer;
-			NetObject::Type playerEntityType;
+			//int numPlayer;
+			//NetObject::Type playerEntityType;
 
 			unpacker.unpack(mapName);
-			unpacker.unpack<0, MAX_PEER_ID>(numPlayer);
+			
+			/*unpacker.unpack<0, MAX_PEER_ID>(numPlayer);
 			unpacker.unpack<0, MAX_PEER_ID>(m_myPlayer.id);
 			unpacker.unpack(m_myPlayer.name);
 			unpacker.unpack(m_myPlayer.team);
@@ -226,7 +249,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 				unpacker.unpack<0, MAX_ENTITY_ID>(info.entityId);
 				m_players.push_back(info);
 				Logger::getInstance().info("PlayingScreen", info.name + "(" + std::to_string(info.id) + ") - " + "entity id: " + std::to_string(info.entityId) + " team: " + toString(info.team));
-			}
+			}*/
 
 			//load map
 			m_map.loadFromFile("map/" + mapName + ".xml");
@@ -495,7 +518,6 @@ void PlayingScreen::update(Client & client)
 
 			client.getNetwork().send(packer, false);
 			client.getNetwork().flush();
-			
 
 			//Prediction
 			for (auto p : m_predictedEntities)
@@ -509,13 +531,10 @@ void PlayingScreen::update(Client & client)
 
 				for (auto e : m_predictedEntities)
 				{
-					const void * obj = s->getEntity(e->getId());
+					const void * obj = s->getEntity(e->getType(), e->getId());
 					if (obj)
 					{
 						e->rollback(obj);
-
-
-
 						for (int t = m_lastRecvTick + 1; t <= m_predictedTick; ++t)
 						{
 							//TODO improve
@@ -547,7 +566,6 @@ void PlayingScreen::render(Client & client)
 {
 	if (m_state != IN_GAME)
 		return;
-
 	//find snapshots
 	sf::Time currentRenderTime = m_renderTime.getElapsedTime();
 	float renderTick = currentRenderTime.asSeconds() * TICKS_PER_SEC;
@@ -579,39 +597,53 @@ void PlayingScreen::render(Client & client)
 		{
 			if (p.second->getType() == NetObject::PLAYER_INFO)
 			{
+				PlayerInfo * info = getPlayerInfo(p.first.id);
+				NetPlayerInfo * netInfo = reinterpret_cast<NetPlayerInfo*>(p.second->data.data());
+				if (info)
+				{
+					info->entityId = netInfo->id;
+					info->entityType = netInfo->type;
+					info->team = netInfo->team;
+
+				}
+
 				continue;
 			}
-
-			Entity * e = getEntity(p.first);
-			if (!e)
+			else
 			{
-				switch (p.second->getType())
+				Entity * e = getEntity(p.first.id);
+				if (!e)
 				{
-				case NetObject::HUMAN:
-					e = new Human(p.first, client, *this);
-					break;
-				case NetObject::ZOMBIE:
-					e = new Zombie(p.first, client, *this);
-					break;
-				case NetObject::PROJECTILE:
-					e = new Projectile(p.first, client, *this);
-					break;
-				case NetObject::CRATE:
-					e = new Crate(p.first, client, *this);
-				default:
-					break;
-				}
-				m_entitiesByType[static_cast<int>(e->getType())].emplace_back(e);
+					switch (p.second->getType())
+					{
+					case NetObject::HUMAN:
+						e = new Human(p.first.id, client, *this);
+						break;
+					case NetObject::ZOMBIE:
+						e = new Zombie(p.first.id, client, *this);
+						break;
+					case NetObject::PROJECTILE:
+						e = new Projectile(p.first.id, client, *this);
+						break;
+					case NetObject::CRATE:
+						e = new Crate(p.first.id, client, *this);
+					default:
+						break;
+					}
+					m_entitiesByType[static_cast<int>(e->getType())].emplace_back(e);
 
 
 
-				if (p.first == m_myPlayer.entityId)
-				{
-					PredictedEntity * p = static_cast<PredictedEntity*>(e);
-					p->setPrediction(true);
-					m_predictedEntities.push_back(p);
+					if (getPlayerInfo(m_myPlayerId) && p.first.id == getPlayerInfo(m_myPlayerId)->entityId)
+					{
+						PredictedEntity * p = static_cast<PredictedEntity*>(e);
+						p->setPrediction(true);
+						m_predictedEntities.push_back(p);
+					}
 				}
 			}
+
+			
 		}
 		//handle transient entities
 		for (auto & p : s0->getTransients())
@@ -629,17 +661,16 @@ void PlayingScreen::render(Client & client)
 		{
 			for (auto & e : v)
 			{
-				if (!s0->getEntity(e->getId()))
+				if (!s0->getEntity(e->getType(), e->getId()))
 					e->setAlive(false);
 			}
 		}
 
+		auto isDead2 = [](Entity * e) {return !e->isAlive(); };
+		m_predictedEntities.erase(std::remove_if(m_predictedEntities.begin(), m_predictedEntities.end(), isDead2), m_predictedEntities.end());
 		auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
 		for (auto & v : m_entitiesByType)
 			v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
-		auto isDead2 = [](Entity * e) {return !e->isAlive(); };
-		m_predictedEntities.erase(std::remove_if(m_predictedEntities.begin(), m_predictedEntities.end(), isDead2), m_predictedEntities.end());
-
 
 		m_snapshots.removeUntil(m_prevRenderTick);
 	}
@@ -648,7 +679,8 @@ void PlayingScreen::render(Client & client)
 	
 	
 	//camera
-	Entity * e = getEntity(m_myPlayer.entityId);
+	const PlayerInfo * myInfo = getPlayerInfo(m_myPlayerId);
+	Entity * e = getEntity(myInfo->entityType, myInfo->entityId);
 	if (e)
 	{
 		sf::Vector2f center = e->getCameraPosition(s0, s1, predT, t);
@@ -739,6 +771,14 @@ Entity * PlayingScreen::getEntity(int id)
 	return nullptr;
 }
 
+Entity * PlayingScreen::getEntity(NetObject::Type type, int id)
+{
+	for (auto & e : m_entitiesByType[static_cast<int>(type)])
+		if (e->getId() == id)
+			return e.get();
+	return nullptr;
+}
+
 void PlayingScreen::debugRender(Client & client, const sf::View & playerView)
 {
 	//draw grid
@@ -811,30 +851,26 @@ void PlayingScreen::debugRender(Client & client, const sf::View & playerView)
 
 }
 
-const PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfo(int id)
+PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfo(int id)
 {
-	if (id == m_myPlayer.id)
-		return &m_myPlayer;
-	for (const auto & p : m_players)
+	for (auto & p : m_players)
 		if (p.id == id)
 			return &p;
 	return nullptr;
 
 }
 
-const PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfoByEntityId(int entityId)
+const PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfoByEntity(int id, NetObject::Type type)
 {
-	if (entityId == m_myPlayer.entityId)
-		return &m_myPlayer;
 	for (const auto & p : m_players)
-		if (p.entityId == entityId)
+		if (p.entityId == id && p.entityType == type)
 			return &p;
 	return nullptr;
 }
 
-const PlayingScreen::PlayerInfo & PlayingScreen::getMyPlayerInfo()
+int PlayingScreen::getMyPlayerId()
 {
-	return m_myPlayer;
+	return m_myPlayerId;
 }
 
 Particles & PlayingScreen::getParticles()

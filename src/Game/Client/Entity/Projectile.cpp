@@ -26,11 +26,11 @@ sf::Vector2f Projectile::getCameraPosition(const Snapshot * from, const Snapshot
 void Projectile::render(const Snapshot * from, const Snapshot * to, float predictedT, float t)
 {
 	sf::RenderWindow & target = m_client->getWindow();
-	const NetProjectile * p0 = static_cast<const NetProjectile*>(from->getEntity(m_id));
+	const NetProjectile * p0 = static_cast<const NetProjectile*>(from->getEntity(NetObject::PROJECTILE, m_id));
 	const NetProjectile * p1 = nullptr;
 
 	if (to)
-		p1 = static_cast<const NetProjectile*>(to->getEntity(m_id));
+		p1 = static_cast<const NetProjectile*>(to->getEntity(NetObject::PROJECTILE, m_id));
 
 
 	sf::Vector2f pos = static_cast<sf::Vector2f>(p0->pos) / 100.f;

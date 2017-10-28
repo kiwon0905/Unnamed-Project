@@ -51,6 +51,7 @@ public:
 	{
 		int id;
 		int entityId;
+		NetObject::Type entityType;
 		Team team;
 		std::string name;
 	};
@@ -76,9 +77,8 @@ private:
 	};
 	State m_state = LOADING;
 
-
+	int m_myPlayerId;
 	std::vector<PlayerInfo> m_players;
-	PlayerInfo m_myPlayer;
 
 	struct Input
 	{
@@ -120,6 +120,7 @@ private:
 
 	//entities
 	Entity * getEntity(int id);
+	Entity * getEntity(NetObject::Type type, int id);
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 	std::vector<PredictedEntity *> m_predictedEntities;
 
@@ -132,9 +133,10 @@ private:
 	tgui::Panel::Ptr m_scoreBoard;
 
 public:
-	const PlayerInfo * getPlayerInfo(int id);
-	const PlayerInfo * getPlayerInfoByEntityId(int entityId);
-	const PlayerInfo & getMyPlayerInfo();
+	PlayerInfo * getPlayerInfo(int id);
+	const PlayerInfo * getPlayerInfoByEntity(int id, NetObject::Type type);
+	int getMyPlayerId();
+
 	Particles & getParticles();
 	const sf::Font * getFont();
 
