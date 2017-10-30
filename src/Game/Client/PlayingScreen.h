@@ -54,6 +54,8 @@ public:
 		NetObject::Type entityType;
 		Team team;
 		std::string name;
+		int score;
+		int ping;
 	};
 
 	PlayingScreen();
@@ -131,7 +133,7 @@ private:
 	tgui::ChatBox::Ptr m_chatBox;
 	tgui::EditBox::Ptr m_editBox;
 	tgui::Panel::Ptr m_scoreBoard;
-
+	void updateScoreboard();
 public:
 	PlayerInfo * getPlayerInfo(int id);
 	const PlayerInfo * getPlayerInfoByEntity(int id, NetObject::Type type);

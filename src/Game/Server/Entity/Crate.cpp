@@ -31,7 +31,11 @@ void Crate::snap(Snapshot & snapshot) const
 void Crate::takeDamage(int dmg, int from, const sf::Vector2f & impulse)
 {
 	m_health--;
-	if(m_health <= 0)
+	if (m_health <= 0)
+	{
 		m_alive = false;
+		m_context->addScore(from, 5);
+		std::cout << from << " killed me\n";
+	}
 
 }

@@ -10,7 +10,8 @@
 
 bool Client::initialize()
 {
-	m_window.create(sf::VideoMode(1600, 900), "", sf::Style::Default, sf::ContextSettings(0, 0, 8));
+	sf::VideoMode a = sf::VideoMode::getFullscreenModes()[10];
+	m_window.create(sf::VideoMode(a.width, a.height), "", sf::Style::Default, sf::ContextSettings(0, 0, 8));
 	m_window.resetGLStates();
 
 	if (!m_parser.loadFromFile("client-config.txt"))
@@ -93,6 +94,10 @@ void Client::run()
 			{
 				if (event.type == sf::Event::Closed)
 					m_screenStack.clear();
+
+				if (event.type == sf::Event::Resized)
+					m_gui.setView(m_window.getView());
+
 				m_screenStack.handleEvent(event, *this);
 				m_gui.handleEvent(event);
 				m_input.handleEvent(event);		

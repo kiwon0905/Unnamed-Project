@@ -56,7 +56,6 @@ private:
 	};
 
 	std::vector<GameInfo> m_internetGames;
-	bool m_connected = false;
 
 	sf::Sprite m_background;
 	sf::FloatRect m_backgroundTextureRect;

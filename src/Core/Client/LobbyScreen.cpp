@@ -31,12 +31,10 @@ void LobbyScreen::onEnter(Client & client)
 
 	m_tabs = tgui::Tabs::create();
 	gui.add(m_tabs);
-	m_tabs->setPosition({ "10%", "8.5%" });
 	m_tabs->add("Internet", true);
 	m_tabs->add("LAN", false);
 	m_tabs->add("Private", false);
 	m_tabs->add("Settings", false);
-
 	auto onTabSelect = [this](const sf::String & s)
 	{
 		for (auto & p : m_panels)
@@ -64,13 +62,16 @@ void LobbyScreen::onEnter(Client & client)
 
 	for (auto & p : m_panels)
 	{
-		p = tgui::Panel::create({ "80%", "50%" });
-		p->setPosition({ tgui::bindLeft(m_tabs), tgui::bindBottom(m_tabs) + 2 });
+		p = tgui::Panel::create({ "80%", "60%" });
+		p->setPosition({ "(&.width - width) / 2", "(&.height - height) / 3" });
 		p->hide();
 		gui.add(p);
 	}
 	m_panels[INTERNET]->show();
 
+	m_tabs->setPosition({ tgui::bindLeft(m_panels[INTERNET]), tgui::bindTop(m_panels[INTERNET]) - m_tabs->getSize().y - 2});
+
+	//INTERNET
 	auto topPanel = tgui::Panel::create({ "100%", "10%" });
 		topPanel->getRenderer()->setBackgroundColor(sf::Color::Green);
 		topPanel->getRenderer()->setBorders(2);
@@ -119,8 +120,29 @@ void LobbyScreen::onEnter(Client & client)
 		bottomPanel->add(grid, "grid");
 	m_panels[INTERNET]->add(bottomPanel, "bottomPanel");
 
+
+	//SETTINGS
+	m_panels[SETTINGS]->getRenderer()->setBackgroundColor(sf::Color::Transparent);
+	m_panels[SETTINGS]->getRenderer()->setBorders(2.f);
+	m_panels[SETTINGS]->getRenderer()->setBorderColor(sf::Color::Black);
+	
+	auto nameLabel = tgui::Label::create("Name:");
+	//nameLabel->getRenderer()->setBorders(1.f);
+	//nameLabel->getRenderer()->setBorderColor(sf::Color::Black);
+	m_panels[SETTINGS]->add(nameLabel);
+
+
+	auto nameEditBox = tgui::EditBox::create();
+	nameEditBox->getRenderer()->setBackgroundColor(sf::Color::Transparent);
+	nameEditBox->getRenderer()->setBorders(0.f);
+	nameEditBox->setPosition({ tgui::bindRight(nameLabel) + 2, tgui::bindTop(nameLabel) });
+	nameEditBox->setSize({ "30%", tgui::bindHeight(nameLabel) });
+	nameEditBox->setTextSize(nameLabel->getTextSize());
+	nameEditBox->setDefaultText("Unnamed Person");
+	m_panels[SETTINGS]->add(nameEditBox, "nameEditBox");
+	//music
 	m_musicPanel = tgui::Panel::create({ "parent.width * .2", "parent.width * .05" });
-	m_musicPanel->setPosition({ "40%", "70%" });
+	m_musicPanel->setPosition({ "40%", tgui::bindBottom(m_panels[INTERNET]) + tgui::bindBottom(m_panels[INTERNET]) * .1});
 	auto horizontalLayout = tgui::HorizontalLayout::create();
 	m_musicPanel->add(horizontalLayout);
 
@@ -184,7 +206,6 @@ void LobbyScreen::onEnter(Client & client)
 	horizontalLayout->add(pause, "pause");
 	horizontalLayout->addSpace(.3f);
 	horizontalLayout->add(next);
-
 	gui.add(m_musicPanel);
 
 
@@ -210,6 +231,11 @@ void LobbyScreen::onEnter(Client & client)
 
 	loadNextMusic();
 	requestInternetGamesInfo(client);
+
+	for (auto & v : sf::VideoMode::getFullscreenModes())
+	{
+		std::cout<<v.width<<", "<<v.height<<"\n";
+	}
 }
 
 void LobbyScreen::handleEvent(const sf::Event & event, Client & client)
@@ -245,23 +271,20 @@ void LobbyScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 	}
 	else if (netEv.type == ENET_EVENT_TYPE_CONNECT)
 	{
-		Logger::getInstance().info("LobbyScreen", "Connected to game server");
-		Packer packer;
-		packer.pack(Msg::CL_REQUEST_JOIN_GAME);
-		packer.pack(std::string("Unnamed Person"));
-		client.getNetwork().send(packer, true);
-		m_connected = true;
+		std::string name = m_panels[SETTINGS]->get<tgui::EditBox>("nameEditBox")->getText();
+		if (name.empty())
+			name = m_panels[SETTINGS]->get<tgui::EditBox>("nameEditBox")->getDefaultText();
+		{
+			Logger::getInstance().info("LobbyScreen", "Connected to game server");
+			Packer packer;
+			packer.pack(Msg::CL_REQUEST_JOIN_GAME);
+			packer.pack(name);
+			client.getNetwork().send(packer, true);
+		}
 	}
 	else if (netEv.type == ENET_EVENT_TYPE_DISCONNECT)
 	{
-		if (m_connected)
-		{
-			Logger::getInstance().info("LobbyScreen", "Disconnected from game server");
-			m_connected = false;
-		}
-		else
-			Logger::getInstance().info("LobbyScreen", "Failed to connecet to game server");
-
+		Logger::getInstance().info("LobbyScreen", "Disconnected from game server");
 	}
 
 }

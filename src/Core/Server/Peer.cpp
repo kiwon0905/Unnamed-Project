@@ -135,8 +135,6 @@ void Peer::snap(Snapshot & snapshot)
 
 			info->type = m_entity->getType();
 			info->id = m_entity->getId();
-
-
 		}
 	}
 

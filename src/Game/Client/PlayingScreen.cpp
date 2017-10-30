@@ -171,9 +171,43 @@ void PlayingScreen::onEnter(Client & client)
 	m_chatBox->setSize("50%", m_chatBox->getSize().y);
 	client.getGui().add(m_chatBox);
 
-	m_scoreBoard = tgui::Panel::create({ "30%", "60%" });
-	m_scoreBoard->getRenderer()->setBackgroundColor(sf::Color(128, 128, 128, 128));
-	m_scoreBoard->setPosition({ "35%", "20%" });
+	m_scoreBoard = tgui::Panel::create({ "&.height * .5", "80%" });
+	m_scoreBoard->getRenderer()->setBackgroundColor(sf::Color(128, 128, 128, 50));
+	m_scoreBoard->setPosition({ "&.width /2 - width / 2", "&.height / 2 - height / 2" });
+
+	auto topPanel = tgui::Panel::create({ "100%", "10%" });
+	topPanel->getRenderer()->setBackgroundColor(sf::Color::Green);
+	topPanel->getRenderer()->setBorders(2);
+
+		auto name = tgui::Label::create("Name");
+		name->setSize("33%", "100%");
+		name->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		name->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		topPanel->add(name);
+
+		auto mode = tgui::Label::create("Score");
+		mode->setPosition({ tgui::bindRight(name), tgui::bindTop(name) });
+		mode->setSize({ "33%", "100%" });
+		mode->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		mode->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		topPanel->add(mode);
+
+		auto status = tgui::Label::create("Ping");
+		status->setPosition({ tgui::bindRight(mode), tgui::bindTop(mode) });
+		status->setSize({ "33%", "100%" });
+		status->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		status->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		topPanel->add(status);
+	m_scoreBoard->add(topPanel);
+
+	auto bottomPanel = tgui::ScrollablePanel::create({ "100%", "90% - 2" });
+	bottomPanel->setPosition({ "0%", "10% + 2" });
+	bottomPanel->getRenderer()->setBorders(2);
+
+	auto grid = tgui::Grid::create();
+	bottomPanel->add(grid, "grid");
+	m_scoreBoard->add(bottomPanel, "bottomPanel");
+
 	client.getGui().add(m_scoreBoard);
 	m_scoreBoard->hide();
 }
@@ -604,10 +638,11 @@ void PlayingScreen::render(Client & client)
 					info->entityId = netInfo->id;
 					info->entityType = netInfo->type;
 					info->team = netInfo->team;
+					info->score = netInfo->score;
+					info->ping = netInfo->ping;
 
 				}
 
-				continue;
 			}
 			else
 			{
@@ -673,6 +708,10 @@ void PlayingScreen::render(Client & client)
 			v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
 
 		m_snapshots.removeUntil(m_prevRenderTick);
+
+
+		//update scoreboard
+		updateScoreboard();
 	}
 
 
@@ -849,6 +888,55 @@ void PlayingScreen::debugRender(Client & client, const sf::View & playerView)
 
 
 
+}
+
+void PlayingScreen::updateScoreboard()
+{
+	auto bottomPanel = m_scoreBoard->get<tgui::Panel>("bottomPanel");
+	std::size_t i = 0;
+
+	auto grid = bottomPanel->get<tgui::Grid>("grid");
+	grid->removeAllWidgets();
+
+	for (const auto & info : m_players)
+	{
+		auto line = tgui::Panel::create({ tgui::bindWidth(bottomPanel) - 4, tgui::bindHeight(bottomPanel) / 10 });
+		line->getRenderer()->setOpacity(.6f);
+
+		if (i % 2)
+			line->getRenderer()->setBackgroundColor(sf::Color(173, 216, 230));
+		else
+			line->getRenderer()->setBackgroundColor(sf::Color(176, 224, 230));
+
+		auto name = tgui::Label::create(info.name);
+		name->setSize("33%", "100%");
+		name->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		name->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		line->add(name, "name");
+		name->setInheritedOpacity(1.f);
+		name->getRenderer()->setTextColor(sf::Color::Black);
+
+		auto score = tgui::Label::create(std::to_string(info.score));
+		score->setPosition({ tgui::bindRight(name), tgui::bindTop(name) });
+		score->setSize({ "33%", "100%" });
+		score->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		score->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		line->add(score, "mode");
+		score->setInheritedOpacity(1.f);
+		score->getRenderer()->setTextColor(sf::Color::Black);
+
+		auto ping = tgui::Label::create(std::to_string(info.ping));
+		ping->setPosition({ tgui::bindRight(score), tgui::bindTop(score) });
+		ping->setSize({ "33%", "100%" });
+		ping->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		ping->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		line->add(ping, "status");
+		ping->setInheritedOpacity(1.f);
+		ping->getRenderer()->setTextColor(sf::Color::Black);
+
+		grid->addWidget(line, i, 0);
+		++i;
+	}
 }
 
 PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfo(int id)
