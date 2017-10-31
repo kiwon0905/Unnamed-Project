@@ -8,6 +8,7 @@
 #include "Core/Server/Peer.h"
 #include "Core/Server/Server.h"
 #include "Core/Utility.h"
+#include "Game/GameConfig.h"
 
 Human::Human(int id, GameContext * context, int peerId, const sf::Vector2f & pos) :
 	Entity(id, NetObject::HUMAN, context, pos),
@@ -54,6 +55,18 @@ void Human::tick(float dt)
 	if (m_fireCooldown < 0)
 		m_fireCooldown = 0;
 	m_position = m_core.getPosition();
+
+
+	//remove old assisters
+	for (auto it = m_assistingPeers.begin(); it != m_assistingPeers.end();)
+	{
+		it->second++;
+		if (it->second > TICKS_PER_SEC * 5)
+			it = m_assistingPeers.erase(it);
+		else
+			++it;
+	}
+
 }
 
 void Human::snap(Snapshot & snapshot) const
@@ -69,15 +82,22 @@ void Human::snap(Snapshot & snapshot) const
 
 void Human::takeDamage(int dmg, int from, const sf::Vector2f & impulse)
 {
+	m_assistingPeers[from] = 0;
+
 	m_health -= dmg;
 	if (m_health <= 0)
 	{
+
+		std::vector<int> assisters;
+		for (const auto & p : m_assistingPeers)
+			assisters.push_back(p.first);
+
 		m_alive = false;
-		m_context->announceDeath(m_peerId, from);
+		m_context->announceDeath(m_peerId, from, assisters);
 		m_context->addScore(from, 5);
 		m_context->getServer()->getPeer(m_peerId)->setEntity(nullptr);
-	}
 
+	}
 	m_core.setVelocity(m_core.getVelocity() + impulse);
 }
 

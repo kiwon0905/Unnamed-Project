@@ -53,6 +53,38 @@ void Snapshot::read(Unpacker & unpacker)
 	int numItems;
 	unpacker.unpack<0, MAX_SNAPSHOT_ITEM_SIZE>(numItems);
 
+	//read all the types
+	std::vector<NetObject::Type> types;
+	for (int i = 0; i < numItems; ++i)
+	{
+		NetObject::Type type;
+		unpacker.unpack(type);
+		types.push_back(type);
+	}
+
+	for (NetObject::Type type : types)
+	{
+		NetObject * item = NetObject::create(type);
+		if (type < NetObject::ENTITY_COUNT)
+		{
+			int id;
+			unpacker.unpack<0, MAX_ENTITY_ID>(id);
+
+			Key key;
+			key.id = id;
+			key.type = type;
+
+			item->read(unpacker);
+			m_entities[key].reset(item);
+		}
+		else
+		{
+			item->read(unpacker);
+			m_transients.emplace_back(item);
+		}
+	}
+
+	/*
 	for (int i = 0; i < numItems; ++i)
 	{
 		NetObject::Type type;
@@ -77,23 +109,36 @@ void Snapshot::read(Unpacker & unpacker)
 			item->read(unpacker);
 			m_transients.emplace_back(item);
 		}
-	}
+	}*/
 
 }
 
 void Snapshot::write(Packer & packer)
 {
 	packer.pack<0, MAX_SNAPSHOT_ITEM_SIZE>(m_entities.size() + m_transients.size());
-	
 	for (auto & e : m_entities)
 	{
 		packer.pack(e.first.type);
+		//e.second->write(packer);
+	}
+	for (auto & e : m_transients)
+	{
+		packer.pack(e->getType());
+		//packer.pack<0, MAX_ENTITY_ID>(0);
+		//e->write(packer);
+	}
+
+
+	for (auto & e : m_entities)
+	{
+	//	packer.pack(e.first.type);
+	//	packer.pack<0, MAX_ENTITY_ID>(e.first.id);
 		packer.pack<0, MAX_ENTITY_ID>(e.first.id);
 		e.second->write(packer);
 	}
 	for (auto & e : m_transients)
 	{
-		packer.pack(e->getType());
+		//packer.pack(e->getType());
 		e->write(packer);
 	}
 }
@@ -104,10 +149,53 @@ void Snapshot::readRelativeTo(Unpacker & unpacker, const Snapshot & s)
 	int numItems;
 	unpacker.unpack<0, MAX_SNAPSHOT_ITEM_SIZE>(numItems);
 
+	std::vector<NetObject::Type> types;
+	for (int i = 0; i < numItems; ++i)
+	{
+		NetObject::Type type;
+		unpacker.unpack(type);
+		types.push_back(type);
+	}
+
 	Packer buf;
 	decode(unpacker, buf);
 	Unpacker temp(buf.getData(), buf.getDataSize());
 
+	for (NetObject::Type type : types)
+	{
+		NetObject * item = NetObject::create(type);
+
+		if (type < NetObject::ENTITY_COUNT)
+		{
+			int id;
+			temp.unpack<0, MAX_ENTITY_ID>(id);
+
+			Key key;
+			key.id = id;
+			key.type = type;
+
+			//check if 
+			auto iter = s.m_entities.find(key);
+			if (iter != s.m_entities.end())
+			{
+				NetObject * o = iter->second.get();
+				item->readRelative(temp, *o);
+			}
+			else
+			{
+				item->read(temp);
+
+			}
+			m_entities[key].reset(item);
+		}
+		else
+		{
+			item->read(temp);
+			m_transients.emplace_back(item);
+		}
+	}
+
+	/*
 	for (int i = 0; i < numItems; ++i)
 	{
 		NetObject::Type type;
@@ -144,7 +232,7 @@ void Snapshot::readRelativeTo(Unpacker & unpacker, const Snapshot & s)
 			m_transients.emplace_back(item);
 		}
 	}
-
+	*/
 }
 
 
@@ -152,10 +240,19 @@ void Snapshot::writeRelativeTo(Packer & packer, const Snapshot & s)
 {
 	packer.pack<0, MAX_SNAPSHOT_ITEM_SIZE>(m_entities.size() + m_transients.size());
 
-	Packer temp;
+
 	for (auto & e : m_entities)
 	{
-		temp.pack(e.first.type);
+		packer.pack(e.first.type);
+	}
+	for (auto & e : m_transients)
+	{
+		packer.pack(e->getType());
+	}
+	Packer temp;
+
+	for (auto & e : m_entities)
+	{
 		temp.pack<0, MAX_ENTITY_ID>(e.first.id);
 		auto iter = s.m_entities.find(e.first);
 		if (iter != s.m_entities.end())
@@ -172,9 +269,9 @@ void Snapshot::writeRelativeTo(Packer & packer, const Snapshot & s)
 
 	for (auto & e : m_transients)
 	{
-		temp.pack(e->getType());
 		e->write(temp);
 	}
+
 	Unpacker unpacker(temp.getData(), temp.getDataSize());
 	encode(unpacker, packer);
 }

@@ -18,4 +18,7 @@ private:
 	int m_health = 100;
 	float m_aimAngle = 0.f;
 	int m_peerId = -1;
+
+	//peer_id, tick
+	std::unordered_map<int, int> m_assistingPeers;
 };

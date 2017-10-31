@@ -49,6 +49,12 @@ bool GameContext::update()
 					packer.pack<-1, MAX_TICK>(m_tick);
 					packer.pack<-1, MAX_TICK>(p->getAckTick());
 					snapshot->writeRelativeTo(packer, *delta);
+					std::cout << "Compressed: " << packer.getDataSize() << "\n";
+					Packer packer2;
+					packer2.pack(Msg::SV_FULL_SNAPSHOT);
+					packer2.pack<-1, MAX_TICK>(m_tick);
+					snapshot->write(packer2);
+					std::cout << "uncompressed: " << packer2.getDataSize() << "\n";
 				}
 				else
 				{
@@ -135,14 +141,17 @@ void GameContext::reset()
 	m_snapshots.clear();
 }
 
-void GameContext::announceDeath(int killedPeer, int killerPeer)
+void GameContext::announceDeath(int killedPeer, int killerPeer, const std::vector<int> & assisters)
 {
 	Peer * killed = m_server->getPeer(killedPeer);
 	Peer * killer = m_server->getPeer(killerPeer);
 
 	Packer packer;
 	packer.pack(Msg::SV_KILL_FEED);
-	std::cout << "killed at: " << m_tick << "\n";
+	std::cout << "killed at: " << m_tick << ". Assisters: ";
+	for (int i : assisters)
+		std::cout << i << ", ";
+	std::cout << "\n";
 	//necessary??
 	int killedPeerId = killed ? killed->getId() : -1;
 	int killerPeerId = killer ? killer->getId() : -1;
