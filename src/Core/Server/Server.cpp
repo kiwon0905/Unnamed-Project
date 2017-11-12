@@ -227,7 +227,7 @@ void Server::handleCommands()
 			m_gameContext->prepareRound();
 			m_state = LOADING;
 			Packer packer;
-			packer.pack(Msg::SV_LOAD_GAME);
+			packer.pack_v(Msg::SV_LOAD_GAME);
 			broadcast(packer, true);
 		}
 	}
@@ -252,16 +252,21 @@ void Server::handleNetwork()
 			Unpacker unpacker;
 			enutil::receive(unpacker, event.packet);
 			Msg msg;
-			unpacker.unpack(msg);
+			//unpacker.unpack(msg);
 
+			unpacker.unpack_v(msg);
 			if (msg == Msg::CL_REQUEST_JOIN_GAME)
 			{
 				std::string name;
-				unpacker.unpack(name);
+				//unpacker.unpack(name);
+				unpacker.unpack_v(name);
+
 				Packer packer;
 				if (m_state == PRE_GAME && m_peers.size() < 16 && m_nextPeerId < MAX_PEER_ID)
 				{
-					packer.pack(Msg::SV_ACCEPT_JOIN);
+					//packer.pack(Msg::SV_ACCEPT_JOIN);
+					packer.pack_v(Msg::SV_ACCEPT_JOIN);
+
 					Peer * p = new Peer(m_nextPeerId++, event.peer);
 					p->setName(name);
 					m_peers.emplace_back(p);
@@ -270,7 +275,8 @@ void Server::handleNetwork()
 				}
 				else
 				{
-					packer.pack(Msg::SV_REJECT_JOIN);
+					//packer.pack(Msg::SV_REJECT_JOIN);
+					packer.pack_v(Msg::SV_REJECT_JOIN);
 				}
 				enutil::send(packer, event.peer, true);
 			}
@@ -290,14 +296,25 @@ void Server::handleNetwork()
 				peer->setState(Peer::LOADING);
 
 				Packer packer;
-				packer.pack(Msg::SV_PLAYER_INFO);
+				
+				/*packer.pack(Msg::SV_PLAYER_INFO);
 				packer.pack<0, MAX_PEER_ID>(m_peers.size());
 				packer.pack<0, MAX_PEER_ID>(peer->getId());
 				for (const auto & p : m_peers)
 				{
 					packer.pack<0, MAX_PEER_ID>(p->getId());
 					packer.pack(p->getName());
+				}*/
+
+				packer.pack_v(Msg::SV_PLAYER_INFO);
+				packer.pack_v(m_peers.size());
+				packer.pack_v(peer->getId());
+				for (const auto & p : m_peers)
+				{
+					packer.pack_v(p->getId());
+					packer.pack_v(p->getName());
 				}
+
 				peer->send(packer, true);
 			}
 			//Client will ask for info after the round has been asked to be prepared
@@ -306,28 +323,15 @@ void Server::handleNetwork()
 				peer->setState(Peer::LOADING);
 
 				Packer packer;
-				packer.pack(Msg::SV_GAME_INFO);
-				packer.pack(m_gameContext->getMap().getName());				//map name
+				//packer.pack(Msg::SV_GAME_INFO);
+				//packer.pack(m_gameContext->getMap().getName());				//map name
+				
+				packer.pack_v(Msg::SV_GAME_INFO);
+				packer.pack_v(m_gameContext->getMap().getName());				//map name
+				
 				peer->send(packer, true);
 				
-				/*packer.pack<0, MAX_PEER_ID>(m_peers.size());				//num peer
-				packer.pack<0, MAX_PEER_ID>(peer->getId());				//my player id
-				packer.pack(peer->getName());								//my name
-				packer.pack(peer->getTeam());								//team
-				packer.pack<0, MAX_ENTITY_ID>(peer->getEntity()->getId());	//my entity id
-				packer.pack(peer->getEntity()->getType());					//my entity type
 
-				for (const auto & p : m_peers)
-				{
-					if (p->getId() != peer->getId())
-					{
-						packer.pack<0, MAX_PEER_ID>(p->getId());				//player id
-						packer.pack(p->getName());								//name
-						packer.pack(p->getTeam());								//team
-						packer.pack<0, MAX_ENTITY_ID>(p->getEntity()->getId());	//entity id
-					}
-				}
-				peer->send(packer, true);*/
 			}
 			else if (msg == Msg::CL_LOAD_COMPLETE && m_state == LOADING)
 			{
@@ -346,8 +350,8 @@ void Server::handleNetwork()
 			{
 				int predictedTick;
 				int ackTick;
-				unpacker.unpack<-1, MAX_TICK>(predictedTick);
-				unpacker.unpack<-1, MAX_TICK>(ackTick);
+				unpacker.unpack_v(predictedTick);
+				unpacker.unpack_v(ackTick);
 				NetInput input;
 				input.read(unpacker);
 				peer->onInput(predictedTick, input);
@@ -357,22 +361,22 @@ void Server::handleNetwork()
 					sf::Time timeLeft = sf::seconds(predictedTick / TICKS_PER_SEC) - m_gameContext->getCurrentTime();
 
 					Packer packer;
-					packer.pack(Msg::SV_INPUT_TIMING);
-					packer.pack<-1, MAX_TICK>(predictedTick);
-					packer.pack(timeLeft.asMilliseconds());
+					packer.pack_v(Msg::SV_INPUT_TIMING);
+					packer.pack_v(predictedTick);
+					packer.pack_v(timeLeft.asMilliseconds());
 					peer->send(packer, false);
 				}
 			}
 			else if (msg == Msg::CL_CHAT)
 			{
 				std::string chat;
-				unpacker.unpack(chat);
+				unpacker.unpack_v(chat);
 
 				Packer packer;
-				packer.pack(Msg::SV_CHAT);
-				packer.pack<-1, MAX_TICK>(m_gameContext->getCurrentTick());
-				packer.pack(uint8_t(peer->getId()));
-				packer.pack(chat);
+				packer.pack_v(Msg::SV_CHAT);
+				packer.pack_v(m_gameContext->getCurrentTick());
+				packer.pack_v(peer->getId());
+				packer.pack_v(chat);
 				broadcast(packer, true);
 			}
 
@@ -394,8 +398,8 @@ void Server::handleNetwork()
 				if (p)
 				{
 					Packer packer;
-					packer.pack(Msg::SV_PLAYER_LEFT);
-					packer.pack<-1, MAX_PEER_ID>(p->getId());
+					packer.pack_v(Msg::SV_PLAYER_LEFT);
+					packer.pack_v(p->getId());
 					broadcast(packer, true, p);
 					if (p->getEntity())
 						p->getEntity()->setAlive(false);
@@ -423,11 +427,11 @@ void Server::handleNetwork()
 	while (enutil::receive(unpacker, addr, m_socket))
 	{
 		Msg msg;
-		unpacker.unpack(msg);
+		unpacker.unpack_v(msg);
 		if (msg == Msg::CL_PING)
 		{
 			Packer packer;
-			packer.pack(Msg::SV_PING_REPLY);
+			packer.pack_v(Msg::SV_PING_REPLY);
 			enutil::send(packer, addr, m_socket);
 		}
 	}
@@ -464,13 +468,21 @@ void Server::sendServerInfoToMasterServer()
 	enet_socket_get_address(m_socket, &pingCheckAddr);
 
 
-	Packer packer;
+	/*Packer packer;
 	packer.pack(Msg::SV_SERVER_INFO);
-	
 	packer.pack(pingCheckAddr.port);
 	packer.pack(std::string("Fun game"));
 	packer.pack(m_gameContext->getName());
 	packer.pack(m_state);
 	packer.pack(int32_t(m_peers.size()));
+	enutil::send(packer, m_masterServer, true);*/
+
+	Packer packer;
+	packer.pack_v(Msg::SV_SERVER_INFO);
+	packer.pack_v(pingCheckAddr.port);
+	packer.pack_v(std::string("Fun game"));
+	packer.pack_v(m_gameContext->getName());
+	packer.pack_v(m_state);
+	packer.pack_v(m_peers.size());
 	enutil::send(packer, m_masterServer, true);
 }

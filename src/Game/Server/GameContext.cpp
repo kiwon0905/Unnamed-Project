@@ -42,24 +42,23 @@ bool GameContext::update()
 			{
 				Packer packer;
 				Snapshot * delta = m_snapshots.get(p->getAckTick());
-				//delta = 0;
+				delta = 0;
 				if (delta)
 				{
-					packer.pack(Msg::SV_DELTA_SNAPSHOT);
-					packer.pack<-1, MAX_TICK>(m_tick);
-					packer.pack<-1, MAX_TICK>(p->getAckTick());
+					packer.pack_v(Msg::SV_DELTA_SNAPSHOT);
+					packer.pack_v(m_tick);
+					packer.pack_v(p->getAckTick());
 					snapshot->writeRelativeTo(packer, *delta);
-					std::cout << "Compressed: " << packer.getDataSize() << "\n";
+					
 					Packer packer2;
-					packer2.pack(Msg::SV_FULL_SNAPSHOT);
-					packer2.pack<-1, MAX_TICK>(m_tick);
+					packer2.pack_v(Msg::SV_FULL_SNAPSHOT);
+					packer2.pack_v(m_tick);
 					snapshot->write(packer2);
-					std::cout << "uncompressed: " << packer2.getDataSize() << "\n";
 				}
 				else
 				{
-					packer.pack(Msg::SV_FULL_SNAPSHOT);
-					packer.pack<-1, MAX_TICK>(m_tick);
+					packer.pack_v(Msg::SV_FULL_SNAPSHOT);
+					packer.pack_v(m_tick);
 					snapshot->write(packer);
 				}
 				p->send(packer, false);
@@ -80,8 +79,8 @@ bool GameContext::update()
 				std::cout << "DRAW\n";
 
 			Packer packer;
-			packer.pack(Msg::SV_ROUND_OVER);
-			packer.pack(winner);
+			packer.pack_v(Msg::SV_ROUND_OVER);
+			packer.pack_v(winner);
 			m_server->broadcast(packer, true);
 
 			return false;
@@ -147,7 +146,7 @@ void GameContext::announceDeath(int killedPeer, int killerPeer, const std::vecto
 	Peer * killer = m_server->getPeer(killerPeer);
 
 	Packer packer;
-	packer.pack(Msg::SV_KILL_FEED);
+	packer.pack_v(Msg::SV_KILL_FEED);
 	std::cout << "killed at: " << m_tick << ". Assisters: ";
 	for (int i : assisters)
 		std::cout << i << ", ";
@@ -155,8 +154,8 @@ void GameContext::announceDeath(int killedPeer, int killerPeer, const std::vecto
 	//necessary??
 	int killedPeerId = killed ? killed->getId() : -1;
 	int killerPeerId = killer ? killer->getId() : -1;
-	packer.pack<-1, MAX_PEER_ID>(killedPeerId);
-	packer.pack<-1, MAX_PEER_ID>(killerPeerId);
+	packer.pack_v(killedPeerId);
+	packer.pack_v(killerPeerId);
 	m_server->broadcast(packer, true);
 }
 

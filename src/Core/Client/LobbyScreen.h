@@ -39,7 +39,7 @@ private:
 		};
 		int id;
 		ENetAddress addr;
-		uint16_t pingCheckPort;
+		enet_uint16 pingCheckPort;
 		std::string name;
 		std::string modeName;
 		Status status;

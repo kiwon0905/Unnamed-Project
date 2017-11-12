@@ -52,6 +52,18 @@ public:
 	void setScore(int score);
 	void addScore(int score);
 
+	int getKills();
+	void setKills(int kills);
+	void addKills(int kills);
+
+	int getDeaths();
+	void setDeaths(int deaths);
+	void addDeaths(int deaths);
+
+	int getAssists();
+	void setAssists(int assists);
+	void addAssists(int assists);
+
 	void onInput(int tick, const NetInput & input);
 	NetInput popInput(int tick);
 
@@ -71,7 +83,11 @@ private:
 	Entity * m_entity = nullptr;
 	Team m_team = Team::NONE;
 	int m_score = 0;
-	
+	int m_kills = 0;
+	int m_deaths = 0;
+	int m_assists = 0;
+
+
 	int m_ackTick = -1;
 	std::priority_queue<Input, std::vector<Input>, InputComparator> m_inputs;
 };

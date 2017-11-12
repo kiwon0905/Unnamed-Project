@@ -132,6 +132,10 @@ struct NetPlayerInfo
 	int id;
 	int ping;
 	int score;
+	int kills;
+	int deaths;
+	int assists;
+
 	Team team;
 };
 

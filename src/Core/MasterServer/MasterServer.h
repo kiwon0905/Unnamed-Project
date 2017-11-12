@@ -37,7 +37,7 @@ private:
 		};
 		
 		int id;
-		uint16_t pingCheckPort;
+		int pingCheckPort;
 		std::string name;
 		std::string modeName;
 		Status status;

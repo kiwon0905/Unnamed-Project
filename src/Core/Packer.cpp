@@ -18,7 +18,7 @@ std::size_t Packer::getDataSize() const
 {
 	return m_data.size();
 }
-
+/*
 void Packer::pack(bool data)
 {
 	pack8(static_cast<std::uint8_t>(data), 1);
@@ -87,12 +87,14 @@ void Packer::pack8(std::uint8_t data, std::size_t bits)
 		m_data.push_back(0);
 		m_data.back() |= secondVal;
 	}
-}
+}*/
+
 
 Unpacker::Unpacker(const void * data, std::size_t size) :
 	m_data(static_cast<const std::uint8_t*>(data)),
 	m_size(size),
-	m_bitsRead(0)
+	//m_bitsRead(0),
+	m_readPos(0)
 {
 }
 
@@ -105,9 +107,10 @@ void Unpacker::setData(const void * data, std::size_t size)
 {
 	m_data = static_cast<const std::uint8_t*>(data);
 	m_size = size;
-	m_bitsRead = 0;
+	//m_bitsRead = 0;
 }
 
+/*
 void Unpacker::unpack(bool & data)
 {
 	std::uint8_t val;
@@ -185,4 +188,4 @@ void Unpacker::unpack8(std::uint8_t & data, std::size_t bits)
 void Unpacker::check(std::size_t bits)
 {
 	assert(m_bitsRead + bits <= 8 * m_size && "attempt to read more than available");
-}
+}*/

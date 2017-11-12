@@ -34,42 +34,82 @@ public:
 	const void * getData() const;
 	std::size_t getDataSize() const;
 
-	template <typename T>
-	std::enable_if_t<std::is_integral_v<T>> pack(T data, std::size_t bits);
-	template <std::int8_t min = (std::numeric_limits<std::int8_t>::min)(), std::int8_t max = (std::numeric_limits<std::int8_t>::max)()>
-	void pack(std::int8_t data);
-	template <std::uint8_t min = (std::numeric_limits<std::uint8_t>::min)(), std::uint8_t max = (std::numeric_limits<std::uint8_t>::max)()>
-	void pack(std::uint8_t data);
-	template <std::int16_t min = (std::numeric_limits<std::int16_t>::min)(), std::int16_t max = (std::numeric_limits<std::int16_t>::max)()>
-	void pack(std::int16_t data);
-	template <std::uint16_t min = (std::numeric_limits<std::uint16_t>::min)(), std::uint16_t max = (std::numeric_limits<std::uint16_t>::max)()>
-	void pack(std::uint16_t data);
-	template <std::int32_t min = (std::numeric_limits<std::int32_t>::min)(), std::int32_t max = (std::numeric_limits<std::int32_t>::max)()>
-	void pack(std::int32_t data);
-	template <std::uint32_t min = (std::numeric_limits<std::uint32_t>::min)(), std::uint32_t max = (std::numeric_limits<std::uint32_t>::max)()>
-	void pack(std::uint32_t data);
-	template <std::int64_t min = (std::numeric_limits<std::int64_t>::min)(), std::int64_t max = (std::numeric_limits<std::int64_t>::max)()>
-	void pack(std::int64_t data);
-	template <std::uint64_t min = (std::numeric_limits<std::uint64_t>::min)(), std::uint64_t max = (std::numeric_limits<std::uint64_t>::max)()>
-	void pack(std::uint64_t data);
-	void pack(bool data);
-	void pack(const std::string & data);
-	void pack(const void * data, std::size_t size, bool alignFirst = true);
-	template <typename T>
-	std::enable_if_t<std::is_enum<T>::value> pack(T data);
-
-	void align();
-
-
-	std::size_t getCurrentBitPos() { return m_bitPos; }
 	void p()
 	{
 		for (char c : m_data)
 			std::cout << std::bitset<8>(c) << " ";
 		std::cout << "\n";
 	}
+
+	void pack_v(bool b)
+	{
+		int intBool = static_cast<int>(b);
+		pack_v(intBool);
+	}
+
+	void pack_v(const std::string & s)
+	{
+		pack_v(s.size());
+		std::size_t start = m_data.size();
+		m_data.resize(start + s.size());
+		std::memcpy(&m_data[start], s.data(), s.size());
+	}
+
+	template <typename F>
+	std::enable_if_t<std::is_floating_point_v<F>> pack_v(F f, int res)
+	{
+		int intFloat = static_cast<int>(std::round(f * res));
+		pack_v(intFloat);
+	}
+
+	template <typename E>
+	std::enable_if_t<std::is_enum_v<E>> pack_v(E e)
+	{
+		std::underlying_type_t<E> intEnum = static_cast<std::underlying_type_t<E>>(e);
+		//std::cout << "intenum: " << intEnum << "\n";
+		pack_v(intEnum);
+	}
+
+
+	template <typename T>
+	std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T>> pack_v(T data)
+	{
+		do
+		{
+			m_data.emplace_back();
+			m_data.back() = data & 0x7f; //pack 7 bits
+			data >>= 7;
+			if (data)
+				m_data.back() |= (1 << 7); //set extend bits
+		} while (data);
+	}
+
+	template <typename T>
+	std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>> pack_v(T data)
+	{
+		m_data.emplace_back();
+
+		//set sign bit if negative
+		if (data < 0)
+			m_data.back() |= 0x40;
+
+		std::make_unsigned_t<T> udata = std::abs(data);
+		//pack 6 bits
+
+		m_data.back() |= udata & 0x3f;
+		udata >>= 6;
+		while (udata)
+		{
+			m_data.back() |= 0x80;
+			m_data.emplace_back();
+			m_data.back() = udata & 0x7f;
+			udata >>= 7;
+		}
+	}
+	
+
 private:
-	void pack8(std::uint8_t data, std::size_t bits);
+	//void pack8(std::uint8_t data, std::size_t bits);
 	std::vector<std::uint8_t> m_data;
 	std::size_t m_bitPos;
 };
@@ -84,43 +124,114 @@ public:
 
 	void setData(const void * data, std::size_t size);
 
-	template <typename T>
-	std::enable_if_t<std::is_integral_v<T>> unpack(T & data, std::size_t bits);
-	template <std::int8_t min = (std::numeric_limits<std::int8_t>::min)(), std::int8_t max = (std::numeric_limits<std::int8_t>::max)()>
-	void unpack(std::int8_t & data);
-	template <std::uint8_t min = (std::numeric_limits<std::uint8_t>::min)(), std::uint8_t max = (std::numeric_limits<std::uint8_t>::max)()>
-	void unpack(std::uint8_t & data);
-	template <std::int16_t min = (std::numeric_limits<std::int16_t>::min)(), std::int16_t max = (std::numeric_limits<std::int16_t>::max)()>
-	void unpack(std::int16_t & data);
-	template <std::uint16_t min = (std::numeric_limits<std::uint16_t>::min)(), std::uint16_t max = (std::numeric_limits<std::uint16_t>::max)()>
-	void unpack(std::uint16_t & data);
-	template <std::int32_t min = (std::numeric_limits<std::int32_t>::min)(), std::int32_t max = (std::numeric_limits<std::int32_t>::max)()>
-	void unpack(std::int32_t & data);
-	template <std::uint32_t min = (std::numeric_limits<std::uint32_t>::min)(), std::uint32_t max = (std::numeric_limits<std::uint32_t>::max)()>
-	void unpack(std::uint32_t & data);
-	template <std::int64_t min = (std::numeric_limits<std::int64_t>::min)(), std::int64_t max = (std::numeric_limits<std::int64_t>::max)()>
-	void unpack(std::int64_t & data);
-	template <std::uint64_t min = (std::numeric_limits<std::uint64_t>::min)(), std::uint64_t max = (std::numeric_limits<std::uint64_t>::max)()>
-	void unpack(std::uint64_t & data);
-	void unpack(bool & data);
-	void unpack(std::string & data);
-	void unpack(void * data, std::size_t size, bool alignFirst = true);
-	template <typename T>
-	std::enable_if_t<std::is_enum<T>::value> unpack(T & data);
-	
-	template <typename T>
-	void peek(T & data, std::size_t bits);
-	void align();
+	bool unpack_v(bool & b)
+	{
+		int intBool;
+		if (!unpack_v(intBool))
+			return false;
+		b = static_cast<bool>(intBool);
+		return true;
+	}
 
-	std::size_t getRemainingBits() { return 8 * m_size - m_bitsRead; }
-	void ununpack(std::size_t bits) { m_bitsRead -= bits; }
+	bool unpack_v(std::string & s)
+	{
+		std::size_t size;
+		if (!unpack_v(size))
+			return false;
+
+		if (m_readPos + size > m_size)
+			return false;
+
+		s.clear();
+		s.resize(size);
+		std::memcpy(&s[0], &m_data[m_readPos], size);
+		m_readPos += size;
+		return true;
+	}
+
+	template <typename F>
+	std::enable_if_t<std::is_floating_point_v<F>, bool> unpack_v(F & f, int res)
+	{
+		int intFloat;
+		if (!unpack_v(intFloat))
+			return false;
+		f = static_cast<float>(intFloat) / res;
+		return true;
+	}
+
+	template <typename E>
+	std::enable_if_t<std::is_enum_v<E>, bool> unpack_v(E & e)
+	{
+		std::underlying_type_t<E> intEnum;
+		if (!unpack_v(intEnum))
+			return false;
+		e = static_cast<E>(intEnum);
+		return true;
+	}
+
+	template <typename T>
+	std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T>, bool> unpack_v(T & data)
+	{
+		data = 0;
+
+		int i = 0;
+		do
+		{
+			if (m_readPos >= m_size)
+				return false;
+
+			data |= (T(m_data[m_readPos] & 0x7f) << (7 * i));
+			if (!(m_data[m_readPos] & 0x80))
+				break;
+
+			m_readPos++;
+			++i;
+
+		} while (true);
+		m_readPos++;
+		return true;
+	}
+
+	template <typename T>
+	std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>, bool> unpack_v(T & data)
+	{
+		if (m_readPos >= m_size)
+			return false;
+
+		int sign = (m_data[m_readPos] >> 6 & 1);
+
+		std::make_unsigned_t<T> udata = 0;
+
+		//read 6 bits
+		udata = m_data[m_readPos] & 0x3f;
+
+		int i = 0;
+		while (m_data[m_readPos] & 0x80)
+		{
+			m_readPos++;
+			if (m_readPos >= m_size)
+				return false;
+
+			udata |= (std::make_unsigned_t<T>(m_data[m_readPos] & 0x7f) << (6 + 7 * i));
+			++i;
+		}
+
+		data = udata;
+		if (sign)
+			data = -data;
+		m_readPos++;
+		return true;
+	}
+
+
+
 private:
-	void unpack8(std::uint8_t & data, std::size_t bits);
-	void check(std::size_t bits);
+
 	const std::uint8_t * m_data;
 	std::size_t m_size;
-	std::size_t m_bitsRead;
+
+	std::size_t m_readPos;
 };
 
 
-#include "Packer.inl"
+//#include "Packer.inl"

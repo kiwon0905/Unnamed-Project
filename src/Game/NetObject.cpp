@@ -74,32 +74,32 @@ NetObject::Type NetHuman::getType() const
 
 void NetHuman::write(Packer & packer) const
 {
-	packer.pack(groundJump); // 1
-	packer.pack(airJump);//1
-	packer.pack<-1, MAX_TICK>(airTick);
-	packer.pack<0, 100>(health); //7
-	packer.pack<0, 500000>(pos.x); // 19
-	packer.pack<0, 500000>(pos.y); //19
-	packer.pack<-500000, 500000>(vel.x); //20
-	packer.pack<-500000, 500000>(vel.y); // 20
+	packer.pack_v(groundJump); // 1
+	packer.pack_v(airJump);//1
+	packer.pack_v(airTick);
+	packer.pack_v(health); //7
+	packer.pack_v(pos.x); // 19
+	packer.pack_v(pos.y); //19
+	packer.pack_v(vel.x); //20
+	packer.pack_v(vel.y); // 20
 
 
-	packer.pack<0, 360>(aimAngle); // 9
+	packer.pack_v(aimAngle); // 9
 }
 
 void NetHuman::read(Unpacker & unpacker)
 {
-	unpacker.unpack(groundJump);
-	unpacker.unpack(airJump);
-	unpacker.unpack<-1, MAX_TICK>(airTick);
-	unpacker.unpack<0, 100>(health);
-	unpacker.unpack<0, 500000>(pos.x);
-	unpacker.unpack<0, 500000>(pos.y);
-	unpacker.unpack<-500000, 500000>(vel.x);
-	unpacker.unpack<-500000, 500000>(vel.y);
+	unpacker.unpack_v(groundJump);
+	unpacker.unpack_v(airJump);
+	unpacker.unpack_v(airTick);
+	unpacker.unpack_v(health);
+	unpacker.unpack_v(pos.x);
+	unpacker.unpack_v(pos.y);
+	unpacker.unpack_v(vel.x);
+	unpacker.unpack_v(vel.y);
 
 
-	unpacker.unpack<0, 360>(aimAngle);
+	unpacker.unpack_v(aimAngle);
 
 }
 
@@ -110,18 +110,18 @@ NetObject::Type NetProjectile::getType() const
 
 void NetProjectile::write(Packer & packer) const
 {
-	packer.pack<0, 500000>(pos.x);
-	packer.pack<0, 500000>(pos.y);
-	packer.pack<-500000, 500000>(vel.x);
-	packer.pack<-500000, 500000>(vel.y);
+	packer.pack_v(pos.x);
+	packer.pack_v(pos.y);
+	packer.pack_v(vel.x);
+	packer.pack_v(vel.y);
 }
 
 void NetProjectile::read(Unpacker & unpacker)
 {
-	unpacker.unpack<0, 500000>(pos.x);
-	unpacker.unpack<0, 500000>(pos.y);
-	unpacker.unpack<-500000, 500000>(vel.x);
-	unpacker.unpack<-500000, 500000>(vel.y);
+	unpacker.unpack_v(pos.x);
+	unpacker.unpack_v(pos.y);
+	unpacker.unpack_v(vel.x);
+	unpacker.unpack_v(vel.y);
 }
 
 NetObject::Type NetZombie::getType() const
@@ -131,18 +131,18 @@ NetObject::Type NetZombie::getType() const
 
 void NetZombie::write(Packer & packer) const
 {
-	packer.pack<0, 500000>(pos.x);
-	packer.pack<0, 500000>(pos.y);
-	packer.pack<-500000, 500000>(vel.x);
-	packer.pack<-500000, 500000>(vel.y);
+	packer.pack_v(pos.x);
+	packer.pack_v(pos.y);
+	packer.pack_v(vel.x);
+	packer.pack_v(vel.y);
 }
 
 void NetZombie::read(Unpacker & unpacker)
 {
-	unpacker.unpack<0, 500000>(pos.x);
-	unpacker.unpack<0, 500000>(pos.y);
-	unpacker.unpack<-500000, 500000>(vel.x);
-	unpacker.unpack<-500000, 500000>(vel.y);
+	unpacker.unpack_v(pos.x);
+	unpacker.unpack_v(pos.y);
+	unpacker.unpack_v(vel.x);
+	unpacker.unpack_v(vel.y);
 }
 
 NetObject::Type NetCrate::getType() const
@@ -152,14 +152,14 @@ NetObject::Type NetCrate::getType() const
 
 void NetCrate::write(Packer & packer) const
 {
-	packer.pack<0, 500000>(pos.x);
-	packer.pack<0, 500000>(pos.y);
+	packer.pack_v(pos.x);
+	packer.pack_v(pos.y);
 }
 
 void NetCrate::read(Unpacker & unpacker)
 {
-	unpacker.unpack<0, 500000>(pos.x);
-	unpacker.unpack<0, 500000>(pos.y);
+	unpacker.unpack_v(pos.x);
+	unpacker.unpack_v(pos.y);
 }
 
 
@@ -183,18 +183,27 @@ NetObject::Type NetPlayerInfo::getType() const
 
 void NetPlayerInfo::write(Packer & packer) const
 {
-	packer.pack(type);
-	packer.pack<0, MAX_ENTITY_ID>(id);
-	packer.pack<0, 1023>(score);
-	packer.pack(team);
+	packer.pack_v(type);
+	packer.pack_v(id);
+	packer.pack_v(score);
+	packer.pack_v(team);
+
+	packer.pack_v(kills);
+	packer.pack_v(deaths);
+	packer.pack_v(assists);
+
 }
 
 void NetPlayerInfo::read(Unpacker & unpacker)
 {
-	unpacker.unpack(type);
-	unpacker.unpack<0, MAX_ENTITY_ID>(id);
-	unpacker.unpack<0, 1023>(score);
-	unpacker.unpack(team);
+	unpacker.unpack_v(type);
+	unpacker.unpack_v(id);
+	unpacker.unpack_v(score);
+	unpacker.unpack_v(team);
+
+	unpacker.unpack_v(kills);
+	unpacker.unpack_v(deaths);
+	unpacker.unpack_v(assists);
 }
 
 NetObject::Type NetExplosion::getType() const
@@ -204,12 +213,12 @@ NetObject::Type NetExplosion::getType() const
 
 void NetExplosion::write(Packer & packer) const
 {
-	packer.pack<0, 500000>(pos.x);
-	packer.pack<0, 500000>(pos.y);
+	packer.pack_v(pos.x);
+	packer.pack_v(pos.y);
 }
 
 void NetExplosion::read(Unpacker & unpacker)
 {
-	unpacker.unpack<0, 500000>(pos.x);
-	unpacker.unpack<0, 500000>(pos.y);
+	unpacker.unpack_v(pos.x);
+	unpacker.unpack_v(pos.y);
 }

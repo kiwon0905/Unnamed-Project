@@ -90,6 +90,51 @@ void Peer::addScore(int score)
 	m_score += score;
 }
 
+int Peer::getKills()
+{
+	return m_kills;
+}
+
+void Peer::setKills(int kills)
+{
+	m_kills = kills;
+}
+
+void Peer::addKills(int kills)
+{
+	m_kills += kills;
+}
+
+int Peer::getDeaths()
+{
+	return m_deaths;
+}
+
+void Peer::setDeaths(int deaths)
+{
+	m_deaths = deaths;
+}
+
+void Peer::addDeaths(int deaths)
+{
+	m_deaths += deaths;
+}
+
+int Peer::getAssists()
+{
+	return m_assists;
+}
+
+void Peer::setAssists(int assists)
+{
+	m_assists = assists;
+}
+
+void Peer::addAssists(int assists)
+{
+	m_assists += assists;
+}
+
 void Peer::onInput(int tick, const NetInput & input)
 {
 	Input i;
@@ -131,7 +176,12 @@ void Peer::snap(Snapshot & snapshot)
 		if (info)
 		{
 			info->score = m_score;
+			info->kills = m_kills;
+			info->deaths = m_deaths;
+			info->assists = m_assists;
+			
 			info->team = m_team;
+
 
 			info->type = m_entity->getType();
 			info->id = m_entity->getId();

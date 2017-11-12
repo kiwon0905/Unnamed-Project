@@ -134,23 +134,31 @@ void MasterServer::finalize()
 void MasterServer::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 {
 	Msg msg;
-	unpacker.unpack(msg);
+	//unpacker.unpack(msg);
+	unpacker.unpack_v(msg);
+	
 	switch (msg)
 	{
 
 	case Msg::SV_SERVER_INFO:
 	{
-		uint16_t pingCheckPort;
+		int pingCheckPort;
 		std::string name;
 		std::string modeName;
 		GameInfo::Status status;
 		int numPlayers;
 		
-		unpacker.unpack(pingCheckPort);
+		/*unpacker.unpack(pingCheckPort);
 		unpacker.unpack(name);
 		unpacker.unpack(modeName);
 		unpacker.unpack(status);
-		unpacker.unpack(int32_t(numPlayers));
+		unpacker.unpack(int32_t(numPlayers));*/
+
+		unpacker.unpack_v(pingCheckPort);
+		unpacker.unpack_v(name);
+		unpacker.unpack_v(modeName);
+		unpacker.unpack_v(status);
+		unpacker.unpack_v(numPlayers);
 		
 		if (m_games.count(peer) == 0)
 		{
@@ -176,14 +184,16 @@ void MasterServer::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 void MasterServer::handlePacket(Unpacker & unpacker, const ENetAddress & addr)
 {
 	Msg msg;
-	unpacker.unpack(msg);
+	//unpacker.unpack(msg);
+	unpacker.unpack_v(msg);
+	
 	if (msg == Msg::CL_REQUEST_INTERNET_SERVER_INFO)
 	{
 		std::string stringAddr;
 		enutil::toString(addr, stringAddr);
 		Logger::getInstance().info("MasterServer", "Received request for internet server list from: " + stringAddr);
 
-		Packer packer;
+		/*Packer packer;
 		packer.pack(Msg::MSV_INTERNET_SERVER_INFO);
 		packer.pack(std::uint32_t(m_games.size()));
 
@@ -197,7 +207,24 @@ void MasterServer::handlePacket(Unpacker & unpacker, const ENetAddress & addr)
 			packer.pack(game.second.modeName);
 			packer.pack(game.second.status);
 			packer.pack(game.second.numPlayers);
+		}*/
+
+		Packer packer;
+		packer.pack_v(Msg::MSV_INTERNET_SERVER_INFO);
+		packer.pack_v(m_games.size());
+		std::cout << "size: " << m_games.size() << "\n";
+		for (const auto & game : m_games)
+		{
+			packer.pack_v(game.first->address.host);
+			packer.pack_v(game.first->address.port);	//game server port
+			packer.pack_v(game.second.pingCheckPort); //ping check port
+			packer.pack_v(game.second.id);
+			packer.pack_v(game.second.name);
+			packer.pack_v(game.second.modeName);
+			packer.pack_v(game.second.status);
+			packer.pack_v(game.second.numPlayers);
 		}
+
 		enutil::send(packer, addr, m_socket);
 	}
 }
