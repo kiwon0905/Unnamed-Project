@@ -117,13 +117,11 @@ PlayingScreen::PlayingScreen()
 void PlayingScreen::onEnter(Client & client)
 {
 	Packer packer;
-	//packer.pack(Msg::CL_REQUEST_PLAYER_INFO);
-	packer.pack_v(Msg::CL_REQUEST_PLAYER_INFO);
+	packer.pack(Msg::CL_REQUEST_PLAYER_INFO);
 	client.getNetwork().send(packer, true);
 
 	Packer packer2;
-	//packer2.pack(Msg::CL_REQUEST_GAME_INFO);
-	packer2.pack_v(Msg::CL_REQUEST_GAME_INFO);
+	packer2.pack(Msg::CL_REQUEST_GAME_INFO);
 	client.getNetwork().send(packer2, true);
 
 	float verticleCameraSize = 2000.f;
@@ -155,8 +153,8 @@ void PlayingScreen::onEnter(Client & client)
 		if (chat != "")
 		{
 			Packer packer;
-			packer.pack_v(Msg::CL_CHAT);
-			packer.pack_v(m_editBox->getText().toAnsiString());
+			packer.pack(Msg::CL_CHAT);
+			packer.pack(m_editBox->getText().toAnsiString());
 			client.getNetwork().send(packer, true);
 			m_editBox->setText("");
 		}
@@ -238,30 +236,22 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		Unpacker unpacker(netEv.packet->data, netEv.packet->dataLength);
 
 		Msg msg;
-		//unpacker.unpack(msg);
-		unpacker.unpack_v(msg);
+		unpacker.unpack(msg);
 
 		if (msg == Msg::SV_PLAYER_INFO)
 		{
 			std::size_t numPlayers;
-			//unpacker.unpack<0, MAX_PEER_ID>(numPlayers);
-			//unpacker.unpack<0, MAX_PEER_ID>(m_myPlayerId);
 			
-			unpacker.unpack_v(numPlayers);
-			unpacker.unpack_v(m_myPlayerId);
+			unpacker.unpack(numPlayers);
+			unpacker.unpack(m_myPlayerId);
 			std::cout << "total " << numPlayers << " players\n";
 			std::cout << "my player id: " << m_myPlayerId << "\n";
 
 			for (std::size_t i = 0; i < numPlayers; ++i)
 			{
 				PlayerInfo info;
-				
-				//unpacker.unpack<0, MAX_PEER_ID>(info.id);
-				//unpacker.unpack(info.name);
-				
-				unpacker.unpack_v(info.id);
-				unpacker.unpack_v(info.name);
-
+				unpacker.unpack(info.id);
+				unpacker.unpack(info.name);
 				m_players.push_back(info);
 				std::cout << info.id << ": " << info.name << "\n";
 			}
@@ -270,11 +260,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		else if (msg == Msg::SV_GAME_INFO)
 		{
 			std::string mapName;
-			//int numPlayer;
-			//NetObject::Type playerEntityType;
-
-			//unpacker.unpack(mapName);
-			unpacker.unpack_v(mapName);
+			unpacker.unpack(mapName);
 
 			//load map
 			m_map.loadFromFile("map/" + mapName + ".xml");
@@ -315,7 +301,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 
 			//send ack
 			Packer packer;
-			packer.pack_v(Msg::CL_LOAD_COMPLETE);
+			packer.pack(Msg::CL_LOAD_COMPLETE);
 			client.getNetwork().send(packer, true);
 			Logger::getInstance().info("PlayingScreen", "Loading complete. Entering game...");
 			m_state = ENTERING;
@@ -328,7 +314,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			
 
 			int serverTick;
-			unpacker.unpack_v(serverTick);
+			unpacker.unpack(serverTick);
 			if (m_lastRecvTick >= serverTick)
 				return;
 
@@ -336,7 +322,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			if (msg == Msg::SV_DELTA_SNAPSHOT)
 			{
 				int deltaTick;
-				unpacker.unpack_v(deltaTick);
+				unpacker.unpack(deltaTick);
 				
 				const Snapshot * deltaSnapshot = m_snapshots.get(deltaTick);
 				if (!deltaSnapshot)
@@ -391,8 +377,8 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		{
 			int inputTick;
 			int32_t timeLeft;
-			unpacker.unpack_v(inputTick);
-			unpacker.unpack_v(timeLeft);
+			unpacker.unpack(inputTick);
+			unpacker.unpack(timeLeft);
 			for (const auto & input : m_inputs)
 			{
 				if (input.tick == inputTick)
@@ -407,7 +393,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		else if (msg == Msg::SV_ROUND_OVER)
 		{
 			Team winner;
-			unpacker.unpack_v(winner);
+			unpacker.unpack(winner);
 			if (winner == Team::NONE)
 				std::cout << "DRAW!\n";
 			else if (winner == Team::A)
@@ -423,9 +409,9 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			int tick;
 			int id;
 			std::string msg;
-			unpacker.unpack_v(tick);
-			unpacker.unpack_v(id);
-			unpacker.unpack_v(msg);
+			unpacker.unpack(tick);
+			unpacker.unpack(id);
+			unpacker.unpack(msg);
 
 			const PlayerInfo * info = getPlayerInfo(int(id));
 
@@ -444,7 +430,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		else if (msg == Msg::SV_PLAYER_LEFT)
 		{
 			int id;
-			unpacker.unpack_v(id);
+			unpacker.unpack(id);
 			const PlayerInfo * info = getPlayerInfo(id);
 			if (info)
 			{
@@ -458,8 +444,8 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		else if (msg == Msg::SV_KILL_FEED)
 		{
 			int killedPeerId, killerPeerId;
-			unpacker.unpack_v(killedPeerId);
-			unpacker.unpack_v(killerPeerId);
+			unpacker.unpack(killedPeerId);
+			unpacker.unpack(killerPeerId);
 
 
 			const PlayerInfo * killedPeerInfo = getPlayerInfo(killedPeerId);
@@ -526,7 +512,6 @@ void PlayingScreen::update(Client & client)
 			if(!m_editBox->isFocused())
 				input = client.getInput().getInput(client.getWindow(), m_view);
 		
-			std::cout <<"play: " << input.aimDirection.x <<", "<<input.aimDirection.y << "\n";
 			//save the input
 			m_inputs[m_currentInputIndex].tick = m_predictedTick;
 			m_inputs[m_currentInputIndex].input = input;
@@ -537,9 +522,9 @@ void PlayingScreen::update(Client & client)
 
 			//send to server
 			Packer packer;
-			packer.pack_v(Msg::CL_INPUT);
-			packer.pack_v(m_predictedTick);
-			packer.pack_v(m_lastRecvTick);
+			packer.pack(Msg::CL_INPUT);
+			packer.pack(m_predictedTick);
+			packer.pack(m_lastRecvTick);
 			input.write(packer);
 
 			client.getNetwork().send(packer, false);

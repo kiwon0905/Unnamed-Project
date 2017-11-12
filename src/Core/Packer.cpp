@@ -18,82 +18,24 @@ std::size_t Packer::getDataSize() const
 {
 	return m_data.size();
 }
-/*
-void Packer::pack(bool data)
+
+void Packer::pack(bool b)
 {
-	pack8(static_cast<std::uint8_t>(data), 1);
+	int intBool = static_cast<int>(b);
+	pack(intBool);
 }
 
-void Packer::pack(const std::string & data)
+void Packer::pack(const std::string & s)
 {
-	std::uint32_t length = static_cast<std::uint32_t>(data.size());
-	pack(length, 32);
-	if (length)
-		pack(data.data(), length);
-
+	pack(s.size());
+	std::size_t start = m_data.size();
+	m_data.resize(start + s.size());
+	std::memcpy(&m_data[start], s.data(), s.size());
 }
-
-void Packer::pack(const void * data, std::size_t size, bool alignFirst)
-{
-	if (alignFirst)
-	{
-		align();
-		std::size_t start = m_data.size();
-		m_data.resize(start + size);
-		std::memcpy(&m_data[start], data, size);
-	}
-	else
-	{
-		const std::uint8_t * d = static_cast<const std::uint8_t*>(data);
-		for (std::size_t i = 0; i < size; ++i)
-		{
-			pack8(d[i], 8);
-		}
-	}
-}
-
-void Packer::align()
-{
-	if (m_bitPos)
-		pack8(0, 8 - m_bitPos);
-}
-
-void Packer::pack8(std::uint8_t data, std::size_t bits)
-{
-	if (bits == 0)
-		return;
-
-	assert(bits <= 8);
-	
-	if (m_bitPos == 0)
-		m_data.push_back(0);
-
-	data &= (std::uint8_t(1) << bits) - 1;
-
-	std::size_t firstBits = std::min(8 - m_bitPos, bits);
-	std::uint8_t firstVal = data << (8 - bits);
-	firstVal >>= m_bitPos;
-	m_data.back() |= firstVal;
-	
-	m_bitPos += bits;
-	if (m_bitPos >= 8)
-		m_bitPos -= 8;
-
-	bits -= firstBits;
-	if (bits)
-	{
-		std::uint8_t secondVal = data & (1 << bits) - 1;
-		secondVal <<= (8 - bits);
-		m_data.push_back(0);
-		m_data.back() |= secondVal;
-	}
-}*/
-
 
 Unpacker::Unpacker(const void * data, std::size_t size) :
 	m_data(static_cast<const std::uint8_t*>(data)),
 	m_size(size),
-	//m_bitsRead(0),
 	m_readPos(0)
 {
 }
@@ -107,85 +49,29 @@ void Unpacker::setData(const void * data, std::size_t size)
 {
 	m_data = static_cast<const std::uint8_t*>(data);
 	m_size = size;
-	//m_bitsRead = 0;
 }
 
-/*
-void Unpacker::unpack(bool & data)
+bool Unpacker::unpack(bool & b)
 {
-	std::uint8_t val;
-	unpack8(val, 1);
-	data = (val != 0);
+	int intBool;
+	if (!unpack(intBool))
+		return false;
+	b = static_cast<bool>(intBool);
+	return true;
 }
 
-void Unpacker::unpack(std::string & data)
+bool Unpacker::unpack(std::string & s)
 {
-	std::uint32_t length;
-	unpack(length, 32);
-	data.clear();
-	data.resize(length);
-	unpack(reinterpret_cast<std::uint8_t*>(&data[0]), length);
+	std::size_t size;
+	if (!unpack(size))
+		return false;
+
+	if (m_readPos + size > m_size)
+		return false;
+
+	s.clear();
+	s.resize(size);
+	std::memcpy(&s[0], &m_data[m_readPos], size);
+	m_readPos += size;
+	return true;
 }
-
-void Unpacker::unpack(void * data, std::size_t size, bool alignFirst)
-{
-	if (alignFirst)
-	{
-		align();
-		check(8 * size);
-		std::memcpy(data, &m_data[m_bitsRead / 8], size);
-		m_bitsRead += 8 * size;
-	}
-	else
-	{
-		std::uint8_t * d = static_cast<std::uint8_t *>(data);
-		for (std::size_t i = 0; i < size; ++i)
-		{
-			unpack8(d[i], 8);
-		}
-	}
-
-}
-
-void Unpacker::align()
-{
-	if (m_bitsRead % 8)
-	{
-		std::uint8_t a;
-		unpack8(a, 8 - m_bitsRead % 8);
-	}
-}
-
-void Unpacker::unpack8(std::uint8_t & data, std::size_t bits)
-{
-	if (bits == 0)
-		return;
-
-	assert(bits <= 8);
-	check(bits);
-
-	data = 0;
-	std::size_t firstBits = std::min(8 - m_bitsRead % 8, bits);
-	data = m_data[m_bitsRead / 8] >> (8 - firstBits - m_bitsRead % 8);
-	data &= (std::uint8_t(1) << firstBits) - 1;
-	
-
-	m_bitsRead += firstBits;
-
-	bits -= firstBits;
-
-	if (bits > 0)
-	{
-		data <<= bits;
-		std::uint8_t secondVal = m_data[m_bitsRead / 8];
-		secondVal &= 0xFF << (8 - bits);
-		secondVal >>= (8 - bits);
-		data |= secondVal;
-		m_bitsRead += bits;
-	}
-}
-
-void Unpacker::check(std::size_t bits)
-{
-	assert(m_bitsRead + bits <= 8 * m_size && "attempt to read more than available");
-}*/

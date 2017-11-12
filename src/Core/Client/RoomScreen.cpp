@@ -18,7 +18,7 @@ void RoomScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 	{
 		Unpacker unpacker(netEv.packet->data, netEv.packet->dataLength);
 		Msg msg;
-		unpacker.unpack_v(msg);
+		unpacker.unpack(msg);
 		if (msg == Msg::SV_LOAD_GAME)
 			client.getScreenStack().push(new PlayingScreen);
 	}

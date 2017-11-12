@@ -1,183 +1,124 @@
-template <typename T>
-std::enable_if_t<std::is_integral_v<T>> Packer::pack(T data, std::size_t bits)
+template <typename F>
+std::enable_if_t<std::is_floating_point_v<F>> Packer::pack(F f, int res)
 {
-	std::uint8_t * p = reinterpret_cast<std::uint8_t*>(&data);
-	while (bits >= 8)
-	{
-		pack8(*p, 8);
-		p++;
-		bits -= 8;
-	}
-	pack8(*p, bits);
+	int intFloat = static_cast<int>(std::round(f * res));
+	pack(intFloat);
 }
 
-template <std::int8_t min, std::int8_t max>
-void Packer::pack(std::int8_t data)
+template <typename E>
+std::enable_if_t<std::is_enum_v<E>> Packer::pack(E e)
 {
-	const int bits = BitsRequired<min, max>::result;
-	uint8_t unsignedValue = data - min;
-	pack(unsignedValue, bits);
-}
-
-template <std::uint8_t min, std::uint8_t max>
-void Packer::pack(std::uint8_t data)
-{
-	const int bits = BitsRequired<min, max>::result;
-	pack(data, bits);
-}
-
-template <std::int16_t min, std::int16_t max>
-void Packer::pack(std::int16_t data)
-{
-	const int bits = BitsRequired<min, max>::result;
-	uint16_t unsignedValue = data - min;
-	pack(unsignedValue, bits);
-}
-
-template <std::uint16_t min, std::uint16_t max>
-void Packer::pack(std::uint16_t data)
-{
-	const int bits = BitsRequired<min, max>::result;
-	pack(data, bits);
-}
-
-template <int32_t min, int32_t max>
-void Packer::pack(std::int32_t data)
-{
-	const int bits = BitsRequired<min, max>::result;
-	uint32_t unsignedValue = data - min;
-	pack(unsignedValue, bits);
-}
-
-template <uint32_t min, uint32_t max>
-void Packer::pack(std::uint32_t data)
-{
-	const int bits = BitsRequired<min, max>::result;
-	pack(data, bits);
-}
-
-template<std::int64_t min, std::int64_t max>
-inline void Packer::pack(std::int64_t data)
-{
-	const int bits = BitsRequired<min, max>::result;
-	uint64_t unsignedValue = data - min;
-	pack(unsignedValue, bits);
-}
-
-template<std::uint64_t min, std::uint64_t max>
-inline void Packer::pack(std::uint64_t data)
-{
-	const int bits = BitsRequired<min, max>::result;
-	pack(data, bits);
-}
-
-template<typename T>
-inline std::enable_if_t<std::is_enum<T>::value> Packer::pack(T data)
-{
-	const int bits = BitsRequired<0, static_cast<std::uint64_t>(T::COUNT)>::result;
-	pack(static_cast<std::uint32_t>(data), bits);
-}
-
-template<typename T>
-inline std::enable_if_t<std::is_integral_v<T>> Unpacker::unpack(T & data, std::size_t bits)
-{
-	T value = 0;
-	std::uint8_t * p = reinterpret_cast<std::uint8_t*>(&value);
-	while (bits >= 8)
-	{
-		std::uint8_t val;
-		unpack8(val, 8);
-		*p |= val;
-		p++;
-		bits -= 8;
-	}
-	std::uint8_t val = 0;
-	unpack8(val, bits);
-	*p |= val;
-	data = value;
-}
-
-
-template <std::int8_t min, std::int8_t max>
-void Unpacker::unpack(std::int8_t & data)
-{
-	const int bits = BitsRequired<min, max>::result;
-	uint8_t unsignedValue;
-	unpack(unsignedValue, bits);
-	int8_t value = (int8_t)unsignedValue + min;
-	data = value;
-}
-
-template <std::uint8_t min, std::uint8_t max>
-void Unpacker::unpack(std::uint8_t & data)
-{
-	const int bits = BitsRequired<min, max>::result;
-	unpack(data, bits);
-}
-
-template <std::int16_t min, std::int16_t max>
-void Unpacker::unpack(std::int16_t & data)
-{
-	const int bits = BitsRequired<min, max>::result;
-	uint16_t unsignedValue;
-	unpack(unsignedValue, bits);
-	int16_t value = (int16_t)unsignedValue + min;
-	data = value;
-}
-
-template <std::uint16_t min, std::uint16_t max>
-void Unpacker::unpack(std::uint16_t & data)
-{
-	const int bits = BitsRequired<min, max>::result;
-	unpack(data, bits);
-}
-
-template <int32_t min, int32_t max>
-void Unpacker::unpack(std::int32_t & data)
-{
-	const int bits = BitsRequired<min, max>::result;
-	uint32_t unsignedValue;
-	unpack(unsignedValue, bits);
-	int32_t value = (int32_t)unsignedValue + min;
-	data = value;
-}
-
-template <uint32_t min, uint32_t max>
-void Unpacker::unpack(std::uint32_t & data)
-{
-	const int bits = BitsRequired<min, max>::result;
-	unpack(data, bits);
-}
-
-template<std::int64_t min, std::int64_t max>
-inline void Unpacker::unpack(std::int64_t & data)
-{
-	const int bits = BitsRequired<min, max>::result;
-	uint64_t unsignedValue;
-	unpack(unsignedValue, bits);
-	int64_t value = (int64_t)unsignedValue + min;
-	data = value;
-}
-
-template<std::uint64_t min, std::uint64_t max>
-inline void Unpacker::unpack(std::uint64_t & data)
-{
-	const int bits = BitsRequired<min, max>::result;
-	unpack(data, bits);
-}
-
-template<typename T>
-inline std::enable_if_t<std::is_enum<T>::value> Unpacker::unpack(T & data)
-{
-	std::uint32_t intEnum;
-	unpack<0, static_cast<std::uint32_t>(T::COUNT)>(intEnum);
-	data = static_cast<T>(intEnum);
+	std::underlying_type_t<E> intEnum = static_cast<std::underlying_type_t<E>>(e);
+	pack(intEnum);
 }
 
 template <typename T>
-inline void Unpacker::peek(T & data, std::size_t bits)
+std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T>> Packer::pack(T data)
 {
-	std::size_t prevBitsRead = m_bitsRead;
-	unpack(data, bits);
-	m_bitsRead = prevBitsRead;
+	do
+	{
+		m_data.emplace_back();
+		m_data.back() = data & 0x7f; //pack 7 bits
+		data >>= 7;
+		if (data)
+			m_data.back() |= (1 << 7); //set extend bits
+	} while (data);
 }
+
+template <typename T>
+std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>> Packer::pack(T data)
+{
+	m_data.emplace_back();
+
+	//set sign bit if negative
+	if (data < 0)
+		m_data.back() |= 0x40;
+
+	std::make_unsigned_t<T> udata = std::abs(data);
+	//pack 6 bits
+
+	m_data.back() |= udata & 0x3f;
+	udata >>= 6;
+	while (udata)
+	{
+		m_data.back() |= 0x80;
+		m_data.emplace_back();
+		m_data.back() = udata & 0x7f;
+		udata >>= 7;
+	}
+}
+
+template <typename F>
+std::enable_if_t<std::is_floating_point_v<F>, bool> Unpacker::unpack(F & f, int res)
+{
+	int intFloat;
+	if (!unpack(intFloat))
+		return false;
+	f = static_cast<float>(intFloat) / res;
+	return true;
+}
+
+template <typename E>
+std::enable_if_t<std::is_enum_v<E>, bool> Unpacker::unpack(E & e)
+{
+	std::underlying_type_t<E> intEnum;
+	if (!unpack(intEnum))
+		return false;
+	e = static_cast<E>(intEnum);
+	return true;
+}
+
+template <typename T>
+std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T>, bool> Unpacker::unpack(T & data)
+{
+	data = 0;
+
+	int i = 0;
+	do
+	{
+		if (m_readPos >= m_size)
+			return false;
+
+		data |= (T(m_data[m_readPos] & 0x7f) << (7 * i));
+		if (!(m_data[m_readPos] & 0x80))
+			break;
+
+		m_readPos++;
+		++i;
+
+	} while (true);
+	m_readPos++;
+	return true;
+}
+
+template <typename T>
+std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>, bool> Unpacker::unpack(T & data)
+{
+	if (m_readPos >= m_size)
+		return false;
+
+	int sign = (m_data[m_readPos] >> 6 & 1);
+
+	std::make_unsigned_t<T> udata = 0;
+
+	//read 6 bits
+	udata = m_data[m_readPos] & 0x3f;
+
+	int i = 0;
+	while (m_data[m_readPos] & 0x80)
+	{
+		m_readPos++;
+		if (m_readPos >= m_size)
+			return false;
+
+		udata |= (std::make_unsigned_t<T>(m_data[m_readPos] & 0x7f) << (6 + 7 * i));
+		++i;
+	}
+
+	data = udata;
+	if (sign)
+		data = -data;
+	m_readPos++;
+	return true;
+}
+

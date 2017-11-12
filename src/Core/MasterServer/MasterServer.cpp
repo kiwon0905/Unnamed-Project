@@ -135,7 +135,7 @@ void MasterServer::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 {
 	Msg msg;
 	//unpacker.unpack(msg);
-	unpacker.unpack_v(msg);
+	unpacker.unpack(msg);
 	
 	switch (msg)
 	{
@@ -154,11 +154,11 @@ void MasterServer::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 		unpacker.unpack(status);
 		unpacker.unpack(int32_t(numPlayers));*/
 
-		unpacker.unpack_v(pingCheckPort);
-		unpacker.unpack_v(name);
-		unpacker.unpack_v(modeName);
-		unpacker.unpack_v(status);
-		unpacker.unpack_v(numPlayers);
+		unpacker.unpack(pingCheckPort);
+		unpacker.unpack(name);
+		unpacker.unpack(modeName);
+		unpacker.unpack(status);
+		unpacker.unpack(numPlayers);
 		
 		if (m_games.count(peer) == 0)
 		{
@@ -185,7 +185,7 @@ void MasterServer::handlePacket(Unpacker & unpacker, const ENetAddress & addr)
 {
 	Msg msg;
 	//unpacker.unpack(msg);
-	unpacker.unpack_v(msg);
+	unpacker.unpack(msg);
 	
 	if (msg == Msg::CL_REQUEST_INTERNET_SERVER_INFO)
 	{
@@ -210,19 +210,19 @@ void MasterServer::handlePacket(Unpacker & unpacker, const ENetAddress & addr)
 		}*/
 
 		Packer packer;
-		packer.pack_v(Msg::MSV_INTERNET_SERVER_INFO);
-		packer.pack_v(m_games.size());
+		packer.pack(Msg::MSV_INTERNET_SERVER_INFO);
+		packer.pack(m_games.size());
 		std::cout << "size: " << m_games.size() << "\n";
 		for (const auto & game : m_games)
 		{
-			packer.pack_v(game.first->address.host);
-			packer.pack_v(game.first->address.port);	//game server port
-			packer.pack_v(game.second.pingCheckPort); //ping check port
-			packer.pack_v(game.second.id);
-			packer.pack_v(game.second.name);
-			packer.pack_v(game.second.modeName);
-			packer.pack_v(game.second.status);
-			packer.pack_v(game.second.numPlayers);
+			packer.pack(game.first->address.host);
+			packer.pack(game.first->address.port);	//game server port
+			packer.pack(game.second.pingCheckPort); //ping check port
+			packer.pack(game.second.id);
+			packer.pack(game.second.name);
+			packer.pack(game.second.modeName);
+			packer.pack(game.second.status);
+			packer.pack(game.second.numPlayers);
 		}
 
 		enutil::send(packer, addr, m_socket);

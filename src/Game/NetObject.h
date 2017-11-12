@@ -38,7 +38,7 @@ public:
 	void readRelative(Unpacker & unpacker, const NetObject & o);
 	NetObject * clone() const;
 
-	std::vector<char> data;
+	std::vector<uint8_t> data;
 	Type(*getTypeFunc)(const void *);
 	void(*writeFunc)(const void *, Packer &);
 	void(*readFunc)(void *, Unpacker &);

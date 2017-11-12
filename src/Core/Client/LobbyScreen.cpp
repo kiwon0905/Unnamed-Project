@@ -257,8 +257,7 @@ void LobbyScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 	{
 		Unpacker unpacker(netEv.packet->data, netEv.packet->dataLength);
 		Msg msg;
-		//unpacker.unpack(msg);
-		unpacker.unpack_v(msg);
+		unpacker.unpack(msg);
 		if (msg == Msg::SV_ACCEPT_JOIN)
 		{
 			Logger::getInstance().info("LobbyScreen", "Joined game");
@@ -278,12 +277,9 @@ void LobbyScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		{
 			Logger::getInstance().info("LobbyScreen", "Connected to game server");
 			Packer packer;
-			
-			//packer.pack(Msg::CL_REQUEST_JOIN_GAME);
-			//packer.pack(name);
 
-			packer.pack_v(Msg::CL_REQUEST_JOIN_GAME);
-			packer.pack_v(name);
+			packer.pack(Msg::CL_REQUEST_JOIN_GAME);
+			packer.pack(name);
 
 			client.getNetwork().send(packer, true);
 		}
@@ -298,8 +294,7 @@ void LobbyScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 void LobbyScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & addr, Client & client)
 {
 	Msg msg;
-	//unpacker.unpack(msg);
-	unpacker.unpack_v(msg);
+	unpacker.unpack(msg);
 	if (client.getMasterServerAddress() && client.getMasterServerAddress()->host == addr.host && client.getMasterServerAddress()->port == addr.port)
 	{
 		std::cout << "msg: " << (int)msg << "\n";
@@ -308,9 +303,9 @@ void LobbyScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & addr,
 		{
 			m_internetGames.clear();
 			
-			/*uint32_t count;
+			std::size_t count;
 			unpacker.unpack(count);
-
+			std::cout << "count: " << count << "\n";
 			for (std::size_t i = 0; i < count; ++i)
 			{
 				GameInfo info;
@@ -322,24 +317,6 @@ void LobbyScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & addr,
 				unpacker.unpack(info.modeName);
 				unpacker.unpack(info.status);
 				unpacker.unpack(info.numPlayers);
-				m_internetGames.push_back(info);
-
-			}*/
-
-			std::size_t count;
-			unpacker.unpack_v(count);
-			std::cout << "count: " << count << "\n";
-			for (std::size_t i = 0; i < count; ++i)
-			{
-				GameInfo info;
-				unpacker.unpack_v(info.addr.host);
-				unpacker.unpack_v(info.addr.port);	//game server port
-				unpacker.unpack_v(info.pingCheckPort); // ping check port
-				unpacker.unpack_v(info.id);
-				unpacker.unpack_v(info.name);
-				unpacker.unpack_v(info.modeName);
-				unpacker.unpack_v(info.status);
-				unpacker.unpack_v(info.numPlayers);
 				m_internetGames.push_back(info);
 			}
 
@@ -461,12 +438,8 @@ void LobbyScreen::requestInternetGamesInfo(Client & client)
 	const ENetAddress * masterAddr = client.getMasterServerAddress();
 	if (masterAddr)
 	{
-		/*Packer packer;
-		packer.pack(Msg::CL_REQUEST_INTERNET_SERVER_INFO);
-		client.getNetwork().send(packer, *masterAddr);*/
-
 		Packer packer;
-		packer.pack_v(Msg::CL_REQUEST_INTERNET_SERVER_INFO);
+		packer.pack(Msg::CL_REQUEST_INTERNET_SERVER_INFO);
 		client.getNetwork().send(packer, *masterAddr);
 	}
 }
@@ -604,7 +577,7 @@ void LobbyScreen::loadNextMusic()
 void LobbyScreen::checkPing(Client & client)
 {
 	Packer packer;
-	packer.pack_v(Msg::CL_PING);
+	packer.pack(Msg::CL_PING);
 	for (auto & g : m_internetGames)
 	{
 		ENetAddress addr = g.addr;

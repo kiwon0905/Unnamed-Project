@@ -9,6 +9,11 @@
 class Snapshot
 {
 public:
+	enum
+	{
+		MAX_ITEM_SIZE = 1023
+	};
+
 	struct Key
 	{
 		int id;

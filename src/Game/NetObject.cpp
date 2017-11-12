@@ -74,32 +74,32 @@ NetObject::Type NetHuman::getType() const
 
 void NetHuman::write(Packer & packer) const
 {
-	packer.pack_v(groundJump); // 1
-	packer.pack_v(airJump);//1
-	packer.pack_v(airTick);
-	packer.pack_v(health); //7
-	packer.pack_v(pos.x); // 19
-	packer.pack_v(pos.y); //19
-	packer.pack_v(vel.x); //20
-	packer.pack_v(vel.y); // 20
+	packer.pack(groundJump); // 1
+	packer.pack(airJump);//1
+	packer.pack(airTick);
+	packer.pack(health); //7
+	packer.pack(pos.x); // 19
+	packer.pack(pos.y); //19
+	packer.pack(vel.x); //20
+	packer.pack(vel.y); // 20
 
 
-	packer.pack_v(aimAngle); // 9
+	packer.pack(aimAngle); // 9
 }
 
 void NetHuman::read(Unpacker & unpacker)
 {
-	unpacker.unpack_v(groundJump);
-	unpacker.unpack_v(airJump);
-	unpacker.unpack_v(airTick);
-	unpacker.unpack_v(health);
-	unpacker.unpack_v(pos.x);
-	unpacker.unpack_v(pos.y);
-	unpacker.unpack_v(vel.x);
-	unpacker.unpack_v(vel.y);
+	unpacker.unpack(groundJump);
+	unpacker.unpack(airJump);
+	unpacker.unpack(airTick);
+	unpacker.unpack(health);
+	unpacker.unpack(pos.x);
+	unpacker.unpack(pos.y);
+	unpacker.unpack(vel.x);
+	unpacker.unpack(vel.y);
 
 
-	unpacker.unpack_v(aimAngle);
+	unpacker.unpack(aimAngle);
 
 }
 
@@ -110,18 +110,18 @@ NetObject::Type NetProjectile::getType() const
 
 void NetProjectile::write(Packer & packer) const
 {
-	packer.pack_v(pos.x);
-	packer.pack_v(pos.y);
-	packer.pack_v(vel.x);
-	packer.pack_v(vel.y);
+	packer.pack(pos.x);
+	packer.pack(pos.y);
+	packer.pack(vel.x);
+	packer.pack(vel.y);
 }
 
 void NetProjectile::read(Unpacker & unpacker)
 {
-	unpacker.unpack_v(pos.x);
-	unpacker.unpack_v(pos.y);
-	unpacker.unpack_v(vel.x);
-	unpacker.unpack_v(vel.y);
+	unpacker.unpack(pos.x);
+	unpacker.unpack(pos.y);
+	unpacker.unpack(vel.x);
+	unpacker.unpack(vel.y);
 }
 
 NetObject::Type NetZombie::getType() const
@@ -131,18 +131,18 @@ NetObject::Type NetZombie::getType() const
 
 void NetZombie::write(Packer & packer) const
 {
-	packer.pack_v(pos.x);
-	packer.pack_v(pos.y);
-	packer.pack_v(vel.x);
-	packer.pack_v(vel.y);
+	packer.pack(pos.x);
+	packer.pack(pos.y);
+	packer.pack(vel.x);
+	packer.pack(vel.y);
 }
 
 void NetZombie::read(Unpacker & unpacker)
 {
-	unpacker.unpack_v(pos.x);
-	unpacker.unpack_v(pos.y);
-	unpacker.unpack_v(vel.x);
-	unpacker.unpack_v(vel.y);
+	unpacker.unpack(pos.x);
+	unpacker.unpack(pos.y);
+	unpacker.unpack(vel.x);
+	unpacker.unpack(vel.y);
 }
 
 NetObject::Type NetCrate::getType() const
@@ -152,14 +152,14 @@ NetObject::Type NetCrate::getType() const
 
 void NetCrate::write(Packer & packer) const
 {
-	packer.pack_v(pos.x);
-	packer.pack_v(pos.y);
+	packer.pack(pos.x);
+	packer.pack(pos.y);
 }
 
 void NetCrate::read(Unpacker & unpacker)
 {
-	unpacker.unpack_v(pos.x);
-	unpacker.unpack_v(pos.y);
+	unpacker.unpack(pos.x);
+	unpacker.unpack(pos.y);
 }
 
 
@@ -183,27 +183,27 @@ NetObject::Type NetPlayerInfo::getType() const
 
 void NetPlayerInfo::write(Packer & packer) const
 {
-	packer.pack_v(type);
-	packer.pack_v(id);
-	packer.pack_v(score);
-	packer.pack_v(team);
+	packer.pack(type);
+	packer.pack(id);
+	packer.pack(score);
+	packer.pack(team);
 
-	packer.pack_v(kills);
-	packer.pack_v(deaths);
-	packer.pack_v(assists);
+	packer.pack(kills);
+	packer.pack(deaths);
+	packer.pack(assists);
 
 }
 
 void NetPlayerInfo::read(Unpacker & unpacker)
 {
-	unpacker.unpack_v(type);
-	unpacker.unpack_v(id);
-	unpacker.unpack_v(score);
-	unpacker.unpack_v(team);
+	unpacker.unpack(type);
+	unpacker.unpack(id);
+	unpacker.unpack(score);
+	unpacker.unpack(team);
 
-	unpacker.unpack_v(kills);
-	unpacker.unpack_v(deaths);
-	unpacker.unpack_v(assists);
+	unpacker.unpack(kills);
+	unpacker.unpack(deaths);
+	unpacker.unpack(assists);
 }
 
 NetObject::Type NetExplosion::getType() const
@@ -213,12 +213,12 @@ NetObject::Type NetExplosion::getType() const
 
 void NetExplosion::write(Packer & packer) const
 {
-	packer.pack_v(pos.x);
-	packer.pack_v(pos.y);
+	packer.pack(pos.x);
+	packer.pack(pos.y);
 }
 
 void NetExplosion::read(Unpacker & unpacker)
 {
-	unpacker.unpack_v(pos.x);
-	unpacker.unpack_v(pos.y);
+	unpacker.unpack(pos.x);
+	unpacker.unpack(pos.y);
 }

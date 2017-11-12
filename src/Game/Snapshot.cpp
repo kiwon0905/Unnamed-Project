@@ -27,7 +27,7 @@ const void * Snapshot::getEntity(NetObject::Type type, int id) const
 
 void * Snapshot::addEntity(NetObject::Type type, int id)
 {
-	if(m_entities.size() + m_transients.size() >= MAX_SNAPSHOT_ITEM_SIZE)
+	if(m_entities.size() + m_transients.size() >= MAX_ITEM_SIZE)
 		return nullptr;
 
 	Key key;
@@ -41,7 +41,7 @@ void * Snapshot::addEntity(NetObject::Type type, int id)
 
 void * Snapshot::addTransient(NetObject::Type type)
 {
-	if (m_entities.size() + m_transients.size() >= MAX_SNAPSHOT_ITEM_SIZE)
+	if (m_entities.size() + m_transients.size() >= MAX_ITEM_SIZE)
 		return nullptr;
 	NetObject * event = NetObject::create(type);
 	m_transients.emplace_back(event);
@@ -51,14 +51,14 @@ void * Snapshot::addTransient(NetObject::Type type)
 void Snapshot::read(Unpacker & unpacker)
 {
 	int numItems;
-	unpacker.unpack_v(numItems);
+	unpacker.unpack(numItems);
 
 	//read all the types
 	std::vector<NetObject::Type> types;
 	for (int i = 0; i < numItems; ++i)
 	{
 		NetObject::Type type;
-		unpacker.unpack_v(type);
+		unpacker.unpack(type);
 		types.push_back(type);
 	}
 
@@ -68,7 +68,7 @@ void Snapshot::read(Unpacker & unpacker)
 		if (type < NetObject::ENTITY_COUNT)
 		{
 			int id;
-			unpacker.unpack_v(id);
+			unpacker.unpack(id);
 
 			Key key;
 			key.id = id;
@@ -88,20 +88,20 @@ void Snapshot::read(Unpacker & unpacker)
 
 void Snapshot::write(Packer & packer)
 {
-	packer.pack_v(m_entities.size() + m_transients.size());
+	packer.pack(m_entities.size() + m_transients.size());
 	for (auto & e : m_entities)
 	{
-		packer.pack_v(e.first.type);
+		packer.pack(e.first.type);
 	}
 	for (auto & e : m_transients)
 	{
-		packer.pack_v(e->getType());
+		packer.pack(e->getType());
 	}
 
 
 	for (auto & e : m_entities)
 	{
-		packer.pack_v(e.first.id);
+		packer.pack(e.first.id);
 		e.second->write(packer);
 	}
 	for (auto & e : m_transients)
@@ -113,8 +113,8 @@ void Snapshot::write(Packer & packer)
 //delta compression can be further optimized: group unchanged entities, rle only entities, not transients, etc... 
 void Snapshot::readRelativeTo(Unpacker & unpacker, const Snapshot & s)
 {
-/*	int numItems;
-	unpacker.unpack<0, MAX_SNAPSHOT_ITEM_SIZE>(numItems);
+	int numItems;
+	unpacker.unpack(numItems);
 
 	std::vector<NetObject::Type> types;
 	for (int i = 0; i < numItems; ++i)
@@ -124,10 +124,6 @@ void Snapshot::readRelativeTo(Unpacker & unpacker, const Snapshot & s)
 		types.push_back(type);
 	}
 
-	Packer buf;
-	decode(unpacker, buf);
-	Unpacker temp(buf.getData(), buf.getDataSize());
-
 	for (NetObject::Type type : types)
 	{
 		NetObject * item = NetObject::create(type);
@@ -135,7 +131,7 @@ void Snapshot::readRelativeTo(Unpacker & unpacker, const Snapshot & s)
 		if (type < NetObject::ENTITY_COUNT)
 		{
 			int id;
-			temp.unpack<0, MAX_ENTITY_ID>(id);
+			unpacker.unpack(id);
 
 			Key key;
 			key.id = id;
@@ -146,28 +142,28 @@ void Snapshot::readRelativeTo(Unpacker & unpacker, const Snapshot & s)
 			if (iter != s.m_entities.end())
 			{
 				NetObject * o = iter->second.get();
-				item->readRelative(temp, *o);
+				item->readRelative(unpacker, *o);
 			}
 			else
 			{
-				item->read(temp);
+				item->read(unpacker);
 
 			}
 			m_entities[key].reset(item);
 		}
 		else
 		{
-			item->read(temp);
+			item->read(unpacker);
 			m_transients.emplace_back(item);
 		}
-	}*/
+	}
 
 }
 
 
 void Snapshot::writeRelativeTo(Packer & packer, const Snapshot & s)
 {
-	/*packer.pack<0, MAX_SNAPSHOT_ITEM_SIZE>(m_entities.size() + m_transients.size());
+	packer.pack(m_entities.size() + m_transients.size());
 
 
 	for (auto & e : m_entities)
@@ -178,31 +174,27 @@ void Snapshot::writeRelativeTo(Packer & packer, const Snapshot & s)
 	{
 		packer.pack(e->getType());
 	}
-	Packer temp;
 
 	for (auto & e : m_entities)
 	{
-		temp.pack<0, MAX_ENTITY_ID>(e.first.id);
+		packer.pack(e.first.id);
 		auto iter = s.m_entities.find(e.first);
 		if (iter != s.m_entities.end())
 		{
 			NetObject * o = iter->second.get();
-			e.second->writeRelative(temp, *o);
+			e.second->writeRelative(packer, *o);
 		}
 		else
 		{
-			e.second->write(temp);
+			e.second->write(packer);
 		}
 	}
 
-
 	for (auto & e : m_transients)
 	{
-		e->write(temp);
+		e->write(packer);
 	}
 
-	Unpacker unpacker(temp.getData(), temp.getDataSize());
-	encode(unpacker, packer);*/
 }
 
 
