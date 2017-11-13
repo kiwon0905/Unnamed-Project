@@ -87,13 +87,12 @@ void Human::takeDamage(int dmg, int from, const sf::Vector2f & impulse)
 	m_health -= dmg;
 	if (m_health <= 0)
 	{
-
-		std::vector<int> assisters;
-		for (const auto & p : m_assistingPeers)
-			assisters.push_back(p.first);
-
 		m_alive = false;
-		m_context->announceDeath(m_peerId, from, assisters);
+
+		//remove killer from the assisters
+		m_assistingPeers.erase(from);
+
+		m_context->announceDeath(m_peerId, from, m_assistingPeers);
 		m_context->addScore(from, 5);
 		m_context->getServer()->getPeer(m_peerId)->setEntity(nullptr);
 

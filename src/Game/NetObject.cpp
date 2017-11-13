@@ -191,6 +191,7 @@ void NetPlayerInfo::write(Packer & packer) const
 	packer.pack(kills);
 	packer.pack(deaths);
 	packer.pack(assists);
+	//std::cout << "wr " << id << ": " << kills << "/" << deaths << "/" << assists << "\n";
 
 }
 
@@ -204,6 +205,8 @@ void NetPlayerInfo::read(Unpacker & unpacker)
 	unpacker.unpack(kills);
 	unpacker.unpack(deaths);
 	unpacker.unpack(assists);
+	//std::cout << "rd " << id << ": " << kills << "/" << deaths << "/" << assists << "\n";
+
 }
 
 NetObject::Type NetExplosion::getType() const

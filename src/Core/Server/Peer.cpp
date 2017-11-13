@@ -103,6 +103,8 @@ void Peer::setKills(int kills)
 void Peer::addKills(int kills)
 {
 	m_kills += kills;
+
+	std::cout <<m_id<< " kill added\n";
 }
 
 int Peer::getDeaths()
@@ -118,6 +120,8 @@ void Peer::setDeaths(int deaths)
 void Peer::addDeaths(int deaths)
 {
 	m_deaths += deaths;
+
+	std::cout <<m_id<< " death added\n";
 }
 
 int Peer::getAssists()
@@ -170,7 +174,7 @@ int Peer::getAckTick()
 
 void Peer::snap(Snapshot & snapshot)
 {
-	if (m_entity)
+	//if (m_entity)
 	{
 		NetPlayerInfo * info = reinterpret_cast<NetPlayerInfo*>(snapshot.addEntity(NetObject::PLAYER_INFO, m_id));
 		if (info)
@@ -181,10 +185,8 @@ void Peer::snap(Snapshot & snapshot)
 			info->assists = m_assists;
 			
 			info->team = m_team;
-
-
-			info->type = m_entity->getType();
-			info->id = m_entity->getId();
+			info->type = m_entity ? m_entity->getType() : NetObject::Type::NONE;
+			info->id = m_entity ? m_entity->getId() : -1;
 		}
 	}
 

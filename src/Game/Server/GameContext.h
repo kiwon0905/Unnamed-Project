@@ -39,7 +39,7 @@ public:
 	void createCrates();
 
 	//
-	void announceDeath(int killedPeer, int killerPeer, const std::vector<int> & assisters);
+	void announceDeath(int killedPeer, int killerPeer, const std::unordered_map<int, int> & assisters);
 	void addScore(int peerId, int score);
 protected:
 	Server * m_server;

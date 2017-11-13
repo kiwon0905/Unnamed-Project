@@ -231,11 +231,6 @@ void LobbyScreen::onEnter(Client & client)
 
 	loadNextMusic();
 	requestInternetGamesInfo(client);
-
-	for (auto & v : sf::VideoMode::getFullscreenModes())
-	{
-		std::cout<<v.width<<", "<<v.height<<"\n";
-	}
 }
 
 void LobbyScreen::handleEvent(const sf::Event & event, Client & client)

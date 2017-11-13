@@ -185,7 +185,7 @@ void PlayingScreen::onEnter(Client & client)
 		name->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 		topPanel->add(name);
 
-		auto mode = tgui::Label::create("Score");
+		auto mode = tgui::Label::create("K/D/A");
 		mode->setPosition({ tgui::bindRight(name), tgui::bindTop(name) });
 		mode->setSize({ "33%", "100%" });
 		mode->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
@@ -617,7 +617,11 @@ void PlayingScreen::render(Client & client)
 					info->team = netInfo->team;
 					info->score = netInfo->score;
 					info->ping = netInfo->ping;
+					info->kills = netInfo->kills;
+					info->deaths = netInfo->deaths;
+					info->assists = netInfo->assists;
 
+					std::cout << info->id << ", entId: " << info->entityId << " - " << info->kills << "/" << info->deaths << "/" << info->assists << "\n";
 				}
 
 			}
@@ -893,7 +897,7 @@ void PlayingScreen::updateScoreboard()
 		name->setInheritedOpacity(1.f);
 		name->getRenderer()->setTextColor(sf::Color::Black);
 
-		auto score = tgui::Label::create(std::to_string(info.score));
+		auto score = tgui::Label::create(std::to_string(info.kills) + "/" + std::to_string(info.deaths) + "/" + std::to_string(info.assists));
 		score->setPosition({ tgui::bindRight(name), tgui::bindTop(name) });
 		score->setSize({ "33%", "100%" });
 		score->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);

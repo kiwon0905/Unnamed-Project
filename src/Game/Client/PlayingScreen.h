@@ -55,6 +55,9 @@ public:
 		Team team;
 		std::string name;
 		int score;
+		int kills;
+		int deaths;
+		int assists;
 		int ping;
 	};
 

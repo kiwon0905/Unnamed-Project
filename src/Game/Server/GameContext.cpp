@@ -133,17 +133,23 @@ void GameContext::reset()
 	m_snapshots.clear();
 }
 
-void GameContext::announceDeath(int killedPeer, int killerPeer, const std::vector<int> & assisters)
+void GameContext::announceDeath(int killedPeer, int killerPeer, const std::unordered_map<int, int> & assisters)
 {
 	Peer * killed = m_server->getPeer(killedPeer);
 	Peer * killer = m_server->getPeer(killerPeer);
-
+	if (killed)
+		killed->addDeaths(1);
+	if (killer)
+		killer->addKills(1);
 	Packer packer;
 	packer.pack(Msg::SV_KILL_FEED);
-	std::cout << "killed at: " << m_tick << ". Assisters: ";
-	for (int i : assisters)
-		std::cout << i << ", ";
-	std::cout << "\n";
+	for (auto & p : assisters)
+	{
+		Peer * assister = m_server->getPeer(p.first);
+		if (assister)
+			assister->addAssists(1);
+	}
+	
 	//necessary??
 	int killedPeerId = killed ? killed->getId() : -1;
 	int killerPeerId = killer ? killer->getId() : -1;
