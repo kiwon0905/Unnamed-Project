@@ -35,7 +35,6 @@ void Human::tick(float dt)
 		if (m_fireCooldown == 0)
 		{
 			sf::Vector2f firePos = center + Math::unit(v) * 60.f;// -sf::Vector2f(25.f, 25.f) / 2.f;
-			//std::cout << "firePos: " <<firePos<<"\n";
 			if (m_context->getMap().getTile(firePos.x, firePos.y) == 0 &&
 				m_context->getMap().getTile(firePos.x + 25.f, firePos.y) == 0 &&
 				m_context->getMap().getTile(firePos.x + 25.f, firePos.y + 25.f) == 0 &&

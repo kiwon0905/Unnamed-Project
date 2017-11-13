@@ -103,8 +103,6 @@ void Peer::setKills(int kills)
 void Peer::addKills(int kills)
 {
 	m_kills += kills;
-
-	std::cout <<m_id<< " kill added\n";
 }
 
 int Peer::getDeaths()
@@ -120,8 +118,6 @@ void Peer::setDeaths(int deaths)
 void Peer::addDeaths(int deaths)
 {
 	m_deaths += deaths;
-
-	std::cout <<m_id<< " death added\n";
 }
 
 int Peer::getAssists()
@@ -183,7 +179,7 @@ void Peer::snap(Snapshot & snapshot)
 			info->kills = m_kills;
 			info->deaths = m_deaths;
 			info->assists = m_assists;
-			
+			info->ping = m_peer->lastRoundTripTime;
 			info->team = m_team;
 			info->type = m_entity ? m_entity->getType() : NetObject::Type::NONE;
 			info->id = m_entity ? m_entity->getId() : -1;

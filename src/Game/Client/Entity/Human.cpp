@@ -37,6 +37,10 @@ sf::Vector2f Human::getCameraPosition(const Snapshot * from, const Snapshot * to
 
 void Human::render(const Snapshot * from, const Snapshot * to, float predictedT, float t)
 {
+	const PlayingScreen::PlayerInfo * info = m_screen->getPlayerInfoByEntity(m_id, NetObject::HUMAN);
+	if (!info)
+		return;
+
 	sf::RenderWindow & target = m_client->getWindow();
 	const NetHuman * h0 = static_cast<const NetHuman*>(from->getEntity(NetObject::HUMAN, m_id));
 	const NetHuman * h1 = nullptr;
@@ -45,8 +49,6 @@ void Human::render(const Snapshot * from, const Snapshot * to, float predictedT,
 
 	sf::Vector2f pos = getRenderPos(h0, h1, predictedT, t);
 
-	//const PlayingScreen::PlayerInfo * info = m_screen->getPlayerInfoByEntityId(m_id);
-	const PlayingScreen::PlayerInfo * info = m_screen->getPlayerInfoByEntity(m_id, NetObject::HUMAN);
 
 	//body
 	sf::RectangleShape body;

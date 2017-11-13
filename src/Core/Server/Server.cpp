@@ -416,18 +416,12 @@ void Server::handleNetwork()
 
 void Server::update()
 {
-	static sf::Clock c;
 
 	if (m_state == IN_GAME)
 	{
 		if (!m_gameContext->update())
 			reset();
-		if (c.getElapsedTime() >= sf::seconds(1))
-		{
-			std::cout << "out: " << m_server->totalSentData << "\n";
-			m_server->totalSentData = 0;
-			c.restart();
-		}
+
 	}
 }
 

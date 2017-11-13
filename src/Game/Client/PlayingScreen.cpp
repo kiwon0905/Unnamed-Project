@@ -620,8 +620,6 @@ void PlayingScreen::render(Client & client)
 					info->kills = netInfo->kills;
 					info->deaths = netInfo->deaths;
 					info->assists = netInfo->assists;
-
-					std::cout << info->id << ", entId: " << info->entityId << " - " << info->kills << "/" << info->deaths << "/" << info->assists << "\n";
 				}
 
 			}

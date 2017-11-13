@@ -11,6 +11,7 @@ struct NetObject
 public:
 	enum Type
 	{
+		NONE,
 		HUMAN,
 		ZOMBIE,
 		PROJECTILE,

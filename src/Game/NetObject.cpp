@@ -185,28 +185,24 @@ void NetPlayerInfo::write(Packer & packer) const
 {
 	packer.pack(type);
 	packer.pack(id);
-	packer.pack(score);
 	packer.pack(team);
-
+	packer.pack(ping);
+	packer.pack(score);
 	packer.pack(kills);
 	packer.pack(deaths);
 	packer.pack(assists);
-	//std::cout << "wr " << id << ": " << kills << "/" << deaths << "/" << assists << "\n";
-
 }
 
 void NetPlayerInfo::read(Unpacker & unpacker)
 {
 	unpacker.unpack(type);
 	unpacker.unpack(id);
-	unpacker.unpack(score);
 	unpacker.unpack(team);
-
+	unpacker.unpack(ping);
+	unpacker.unpack(score);
 	unpacker.unpack(kills);
 	unpacker.unpack(deaths);
 	unpacker.unpack(assists);
-	//std::cout << "rd " << id << ": " << kills << "/" << deaths << "/" << assists << "\n";
-
 }
 
 NetObject::Type NetExplosion::getType() const

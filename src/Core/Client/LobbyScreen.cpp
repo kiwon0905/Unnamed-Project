@@ -292,15 +292,12 @@ void LobbyScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & addr,
 	unpacker.unpack(msg);
 	if (client.getMasterServerAddress() && client.getMasterServerAddress()->host == addr.host && client.getMasterServerAddress()->port == addr.port)
 	{
-		std::cout << "msg: " << (int)msg << "\n";
-
 		if (msg == Msg::MSV_INTERNET_SERVER_INFO)
 		{
 			m_internetGames.clear();
 			
 			std::size_t count;
 			unpacker.unpack(count);
-			std::cout << "count: " << count << "\n";
 			for (std::size_t i = 0; i < count; ++i)
 			{
 				GameInfo info;

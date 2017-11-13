@@ -21,7 +21,6 @@ void Vanilla::prepareRound()
 	for (auto & p : m_server->getPeers())
 	{
 		Human * h = m_gameWorld.createEntity<Human>(p->getId(), sf::Vector2f(100.f, 100.f));
-		std::cout << "created human for peer " << p->getId() << "\n";
 		p->setEntity(h);
 
 		if (i % 2 == 0)

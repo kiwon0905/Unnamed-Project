@@ -212,7 +212,6 @@ void MasterServer::handlePacket(Unpacker & unpacker, const ENetAddress & addr)
 		Packer packer;
 		packer.pack(Msg::MSV_INTERNET_SERVER_INFO);
 		packer.pack(m_games.size());
-		std::cout << "size: " << m_games.size() << "\n";
 		for (const auto & game : m_games)
 		{
 			packer.pack(game.first->address.host);
