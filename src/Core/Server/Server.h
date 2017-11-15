@@ -60,7 +60,7 @@ private:
 	Config m_config;
 
 	State m_state = PRE_GAME;
-	int m_nextPeerId = 3;
+	int m_nextPeerId = 0;
 	std::vector<std::unique_ptr<Peer>> m_peers;
 	std::unique_ptr<GameContext> m_gameContext;
 };

@@ -15,10 +15,13 @@ GameWorld::GameWorld(GameContext * context):
 	m_entitiesByType.resize(static_cast<int>(NetObject::ENTITY_COUNT));
 }
 
-void GameWorld::onDisconnect(Peer & peer)
+void GameWorld::onDisconnect(Player & player)
 {
-	if (peer.getEntity())
-		peer.getEntity()->setAlive(false);
+	if (player.getEntity())
+		player.getEntity()->setAlive(false);
+	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
+	for (auto & v : m_entitiesByType)
+		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
 }
 
 void GameWorld::reset()
@@ -32,6 +35,7 @@ void GameWorld::reset()
 
 void GameWorld::tick()
 {
+	//add new entities
 	for (auto & e : m_newEntities)
 	{
 		Entity * entity = e.release();
@@ -39,13 +43,15 @@ void GameWorld::tick()
 	}
 	m_newEntities.clear();
 
-	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
-	for (auto & v : m_entitiesByType)
-		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
-	
+	//tick
 	for (auto & v : m_entitiesByType)
 		for (auto & e : v)
 			e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds());
+
+	//remove dead entities
+	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
+	for (auto & v : m_entitiesByType)
+		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
 }
 
 void GameWorld::snap(Snapshot & snapshot)

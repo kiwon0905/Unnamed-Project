@@ -114,6 +114,9 @@
     <ClInclude Include="src\Core\Server\Peer.h">
       <Filter>Core\Server</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\Server\Player.h">
+      <Filter>Game\Server</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game\Server\GameWorld.cpp">
@@ -193,6 +196,9 @@
     </ClCompile>
     <ClCompile Include="src\Core\Server\Peer.cpp">
       <Filter>Core\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Server\Player.cpp">
+      <Filter>Game\Server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

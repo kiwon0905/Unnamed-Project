@@ -32,22 +32,20 @@ bool GameContext::update()
 		{
 
 			std::unique_ptr<Snapshot> snapshot = std::make_unique<Snapshot>();
-			for (auto & p : m_server->getPeers())
-				p->snap(*snapshot);
+			for (auto & p : m_players)
+				p.snap(*snapshot);
 			m_gameWorld.snap(*snapshot);
 
-
-
-			for (auto & p : m_server->getPeers())
+			for (auto & p : m_players)
 			{
 				Packer packer;
-				Snapshot * delta = m_snapshots.get(p->getAckTick());
+				Snapshot * delta = m_snapshots.get(p.getAckTick());
 				//delta = 0;
 				if (delta)
 				{
 					packer.pack(Msg::SV_DELTA_SNAPSHOT);
 					packer.pack(m_tick);
-					packer.pack(p->getAckTick());
+					packer.pack(p.getAckTick());
 					snapshot->writeRelativeTo(packer, *delta);
 				}
 				else
@@ -56,7 +54,7 @@ bool GameContext::update()
 					packer.pack(m_tick);
 					snapshot->write(packer);
 				}
-				p->send(packer, false);
+				m_server->getPeer(p.getPeerId())->send(packer, false);
 			}
 
 			m_snapshots.add(snapshot.release(), m_tick);
@@ -100,6 +98,37 @@ GameWorld & GameContext::getWorld()
 	return m_gameWorld;
 }
 
+void GameContext::onJoin(int peerId)
+{
+	m_players.emplace_back(peerId, this);
+}
+
+void GameContext::onDisconnect(int peerId)
+{
+	m_gameWorld.onDisconnect(*getPlayer(peerId));
+	
+	auto isDead = [peerId](Player & p) {return p.getPeerId() == peerId; };
+
+	m_players.erase(std::remove_if(m_players.begin(), m_players.end(), isDead), m_players.end());
+}
+
+void GameContext::onInput(int peerId, int predictedTick, const NetInput & input, int ackTick)
+{
+	Player * player = getPlayer(peerId);
+	player->onInput(predictedTick, input);
+	player->setAckTick(ackTick);
+
+	if(m_tick % 2)
+	{
+		sf::Time timeLeft = sf::seconds(predictedTick / TICKS_PER_SEC) - m_clock.getElapsedTime();
+		Packer packer;
+		packer.pack(Msg::SV_INPUT_TIMING);
+		packer.pack(predictedTick);
+		packer.pack(timeLeft.asMilliseconds());
+		m_server->getPeer(peerId)->send(packer, false);
+	}
+}
+
 int GameContext::getCurrentTick() const
 {
 	return m_tick;
@@ -118,8 +147,14 @@ void GameContext::createCrates()
 	}
 }
 
+void GameContext::loadRound()
+{
+	m_map.loadFromFile("map/grass2.xml");
+}
+
 void GameContext::startRound()
 {
+	onRoundStart();
 	m_clock.restart();
 }
 
@@ -135,24 +170,24 @@ void GameContext::reset()
 
 void GameContext::announceDeath(int killedPeer, int killerPeer, const std::unordered_map<int, int> & assisters)
 {
-	Peer * killed = m_server->getPeer(killedPeer);
-	Peer * killer = m_server->getPeer(killerPeer);
+	Player * killed = getPlayer(killedPeer);
+	Player * killer = getPlayer(killerPeer);
 	if (killed)
-		killed->addDeaths(1);
+		killed->addDeath();
 	if (killer)
-		killer->addKills(1);
+		killer->addKill();
 	Packer packer;
 	packer.pack(Msg::SV_KILL_FEED);
 	for (auto & p : assisters)
 	{
-		Peer * assister = m_server->getPeer(p.first);
+		Player * assister = getPlayer(p.first);
 		if (assister)
-			assister->addAssists(1);
+			assister->addAssist();
 	}
 	
 	//necessary??
-	int killedPeerId = killed ? killed->getId() : -1;
-	int killerPeerId = killer ? killer->getId() : -1;
+	int killedPeerId = killed ? killed->getPeerId() : -1;
+	int killerPeerId = killer ? killer->getPeerId() : -1;
 	packer.pack(killedPeerId);
 	packer.pack(killerPeerId);
 	m_server->broadcast(packer, true);
@@ -160,9 +195,16 @@ void GameContext::announceDeath(int killedPeer, int killerPeer, const std::unord
 
 void GameContext::addScore(int peerId, int score)
 {
-	Peer * peer = m_server->getPeer(peerId);
-	if (peer)
-	{
-		peer->addScore(score);
-	}
+	Player * p = getPlayer(peerId);
+	if (p)
+		p->addScore(score);
+
+}
+
+Player * GameContext::getPlayer(int peerId)
+{
+	for (auto & p : m_players)
+		if (p.getPeerId() == peerId)
+			return &p;
+	return nullptr;
 }

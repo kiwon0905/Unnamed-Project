@@ -43,12 +43,12 @@ void Projectile::tick(float dt)
 
 	for (auto e : m_context->getWorld().getEntitiesOfType({ NetObject::HUMAN, NetObject::CRATE }))
 	{
-		if (m_context->getServer()->getPeer(m_shooterPeerId) && m_context->getServer()->getPeer(m_shooterPeerId)->getEntity() &&
-			m_context->getServer()->getPeer(m_shooterPeerId)->getEntity()->getId() == e->getId())
+		//no self dmg
+		if (m_context->getPlayer(m_shooterPeerId) && m_context->getPlayer(m_shooterPeerId)->getEntity() &&
+			m_context->getPlayer(m_shooterPeerId)->getEntity()->getId() == e->getId())
 			continue;
-	//	if (e->getId() == m_shooterPeerId)
-		//	continue;
-		if (e->getType() == NetObject::HUMAN && m_context->getServer()->getPeer(static_cast<Human*>(e)->getPeerId())->getTeam() == m_team)
+
+		if (e->getType() == NetObject::HUMAN && m_context->getPlayer(static_cast<Human*>(e)->getPeerId())->getTeam() == m_team)
 			continue;
 
 		Aabb aabb{ e->getPosition(), e->getSize() };

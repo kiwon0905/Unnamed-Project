@@ -13,14 +13,14 @@
 #include <memory>
 
 class GameContext;
-class Peer;
+class Player;
 
 class GameWorld
 {
 public:
 	GameWorld(GameContext * context);
 
-	void onDisconnect(Peer & peer);
+	void onDisconnect(Player & player);
 
 	void reset();
 	void tick();

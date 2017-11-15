@@ -47,6 +47,7 @@
     <ClInclude Include="src\Game\Server\GameContext\Infection.h" />
     <ClInclude Include="src\Game\Server\GameContext\Vanilla.h" />
     <ClInclude Include="src\Game\Server\GameWorld.h" />
+    <ClInclude Include="src\Game\Server\Player.h" />
     <ClInclude Include="src\Game\Snapshot.h" />
   </ItemGroup>
   <ItemGroup>
@@ -75,6 +76,7 @@
     <ClCompile Include="src\Game\Server\GameContext\Infection.cpp" />
     <ClCompile Include="src\Game\Server\GameContext\Vanilla.cpp" />
     <ClCompile Include="src\Game\Server\GameWorld.cpp" />
+    <ClCompile Include="src\Game\Server\Player.cpp" />
     <ClCompile Include="src\Game\Snapshot.cpp" />
   </ItemGroup>
   <ItemGroup>

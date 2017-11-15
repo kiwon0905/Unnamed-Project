@@ -5,7 +5,7 @@ class Vanilla : public GameContext
 public:
 	Vanilla(Server * server);
 	std::string getName();
-	void prepareRound();
+	void onRoundStart();
 	bool checkRound(Team & team);
 private:
 

@@ -20,7 +20,8 @@ Human::Human(int id, GameContext * context, int peerId, const sf::Vector2f & pos
 
 void Human::tick(float dt)
 {
-	NetInput input = m_context->getServer()->getPeer(m_peerId)->popInput(m_context->getCurrentTick());
+	NetInput input = m_context->getPlayer(m_peerId)->popInput(m_context->getCurrentTick());
+		//m_context->getServer()->getPeer(m_peerId)->popInput(m_context->getCurrentTick());
 
 	m_core.tick(dt, input, m_context->getMap());
 
@@ -40,7 +41,7 @@ void Human::tick(float dt)
 				m_context->getMap().getTile(firePos.x + 25.f, firePos.y + 25.f) == 0 &&
 				m_context->getMap().getTile(firePos.x, firePos.y + 25.f) == 0)
 			{
-				Projectile * p = m_context->getWorld().createEntity<Projectile>(m_peerId, m_context->getServer()->getPeer(m_peerId)->getTeam());
+				Projectile * p = m_context->getWorld().createEntity<Projectile>(m_peerId, m_context->getPlayer(m_peerId)->getTeam());
 
 				p->setVelocity(Math::unit(v) * 1500.f);
 				p->setPosition(firePos);
@@ -93,7 +94,7 @@ void Human::takeDamage(int dmg, int from, const sf::Vector2f & impulse)
 
 		m_context->announceDeath(m_peerId, from, m_assistingPeers);
 		m_context->addScore(from, 5);
-		m_context->getServer()->getPeer(m_peerId)->setEntity(nullptr);
+		m_context->getPlayer(m_peerId)->setEntity(nullptr);
 
 	}
 	m_core.setVelocity(m_core.getVelocity() + impulse);

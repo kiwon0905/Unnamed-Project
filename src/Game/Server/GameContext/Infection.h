@@ -5,7 +5,7 @@ class Infection : public GameContext
 public:
 	Infection(Server * server);
 	std::string getName();
-	void prepareRound();
+	void onRoundStart();
 	bool checkRound(Team & team);
 private:
 };

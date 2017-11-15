@@ -215,7 +215,7 @@ void Server::handleCommands()
 			m_running = false;
 		else if (line == "start_dev")
 		{
-			m_gameContext->prepareRound();
+			m_gameContext->loadRound();
 			m_state = LOADING;
 			Packer packer;
 			packer.pack(Msg::SV_LOAD_GAME);
@@ -243,13 +243,11 @@ void Server::handleNetwork()
 			Unpacker unpacker;
 			enutil::receive(unpacker, event.packet);
 			Msg msg;
-			//unpacker.unpack(msg);
-
 			unpacker.unpack(msg);
+
 			if (msg == Msg::CL_REQUEST_JOIN_GAME)
 			{
 				std::string name;
-				//unpacker.unpack(name);
 				unpacker.unpack(name);
 
 				Packer packer;
@@ -260,8 +258,8 @@ void Server::handleNetwork()
 					Peer * p = new Peer(m_nextPeerId++, event.peer);
 					p->setName(name);
 					m_peers.emplace_back(p);
-
 					sendServerInfoToMasterServer();
+					m_gameContext->onJoin(p->getId());
 				}
 				else
 				{
@@ -302,13 +300,10 @@ void Server::handleNetwork()
 				peer->setState(Peer::LOADING);
 
 				Packer packer;
-				
 				packer.pack(Msg::SV_GAME_INFO);
 				packer.pack(m_gameContext->getMap().getName());				//map name
 				
 				peer->send(packer, true);
-				
-
 			}
 			else if (msg == Msg::CL_LOAD_COMPLETE && m_state == LOADING)
 			{
@@ -331,18 +326,8 @@ void Server::handleNetwork()
 				unpacker.unpack(ackTick);
 				NetInput input;
 				input.read(unpacker);
-				peer->onInput(predictedTick, input);
-				peer->setAckTick(ackTick);
-				if (m_gameContext->getCurrentTick() % 2 == 0)
-				{
-					sf::Time timeLeft = sf::seconds(predictedTick / TICKS_PER_SEC) - m_gameContext->getCurrentTime();
+				m_gameContext->onInput(peer->getId(), predictedTick, input, ackTick);
 
-					Packer packer;
-					packer.pack(Msg::SV_INPUT_TIMING);
-					packer.pack(predictedTick);
-					packer.pack(timeLeft.asMilliseconds());
-					peer->send(packer, false);
-				}
 			}
 			else if (msg == Msg::CL_CHAT)
 			{
@@ -378,9 +363,9 @@ void Server::handleNetwork()
 					packer.pack(Msg::SV_PLAYER_LEFT);
 					packer.pack(p->getId());
 					broadcast(packer, true, p);
-					if (p->getEntity())
-						p->getEntity()->setAlive(false);
+					m_gameContext->onDisconnect(p->getId());
 				}
+
 				auto pred = [p](const auto & ptr)
 				{
 					return ptr.get() == p;
@@ -389,7 +374,7 @@ void Server::handleNetwork()
 
 				if (m_peers.empty())
 				{
-					//m_nextPeerId = 0;
+					m_nextPeerId = 0;
 					reset();
 				}
 			}
@@ -432,8 +417,7 @@ void Server::reset()
 	m_state = PRE_GAME;
 	for (auto & p : m_peers)
 	{
-		p->reset();
-
+		p->setState(Peer::PRE_GAME);
 	}
 	m_gameContext->reset();
 }

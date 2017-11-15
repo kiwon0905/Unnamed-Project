@@ -13,20 +13,18 @@ std::string Vanilla::getName()
 	return "Vanilla";
 }
 
-void Vanilla::prepareRound()
+void Vanilla::onRoundStart()
 {
-	m_map.loadFromFile("map/grass2.xml");
-
 	int i = 0;
-	for (auto & p : m_server->getPeers())
+	for (auto & p : m_players)
 	{
-		Human * h = m_gameWorld.createEntity<Human>(p->getId(), sf::Vector2f(100.f, 100.f));
-		p->setEntity(h);
+		Human * h = m_gameWorld.createEntity<Human>(p.getPeerId(), sf::Vector2f(100.f, 100.f));
+		p.setEntity(h);
 
 		if (i % 2 == 0)
-			p->setTeam(Team::A);
+			p.setTeam(Team::A);
 		else
-			p->setTeam(Team::B);
+			p.setTeam(Team::B);
 		++i;
 	}
 

@@ -5,21 +5,6 @@
 #include "Game/Enums.h"
 #include <enet/enet.h>
 #include <queue>
-class Entity;
-
-struct Input
-{
-	int tick;
-	NetInput input;
-};
-
-struct InputComparator
-{
-	bool operator()(const Input & i, const Input & j)
-	{
-		return i.tick > j.tick;
-	}
-};
 
 class Peer
 {
@@ -42,52 +27,10 @@ public:
 	State getState() const;
 	void setState(State state);
 
-	Entity * getEntity();
-	void setEntity(Entity * e);	
-	
-	Team getTeam();
-	void setTeam(Team team);
-	
-	int getScore();
-	void setScore(int score);
-	void addScore(int score);
-
-	int getKills();
-	void setKills(int kills);
-	void addKills(int kills);
-
-	int getDeaths();
-	void setDeaths(int deaths);
-	void addDeaths(int deaths);
-
-	int getAssists();
-	void setAssists(int assists);
-	void addAssists(int assists);
-
-	void onInput(int tick, const NetInput & input);
-	NetInput popInput(int tick);
-
-	void setAckTick(int tick);
-	int getAckTick();
-	
-	void reset();
 	bool send(const Packer & packer, bool reliable);
-
-	void snap(class Snapshot & snapshot);
 private:
 	int m_id;
 	std::string m_name;
 	ENetPeer * m_peer;
 	State m_state = PRE_GAME;
-
-	Entity * m_entity = nullptr;
-	Team m_team = Team::NONE;
-	int m_score = 0;
-	int m_kills = 0;
-	int m_deaths = 0;
-	int m_assists = 0;
-
-
-	int m_ackTick = -1;
-	std::priority_queue<Input, std::vector<Input>, InputComparator> m_inputs;
 };
