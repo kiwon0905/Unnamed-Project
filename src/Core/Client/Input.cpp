@@ -6,25 +6,28 @@
 bool Input::initialize(Client & client)
 {
 
-	m_controls[Control::MOVE_LEFT] = std::bind(&Input::getKeyState, this, sf::Keyboard::A);
-	m_controls[Control::MOVE_RIGHT] = std::bind(&Input::getKeyState, this, sf::Keyboard::D);
-	m_controls[Control::MOVE_UP] = std::bind(&Input::getKeyState, this, sf::Keyboard::W);
-	m_controls[Control::MOVE_DOWN] = std::bind(&Input::getKeyState, this, sf::Keyboard::S);
+	m_controls[Control::MOVE_LEFT] = std::bind(&Input::getKeyState_, this, sf::Keyboard::A, false);
+	m_controls[Control::MOVE_RIGHT] = std::bind(&Input::getKeyState_, this, sf::Keyboard::D, false);
+	m_controls[Control::MOVE_UP] = std::bind(&Input::getKeyState_, this, sf::Keyboard::W, false);
+	m_controls[Control::MOVE_DOWN] = std::bind(&Input::getKeyState_, this, sf::Keyboard::S, false);
 
-	m_controls[Control::JUMP] = [this]() {return isActive({ sf::Keyboard::Space }); };
-	m_controls[Control::PRIMARY_FIRE] = [this]() {return isActive({}, { sf::Mouse::Left }); };
-
-	addKeyCombination({ sf::Keyboard::LControl, sf::Keyboard::LShift, sf::Keyboard::D });
-	addKeyCombination({ sf::Keyboard::Space });
-	addKeyCombination({}, { sf::Mouse::Left });
-	addKeyCombination({ sf::Keyboard::Return });
+	m_controls[Control::JUMP] = std::bind(&Input::getKeyState_, this, sf::Keyboard::Space, false);
+	m_controls[Control::PRIMARY_FIRE] = std::bind(&Input::getButtonState_, this, sf::Mouse::Left, false);
 
 	m_hasFocus = client.getWindow().hasFocus();
+
+	m_prevInput.jump = false;
+	m_prevInput.fire = false;
 	return true;
 }
 
 void Input::finalize(Client & client)
 {
+}
+
+void Input::beginFrame()
+{
+	m_frame++;
 }
 
 NetInput Input::getInput(const sf::RenderTarget & target, const sf::View & view)
@@ -43,83 +46,58 @@ NetInput Input::getInput(const sf::RenderTarget & target, const sf::View & view)
 		if (m_controls[Control::MOVE_DOWN]())
 			input.vMoveDirection++;
 
-		input.jump = m_controls[Control::JUMP]();
-		input.fire = m_controls[Control::PRIMARY_FIRE]();
+		input.jump = m_controls[Control::JUMP]() && !m_prevInput.jump;
+		input.fire = m_controls[Control::PRIMARY_FIRE]() && !m_prevInput.fire;
 	}
+
+	m_prevInput = input;
 	return input;
 
 }
 
-void Input::addKeyCombination(const std::unordered_set<sf::Keyboard::Key> & keys, const std::unordered_set<sf::Mouse::Button> & buttons)
-{
-	KeyCombination comb;
-	comb.keys = keys;
-	comb.buttons = buttons;
-
-	m_keyCombinations.push_back(comb);
-}
-
-bool Input::isActive(const std::unordered_set<sf::Keyboard::Key> & keys, const std::unordered_set<sf::Mouse::Button> & buttons)
-{
-	for (auto & c : m_keyCombinations)
-	{
-		if (c.keys == keys && c.buttons == buttons)
-		{
-
-			bool currentActive = true;
-			for (auto key : c.keys)
-			{
-				currentActive = currentActive && m_activeKeys[key];
-			}
-			for (auto button : c.buttons)
-			{
-				currentActive = currentActive && m_activeButtons[button];
-			}
-
-			c.current = (currentActive && !c.last);
-			c.last = currentActive;
-			return c.current;
-		}
-
-	}
-
-	return false;
-}
 
 void Input::handleEvent(const sf::Event & event)
 {
-
 	if (event.type == sf::Event::LostFocus)
 	{
 		m_hasFocus = false;
-		memset(m_activeButtons, 0, sizeof(bool) * sf::Mouse::ButtonCount);
-		memset(m_activeKeys, 0, sizeof(bool) * sf::Keyboard::KeyCount);
-		for (auto & c : m_keyCombinations)
-			c.current = c.last = false;
+		for (auto & k : m_keyStates)
+			k.pressed = false;
+		for (auto & b : m_buttonStates)
+			b.pressed = false;
 	}
 	else if (event.type == sf::Event::GainedFocus)
 	{
 		m_hasFocus = true;
-
 	}
 
 	if (m_hasFocus)
 	{
 		if (event.type == sf::Event::KeyPressed)
 		{
-			m_activeKeys[event.key.code] = true;
+			State & s = m_keyStates[event.key.code];
+			if (!s.pressed)
+			{
+				s.pressed = true;
+				s.frame = m_frame;
+			}
 		}
 		else if (event.type == sf::Event::KeyReleased)
 		{
-			m_activeKeys[event.key.code] = false;
+			m_keyStates[event.key.code].pressed = false;
 		}
 		else if (event.type == sf::Event::MouseButtonPressed)
 		{
-			m_activeButtons[event.mouseButton.button] = true;
+			State & s = m_buttonStates[event.mouseButton.button];
+			if (!s.pressed)
+			{
+				s.pressed = true;
+				s.frame = m_frame;
+			}
 		}
 		else if (event.type == sf::Event::MouseButtonReleased)
 		{
-			m_activeButtons[event.mouseButton.button] = false;
+			m_buttonStates[event.mouseButton.button].pressed = false;
 		}
 		else if (event.type == sf::Event::MouseMoved)
 		{
@@ -127,10 +105,19 @@ void Input::handleEvent(const sf::Event & event)
 			m_mousePosition.y = event.mouseMove.y;
 		}
 	}
-
 }
 
-bool Input::getKeyState(sf::Keyboard::Key key)
+bool Input::getKeyState_(sf::Keyboard::Key key, bool currentFrame)
 {
-	return m_activeKeys[key];
+	if (currentFrame)
+		return m_keyStates[key].pressed && m_keyStates[key].frame == m_frame;
+
+	return m_keyStates[key].pressed;
+}
+
+bool Input::getButtonState_(sf::Mouse::Button button, bool currentFrame)
+{
+	if (currentFrame)
+		return m_buttonStates[button].pressed && m_buttonStates[button].frame == m_frame;
+	return m_buttonStates[button].pressed;
 }

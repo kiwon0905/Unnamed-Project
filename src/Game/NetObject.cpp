@@ -191,6 +191,7 @@ void NetPlayerInfo::write(Packer & packer) const
 	packer.pack(kills);
 	packer.pack(deaths);
 	packer.pack(assists);
+	packer.pack(respawnTick);
 }
 
 void NetPlayerInfo::read(Unpacker & unpacker)
@@ -203,6 +204,7 @@ void NetPlayerInfo::read(Unpacker & unpacker)
 	unpacker.unpack(kills);
 	unpacker.unpack(deaths);
 	unpacker.unpack(assists);
+	unpacker.unpack(respawnTick);
 }
 
 NetObject::Type NetExplosion::getType() const

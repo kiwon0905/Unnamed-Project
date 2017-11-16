@@ -75,10 +75,10 @@ namespace Math
 	}
 
 	inline float normalizedAngle(float x) {
-		x = static_cast<float>(fmod(x, 360));
+		x = static_cast<float>(fmod(x + 180, 360));
 		if (x < 0)
 			x += 360;
-		return x;
+		return x - 180;
 	}
 
 	sf::Vector2f rotatePoint(const sf::Vector2f & p, float angle);

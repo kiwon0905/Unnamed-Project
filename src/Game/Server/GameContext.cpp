@@ -25,7 +25,8 @@ bool GameContext::update()
 		m_tick++;
 		m_accumulator -= sf::seconds(1.f / TICKS_PER_SEC);
 		m_gameWorld.tick();
-
+		for (auto & p : m_players)
+			p.tick();
 
 
 		//if (m_tick % 2 == 0)
@@ -40,7 +41,6 @@ bool GameContext::update()
 			{
 				Packer packer;
 				Snapshot * delta = m_snapshots.get(p.getAckTick());
-				//delta = 0;
 				if (delta)
 				{
 					packer.pack(Msg::SV_DELTA_SNAPSHOT);

@@ -9,6 +9,13 @@ enum class Team
 	COUNT
 };
 
+enum class Weapon
+{
+	BULLET,
+	BOMB,
+	WEAPON_COUNT
+};
+
 inline std::string toString(Team t)
 {
 	switch (t)

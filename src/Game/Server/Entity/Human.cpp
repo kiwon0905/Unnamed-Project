@@ -30,7 +30,6 @@ void Human::tick(float dt)
 	if (v == sf::Vector2f())
 		v = sf::Vector2f(0.f, -1.f);
 	m_aimAngle = atan2f(v.y, v.x) * 180.f / Math::PI;
-	m_aimAngle = Math::normalizedAngle(m_aimAngle);
 	if (input.fire)
 	{
 		if (m_fireCooldown == 0)
@@ -75,7 +74,7 @@ void Human::snap(Snapshot & snapshot) const
 	if (h)
 	{
 		m_core.write(*h);
-		h->aimAngle = Math::roundToInt(m_aimAngle);
+		h->aimAngle = Math::roundToInt(m_aimAngle) % 360;
 		h->health = m_health;
 	}
 }
@@ -94,7 +93,10 @@ void Human::takeDamage(int dmg, int from, const sf::Vector2f & impulse)
 
 		m_context->announceDeath(m_peerId, from, m_assistingPeers);
 		m_context->addScore(from, 5);
-		m_context->getPlayer(m_peerId)->setEntity(nullptr);
+
+		Player * player = m_context->getPlayer(m_peerId);
+		player->setEntity(nullptr);
+		player->setRespawnTick(TICKS_PER_SEC * 3);
 
 	}
 	m_core.setVelocity(m_core.getVelocity() + impulse);

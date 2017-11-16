@@ -131,13 +131,14 @@ struct NetPlayerInfo
 
 	NetObject::Type type;
 	int id;
+	Team team;
 	int ping;
 	int score;
 	int kills;
 	int deaths;
 	int assists;
+	int respawnTick;
 
-	Team team;
 };
 
 //Transient

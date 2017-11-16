@@ -89,6 +89,7 @@ void Client::run()
 			}
 			numFrames++;	
 
+			m_input.beginFrame();
 			sf::Event event;
 			while (m_window.pollEvent(event))
 			{
@@ -103,7 +104,7 @@ void Client::run()
 				m_input.handleEvent(event);		
 			}
 
-			if (m_input.isActive({ sf::Keyboard::LControl, sf::Keyboard::LShift, sf::Keyboard::D }))
+			if (m_input.getKeyState_(sf::Keyboard::LControl) && m_input.getKeyState_(sf::Keyboard::LShift) && m_input.getKeyState_(sf::Keyboard::D, true))
 			{
 				m_debugRender ^= 1;
 			}

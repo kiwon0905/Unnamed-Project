@@ -49,20 +49,22 @@ public:
 
 	struct PlayerInfo
 	{
-		int id;
-		int entityId;
-		NetObject::Type entityType;
-		Team team;
 		std::string name;
+		int id;
+
+		NetObject::Type entityType;
+		int entityId;
+		Team team;
 		int score;
 		int kills;
 		int deaths;
 		int assists;
 		int ping;
+		int respawnTick;
 	};
 
 	PlayingScreen();
-	~PlayingScreen() { std::cout << "play destroy!"; }
+	~PlayingScreen() = default;
 	void onEnter(Client & client);
 	void handleEvent(const sf::Event & event, Client & client);
 	void handleNetEvent(ENetEvent & netEv, Client & client);

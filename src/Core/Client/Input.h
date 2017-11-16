@@ -28,31 +28,32 @@ class Input
 public:
 	bool initialize(Client & client);
 	void finalize(Client & client);
-	NetInput getInput(const sf::RenderTarget & target, const sf::View & view);
-
-	void addKeyCombination(const std::unordered_set<sf::Keyboard::Key> & keys, const std::unordered_set<sf::Mouse::Button> & buttons = {});
-	bool isActive(const std::unordered_set<sf::Keyboard::Key> & keys, const std::unordered_set<sf::Mouse::Button> & buttons = {});
-	sf::Vector2i getMousePosition() { return m_mousePosition; }
-	bool getKeyState(sf::Keyboard::Key key);
-
-	
+	void beginFrame();
 	void handleEvent(const sf::Event & event);
+
+	NetInput getInput(const sf::RenderTarget & target, const sf::View & view);
+	sf::Vector2i getMousePosition() { return m_mousePosition; }
+
+	bool getKeyState_(sf::Keyboard::Key key, bool currentFrame = false);
+	bool getButtonState_(sf::Mouse::Button button, bool currentFrame = false);
+	
 private:
-	std::unordered_map<Control, std::function<bool()>> m_controls;
-	
-	
-	bool m_activeKeys[sf::Keyboard::KeyCount] = { false };
-	bool m_activeButtons[sf::Mouse::ButtonCount] = { false };
+	struct State
+	{
+		int frame;
+		bool pressed = false;
+	};
+	State m_keyStates[sf::Keyboard::KeyCount];
+	State m_buttonStates[sf::Mouse::ButtonCount];
+
+	int m_frame = 0;
 	sf::Vector2i m_mousePosition;
 	bool m_hasFocus;
-	struct KeyCombination
-	{
-		std::unordered_set<sf::Keyboard::Key> keys;
-		std::unordered_set<sf::Mouse::Button> buttons;
-		bool last = false;
-		bool current = false;
-	};
 
-	std::vector<KeyCombination> m_keyCombinations;
+	NetInput m_prevInput;
 
+
+	std::unordered_map<Control, std::function<bool()>> m_controls;
+	bool m_activeKeys[sf::Keyboard::KeyCount] = { false };
+	bool m_activeButtons[sf::Mouse::ButtonCount] = { false };
 };

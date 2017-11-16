@@ -476,7 +476,7 @@ void PlayingScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & add
 
 void PlayingScreen::update(Client & client)
 {
-	if (client.getInput().isActive({ sf::Keyboard::Return }))
+	if(client.getInput().getKeyState_(sf::Keyboard::Return, true))
 	{
 		if (m_editBox->isVisible())
 		{
@@ -612,14 +612,15 @@ void PlayingScreen::render(Client & client)
 				NetPlayerInfo * netInfo = reinterpret_cast<NetPlayerInfo*>(p.second->data.data());
 				if (info)
 				{
-					info->entityId = netInfo->id;
 					info->entityType = netInfo->type;
+					info->entityId = netInfo->id;
 					info->team = netInfo->team;
 					info->score = netInfo->score;
 					info->ping = netInfo->ping;
 					info->kills = netInfo->kills;
 					info->deaths = netInfo->deaths;
 					info->assists = netInfo->assists;
+					info->respawnTick = netInfo->respawnTick;
 				}
 
 			}
@@ -693,9 +694,6 @@ void PlayingScreen::render(Client & client)
 		updateScoreboard();
 	}
 
-
-	
-	
 	//camera
 	const PlayerInfo * myInfo = getPlayerInfo(m_myPlayerId);
 	Entity * e = getEntity(myInfo->entityType, myInfo->entityId);
@@ -721,6 +719,10 @@ void PlayingScreen::render(Client & client)
 			center.y = worldSize.y - m_view.getSize().y / 2.f;
 		}
 		m_view.setCenter(center);
+	}
+	else
+	{
+		std::cout << "Respawning in: " << myInfo->respawnTick  << "\n";
 	}
 	sf::RenderWindow & window = client.getWindow();
 	window.setView(m_view);

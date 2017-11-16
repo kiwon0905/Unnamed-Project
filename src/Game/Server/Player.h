@@ -48,6 +48,8 @@ public:
 	int getAssists() const;
 	void addAssist();
 
+	void setRespawnTick(int tick);
+
 	void onInput(int tick, const NetInput & input);
 	NetInput popInput(int tick);
 
