@@ -32,26 +32,30 @@ void Input::beginFrame()
 
 NetInput Input::getInput(const sf::RenderTarget & target, const sf::View & view)
 {
-	NetInput input;
-	input.aimDirection = target.mapPixelToCoords(m_mousePosition, view);
+	NetInput rawInput;
+	rawInput.aimDirection = target.mapPixelToCoords(m_mousePosition, view);
 
-	{
-		if (m_controls[Control::MOVE_LEFT]())
-			input.moveDirection--;
-		if (m_controls[Control::MOVE_RIGHT]())
-			input.moveDirection++;
+	if (m_controls[Control::MOVE_LEFT]())
+		rawInput.moveDirection--;
+	if (m_controls[Control::MOVE_RIGHT]())
+		rawInput.moveDirection++;
 
-		if (m_controls[Control::MOVE_UP]())
-			input.vMoveDirection--;
-		if (m_controls[Control::MOVE_DOWN]())
-			input.vMoveDirection++;
+	if (m_controls[Control::MOVE_UP]())
+		rawInput.vMoveDirection--;
+	if (m_controls[Control::MOVE_DOWN]())
+		rawInput.vMoveDirection++;
 
-		input.jump = m_controls[Control::JUMP]() && !m_prevInput.jump;
-		input.fire = m_controls[Control::PRIMARY_FIRE]() && !m_prevInput.fire;
-	}
+	rawInput.jump = m_controls[Control::JUMP]();
+	rawInput.fire = m_controls[Control::PRIMARY_FIRE]();
 
-	m_prevInput = input;
-	return input;
+
+	NetInput filteredInput = rawInput;
+	if (m_prevInput.jump)
+		filteredInput.jump = false;
+	m_prevInput = rawInput;
+
+
+	return filteredInput;
 
 }
 

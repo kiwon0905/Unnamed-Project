@@ -73,4 +73,6 @@ private:
 	tgui::Texture m_pauseTexture;
 	tgui::Texture m_playTexture;
 	tgui::Texture m_nextTexture;
+
+	std::unique_ptr<std::thread> m_fadeOutThread;
 };

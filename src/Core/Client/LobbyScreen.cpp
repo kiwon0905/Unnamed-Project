@@ -375,7 +375,8 @@ void LobbyScreen::render(Client & client)
 
 void LobbyScreen::onExit(Client & client)
 {
-
+	if (m_fadeOutThread && m_fadeOutThread->joinable())
+		m_fadeOutThread->join();
 }
 
 void LobbyScreen::onObscure(Client & client)
@@ -396,8 +397,7 @@ void LobbyScreen::onObscure(Client & client)
 		m_music.setVolume(100.f);
 
 	};
-	std::thread th(fadeOut);
-	th.detach();
+	m_fadeOutThread = std::make_unique<std::thread>(fadeOut);
 }
 
 void LobbyScreen::onReveal(Client & client)
