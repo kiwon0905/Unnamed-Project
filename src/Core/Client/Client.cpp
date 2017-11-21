@@ -104,7 +104,7 @@ void Client::run()
 				m_input.handleEvent(event);		
 			}
 
-			if (m_input.getKeyState_(sf::Keyboard::LControl) && m_input.getKeyState_(sf::Keyboard::LShift) && m_input.getKeyState_(sf::Keyboard::D, true))
+			if (m_input.getKeyState(sf::Keyboard::LControl) && m_input.getKeyState(sf::Keyboard::LShift) && m_input.getKeyState(sf::Keyboard::D, true))
 			{
 				m_debugRender ^= 1;
 			}

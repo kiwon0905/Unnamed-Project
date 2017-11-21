@@ -6,7 +6,7 @@
 class Zombie : public Entity
 {
 public:
-	Zombie(int id, GameContext * context, int peerId);
+	Zombie(int id, GameContext * context, int peerId, const sf::Vector2f & pos);
 
 	void tick(float dt);
 	void snap(Snapshot & snapshot) const;

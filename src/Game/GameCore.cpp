@@ -17,7 +17,6 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 	{
 		accel = 3000.f;
 		friction = .99f;
-		//maxSpeed = 1400.f;
 	}
 	
 
@@ -32,30 +31,32 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 
 	if (grounded)
 	{
-		m_airJump = false;
-		m_groundJump = false;
 		m_airTick = 0;
+		m_jump &= ~1;
+		m_jump &= ~2;
 	}
 	else
 	{
 		m_airTick++;
 	}
 
+
+	//1(1) groundjump, 2(10) airjump, 4(100) prevJump
 	if (input.jump)
 	{
 		if (grounded || m_airTick < 10)
 		{
-			if (!m_groundJump)
+			if (!(m_jump & 1))
 			{
 				m_velocity.y = -700.f;
-				m_groundJump = true;
+				m_jump |= 1;
 			}
 		}
 		else
 		{
-			if (!m_airJump)
+			if (!(m_jump & 2))
 			{
-				m_airJump = true;
+				m_jump |= 2;
 				m_velocity.y = -650.f;
 			}
 		}
@@ -86,8 +87,7 @@ void HumanCore::read(const NetHuman & nh)
 	m_position.y = nh.pos.y / 100.f;
 	m_velocity.x = nh.vel.x / 100.f;
 	m_velocity.y = nh.vel.y / 100.f;
-	m_airJump = nh.airJump;
-	m_groundJump = nh.groundJump;
+	m_jump = nh.jump;
 	m_airTick = nh.airTick;
 }
 
@@ -97,8 +97,7 @@ void HumanCore::write(NetHuman & nh) const
 	nh.vel.y = Math::roundToInt(m_velocity.y * 100.f);
 	nh.pos.x = Math::roundToInt(m_position.x * 100.f);
 	nh.pos.y = Math::roundToInt(m_position.y * 100.f);
-	nh.groundJump = m_groundJump;
-	nh.airJump = m_airJump;
+	nh.jump = m_jump;
 	nh.airTick = m_airTick;
 }
 
@@ -198,4 +197,9 @@ void ZombieCore::write(NetZombie & nz) const
 const sf::Vector2f & ZombieCore::getPosition() const
 {
 	return m_position;
+}
+
+void ZombieCore::setPosition(const sf::Vector2f & pos)
+{
+	m_position = pos;
 }

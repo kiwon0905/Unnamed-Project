@@ -74,8 +74,7 @@ NetObject::Type NetHuman::getType() const
 
 void NetHuman::write(Packer & packer) const
 {
-	packer.pack(groundJump); // 1
-	packer.pack(airJump);//1
+	packer.pack(jump);
 	packer.pack(airTick);
 	packer.pack(health); //7
 	packer.pack(pos.x); // 19
@@ -89,8 +88,7 @@ void NetHuman::write(Packer & packer) const
 
 void NetHuman::read(Unpacker & unpacker)
 {
-	unpacker.unpack(groundJump);
-	unpacker.unpack(airJump);
+	unpacker.unpack(jump);
 	unpacker.unpack(airTick);
 	unpacker.unpack(health);
 	unpacker.unpack(pos.x);

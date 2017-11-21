@@ -476,7 +476,7 @@ void PlayingScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & add
 
 void PlayingScreen::update(Client & client)
 {
-	if(client.getInput().getKeyState_(sf::Keyboard::Return, true))
+	if(client.getInput().getKeyState(sf::Keyboard::Return, true))
 	{
 		if (m_editBox->isVisible())
 		{

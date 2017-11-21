@@ -76,8 +76,7 @@ struct NetHuman
 
 	sf::Vector2i pos;
 	sf::Vector2i vel;
-	bool groundJump;
-	bool airJump;
+	int jump;
 	int airTick;
 	///
 	int aimAngle;

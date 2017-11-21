@@ -29,8 +29,8 @@ public:
 private:
 	sf::Vector2f m_position;
 	sf::Vector2f m_velocity;
-	bool m_groundJump = false;
-	bool m_airJump = false;
+
+	int m_jump = 0;
 	int m_airTick = 10;
 };
 
@@ -43,7 +43,10 @@ public:
 	void write(NetZombie & nz) const;
 
 	const sf::Vector2f & getPosition() const;
+	void setPosition(const sf::Vector2f & pos);
 private:
 	sf::Vector2f m_position;
 	sf::Vector2f m_velocity;
+	int m_fuel;
+	int m_airTick;
 };

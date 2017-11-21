@@ -8,7 +8,6 @@ struct NetInput
 
 	sf::Vector2f aimDirection;
 	int  moveDirection = 0;
-	int vMoveDirection = 0;
 	bool jump = false;
 	bool fire = false;
 

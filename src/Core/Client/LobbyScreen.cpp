@@ -229,7 +229,7 @@ void LobbyScreen::onEnter(Client & client)
 	auto seed = std::chrono::system_clock::now().time_since_epoch().count();
 	std::shuffle(m_musics.begin(), m_musics.end(), std::default_random_engine(static_cast<unsigned>(seed)));
 
-	loadNextMusic();
+	//loadNextMusic();
 	requestInternetGamesInfo(client);
 }
 

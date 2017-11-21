@@ -5,11 +5,12 @@
 #include "Core/Server/Server.h"
 #include "Core/Utility.h"
 
-Zombie::Zombie(int id, GameContext * context, int peerId):
+Zombie::Zombie(int id, GameContext * context, int peerId, const sf::Vector2f & pos):
 	Entity(id, NetObject::ZOMBIE, context),
 	m_peerId(peerId)
 {
 	m_size = { 69.f, 69.f };
+	m_core.setPosition(pos);
 }
 
 void Zombie::tick(float dt)

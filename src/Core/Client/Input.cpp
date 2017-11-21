@@ -6,13 +6,13 @@
 bool Input::initialize(Client & client)
 {
 
-	m_controls[Control::MOVE_LEFT] = std::bind(&Input::getKeyState_, this, sf::Keyboard::A, false);
-	m_controls[Control::MOVE_RIGHT] = std::bind(&Input::getKeyState_, this, sf::Keyboard::D, false);
-	m_controls[Control::MOVE_UP] = std::bind(&Input::getKeyState_, this, sf::Keyboard::W, false);
-	m_controls[Control::MOVE_DOWN] = std::bind(&Input::getKeyState_, this, sf::Keyboard::S, false);
+	m_controls[Control::MOVE_LEFT] = std::bind(&Input::getKeyState, this, sf::Keyboard::A, false);
+	m_controls[Control::MOVE_RIGHT] = std::bind(&Input::getKeyState, this, sf::Keyboard::D, false);
+	m_controls[Control::MOVE_UP] = std::bind(&Input::getKeyState, this, sf::Keyboard::W, false);
+	m_controls[Control::MOVE_DOWN] = std::bind(&Input::getKeyState, this, sf::Keyboard::S, false);
 
-	m_controls[Control::JUMP] = std::bind(&Input::getKeyState_, this, sf::Keyboard::Space, false);
-	m_controls[Control::PRIMARY_FIRE] = std::bind(&Input::getButtonState_, this, sf::Mouse::Left, false);
+	m_controls[Control::JUMP] = std::bind(&Input::getKeyState, this, sf::Keyboard::Space, false);
+	m_controls[Control::PRIMARY_FIRE] = std::bind(&Input::getButtonState, this, sf::Mouse::Left, false);
 
 	m_hasFocus = client.getWindow().hasFocus();
 
@@ -40,10 +40,6 @@ NetInput Input::getInput(const sf::RenderTarget & target, const sf::View & view)
 	if (m_controls[Control::MOVE_RIGHT]())
 		rawInput.moveDirection++;
 
-	if (m_controls[Control::MOVE_UP]())
-		rawInput.vMoveDirection--;
-	if (m_controls[Control::MOVE_DOWN]())
-		rawInput.vMoveDirection++;
 
 	rawInput.jump = m_controls[Control::JUMP]();
 	rawInput.fire = m_controls[Control::PRIMARY_FIRE]();
@@ -111,7 +107,7 @@ void Input::handleEvent(const sf::Event & event)
 	}
 }
 
-bool Input::getKeyState_(sf::Keyboard::Key key, bool currentFrame)
+bool Input::getKeyState(sf::Keyboard::Key key, bool currentFrame)
 {
 	if (currentFrame)
 		return m_keyStates[key].pressed && m_keyStates[key].frame == m_frame;
@@ -119,7 +115,7 @@ bool Input::getKeyState_(sf::Keyboard::Key key, bool currentFrame)
 	return m_keyStates[key].pressed;
 }
 
-bool Input::getButtonState_(sf::Mouse::Button button, bool currentFrame)
+bool Input::getButtonState(sf::Mouse::Button button, bool currentFrame)
 {
 	if (currentFrame)
 		return m_buttonStates[button].pressed && m_buttonStates[button].frame == m_frame;

@@ -34,8 +34,8 @@ public:
 	NetInput getInput(const sf::RenderTarget & target, const sf::View & view);
 	sf::Vector2i getMousePosition() { return m_mousePosition; }
 
-	bool getKeyState_(sf::Keyboard::Key key, bool currentFrame = false);
-	bool getButtonState_(sf::Mouse::Button button, bool currentFrame = false);
+	bool getKeyState(sf::Keyboard::Key key, bool currentFrame = false);
+	bool getButtonState(sf::Mouse::Button button, bool currentFrame = false);
 	
 private:
 	struct State
