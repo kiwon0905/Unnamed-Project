@@ -14,11 +14,9 @@ enum Control
 	JUMP = 1 << 0,
 	MOVE_LEFT = 1 << 1,
 	MOVE_RIGHT = 1 << 2,
-	MOVE_UP = 1 << 3,
-	MOVE_DOWN = 1 << 4,
-	PRIMARY_FIRE = 1 << 5,
-	ABILITY1 = 1 << 6,
-	ABILITY2 = 1 << 7,
+	PRIMARY_FIRE = 1 << 3,
+	ABILITY1 = 1 << 4,
+	ABILITY2 = 1 << 5,
 };
 
 class Client;
@@ -49,9 +47,6 @@ private:
 	int m_frame = 0;
 	sf::Vector2i m_mousePosition;
 	bool m_hasFocus;
-
-	NetInput m_prevInput;
-
 
 	std::unordered_map<Control, std::function<bool()>> m_controls;
 	bool m_activeKeys[sf::Keyboard::KeyCount] = { false };

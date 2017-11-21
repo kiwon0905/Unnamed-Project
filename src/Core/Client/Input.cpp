@@ -8,16 +8,12 @@ bool Input::initialize(Client & client)
 
 	m_controls[Control::MOVE_LEFT] = std::bind(&Input::getKeyState, this, sf::Keyboard::A, false);
 	m_controls[Control::MOVE_RIGHT] = std::bind(&Input::getKeyState, this, sf::Keyboard::D, false);
-	m_controls[Control::MOVE_UP] = std::bind(&Input::getKeyState, this, sf::Keyboard::W, false);
-	m_controls[Control::MOVE_DOWN] = std::bind(&Input::getKeyState, this, sf::Keyboard::S, false);
-
 	m_controls[Control::JUMP] = std::bind(&Input::getKeyState, this, sf::Keyboard::Space, false);
 	m_controls[Control::PRIMARY_FIRE] = std::bind(&Input::getButtonState, this, sf::Mouse::Left, false);
+	m_controls[Control::ABILITY1] = std::bind(&Input::getKeyState, this, sf::Keyboard::LShift, false);
+	m_controls[Control::ABILITY2] = std::bind(&Input::getKeyState, this, sf::Keyboard::E, false);
 
 	m_hasFocus = client.getWindow().hasFocus();
-
-	m_prevInput.jump = false;
-	m_prevInput.fire = false;
 	return true;
 }
 
@@ -43,15 +39,11 @@ NetInput Input::getInput(const sf::RenderTarget & target, const sf::View & view)
 
 	rawInput.jump = m_controls[Control::JUMP]();
 	rawInput.fire = m_controls[Control::PRIMARY_FIRE]();
+	rawInput.ability1 = m_controls[Control::ABILITY1]();
+	rawInput.ability2 = m_controls[Control::ABILITY2]();
 
 
-	NetInput filteredInput = rawInput;
-	if (m_prevInput.jump)
-		filteredInput.jump = false;
-	m_prevInput = rawInput;
-
-
-	return filteredInput;
+	return rawInput;
 
 }
 

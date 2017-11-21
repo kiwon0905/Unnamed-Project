@@ -19,14 +19,14 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 		friction = .99f;
 	}
 	
-
-
 	if (input.moveDirection > 0)
 		m_velocity.x = Math::clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, accel * dt);
 	else if (input.moveDirection < 0)
 		m_velocity.x = Math::clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, -accel * dt);
 	else
 		m_velocity.x = m_velocity.x * friction;
+
+
 
 
 	if (grounded)
@@ -39,10 +39,19 @@ void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 	{
 		m_airTick++;
 	}
+	bool jump = input.jump;
+
+	//jump can't be made twice in a row.
+	if (m_jump & 4)
+		jump = 0;
+	if (input.jump)
+		m_jump |= 4;
+	else
+		m_jump &= ~4;
 
 
 	//1(1) groundjump, 2(10) airjump, 4(100) prevJump
-	if (input.jump)
+	if (jump)
 	{
 		if (grounded || m_airTick < 10)
 		{

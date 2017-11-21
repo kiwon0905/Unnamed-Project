@@ -81,8 +81,6 @@ void NetHuman::write(Packer & packer) const
 	packer.pack(pos.y); //19
 	packer.pack(vel.x); //20
 	packer.pack(vel.y); // 20
-
-
 	packer.pack(aimAngle); // 9
 }
 
@@ -95,10 +93,7 @@ void NetHuman::read(Unpacker & unpacker)
 	unpacker.unpack(pos.y);
 	unpacker.unpack(vel.x);
 	unpacker.unpack(vel.y);
-
-
 	unpacker.unpack(aimAngle);
-
 }
 
 NetObject::Type NetProjectile::getType() const
