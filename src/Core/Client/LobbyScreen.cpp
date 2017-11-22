@@ -127,8 +127,6 @@ void LobbyScreen::onEnter(Client & client)
 	m_panels[SETTINGS]->getRenderer()->setBorderColor(sf::Color::Black);
 	
 	auto nameLabel = tgui::Label::create("Name:");
-	//nameLabel->getRenderer()->setBorders(1.f);
-	//nameLabel->getRenderer()->setBorderColor(sf::Color::Black);
 	m_panels[SETTINGS]->add(nameLabel);
 
 
@@ -141,8 +139,10 @@ void LobbyScreen::onEnter(Client & client)
 	nameEditBox->setDefaultText("Unnamed Person");
 	m_panels[SETTINGS]->add(nameEditBox, "nameEditBox");
 	//music
+	
 	m_musicPanel = tgui::Panel::create({ "parent.width * .2", "parent.width * .05" });
 	m_musicPanel->setPosition({ "40%", tgui::bindBottom(m_panels[INTERNET]) + tgui::bindBottom(m_panels[INTERNET]) * .1});
+	
 	auto horizontalLayout = tgui::HorizontalLayout::create();
 	m_musicPanel->add(horizontalLayout);
 
@@ -152,7 +152,7 @@ void LobbyScreen::onEnter(Client & client)
 	m_playTexture.load("assets/play.png", {}, {}, true);
 	m_nextTexture.load("assets/next.png", {}, {}, true);
 
-	
+	//TODO FIX MEM LEAK HERE
 	auto prev = tgui::Picture::create(m_prevTexture);
 	auto play = tgui::Picture::create(m_playTexture);
 	auto pause = tgui::Picture::create(m_pauseTexture);
@@ -175,7 +175,6 @@ void LobbyScreen::onEnter(Client & client)
 		horizontalLayout->addSpace(.3f);
 		horizontalLayout->add(next);
 		m_music.play();
-
 	};
 	play->onClick.connect(onPlayClick);
 
@@ -229,7 +228,7 @@ void LobbyScreen::onEnter(Client & client)
 	auto seed = std::chrono::system_clock::now().time_since_epoch().count();
 	std::shuffle(m_musics.begin(), m_musics.end(), std::default_random_engine(static_cast<unsigned>(seed)));
 
-	//loadNextMusic();
+	loadNextMusic();
 	requestInternetGamesInfo(client);
 }
 
@@ -443,7 +442,8 @@ void LobbyScreen::updateInternetGamesUi(Client & client)
 	
 	auto grid = bottomPanel->get<tgui::Grid>("grid");
 	grid->removeAllWidgets();
-	
+	grid->disconnectAll();
+
 	for (const auto & info : m_internetGames)
 	{
 		float scrollbarWidth = 0.f;
@@ -451,8 +451,9 @@ void LobbyScreen::updateInternetGamesUi(Client & client)
 			scrollbarWidth = bottomPanel->getScrollbarWidth();
 		auto line = tgui::Panel::create({ tgui::bindWidth(bottomPanel) - scrollbarWidth - 4, tgui::bindHeight(bottomPanel) / 10 });
 		
-		auto onEnter = [line]()
+		auto onEnter = [](tgui::Widget::Ptr widget, const std::string& signalName)
 		{
+			auto line = std::static_pointer_cast<tgui::Panel>(widget);
 			line->getRenderer()->setOpacity(1.f);
 
 			for (auto & w : line->getWidgets())
@@ -462,8 +463,9 @@ void LobbyScreen::updateInternetGamesUi(Client & client)
 			}
 		};
 
-		auto onLeave = [line]()
+		auto onLeave = [](tgui::Widget::Ptr widget, const std::string& signalName)
 		{
+			auto line = std::static_pointer_cast<tgui::Panel>(widget);
 			line->getRenderer()->setOpacity(.6f);
 			for (auto & w : line->getWidgets())
 			{
@@ -477,9 +479,12 @@ void LobbyScreen::updateInternetGamesUi(Client & client)
 		{
 			client.getNetwork().connect(info.addr);
 		};
+		
 		line->onMouseEnter.connect(onEnter);
 		line->onMouseLeave.connect(onLeave);
 		line->onClick.connect(onClick);
+
+
 		line->getRenderer()->setOpacity(.6f);
 
 		if (i % 2)

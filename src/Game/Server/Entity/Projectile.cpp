@@ -47,7 +47,7 @@ void Projectile::tick(float dt)
 		collided = true;
 	}
 
-	for (auto e : m_context->getWorld().getEntitiesOfType({ Entity::CHARACTER }))
+	for (auto e : m_context->getWorld().getEntities(Entity::CHARACTER))
 	{
 		//no self dmg
 		if (m_context->getPlayer(m_shooterPeerId) && m_context->getPlayer(m_shooterPeerId)->getCharacter() &&

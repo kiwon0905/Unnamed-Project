@@ -30,8 +30,7 @@ public:
 	T * createEntity(Args &&... args);
 	
 	Entity * getEntity(int id, Entity::Type type);
-	const std::vector<std::unique_ptr<Entity>> & getEntities(Entity::Type type);
-	const std::vector<Entity *> & getEntitiesOfType(const std::initializer_list<Entity::Type> & types);
+	std::vector<Entity *> getEntities(Entity::Type type);
 
 	template <typename T, typename... Args>
 	T * createTransientEntity(Args &&... args);

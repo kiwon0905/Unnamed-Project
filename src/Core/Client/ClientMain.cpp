@@ -12,12 +12,6 @@
 
 
 
-#include "Game/Snapshot.h"
-#include "Core/Rle.h"
-#include "Core/Utility.h"
-
-#include "Game/Aabb.h"
-
 int main()
 {
 #ifdef _DEBUG
@@ -27,17 +21,28 @@ int main()
 	client.run();
 
 }
+
+
 /*
-#include <SFML/Graphics.hpp>
+#include <TGUI/TGUI.hpp>
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(800, 600), "SFML works!");
+#ifdef _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+	sf::RenderWindow window{ { 800, 600 }, "Window" };
+	tgui::Gui gui{ window }; // Create the gui and attach it to the window
 
-
-	sf::Vector2f size = { 400.f, 100.f };
-	sf::Vector2f pos = { 100.f, 100.f };
-	sf::Vector2f point = { 600.f, 600.f };
+	tgui::Texture texture;
+	texture.load("assets/prev.png", {}, {}, true);
+	auto prev = tgui::Picture::create(texture);
+	auto onClick = []()
+	{
+		std::cout << "clicked\n";
+	};
+	prev->onClick.connect(onClick);
+	gui.add(prev);
 
 	while (window.isOpen())
 	{
@@ -46,47 +51,12 @@ int main()
 		{
 			if (event.type == sf::Event::Closed)
 				window.close();
-			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A)
-				point = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+
+			gui.handleEvent(event); // Pass the event to the widgets
 		}
-
-		sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-
-		sf::VertexArray arr{ sf::PrimitiveType::Lines, 2 };
-		sf::Vertex v0;
-		v0.position = point;
-		v0.color = sf::Color::Yellow;
-		sf::Vertex v1;
-		v1.position = static_cast<sf::Vector2f>(mousePos);
-		v1.color = sf::Color::Yellow;
-		arr.append(v0);
-		arr.append(v1);
 
 		window.clear();
-
-		Aabb aabb{ pos, size };
-		float t;
-		if (aabb.testLine(v0.position, v1.position, t))
-		{
-			std::cout << "!";
-
-			sf::Vector2f intersectionPoint = v0.position + (v1.position - v0.position) * t;
-			sf::CircleShape c;
-			c.setRadius(10.f);
-			c.setOrigin(10.f, 10.f);
-			c.setPosition(intersectionPoint);
-			window.draw(c);
-
-		}
-
-
-		sf::RectangleShape r;
-		r.setSize(size);
-		r.setPosition(pos);
-		window.draw(r);
-		window.draw(arr);
+		gui.draw(); // Draw all widgets
 		window.display();
 	}
-
-	return 0;
 }*/

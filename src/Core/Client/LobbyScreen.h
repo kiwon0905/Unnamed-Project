@@ -69,6 +69,7 @@ private:
 	tgui::Tabs::Ptr m_tabs;
 	std::vector<tgui::Panel::Ptr> m_panels;
 	tgui::Panel::Ptr m_musicPanel;
+	
 	tgui::Texture m_prevTexture;
 	tgui::Texture m_pauseTexture;
 	tgui::Texture m_playTexture;

@@ -73,25 +73,10 @@ Entity * GameWorld::getEntity(int id, Entity::Type type)
 	return nullptr;
 }
 
-const std::vector<std::unique_ptr<Entity>> & GameWorld::getEntities(Entity::Type type)
+std::vector<Entity *> GameWorld::getEntities(Entity::Type type)
 {
-	return m_entitiesByType[static_cast<int>(type)];
-}
-
-const std::vector<Entity *> & GameWorld::getEntitiesOfType(const std::initializer_list<Entity::Type> & types)
-{
-	static std::vector<Entity*> entities;
-
-	entities.clear();
-
-	for (Entity::Type type : types)
-	{
-		for (const auto & e : m_entitiesByType[static_cast<int>(type)])
-		{
-			entities.push_back(e.get());
-		}
-	}
-
-
-	return entities;
+	std::vector<Entity *> v;
+	for (auto & e : m_entitiesByType[static_cast<int>(type)])
+		v.push_back(e.get());
+	return v;
 }
