@@ -2,7 +2,8 @@
 #include <SFML/System.hpp>
 
 #include "NetInput.h"
-#include "NetObject.h"
+#include "NetObject/NetHuman.h"
+#include "NetObject/NetZombie.h"
 #include "Map.h"
 
 class WorldCore
@@ -47,6 +48,7 @@ public:
 private:
 	sf::Vector2f m_position;
 	sf::Vector2f m_velocity;
-	int m_fuel;
-	int m_airTick;
+	int m_fuel = 100;
+	int m_refuelCooldown = 0;
+	int m_boostCooldown = 0;
 };

@@ -9,11 +9,10 @@ enum class Team
 	COUNT
 };
 
-enum class Weapon
+enum class ProjectileType
 {
 	BULLET,
-	BOMB,
-	WEAPON_COUNT
+	ROCKET
 };
 
 inline std::string toString(Team t)

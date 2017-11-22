@@ -11,11 +11,19 @@ class Peer;
 class Entity
 {
 public:
-	Entity(int id, NetObject::Type type, GameContext * context, const sf::Vector2f & pos = sf::Vector2f());
+	enum Type
+	{
+		CHARACTER,
+		ITEM,
+		PROJECTILE,
+		COUNT
+	};
+
+	Entity(int id, Type type, GameContext * context, const sf::Vector2f & pos = sf::Vector2f());
 	virtual ~Entity() {}
 	
 	int getId();
-	NetObject::Type getType();
+	Type getType();
 
 	bool isAlive();
 	void setAlive(bool alive);
@@ -25,10 +33,9 @@ public:
 	
 	virtual void tick(float dt) = 0;
 	virtual void snap(Snapshot & snapshot) const = 0;
-	virtual void takeDamage(int dmg, int from, const sf::Vector2f & impulse);
 protected:
 	int m_id;
-	NetObject::Type m_type;
+	Type m_type;
 	bool m_alive = true;
 	sf::Vector2f m_position;
 	sf::Vector2f m_size;

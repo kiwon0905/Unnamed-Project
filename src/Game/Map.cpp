@@ -102,55 +102,6 @@ bool Map::sweepPoints(const std::vector<sf::Vector2f>& points, const sf::Vector2
 		time = minTime;
 	return collided;
 }
-/*
-int Map::sweep(const Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vector2i & norm) const
-{
-	//   x0    x1
-	//y0
-	//
-	//y1
-
-	float x0, x1, y0, y1;
-	x0 = d.x > 0 ? aabb.x : aabb.x + d.x;
-	y0 = d.y > 0 ? aabb.y : aabb.y + d.y;
-	x1 = d.x > 0 ? aabb.x + aabb.w + d.x : aabb.x + aabb.w;
-	y1 = d.y > 0 ? aabb.y + aabb.h + d.y : aabb.y + aabb.h;
-
-	int startX = static_cast<int>(std::floor(x0 / m_tileSize));
-	int endX = static_cast<int>(std::floor(x1 / m_tileSize));
-	int startY = static_cast<int>(std::floor(y0 / m_tileSize));
-	int endY = static_cast<int>(std::floor(y1 / m_tileSize));
-
-	int minTile = 0;
-	float minTime = 1.f;
-	sf::Vector2i minNorm;
-
-	for (int x = startX; x <= endX; ++x)
-	{
-		for (int y = startY; y <= endY; ++y)
-		{
-			int tile = getTile(x, y);
-			if (tile)
-			{
-				float time;
-				sf::Vector2i norm;
-				Aabb tileAabb(static_cast<float>(x * m_tileSize), static_cast<float>(y * m_tileSize), static_cast<float>(m_tileSize), static_cast<float>(m_tileSize));
-				if (aabb.sweep(d, tileAabb, time, norm))
-				{
-					if (time < minTime)
-					{
-						minTime = time;
-						minTile = tile;
-						minNorm = norm;
-					}
-				}
-			}
-		}
-	}
-	time = minTime;
-	norm = minNorm;
-	return minTile;
-}*/
 
 bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f & out, sf::Vector2i & norm, sf::Vector2i & tile) const
 {
@@ -309,17 +260,4 @@ int Map::getTile(float x, float y) const
 	int xt = static_cast<int>(std::floor(x / m_tileSize));
 	int yt = static_cast<int>(std::floor(y / m_tileSize));
 	return getTile(xt, yt);
-}
-
-std::vector<sf::Vector2f> Map::getCratePositions()
-{
-	std::vector<sf::Vector2f> vec;
-	vec.push_back(sf::Vector2f{ 21.f, 27.f } *static_cast<float>(m_tileSize));
-	vec.push_back(sf::Vector2f{ 31.f, 27.f } *static_cast<float>(m_tileSize));
-	vec.push_back(sf::Vector2f{ 41.f, 27.f } *static_cast<float>(m_tileSize));
-
-	//(21, 27)
-	//(31, 27)
-	return vec;
-
 }

@@ -40,11 +40,6 @@ public:
 	virtual bool checkRound(Team & team) = 0;
 	void reset();
 	
-	
-	//call this in startRound to create crates
-	void createCrates();
-
-	//
 	void announceDeath(int killedPeer, int killerPeer, const std::unordered_map<int, int> & assisters);
 	void addScore(int peerId, int score);
 private:

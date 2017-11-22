@@ -6,7 +6,7 @@
 class Projectile : public Entity
 {
 public:
-	Projectile(int id, GameContext * context, int shooterPeerId, Team shooterTeam);
+	Projectile(int id, GameContext * context, ProjectileType type, int shooterPeerId, Team shooterTeam);
 
 	void tick(float dt);
 	void snap(Snapshot & snapshot) const;

@@ -22,6 +22,9 @@
     <Filter Include="Game\Client\Entity">
       <UniqueIdentifier>{6ddd3315-ae23-498c-8850-54ebfa9dcde5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Shared\NetObject">
+      <UniqueIdentifier>{a56729ad-c2c6-44ed-a4f9-71ee0dd1d87b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\Client\Client.h">
@@ -117,14 +120,29 @@
     <ClInclude Include="src\Game\Client\Entity\Item.h">
       <Filter>Game\Client\Entity</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\Client\Entity\Crate.h">
-      <Filter>Game\Client\Entity</Filter>
-    </ClInclude>
     <ClInclude Include="src\Game\Client\PredictedEntity.h">
       <Filter>Game\Client</Filter>
     </ClInclude>
     <ClInclude Include="src\Game\Client\PlayingScreen.h">
       <Filter>Game\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\NetObject\NetZombie.h">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\NetObject\NetProjectile.h">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\NetObject\NetPlayerInfo.h">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\NetObject\NetItem.h">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\NetObject\NetHuman.h">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\NetObject\NetExplosion.h">
+      <Filter>Game\Shared\NetObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -209,9 +227,6 @@
     <ClCompile Include="src\Game\Client\Entity\Item.cpp">
       <Filter>Game\Client\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Client\Entity\Crate.cpp">
-      <Filter>Game\Client\Entity</Filter>
-    </ClCompile>
     <ClCompile Include="src\Game\Client\PredictedEntity.cpp">
       <Filter>Game\Client</Filter>
     </ClCompile>
@@ -220,6 +235,24 @@
     </ClCompile>
     <ClCompile Include="src\Game\Client\Entity\Zombie.cpp">
       <Filter>Game\Client\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\NetObject\NetZombie.cpp">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\NetObject\NetProjectile.cpp">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\NetObject\NetPlayerInfo.cpp">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\NetObject\NetItem.cpp">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\NetObject\NetHuman.cpp">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\NetObject\NetExplosion.cpp">
+      <Filter>Game\Shared\NetObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

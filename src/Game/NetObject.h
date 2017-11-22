@@ -15,7 +15,6 @@ public:
 		HUMAN,
 		ZOMBIE,
 		PROJECTILE,
-		CRATE,
 		ITEM,
 		PLAYER_INFO,
 		ENTITY_COUNT,
@@ -65,88 +64,3 @@ NetObject * NetObject::create()
 	};
 	return o;
 }
-
-//////////////////////////////////////////////////////////////
-
-struct NetHuman
-{
-	NetObject::Type getType() const;
-	void write(Packer & packer) const;
-	void read(Unpacker & unpacker);
-
-	sf::Vector2i pos;
-	sf::Vector2i vel;
-	int jump;
-	int airTick;
-	///
-	int aimAngle;
-	int health;
-};
-
-struct NetZombie
-{
-	NetObject::Type getType() const;
-	void write(Packer & packer) const;
-	void read(Unpacker & unpacker);
-
-	sf::Vector2i pos;
-	sf::Vector2i vel;
-};
-
-struct NetProjectile
-{
-	NetObject::Type getType() const;
-	void write(Packer & packer) const;
-	void read(Unpacker & unpacker);
-
-	sf::Vector2i pos;
-	sf::Vector2i vel;
-
-};
-
-struct NetCrate
-{
-	NetObject::Type getType() const;
-	void write(Packer & packer) const;
-	void read(Unpacker & unpacker);
-
-	sf::Vector2i pos;
-};
-
-struct NetItem
-{
-	NetObject::Type getType() const;
-	void write(Packer & packer) const;
-	void read(Unpacker & unpacker);
-
-	sf::Vector2i pos;
-};
-
-struct NetPlayerInfo
-{
-	NetObject::Type getType() const;
-	void write(Packer & packer) const;
-	void read(Unpacker & unpacker);
-
-	NetObject::Type type;
-	int id;
-	Team team;
-	int ping;
-	int score;
-	int kills;
-	int deaths;
-	int assists;
-	int respawnTick;
-
-};
-
-//Transient
-struct NetExplosion
-{
-	NetObject::Type getType() const;
-	void write(Packer & packer) const;
-	void read(Unpacker & unpacker);
-
-	sf::Vector2i pos;
-};
-

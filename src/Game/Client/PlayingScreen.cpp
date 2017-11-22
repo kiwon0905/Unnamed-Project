@@ -2,8 +2,9 @@
 #include "Game/Client/Entity/Human.h"
 #include "Game/Client/Entity/Zombie.h"
 #include "Game/Client/Entity/Projectile.h"
-#include "Game/Client/Entity/Crate.h"
 #include "Game/GameConfig.h"
+#include "Game/NetObject/NetPlayerInfo.h"
+#include "Game/NetObject//NetExplosion.h"
 
 #include "Core/Client/Client.h"
 #include "Core/Packer.h"
@@ -640,8 +641,6 @@ void PlayingScreen::render(Client & client)
 					case NetObject::PROJECTILE:
 						e = new Projectile(p.first.id, client, *this);
 						break;
-					case NetObject::CRATE:
-						e = new Crate(p.first.id, client, *this);
 					default:
 						break;
 					}

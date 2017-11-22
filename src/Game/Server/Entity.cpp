@@ -1,6 +1,6 @@
 #include "Entity.h"
 
-Entity::Entity(int id, NetObject::Type type, GameContext * context, const sf::Vector2f & pos):
+Entity::Entity(int id, Type type, GameContext * context, const sf::Vector2f & pos):
 	m_id(id),
 	m_type(type),
 	m_context(context),
@@ -13,7 +13,7 @@ int Entity::getId()
 	return m_id;
 }
 
-NetObject::Type Entity::getType()
+Entity::Type Entity::getType()
 {
 	return m_type;
 }
@@ -36,8 +36,4 @@ sf::Vector2f Entity::getPosition()
 sf::Vector2f Entity::getSize()
 {
 	return m_size;
-}
-
-void Entity::takeDamage(int dmg, int from, const sf::Vector2f & impulse)
-{
 }

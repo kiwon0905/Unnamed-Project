@@ -1,5 +1,5 @@
 #include "Projectile.h"
-#include "Game/NetObject.h"
+#include "Game/NetObject/NetProjectile.h"
 #include "Game/Snapshot.h"
 #include "Game/Client/PlayingScreen.h"
 #include "Core/Utility.h"
@@ -44,7 +44,10 @@ void Projectile::render(const Snapshot * from, const Snapshot * to, float predic
 
 	sf::RectangleShape r;
 	r.setFillColor(sf::Color::Black);
-	r.setSize({ 25.f, 25.f });
+	if (p0->type == ProjectileType::BULLET)
+		r.setSize({ 10.f, 10.f });
+	else if (p0->type == ProjectileType::ROCKET)
+		r.setSize({ 25.f, 25.f });
 	r.setOrigin(r.getSize() / 2.f);
 	r.setPosition(pos);
 	float angle = atan2f(vel.y, vel.x);

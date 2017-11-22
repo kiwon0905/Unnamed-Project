@@ -25,6 +25,9 @@
     <Filter Include="Game\Server\Entity">
       <UniqueIdentifier>{7753812d-b963-4a80-b29a-325c1348be6e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Shared\NetObject">
+      <UniqueIdentifier>{7f3bc6b1-cf28-4308-be46-585296707c5c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Game\Server\Entity.h">
@@ -102,9 +105,6 @@
     <ClInclude Include="src\Game\Server\Entity\TransientEntities.h">
       <Filter>Game\Server\Entity</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\Server\Entity\Crate.h">
-      <Filter>Game\Server\Entity</Filter>
-    </ClInclude>
     <ClInclude Include="src\Game\Server\Entity\Item.h">
       <Filter>Game\Server\Entity</Filter>
     </ClInclude>
@@ -116,6 +116,27 @@
     </ClInclude>
     <ClInclude Include="src\Game\Server\Player.h">
       <Filter>Game\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\NetObject\NetExplosion.h">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\NetObject\NetHuman.h">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\NetObject\NetItem.h">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\NetObject\NetPlayerInfo.h">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\NetObject\NetProjectile.h">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\NetObject\NetZombie.h">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Server\Entity\Character.h">
+      <Filter>Game\Server\Entity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -185,9 +206,6 @@
     <ClCompile Include="src\Game\Server\Entity\TransientEntities.cpp">
       <Filter>Game\Server\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Server\Entity\Crate.cpp">
-      <Filter>Game\Server\Entity</Filter>
-    </ClCompile>
     <ClCompile Include="src\Game\Server\Entity\Item.cpp">
       <Filter>Game\Server\Entity</Filter>
     </ClCompile>
@@ -199,6 +217,27 @@
     </ClCompile>
     <ClCompile Include="src\Game\Server\Player.cpp">
       <Filter>Game\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\NetObject\NetExplosion.cpp">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\NetObject\NetHuman.cpp">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\NetObject\NetItem.cpp">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\NetObject\NetPlayerInfo.cpp">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\NetObject\NetProjectile.cpp">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\NetObject\NetZombie.cpp">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Server\Entity\Character.cpp">
+      <Filter>Game\Server\Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

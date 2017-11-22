@@ -1,8 +1,8 @@
 #include "Player.h"
 #include "GameContext.h"
-#include "Game/NetObject.h"
+#include "Game//NetObject/NetPlayerInfo.h"
 #include "Game/Snapshot.h"
-#include "Game/Server/Entity.h"
+#include "Game/Server/Entity/Character.h"
 #include "Core/Server/Server.h"
 
 #include "Game/Server/Entity/Human.h"
@@ -18,14 +18,14 @@ int Player::getPeerId() const
 	return m_peerId;
 }
 
-Entity * Player::getEntity() const
+Character * Player::getCharacter() const
 {
-	return m_entity;
+	return m_character;
 }
 
-void Player::setEntity(Entity * e)
+void Player::setCharacter(Character * c)
 {
-	m_entity = e;
+	m_character = c;
 }
 
 Team Player::getTeam() const
@@ -90,7 +90,7 @@ void Player::setRespawnTick(int tick)
 
 void Player::onInput(int tick, const NetInput & input)
 {
-	if (!m_entity)
+	if (!m_character)
 		return;
 	Input i;
 	i.tick = tick;
@@ -124,7 +124,7 @@ void Player::setAckTick(int tick)
 
 void Player::reset()
 {
-	m_entity = nullptr;
+	m_character = nullptr;
 	m_team = Team::NONE;
 	m_score = 0;
 	m_kills = 0;
@@ -138,12 +138,12 @@ void Player::reset()
 void Player::tick()
 {
 	//Waiting for respawn
-	if (!m_entity && m_respawnTick > 0)
+	if (!m_character && m_respawnTick > 0)
 	{
 		--m_respawnTick;
 		if (m_respawnTick == 0)
 		{
-			m_entity = m_context->getWorld().createEntity<Human>(m_peerId, sf::Vector2f(100.f, 100.f));
+			m_character = m_context->getWorld().createEntity<Human>(m_peerId, sf::Vector2f(100.f, 100.f));
 			m_respawnTick = -1;
 		}
 	}
@@ -154,8 +154,8 @@ void Player::snap(Snapshot & snapshot)
 	NetPlayerInfo * info = reinterpret_cast<NetPlayerInfo*>(snapshot.addEntity(NetObject::PLAYER_INFO, m_peerId));
 	if (info)
 	{
-		info->type = m_entity ? m_entity->getType() : NetObject::Type::NONE;
-		info->id = m_entity ? m_entity->getId() : -1;
+		info->type = m_character ? m_character->getNetObjectType() : NetObject::Type::NONE;
+		info->id = m_character ? m_character->getId() : -1;
 		info->team = m_team;
 		info->score = m_score;
 		info->kills = m_kills;

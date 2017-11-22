@@ -39,7 +39,6 @@
     <ClInclude Include="src\Core\Utility.h" />
     <ClInclude Include="src\Game\Aabb.h" />
     <ClInclude Include="src\Game\Client\Entity.h" />
-    <ClInclude Include="src\Game\Client\Entity\Crate.h" />
     <ClInclude Include="src\Game\Client\Entity\Human.h" />
     <ClInclude Include="src\Game\Client\Entity\Item.h" />
     <ClInclude Include="src\Game\Client\Entity\Projectile.h" />
@@ -52,6 +51,12 @@
     <ClInclude Include="src\Game\GameCore.h" />
     <ClInclude Include="src\Game\Map.h" />
     <ClInclude Include="src\Game\NetObject.h" />
+    <ClInclude Include="src\Game\NetObject\NetExplosion.h" />
+    <ClInclude Include="src\Game\NetObject\NetHuman.h" />
+    <ClInclude Include="src\Game\NetObject\NetItem.h" />
+    <ClInclude Include="src\Game\NetObject\NetPlayerInfo.h" />
+    <ClInclude Include="src\Game\NetObject\NetProjectile.h" />
+    <ClInclude Include="src\Game\NetObject\NetZombie.h" />
     <ClInclude Include="src\Game\Snapshot.h" />
   </ItemGroup>
   <ItemGroup>
@@ -74,7 +79,6 @@
     <ClCompile Include="src\Core\Utility.cpp" />
     <ClCompile Include="src\Game\Aabb.cpp" />
     <ClCompile Include="src\Game\Client\Entity.cpp" />
-    <ClCompile Include="src\Game\Client\Entity\Crate.cpp" />
     <ClCompile Include="src\Game\Client\Entity\Human.cpp" />
     <ClCompile Include="src\Game\Client\Entity\Item.cpp" />
     <ClCompile Include="src\Game\Client\Entity\Projectile.cpp" />
@@ -85,6 +89,12 @@
     <ClCompile Include="src\Game\GameCore.cpp" />
     <ClCompile Include="src\Game\Map.cpp" />
     <ClCompile Include="src\Game\NetObject.cpp" />
+    <ClCompile Include="src\Game\NetObject\NetExplosion.cpp" />
+    <ClCompile Include="src\Game\NetObject\NetHuman.cpp" />
+    <ClCompile Include="src\Game\NetObject\NetItem.cpp" />
+    <ClCompile Include="src\Game\NetObject\NetPlayerInfo.cpp" />
+    <ClCompile Include="src\Game\NetObject\NetProjectile.cpp" />
+    <ClCompile Include="src\Game\NetObject\NetZombie.cpp" />
     <ClCompile Include="src\Game\Snapshot.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -145,30 +145,56 @@ void ZombieCore::tick(float dt, const NetInput & input, const Map & map)
 	{
 		accel = 3000.f;
 		friction = .99f;
+		maxSpeed = 300.f;
 	}
 
-	if (input.moveDirection > 0)
-		m_velocity.x = Math::clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, accel * dt);
-	else if (input.moveDirection < 0)
-		m_velocity.x = Math::clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, -accel * dt);
-	else
+	if (input.moveDirection == 0 || std::fabs(m_velocity.x) > maxSpeed)
 		m_velocity.x = m_velocity.x * friction;
+	else if (input.moveDirection > 0)
+		m_velocity.x = Math::clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, accel * dt);
+	else
+		m_velocity.x = Math::clampedAdd(-maxSpeed, maxSpeed, m_velocity.x, -accel * dt);
 
-
-
-	if (grounded)
+	if (input.ability1 && m_boostCooldown == 0)
 	{
-		if (input.jump)
+		m_velocity.y = -900.f;
+		m_boostCooldown = 200;
+	}
+
+	m_boostCooldown--;
+	if (m_boostCooldown < 0)
+		m_boostCooldown = 0;
+
+
+	if (input.jump)
+	{
+		if (grounded)
 		{
-			m_velocity.y = -700.f;
+			m_velocity.y = -400.f;
+		}
+		else if (m_fuel > 0)
+		{
+			m_velocity.y = std::min(m_velocity.y, Math::clampedAdd(-100.f, 3000.f, m_velocity.y, -10000.f * dt));
+			m_fuel--;
+			m_refuelCooldown = 10;
 		}
 	}
 
+	if (m_refuelCooldown > 0)
+	{
+		m_refuelCooldown--;
+	}
+
+	else if (m_refuelCooldown == 0)
+	{
+		m_fuel++;
+		if (m_fuel > 100)
+			m_fuel = 100;
+	}
 
 
 
 	sf::Vector2f d = m_velocity * dt;
-
 
 	sf::Vector2f out;
 	sf::Vector2i norm;
@@ -193,6 +219,9 @@ void ZombieCore::read(const NetZombie & nz)
 	m_position.y = nz.pos.y / 100.f;
 	m_velocity.x = nz.vel.x / 100.f;
 	m_velocity.y = nz.vel.y / 100.f;
+	m_fuel = nz.fuel;
+	m_boostCooldown = nz.boostCooldown;
+	m_refuelCooldown = nz.refuelCooldown;
 }
 
 void ZombieCore::write(NetZombie & nz) const
@@ -201,6 +230,9 @@ void ZombieCore::write(NetZombie & nz) const
 	nz.vel.y = Math::roundToInt(m_velocity.y * 100.f);
 	nz.pos.x = Math::roundToInt(m_position.x * 100.f);
 	nz.pos.y = Math::roundToInt(m_position.y * 100.f);
+	nz.fuel = m_fuel;
+	nz.boostCooldown = m_boostCooldown;
+	nz.refuelCooldown = m_refuelCooldown;
 }
 
 const sf::Vector2f & ZombieCore::getPosition() const

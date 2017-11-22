@@ -1,5 +1,5 @@
 #include "TransientEntities.h"
-#include "Game/NetObject.h"
+#include "Game/NetObject/NetExplosion.h"
 #include "Game/Snapshot.h"
 
 Explosion::Explosion(const sf::Vector2f & pos):

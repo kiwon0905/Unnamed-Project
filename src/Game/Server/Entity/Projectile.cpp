@@ -4,36 +4,42 @@
 #include "TransientEntities.h"
 #include "Game/Server/GameWorld.h"
 #include "Game/Server/GameContext.h"
-#include "Game/NetObject.h"
+#include "Game/NetObject/NetProjectile.h"
 #include "Game/Map.h"
 #include "Core/Server/Peer.h"
 #include "Core/Server/Server.h"
 #include "Core/Utility.h"
 
-Projectile::Projectile(int id, GameContext * context, int shooterPeerId, Team shooterTeam):
-	Entity(id, NetObject::PROJECTILE, context),
+Projectile::Projectile(int id, GameContext * context, ProjectileType type, int shooterPeerId, Team shooterTeam):
+	Entity(id, Entity::PROJECTILE, context),
 	m_shooterPeerId(shooterPeerId),
 	m_team(shooterTeam)
 {
-	m_size = { 25.f, 25.f };
+	if (type == ProjectileType::BULLET)
+	{
+		m_size = { 10.f, 10.f };
+	}
+	else if (type == ProjectileType::ROCKET)
+	{
+		m_size = { 25.f, 25.f };
+	}
 }
 
 void Projectile::tick(float dt)
 {
-
 	m_velocity.y = Math::clampedAdd(-3000.f, 3000.f, m_velocity.y, 1000.f * dt);
 	float angle = atan2f(m_velocity.y, m_velocity.x);
 
-	sf::Vector2f a = m_position + Math::rotatePoint({ 12.5f, 12.5f }, angle);
-	sf::Vector2f b = m_position + Math::rotatePoint({ 12.5f, 0.f }, angle);
-	sf::Vector2f c = m_position + Math::rotatePoint({ 12.5f, -12.5f }, angle);
+	sf::Vector2f a = m_position + Math::rotatePoint({ m_size.x / 2.f, m_size.y / 2.f }, angle);
+	sf::Vector2f b = m_position + Math::rotatePoint({ m_size.x / 2.f, 0.f }, angle);
+	sf::Vector2f c = m_position + Math::rotatePoint({ m_size.x / 2.f, -m_size.y / 2.f }, angle);
 
 
 	sf::Vector2f d = m_velocity * dt;
 	
 	float minTime = 1.f;
 	bool collided = false;
-	Entity * hitEntity = nullptr;
+	Character * hitEntity = nullptr;
 
 	//tile
 	if (m_context->getMap().sweepPoints({ a, b, c }, d, minTime))
@@ -41,14 +47,14 @@ void Projectile::tick(float dt)
 		collided = true;
 	}
 
-	for (auto e : m_context->getWorld().getEntitiesOfType({ NetObject::HUMAN, NetObject::CRATE }))
+	for (auto e : m_context->getWorld().getEntitiesOfType({ Entity::CHARACTER }))
 	{
 		//no self dmg
-		if (m_context->getPlayer(m_shooterPeerId) && m_context->getPlayer(m_shooterPeerId)->getEntity() &&
-			m_context->getPlayer(m_shooterPeerId)->getEntity()->getId() == e->getId())
+		if (m_context->getPlayer(m_shooterPeerId) && m_context->getPlayer(m_shooterPeerId)->getCharacter() &&
+			m_context->getPlayer(m_shooterPeerId)->getCharacter()->getId() == e->getId())
 			continue;
 
-		if (e->getType() == NetObject::HUMAN && m_context->getPlayer(static_cast<Human*>(e)->getPeerId())->getTeam() == m_team)
+		if (m_context->getPlayer(static_cast<Human*>(e)->getPeerId())->getTeam() == m_team)
 			continue;
 
 		Aabb aabb{ e->getPosition(), e->getSize() };
@@ -60,7 +66,7 @@ void Projectile::tick(float dt)
 			if (t < minTime)
 			{
 				minTime = t;
-				hitEntity = e;
+				hitEntity = static_cast<Character*>(e);
 			}
 		}
 		

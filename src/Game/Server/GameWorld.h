@@ -28,10 +28,10 @@ public:
 
 	template <typename T, typename... Args>
 	T * createEntity(Args &&... args);
-	Entity * getEntity(int id, NetObject::Type type);
-
-	const std::vector<std::unique_ptr<Entity>> & getEntities(NetObject::Type type);
-	const std::vector<Entity *> & getEntitiesOfType(const std::initializer_list<NetObject::Type> & types);
+	
+	Entity * getEntity(int id, Entity::Type type);
+	const std::vector<std::unique_ptr<Entity>> & getEntities(Entity::Type type);
+	const std::vector<Entity *> & getEntitiesOfType(const std::initializer_list<Entity::Type> & types);
 
 	template <typename T, typename... Args>
 	T * createTransientEntity(Args &&... args);

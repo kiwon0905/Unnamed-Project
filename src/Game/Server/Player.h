@@ -4,7 +4,7 @@
 #include "Core/Server/Peer.h"
 #include <queue>
 
-class Entity;
+class Character;
 class Snapshot;
 class GameContext;
 
@@ -29,8 +29,8 @@ public:
 
 	int getPeerId() const;
 
-	Entity * getEntity() const;
-	void setEntity(Entity * e);
+	Character * getCharacter() const;
+	void setCharacter(Character * c);
 
 	Team getTeam() const;
 	void setTeam(Team team);
@@ -62,7 +62,7 @@ public:
 private:
 	int m_peerId;
 	GameContext * m_context;
-	Entity * m_entity = nullptr;
+	Character * m_character = nullptr;
 	Team m_team = Team::NONE;
 	int m_score = 0;
 	int m_kills = 0;

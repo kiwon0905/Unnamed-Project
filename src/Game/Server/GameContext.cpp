@@ -1,5 +1,4 @@
 #include "GameContext.h"
-#include "Game/Server/Entity/Crate.h"
 #include "Core/Server/Server.h"
 #include "Core/ENetUtility.h"
 #include "Core/Logger.h"
@@ -137,14 +136,6 @@ int GameContext::getCurrentTick() const
 sf::Time GameContext::getCurrentTime() const
 {
 	return m_clock.getElapsedTime();
-}
-
-void GameContext::createCrates()
-{
-	for (const auto & v : m_map.getCratePositions())
-	{
-		m_gameWorld.createEntity<Crate>(v);
-	}
 }
 
 void GameContext::loadRound()

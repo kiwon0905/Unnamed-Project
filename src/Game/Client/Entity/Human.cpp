@@ -92,7 +92,6 @@ void Human::render(const Snapshot * from, const Snapshot * to, float predictedT,
 
 		}
 	}
-	//aimAngle = 0.f;
 	gun.setRotation(aimAngle);
 	target.draw(gun);
 

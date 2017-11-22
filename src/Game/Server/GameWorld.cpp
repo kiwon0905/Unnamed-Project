@@ -12,13 +12,13 @@
 GameWorld::GameWorld(GameContext * context):
 	m_context(context)
 {
-	m_entitiesByType.resize(static_cast<int>(NetObject::ENTITY_COUNT));
+	m_entitiesByType.resize(static_cast<int>(Entity::COUNT));
 }
 
 void GameWorld::onDisconnect(Player & player)
 {
-	if (player.getEntity())
-		player.getEntity()->setAlive(false);
+	if (player.getCharacter())
+		player.getCharacter()->setAlive(false);
 	auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
 	for (auto & v : m_entitiesByType)
 		v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
@@ -65,7 +65,7 @@ void GameWorld::snap(Snapshot & snapshot)
 	m_transientEntities.clear();
 }
 
-Entity * GameWorld::getEntity(int id, NetObject::Type type)
+Entity * GameWorld::getEntity(int id, Entity::Type type)
 {
 	for (auto & e : m_entitiesByType[static_cast<int>(type)])
 		if (e->getId() == id)
@@ -73,18 +73,18 @@ Entity * GameWorld::getEntity(int id, NetObject::Type type)
 	return nullptr;
 }
 
-const std::vector<std::unique_ptr<Entity>> & GameWorld::getEntities(NetObject::Type type)
+const std::vector<std::unique_ptr<Entity>> & GameWorld::getEntities(Entity::Type type)
 {
 	return m_entitiesByType[static_cast<int>(type)];
 }
 
-const std::vector<Entity *> & GameWorld::getEntitiesOfType(const std::initializer_list<NetObject::Type> & types)
+const std::vector<Entity *> & GameWorld::getEntitiesOfType(const std::initializer_list<Entity::Type> & types)
 {
 	static std::vector<Entity*> entities;
 
 	entities.clear();
 
-	for (NetObject::Type type : types)
+	for (Entity::Type type : types)
 	{
 		for (const auto & e : m_entitiesByType[static_cast<int>(type)])
 		{
