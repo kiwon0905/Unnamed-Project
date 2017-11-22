@@ -74,7 +74,7 @@ void Announcer::announce(const std::string & s, const sf::Color & fill, const sf
 	m_infos.back().text.setFont(*m_font);
 	m_infos.back().text.setFillColor(fill);
 	m_infos.back().text.setOutlineColor(outline);
-	m_infos.back().text.setOutlineThickness(3.f);
+	//m_infos.back().text.setOutlineThickness(3.f); mem leak here
 	m_infos.back().text.setString(s);
 }
 

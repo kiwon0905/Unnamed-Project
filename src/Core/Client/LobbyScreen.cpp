@@ -152,46 +152,32 @@ void LobbyScreen::onEnter(Client & client)
 	m_playTexture.load("assets/play.png", {}, {}, true);
 	m_nextTexture.load("assets/next.png", {}, {}, true);
 
-	//TODO FIX MEM LEAK HERE
 	auto prev = tgui::Picture::create(m_prevTexture);
-	auto play = tgui::Picture::create(m_playTexture);
-	auto pause = tgui::Picture::create(m_pauseTexture);
+	auto playPause = tgui::Picture::create(m_playTexture);
 	auto next = tgui::Picture::create(m_nextTexture);
-
+	
 	auto onPrevClick = [this]()
 	{
 		loadPrevMusic();
 	};
 	prev->onClick.connect(onPrevClick);
 
-
-	auto onPlayClick = [this, horizontalLayout, prev, pause, next]()
+	auto onPlayPauseClick = [this](tgui::Widget::Ptr widget, const std::string& signalName)
 	{
-		std::cout << "play\n";
-		horizontalLayout->removeAllWidgets();
-		horizontalLayout->add(prev);
-		horizontalLayout->addSpace(.3f);
-		horizontalLayout->add(pause, "pause");
-		horizontalLayout->addSpace(.3f);
-		horizontalLayout->add(next);
-		m_music.play();
-	};
-	play->onClick.connect(onPlayClick);
-
-
-	auto onPauseClick = [this, horizontalLayout, prev, play, next]()
-	{
-		std::cout << "pause\n";
-		horizontalLayout->removeAllWidgets();
-		horizontalLayout->add(prev);
-		horizontalLayout->addSpace(.3f);
-		horizontalLayout->add(play, "play");
-		horizontalLayout->addSpace(.3f);
-		horizontalLayout->add(next);
-		m_music.pause();
+		tgui::Picture::Ptr pic = std::static_pointer_cast<tgui::Picture>(widget);
+		if (m_music.getStatus() == sf::Music::Paused || m_music.getStatus() == sf::Music::Stopped)
+		{
+			pic->getRenderer()->setTexture(m_pauseTexture);
+			m_music.play();
+		}
+		else if (m_music.getStatus() == sf::Music::Playing)
+		{
+			pic->getRenderer()->setTexture(m_playTexture);
+			m_music.pause();
+		}
 		
 	};
-	pause->onClick.connect(onPauseClick);
+	playPause->onClick.connect(onPlayPauseClick);
 
 
 	auto onNextClick = [this]()
@@ -202,7 +188,7 @@ void LobbyScreen::onEnter(Client & client)
 	
 	horizontalLayout->add(prev);
 	horizontalLayout->addSpace(.3f);
-	horizontalLayout->add(pause, "pause");
+	horizontalLayout->add(playPause);
 	horizontalLayout->addSpace(.3f);
 	horizontalLayout->add(next);
 	gui.add(m_musicPanel);
@@ -229,6 +215,7 @@ void LobbyScreen::onEnter(Client & client)
 	std::shuffle(m_musics.begin(), m_musics.end(), std::default_random_engine(static_cast<unsigned>(seed)));
 
 	loadNextMusic();
+	m_music.stop();
 	requestInternetGamesInfo(client);
 }
 
