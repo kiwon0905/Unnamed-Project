@@ -12,6 +12,7 @@
 
 Projectile::Projectile(int id, GameContext * context, ProjectileType type, int shooterPeerId, Team shooterTeam):
 	Entity(id, Entity::PROJECTILE, context),
+	m_type(type),
 	m_shooterPeerId(shooterPeerId),
 	m_team(shooterTeam)
 {
@@ -21,15 +22,18 @@ Projectile::Projectile(int id, GameContext * context, ProjectileType type, int s
 	}
 	else if (type == ProjectileType::ROCKET)
 	{
-		m_size = { 25.f, 25.f };
+		m_size = { 50.f, 25.f };
 	}
 }
 
 void Projectile::tick(float dt)
 {
-	m_velocity.y = Math::clampedAdd(-3000.f, 3000.f, m_velocity.y, 1000.f * dt);
+	m_velocity.y = Math::clampedAdd(-3000.f, 3000.f, m_velocity.y, m_gravity * dt);
+	
+	
 	float angle = atan2f(m_velocity.y, m_velocity.x);
 
+	//collision points
 	sf::Vector2f a = m_position + Math::rotatePoint({ m_size.x / 2.f, m_size.y / 2.f }, angle);
 	sf::Vector2f b = m_position + Math::rotatePoint({ m_size.x / 2.f, 0.f }, angle);
 	sf::Vector2f c = m_position + Math::rotatePoint({ m_size.x / 2.f, -m_size.y / 2.f }, angle);
@@ -95,10 +99,11 @@ void Projectile::snap(Snapshot & snapshot) const
 	NetProjectile * np = static_cast<NetProjectile*>(snapshot.addEntity(NetObject::PROJECTILE, m_id));
 	if (np)
 	{
-		np->pos.x = (int)std::round(m_position.x * 100.f);
-		np->pos.y = (int)std::round(m_position.y * 100.f);
-		np->vel.x = (int)std::round(m_velocity.x * 100.f);
-		np->vel.y = (int)std::round(m_velocity.y * 100.f);
+		np->type = m_type;
+		np->pos.x = static_cast<int>(std::round(m_position.x * 100.f));
+		np->pos.y = static_cast<int>(std::round(m_position.y * 100.f));
+		np->vel.x = static_cast<int>(std::round(m_velocity.x * 100.f));
+		np->vel.y = static_cast<int>(std::round(m_velocity.y * 100.f));
 	}
 }
 

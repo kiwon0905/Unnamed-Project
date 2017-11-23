@@ -16,5 +16,7 @@ public:
 private:
 	sf::Vector2f m_velocity;
 	int m_shooterPeerId;
+	ProjectileType m_type;
+	float m_gravity = 0.f;
 	Team m_team;
 };

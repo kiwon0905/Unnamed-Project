@@ -12,6 +12,8 @@ std::ostream & operator<<(std::ostream & os, const sf::Vector2<T> & v)
 	return os << "(" << v.x << ", " << v.y << ")";
 }
 
+std::string getStringFromTime(int totalSeconds);
+
 namespace Math
 {
 	const float PI = 3.1415926535f;

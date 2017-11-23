@@ -106,6 +106,17 @@ void Zombie::render(const Snapshot * from, const Snapshot * to, float predictedT
 	health.setSize(sf::Vector2f(healthVal / 100.f * (70.f + 2 * total.getOutlineThickness()), total.getSize().y + total.getOutlineThickness() * 2));
 	health.setPosition(total.getPosition() - sf::Vector2f{ total.getOutlineThickness(), total.getOutlineThickness() });
 	target.draw(health);
+
+	//name
+	sf::Text name;
+	name.setFont(*m_screen->getFont());
+	name.setString(info->name);
+	name.setOrigin(name.getLocalBounds().left, name.getLocalBounds().top);
+	if (m_screen->getMyPlayerId() == info->id)
+		name.setFillColor(sf::Color::Yellow);
+	name.setPosition(pos);
+	name.setPosition({ pos.x + 69.f / 2.f - name.getLocalBounds().width / 2.f, total.getPosition().y - name.getLocalBounds().height - name.getFont()->getLineSpacing(name.getCharacterSize()) });
+	target.draw(name);
 }
 
 sf::Vector2f Zombie::getRenderPos(const NetZombie * z0, const NetZombie * z1, float predictedT, float t) const

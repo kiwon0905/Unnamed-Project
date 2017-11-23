@@ -44,13 +44,7 @@ private:
 	float m_accumulator = 0.f;
 };
 
-class SmokeTrailEmitter : public ParticleEmitter
-{
-public:
-	SmokeTrailEmitter();
-	void onEmit(Particle & p);
-	sf::Vector2f pos;
-};
+
 
 class Particles : public sf::Drawable
 {
@@ -72,4 +66,3 @@ private:
 	sf::VertexArray m_vertices;
 };
 
-void createExplosion(Particles & p, const sf::Vector2f & pos);

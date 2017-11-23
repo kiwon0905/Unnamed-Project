@@ -144,6 +144,12 @@
     <ClInclude Include="src\Game\NetObject\NetExplosion.h">
       <Filter>Game\Shared\NetObject</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\Client\ParticleEffects.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Client\Hud.h">
+      <Filter>Game\Client</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Client\Client.cpp">
@@ -253,6 +259,12 @@
     </ClCompile>
     <ClCompile Include="src\Game\NetObject\NetExplosion.cpp">
       <Filter>Game\Shared\NetObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\ParticleEffects.cpp">
+      <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Client\Hud.cpp">
+      <Filter>Game\Client</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

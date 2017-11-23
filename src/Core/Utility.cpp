@@ -1,5 +1,20 @@
 #include "Utility.h"
 
+
+std::string getStringFromTime(int totalSeconds)
+{
+	int minutes = totalSeconds / 60;
+	int seconds = totalSeconds % 60;
+
+	std::string minutesString = std::to_string(minutes);
+	std::string secondsString = std::to_string(seconds);
+	if (minutes < 10)
+		minutesString = "0" + minutesString;
+	if (seconds < 10)
+		secondsString = "0" + secondsString;
+	return minutesString + ":" + secondsString;
+}
+
 namespace Math
 {
 	sf::Vector2f rotatePoint(const sf::Vector2f & p, float angle)

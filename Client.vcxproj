@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Client\ParticleEffects.h" />
     <ClInclude Include="src\Core\Client\Particles.h" />
     <ClInclude Include="src\Core\Client\SoundPlayer.h" />
     <ClInclude Include="src\Core\Client\Client.h" />
@@ -43,6 +44,7 @@
     <ClInclude Include="src\Game\Client\Entity\Item.h" />
     <ClInclude Include="src\Game\Client\Entity\Projectile.h" />
     <ClInclude Include="src\Game\Client\Entity\Zombie.h" />
+    <ClInclude Include="src\Game\Client\Hud.h" />
     <ClInclude Include="src\Game\Client\PlayingScreen.h" />
     <ClInclude Include="src\Game\Client\PredictedEntity.h" />
     <ClInclude Include="src\Game\NetInput.h" />
@@ -60,6 +62,7 @@
     <ClInclude Include="src\Game\Snapshot.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Client\ParticleEffects.cpp" />
     <ClCompile Include="src\Core\Client\Particles.cpp" />
     <ClCompile Include="src\Core\Client\SoundPlayer.cpp" />
     <ClCompile Include="src\Core\Client\Client.cpp" />
@@ -83,6 +86,7 @@
     <ClCompile Include="src\Game\Client\Entity\Item.cpp" />
     <ClCompile Include="src\Game\Client\Entity\Projectile.cpp" />
     <ClCompile Include="src\Game\Client\Entity\Zombie.cpp" />
+    <ClCompile Include="src\Game\Client\Hud.cpp" />
     <ClCompile Include="src\Game\Client\PlayingScreen.cpp" />
     <ClCompile Include="src\Game\Client\PredictedEntity.cpp" />
     <ClCompile Include="src\Game\NetInput.cpp" />

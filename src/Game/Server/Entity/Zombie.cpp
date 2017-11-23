@@ -37,7 +37,7 @@ void Zombie::tick(float dt)
 				m_context->getMap().getTile(firePos.x + 25.f, firePos.y + 25.f) == 0 &&
 				m_context->getMap().getTile(firePos.x, firePos.y + 25.f) == 0)
 			{
-				Projectile * p = m_context->getWorld().createEntity<Projectile>(ProjectileType::BULLET, m_peerId, m_context->getPlayer(m_peerId)->getTeam());
+				Projectile * p = m_context->getWorld().createEntity<Projectile>(ProjectileType::ROCKET, m_peerId, m_context->getPlayer(m_peerId)->getTeam());
 
 				p->setVelocity(Math::unit(v) * 1500.f);
 				p->setPosition(firePos);

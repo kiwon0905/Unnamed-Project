@@ -3,7 +3,7 @@
 #include "Game/Snapshot.h"
 #include "Game/Client/PlayingScreen.h"
 #include "Core/Utility.h"
-#include "Core/Client/Particles.h"
+#include "Core/Client/ParticleEffects.h"
 #include <SFML/Graphics.hpp>
 
 Projectile::Projectile(int id, Client & client, PlayingScreen & screen):
@@ -47,39 +47,12 @@ void Projectile::render(const Snapshot * from, const Snapshot * to, float predic
 	if (p0->type == ProjectileType::BULLET)
 		r.setSize({ 10.f, 10.f });
 	else if (p0->type == ProjectileType::ROCKET)
-		r.setSize({ 25.f, 25.f });
+		r.setSize({ 50.f, 25.f });
 	r.setOrigin(r.getSize() / 2.f);
 	r.setPosition(pos);
 	float angle = atan2f(vel.y, vel.x);
 	r.setRotation(angle * 180 / Math::PI);
 	target.draw(r);
-
-
-	sf::Vector2f a = Math::rotatePoint({ 12.5f, 12.5f }, angle);
-	sf::Vector2f b = Math::rotatePoint({ 12.5f, 0.f }, angle);
-	sf::Vector2f c = Math::rotatePoint({ 12.5f, -12.5f }, angle);
-
-	sf::RectangleShape ar{ {5.f, 5.f} };
-	ar.setFillColor(sf::Color::White);
-	ar.setOrigin(2.5f, 2.5f);
-	ar.setPosition(a + pos);
-
-	sf::RectangleShape br{ { 5.f, 5.f } };
-	br.setFillColor(sf::Color::White);
-	br.setOrigin(2.5f, 2.5f);
-	br.setPosition(b + pos);
-
-	sf::RectangleShape cr{ { 5.f, 5.f } };
-	cr.setFillColor(sf::Color::White);
-	cr.setOrigin(2.5f, 2.5f);
-	cr.setPosition(c + pos);
-	
-	target.draw(ar);
-	target.draw(br);
-
-	target.draw(cr);
-
-
 
 
 	sf::Vector2f smokeOffset;

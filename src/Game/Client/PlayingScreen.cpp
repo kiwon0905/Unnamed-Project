@@ -1,11 +1,12 @@
 #include "PlayingScreen.h"
+#include "Game/GameConfig.h"
 #include "Game/Client/Entity/Human.h"
 #include "Game/Client/Entity/Zombie.h"
 #include "Game/Client/Entity/Projectile.h"
-#include "Game/GameConfig.h"
 #include "Game/NetObject/NetPlayerInfo.h"
-#include "Game/NetObject//NetExplosion.h"
+#include "Game/NetObject/NetExplosion.h"
 
+#include "Core/Client/ParticleEffects.h"
 #include "Core/Client/Client.h"
 #include "Core/Packer.h"
 #include "Core/Protocol.h"
@@ -15,20 +16,6 @@
 #include <iostream>
 
 sf::Vector2f g_pos;
-
-std::string getStringFromTime(int totalSeconds)
-{
-	int minutes = totalSeconds / 60;
-	int seconds = totalSeconds % 60;
-
-	std::string minutesString = std::to_string(minutes);
-	std::string secondsString = std::to_string(seconds);
-	if (minutes < 10)
-		minutesString = "0" + minutesString;
-	if (seconds < 10)
-		secondsString = "0" + secondsString;
-	return minutesString + ":" + secondsString;
-}
 
 sf::Time SmoothClock::getElapsedTime()
 {
@@ -63,53 +50,6 @@ void SmoothClock::update(sf::Time target, sf::Time converge)
 	m_converge = converge;
 }
 
-void Announcer::setFont(const sf::Font & font)
-{
-	m_font = &font;
-}
-
-void Announcer::announce(const std::string & s, const sf::Color & fill, const sf::Color & outline)
-{
-	m_infos.emplace_back();
-	m_infos.back().text.setFont(*m_font);
-	m_infos.back().text.setFillColor(fill);
-	m_infos.back().text.setOutlineColor(outline);
-	//m_infos.back().text.setOutlineThickness(3.f); mem leak here
-	m_infos.back().text.setString(s);
-}
-
-void Announcer::update(float dt)
-{
-	if (!m_infos.empty())
-	{
-		m_infos[0].time += dt;
-		if (m_infos[0].time > 1.f)
-		{
-			float t = (m_infos[0].time - 1.f);
-			int alpha = Math::lerp(255, 0, t);
-			sf::Color c = m_infos[0].text.getFillColor();
-			c.a = alpha;
-			m_infos[0].text.setFillColor(c);
-			c = m_infos[0].text.getOutlineColor();
-			c.a = alpha;
-			m_infos[0].text.setOutlineColor(c);
-		}
-		if (m_infos[0].time > 2.f)
-			m_infos.pop_front();
-	}
-}
-
-void Announcer::draw(sf::RenderTarget & target, sf::RenderStates states) const
-{
-	if (!m_infos.empty())
-	{
-		sf::Vector2f pos = sf::Vector2f((target.getSize().x - m_infos[0].text.getLocalBounds().width) / 2.f, target.getSize().y * 0.2f);
-		states.transform.translate(pos);
-		target.draw(m_infos[0].text, states);
-	}
-}
-
-
 PlayingScreen::PlayingScreen()
 {
 	m_entitiesByType.resize(static_cast<std::size_t>(NetObject::ENTITY_COUNT));
@@ -139,14 +79,13 @@ void PlayingScreen::onEnter(Client & client)
 
 
 	m_particles.setTexture(*client.getAssetManager().get<sf::Texture>("assets/Untitled.png"));
-	m_announcer.setFont(*m_font);
 
 	//ui
 	m_editBox = tgui::EditBox::create();
 	m_editBox->setPosition({ 0.f, client.getWindow().getSize().y - m_editBox->getSize().y });
 	m_editBox->setSize("50%", m_editBox->getSize().y);
 	m_editBox->hide();
-
+	m_hud.reset(new Hud(*m_font, *this));
 
 	auto sendChat = [&client, this]()
 	{
@@ -420,7 +359,6 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			{
 				float s = tick / TICKS_PER_SEC;
 				std::string time = getStringFromTime(static_cast<int>(s));
-
 				std::string line = "[" + time + "] " + info->name + ": " + msg;
 				Logger::getInstance().info("Chat", line);
 				m_chatBox->addLine(line);
@@ -455,7 +393,8 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			std::string killedPeerName = killedPeerInfo ? killedPeerInfo->name : "Unknown player";
 			std::string killerPeerName = killerPeerInfo ? killerPeerInfo->name : "Unknown player";
 			std::string str = killerPeerName + " killed " + killedPeerName;
-			m_announcer.announce(str);
+			//m_announcer.announce(str);
+			m_hud->announce(str);
 			m_chatBox->addLine(str, sf::Color::Red);
 		}
 	}
@@ -531,11 +470,18 @@ void PlayingScreen::update(Client & client)
 			client.getNetwork().send(packer, false);
 			client.getNetwork().flush();
 
+
+			//TODO: improve this clusterfuck of logic
+
+			const PlayerInfo * myPlayer = getPlayerInfo(m_myPlayerId);
+
 			//Prediction
 			for (auto p : m_predictedEntities)
 			{
 				p->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), input, m_map);
+				
 			}
+			
 
 			if (m_repredict)
 			{
@@ -547,16 +493,20 @@ void PlayingScreen::update(Client & client)
 					if (obj)
 					{
 						e->rollback(obj);
+
+
 						for (int t = m_lastRecvTick + 1; t <= m_predictedTick; ++t)
 						{
-							//TODO improve
 							NetInput input;
 							for (const auto & i : m_inputs)
 								if (i.tick == t)
 									input = i.input;
 
 							e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), input, m_map);
+						
 						}
+
+
 					}
 					m_repredict = false;
 				}
@@ -570,7 +520,7 @@ void PlayingScreen::update(Client & client)
 		}
 		sf::Time timeSinceLastUpdate = clock.restart();
 		m_particles.update(timeSinceLastUpdate.asSeconds());
-		m_announcer.update(timeSinceLastUpdate.asSeconds());
+		m_hud->update(timeSinceLastUpdate.asSeconds());
 	}
 }
 
@@ -750,22 +700,12 @@ void PlayingScreen::render(Client & client)
 	//particles
 	window.draw(m_particles);
 
-
-	//Time
-	window.setView(window.getDefaultView());
-	sf::Text timeText;
-	timeText.setFillColor(sf::Color::Blue);
-	int totalSeconds = static_cast<int>(currentRenderTime.asMicroseconds()) / 1000000;
-	timeText.setString(getStringFromTime(totalSeconds));
-	timeText.setFont(*client.getAssetManager().get<sf::Font>("assets/font/arial.ttf"));
-	timeText.setPosition(static_cast<float>(client.getWindow().getSize().x / 2.f - timeText.getLocalBounds().width / 2.f), 0.f);
-	window.draw(timeText);
 	
 	if(client.debugRenderEnabled())
 		debugRender(client, m_view);
 
-	//announcer
-	window.draw(m_announcer);
+	m_hud->setGameTime(currentRenderTime);
+	window.draw(*m_hud);
 }
 
 void PlayingScreen::onExit(Client & client)
