@@ -12,6 +12,7 @@ public:
 	sf::Vector2f getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const;
 	void render(const Snapshot * from, const Snapshot * to, float predictedT, float t);
 
+	const ZombieCore & getCore() const;
 private:
 	sf::Vector2f getRenderPos(const NetZombie * from, const NetZombie * to, float predictedT, float t) const;
 	ZombieCore m_prevCore;

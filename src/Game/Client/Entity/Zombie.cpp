@@ -119,6 +119,11 @@ void Zombie::render(const Snapshot * from, const Snapshot * to, float predictedT
 	target.draw(name);
 }
 
+const ZombieCore & Zombie::getCore() const
+{
+	return m_currentCore;
+}
+
 sf::Vector2f Zombie::getRenderPos(const NetZombie * z0, const NetZombie * z1, float predictedT, float t) const
 {
 	if (isPredicted())

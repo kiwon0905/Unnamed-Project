@@ -137,8 +137,9 @@ void ZombieCore::tick(float dt, const NetInput & input, const Map & map)
 
 	float accel = 10000.f;
 	float friction = .5f;
-	float maxSpeed = 600.f;
+	float maxSpeed = 400.f;
 
+	//gravity
 	m_velocity.y = Math::clampedAdd(-3000.f, 3000.f, m_velocity.y, 1000.f * dt);
 
 	if (!grounded)
@@ -161,18 +162,14 @@ void ZombieCore::tick(float dt, const NetInput & input, const Map & map)
 		m_boostCooldown = 200;
 	}
 
-	m_boostCooldown--;
-	if (m_boostCooldown < 0)
-		m_boostCooldown = 0;
-
-
 	if (input.jump)
 	{
 		if (grounded)
 		{
 			m_velocity.y = -400.f;
+			m_hoverCooldown = 10;
 		}
-		else if (m_fuel > 0)
+		else if (m_fuel > 0 && m_hoverCooldown == 0)
 		{
 			m_velocity.y = std::min(m_velocity.y, Math::clampedAdd(-100.f, 3000.f, m_velocity.y, -10000.f * dt));
 			m_fuel--;
@@ -184,14 +181,17 @@ void ZombieCore::tick(float dt, const NetInput & input, const Map & map)
 	{
 		m_refuelCooldown--;
 	}
-
 	else if (m_refuelCooldown == 0)
 	{
-		m_fuel++;
-		if (m_fuel > 100)
-			m_fuel = 100;
+		if (m_fuel < 100)
+			m_fuel++;
 	}
 
+	if (m_boostCooldown > 0)
+		m_boostCooldown--;
+
+	if (m_hoverCooldown > 0)
+		m_hoverCooldown--;
 
 
 	sf::Vector2f d = m_velocity * dt;
@@ -220,6 +220,7 @@ void ZombieCore::read(const NetZombie & nz)
 	m_velocity.x = nz.vel.x / 100.f;
 	m_velocity.y = nz.vel.y / 100.f;
 	m_fuel = nz.fuel;
+	m_hoverCooldown = nz.hoverCooldown;
 	m_boostCooldown = nz.boostCooldown;
 	m_refuelCooldown = nz.refuelCooldown;
 }
@@ -231,6 +232,7 @@ void ZombieCore::write(NetZombie & nz) const
 	nz.pos.x = Math::roundToInt(m_position.x * 100.f);
 	nz.pos.y = Math::roundToInt(m_position.y * 100.f);
 	nz.fuel = m_fuel;
+	nz.hoverCooldown = m_hoverCooldown;
 	nz.boostCooldown = m_boostCooldown;
 	nz.refuelCooldown = m_refuelCooldown;
 }

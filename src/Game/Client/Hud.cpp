@@ -1,5 +1,8 @@
 #include "Hud.h"
 #include "PlayingScreen.h"
+
+#include "Entity/Zombie.h"
+#include "Entity/Human.h"
 #include "Core/Utility.h"
 
 
@@ -52,7 +55,53 @@ void Hud::draw(sf::RenderTarget & target, sf::RenderStates states) const
 		states.transform.translate(pos);
 		target.draw(m_announcerMsgs[0].text, states);
 	}
+
+
+	//character info
+	if (!m_entity)
+		return;
+
+	switch (m_entity->getType())
+	{
+	case NetObject::HUMAN:
+	{
+
+	}
+		break;
+
+	case NetObject::ZOMBIE:
+	{
+		const Zombie * z = static_cast<const Zombie*>(m_entity);
+		const ZombieCore & core = z->getCore();
+		NetZombie netZombie;
+		core.write(netZombie);
+
+		sf::Text fuelText;
+		fuelText.setFont(*m_font);
+		fuelText.setString("Fuel: " + std::to_string(netZombie.fuel));
+		fuelText.setOrigin({ fuelText.getLocalBounds().left, fuelText.getLocalBounds().top });
+		fuelText.setPosition(static_cast<sf::Vector2f>(target.getSize()) - sf::Vector2f(fuelText.getLocalBounds().width, fuelText.getLocalBounds().height));
+		
+		sf::Text boostCooldownText;
+		boostCooldownText.setFont(*m_font);
+		boostCooldownText.setString("Boost: " + std::to_string(netZombie.boostCooldown));
+		
+		target.draw(fuelText);
+		target.draw(boostCooldownText);
+	}
+		break;
+
+
+	default:
+		break;
+	}
 	target.setView(v);
+
+}
+
+void Hud::setEntity(const Entity * e)
+{
+	m_entity = e;
 }
 
 void Hud::setGameTime(const sf::Time & time)

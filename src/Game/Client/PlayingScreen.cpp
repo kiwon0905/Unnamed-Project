@@ -645,10 +645,10 @@ void PlayingScreen::render(Client & client)
 
 	//camera
 	const PlayerInfo * myInfo = getPlayerInfo(m_myPlayerId);
-	Entity * e = getEntity(myInfo->entityType, myInfo->entityId);
-	if (e)
+	Entity * myEntity = getEntity(myInfo->entityType, myInfo->entityId);
+	if (myEntity)
 	{
-		sf::Vector2f center = e->getCameraPosition(s0, s1, predT, t);
+		sf::Vector2f center = myEntity->getCameraPosition(s0, s1, predT, t);
 		sf::FloatRect area{ center - m_view.getSize() / 2.f, m_view.getSize() };
 		sf::Vector2f worldSize = static_cast<sf::Vector2f>(m_map.getSize()) * static_cast<float>(m_map.getTileSize());
 		if (area.left < 0.f)
@@ -705,6 +705,7 @@ void PlayingScreen::render(Client & client)
 		debugRender(client, m_view);
 
 	m_hud->setGameTime(currentRenderTime);
+	m_hud->setEntity(myEntity);
 	window.draw(*m_hud);
 }
 

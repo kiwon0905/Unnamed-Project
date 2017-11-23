@@ -48,6 +48,7 @@ public:
 private:
 	sf::Vector2f m_position;
 	sf::Vector2f m_velocity;
+	int m_hoverCooldown = 0;
 	int m_fuel = 100;
 	int m_refuelCooldown = 0;
 	int m_boostCooldown = 0;
