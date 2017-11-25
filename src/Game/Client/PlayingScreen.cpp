@@ -489,12 +489,8 @@ void PlayingScreen::update(Client & client)
 
 				for (auto e : m_predictedEntities)
 				{
-					const void * obj = s->getEntity(e->getType(), e->getId());
-					if (obj)
+					if (e->rollback(*s))
 					{
-						e->rollback(obj);
-
-
 						for (int t = m_lastRecvTick + 1; t <= m_predictedTick; ++t)
 						{
 							NetInput input;
@@ -503,11 +499,10 @@ void PlayingScreen::update(Client & client)
 									input = i.input;
 
 							e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), input, m_map);
-						
+
 						}
-
-
 					}
+					
 					m_repredict = false;
 				}
 			}

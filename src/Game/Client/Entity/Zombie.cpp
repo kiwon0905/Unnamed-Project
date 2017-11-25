@@ -8,11 +8,15 @@ Zombie::Zombie(int id, Client & client, PlayingScreen & screen):
 {
 }
 
-void Zombie::rollback(const void * obj)
+bool Zombie::rollback(Snapshot & snapshot)
 {
-	const NetZombie & nz = *static_cast<const NetZombie*>(obj);
-	m_prevCore.read(nz);
-	m_currentCore.read(nz);
+	const NetZombie * nz = static_cast<const NetZombie*>(snapshot.getEntity(NetObject::ZOMBIE, m_id));
+	if (!nz)
+		return false;
+	m_prevCore.read(*nz);
+	m_currentCore.read(*nz);
+
+	return true;
 }
 
 void Zombie::tick(float dt, const NetInput & input, Map & map)

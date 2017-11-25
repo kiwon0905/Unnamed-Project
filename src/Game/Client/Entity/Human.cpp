@@ -10,12 +10,15 @@ Human::Human(int id, Client & client, PlayingScreen & screen):
 {
 }
 
-void Human::rollback(const void * e)
+bool Human::rollback(Snapshot & snapshot)
 {
-	const NetHuman & nh = *static_cast<const NetHuman*>(e);
+	const NetHuman * nh = static_cast<const NetHuman*>(snapshot.getEntity(NetObject::HUMAN, m_id));
+	if (!nh)
+		return false;
+	m_prevCore.read(*nh);
+	m_currentCore.read(*nh);
 
-	m_prevCore.read(nh);
-	m_currentCore.read(nh);
+	return true;
 }
 
 void Human::tick(float dt, const NetInput & input, Map & map)
