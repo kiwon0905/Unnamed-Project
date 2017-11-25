@@ -39,7 +39,6 @@ public:
 		std::string name;
 		int id;
 
-		NetObject::Type entityType;
 		int entityId;
 		Team team;
 		int score;
@@ -113,7 +112,7 @@ private:
 
 	//entities
 	Entity * getEntity(int id);
-	Entity * getEntity(NetObject::Type type, int id);
+	//Entity * getEntity(NetObject::Type type, int id);
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 	std::vector<PredictedEntity *> m_predictedEntities;
 
@@ -130,7 +129,7 @@ private:
 	void updateScoreboard();
 public:
 	PlayerInfo * getPlayerInfo(int id);
-	const PlayerInfo * getPlayerInfoByEntity(int id, NetObject::Type type);
+	const PlayerInfo * getPlayerInfoByEntity(int id);
 	int getMyPlayerId();
 
 	Particles & getParticles();

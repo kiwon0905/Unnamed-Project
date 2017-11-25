@@ -154,7 +154,6 @@ void Player::snap(Snapshot & snapshot)
 	NetPlayerInfo * info = reinterpret_cast<NetPlayerInfo*>(snapshot.addEntity(NetObject::PLAYER_INFO, m_peerId));
 	if (info)
 	{
-		info->type = m_character ? m_character->getNetObjectType() : NetObject::Type::NONE;
 		info->id = m_character ? m_character->getId() : -1;
 		info->team = m_team;
 		info->score = m_score;

@@ -7,7 +7,6 @@ NetObject::Type NetPlayerInfo::getType() const
 
 void NetPlayerInfo::write(Packer & packer) const
 {
-	packer.pack(type);
 	packer.pack(id);
 	packer.pack(team);
 	packer.pack(ping);
@@ -20,7 +19,6 @@ void NetPlayerInfo::write(Packer & packer) const
 
 void NetPlayerInfo::read(Unpacker & unpacker)
 {
-	unpacker.unpack(type);
 	unpacker.unpack(id);
 	unpacker.unpack(team);
 	unpacker.unpack(ping);

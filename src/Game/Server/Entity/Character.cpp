@@ -3,7 +3,7 @@
 #include "Game/Server/Player.h"
 
 Character::Character(int id, GameContext * context, int peerId, const sf::Vector2f & pos):
-	Entity(id, Entity::CHARACTER, context, pos),
+	Entity(id, EntityType::CHARACTER, context, pos),
 	m_peerId(peerId)
 {
 }

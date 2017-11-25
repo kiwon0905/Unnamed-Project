@@ -68,8 +68,3 @@ void Zombie::takeDamage(int dmg, int from, const sf::Vector2f & impulse)
 {
 	Character::takeDamage(dmg, from, impulse);
 }
-
-NetObject::Type Zombie::getNetObjectType()
-{
-	return NetObject::ZOMBIE;
-}

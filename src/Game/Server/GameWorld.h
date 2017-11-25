@@ -29,8 +29,8 @@ public:
 	template <typename T, typename... Args>
 	T * createEntity(Args &&... args);
 	
-	Entity * getEntity(int id, Entity::Type type);
-	std::vector<Entity *> getEntities(Entity::Type type);
+	Entity * getEntity(int id, EntityType type);
+	std::vector<Entity *> getEntities(EntityType type);
 
 	template <typename T, typename... Args>
 	T * createTransientEntity(Args &&... args);

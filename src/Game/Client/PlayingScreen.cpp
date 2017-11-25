@@ -52,7 +52,7 @@ void SmoothClock::update(sf::Time target, sf::Time converge)
 
 PlayingScreen::PlayingScreen()
 {
-	m_entitiesByType.resize(static_cast<std::size_t>(NetObject::ENTITY_COUNT));
+	m_entitiesByType.resize(static_cast<std::size_t>(EntityType::COUNT));
 }
 
 void PlayingScreen::onEnter(Client & client)
@@ -538,7 +538,10 @@ void PlayingScreen::render(Client & client)
 
 	if (s.second)
 		s1 = s.second->snapshot.get();
+	else
+		std::cout << "!";
 
+	
 	//calculate interp
 	float t = 0.f;
 	float predT = m_accumulator / sf::seconds(1.f / TICKS_PER_SEC);
@@ -558,7 +561,6 @@ void PlayingScreen::render(Client & client)
 				NetPlayerInfo * netInfo = reinterpret_cast<NetPlayerInfo*>(p.second->data.data());
 				if (info)
 				{
-					info->entityType = netInfo->type;
 					info->entityId = netInfo->id;
 					info->team = netInfo->team;
 					info->score = netInfo->score;
@@ -622,6 +624,7 @@ void PlayingScreen::render(Client & client)
 			{
 				if (!e->find(*s0))
 					e->setAlive(false);
+
 			}
 		}
 
@@ -640,7 +643,7 @@ void PlayingScreen::render(Client & client)
 
 	//camera
 	const PlayerInfo * myInfo = getPlayerInfo(m_myPlayerId);
-	Entity * myEntity = getEntity(myInfo->entityType, myInfo->entityId);
+	Entity * myEntity = getEntity(myInfo->entityId);
 	if (myEntity)
 	{
 		sf::Vector2f center = myEntity->getCameraPosition(s0, s1, predT, t);
@@ -725,14 +728,14 @@ Entity * PlayingScreen::getEntity(int id)
 				return e.get();
 	return nullptr;
 }
-
+/*
 Entity * PlayingScreen::getEntity(NetObject::Type type, int id)
 {
 	for (auto & e : m_entitiesByType[static_cast<int>(type)])
 		if (e->getId() == id)
 			return e.get();
 	return nullptr;
-}
+}*/
 
 void PlayingScreen::debugRender(Client & client, const sf::View & playerView)
 {
@@ -864,10 +867,10 @@ PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfo(int id)
 
 }
 
-const PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfoByEntity(int id, NetObject::Type type)
+const PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfoByEntity(int id)
 {
 	for (const auto & p : m_players)
-		if (p.entityId == id && p.entityType == type)
+		if (p.entityId == id)
 			return &p;
 	return nullptr;
 }

@@ -15,8 +15,6 @@ public:
 	virtual void tick(float dt);
 
 	virtual void takeDamage(int dmg, int from, const sf::Vector2f & impulse);
-
-	virtual NetObject::Type getNetObjectType() = 0;
 protected:
 	NetInput getInput();
 	Player * getPlayer();

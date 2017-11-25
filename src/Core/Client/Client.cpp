@@ -51,7 +51,7 @@ bool Client::initialize()
 	m_screenStack.push(new LobbyScreen);
 	m_screenStack.applyChanges(*this);
 	//m_window.setVerticalSyncEnabled(true);
-	//window.setFramerateLimit(300);
+	//m_window.setFramerateLimit(60);
 	//window.setMouseCursorGrabbed(true);
 
 	m_gui.setTarget(m_window);
@@ -134,7 +134,7 @@ void Client::run()
 
 			m_window.display();
 
-			std::this_thread::sleep_for(std::chrono::microseconds(10));
+			//std::this_thread::sleep_for(std::chrono::microseconds(1));
 			//sf::sleep(sf::microseconds(1));
 			m_screenStack.applyChanges(*this);
 		}

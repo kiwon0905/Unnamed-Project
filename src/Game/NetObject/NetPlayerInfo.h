@@ -7,7 +7,6 @@ struct NetPlayerInfo
 	void write(Packer & packer) const;
 	void read(Unpacker & unpacker);
 
-	NetObject::Type type;
 	int id;
 	Team team;
 	int ping;

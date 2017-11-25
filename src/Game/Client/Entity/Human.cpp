@@ -6,7 +6,7 @@
 #include <SFML/Graphics.hpp>
 
 Human::Human(int id, Client & client, PlayingScreen & screen):
-	PredictedEntity(id, NetObject::HUMAN, client, screen)
+	PredictedEntity(id, client, screen)
 {
 }
 
@@ -45,7 +45,7 @@ sf::Vector2f Human::getCameraPosition(const Snapshot * from, const Snapshot * to
 
 void Human::render(const Snapshot * from, const Snapshot * to, float predictedT, float t)
 {
-	const PlayingScreen::PlayerInfo * info = m_screen->getPlayerInfoByEntity(m_id, NetObject::HUMAN);
+	const PlayingScreen::PlayerInfo * info = m_screen->getPlayerInfoByEntity(m_id);
 	//if (!info)
 	//	return;
 

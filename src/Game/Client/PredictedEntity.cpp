@@ -1,7 +1,7 @@
 #include "PredictedEntity.h"
 
-PredictedEntity::PredictedEntity(int id, NetObject::Type type, Client & client, PlayingScreen & screen):
-	Entity(id, type, client, screen)
+PredictedEntity::PredictedEntity(int id, Client & client, PlayingScreen & screen):
+	Entity(id, EntityType::CHARACTER, client, screen)
 {
 }
 

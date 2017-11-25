@@ -7,7 +7,7 @@
 class PredictedEntity : public Entity
 {
 public:
-	PredictedEntity(int id, NetObject::Type type, Client & client, PlayingScreen & screen);
+	PredictedEntity(int id, Client & client, PlayingScreen & screen);
 
 	void setPrediction(bool predict);
 	bool isPredicted() const;

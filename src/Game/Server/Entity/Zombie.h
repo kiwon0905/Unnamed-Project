@@ -12,8 +12,6 @@ public:
 	void snap(Snapshot & snapshot) const;
 
 	void takeDamage(int dmg, int from, const sf::Vector2f & impulse);
-	NetObject::Type getNetObjectType();
-
 private:
 	ZombieCore m_core;
 	int m_fireCooldown = 0;

@@ -73,8 +73,3 @@ void Human::takeDamage(int dmg, int from, const sf::Vector2f & impulse)
 	Character::takeDamage(dmg, from, impulse);
 	m_core.setVelocity(m_core.getVelocity() + impulse);
 }
-
-NetObject::Type Human::getNetObjectType()
-{
-	return NetObject::HUMAN;
-}

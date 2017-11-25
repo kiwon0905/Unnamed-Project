@@ -11,7 +11,7 @@
 #include "Core/Utility.h"
 
 Projectile::Projectile(int id, GameContext * context, ProjectileType type, int shooterPeerId, Team shooterTeam):
-	Entity(id, Entity::PROJECTILE, context),
+	Entity(id, EntityType::PROJECTILE, context),
 	m_type(type),
 	m_shooterPeerId(shooterPeerId),
 	m_team(shooterTeam)
@@ -51,7 +51,7 @@ void Projectile::tick(float dt)
 		collided = true;
 	}
 
-	for (auto e : m_context->getWorld().getEntities(Entity::CHARACTER))
+	for (auto e : m_context->getWorld().getEntities(EntityType::CHARACTER))
 	{
 		//no self dmg
 		if (m_context->getPlayer(m_shooterPeerId) && m_context->getPlayer(m_shooterPeerId)->getCharacter() &&

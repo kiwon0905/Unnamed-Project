@@ -9,6 +9,14 @@ enum class Team
 	COUNT
 };
 
+enum class EntityType
+{
+	CHARACTER,
+	ITEM,
+	PROJECTILE,
+	COUNT
+};
+
 enum class ProjectileType
 {
 	BULLET,

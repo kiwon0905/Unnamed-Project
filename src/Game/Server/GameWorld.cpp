@@ -12,7 +12,7 @@
 GameWorld::GameWorld(GameContext * context):
 	m_context(context)
 {
-	m_entitiesByType.resize(static_cast<int>(Entity::COUNT));
+	m_entitiesByType.resize(static_cast<int>(EntityType::COUNT));
 }
 
 void GameWorld::onDisconnect(Player & player)
@@ -65,7 +65,7 @@ void GameWorld::snap(Snapshot & snapshot)
 	m_transientEntities.clear();
 }
 
-Entity * GameWorld::getEntity(int id, Entity::Type type)
+Entity * GameWorld::getEntity(int id, EntityType type)
 {
 	for (auto & e : m_entitiesByType[static_cast<int>(type)])
 		if (e->getId() == id)
@@ -73,7 +73,7 @@ Entity * GameWorld::getEntity(int id, Entity::Type type)
 	return nullptr;
 }
 
-std::vector<Entity *> GameWorld::getEntities(Entity::Type type)
+std::vector<Entity *> GameWorld::getEntities(EntityType type)
 {
 	std::vector<Entity *> v;
 	for (auto & e : m_entitiesByType[static_cast<int>(type)])

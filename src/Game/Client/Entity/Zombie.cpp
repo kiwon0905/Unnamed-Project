@@ -4,7 +4,7 @@
 #include "Game/Snapshot.h"
 
 Zombie::Zombie(int id, Client & client, PlayingScreen & screen):
-	PredictedEntity(id, NetObject::ZOMBIE, client, screen)
+	PredictedEntity(id, client, screen)
 {
 }
 
@@ -43,7 +43,7 @@ sf::Vector2f Zombie::getCameraPosition(const Snapshot * from, const Snapshot * t
 void Zombie::render(const Snapshot * from, const Snapshot * to, float predictedT, float t)
 {
 	sf::RenderTarget & target = m_client->getWindow();
-	const PlayingScreen::PlayerInfo * info = m_screen->getPlayerInfoByEntity(m_id, NetObject::ZOMBIE);
+	const PlayingScreen::PlayerInfo * info = m_screen->getPlayerInfoByEntity(m_id);
 
 
 	const NetZombie * z0 = static_cast<const NetZombie*>(from->getEntity(NetObject::ZOMBIE, m_id));
