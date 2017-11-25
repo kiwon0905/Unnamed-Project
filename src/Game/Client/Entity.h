@@ -23,6 +23,7 @@ public:
 	void setAlive(bool alive);
 	bool isAlive() const;
 	
+	virtual const void * find(const Snapshot & s) = 0;
 	virtual sf::Vector2f getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const = 0;
 	virtual void render(const Snapshot * from, const Snapshot * to, float predictedT, float t) = 0;
 protected:

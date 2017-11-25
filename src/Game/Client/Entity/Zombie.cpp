@@ -25,6 +25,11 @@ void Zombie::tick(float dt, const NetInput & input, Map & map)
 	m_currentCore.tick(dt, input, map);
 }
 
+const void * Zombie::find(const Snapshot & s)
+{
+	return s.getEntity(NetObject::ZOMBIE, m_id);
+}
+
 sf::Vector2f Zombie::getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const
 {
 	const NetZombie * z0 = static_cast<const NetZombie*>(from->getEntity(NetObject::ZOMBIE, m_id));

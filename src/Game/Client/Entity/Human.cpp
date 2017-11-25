@@ -21,6 +21,11 @@ bool Human::rollback(Snapshot & snapshot)
 	return true;
 }
 
+const void * Human::find(const Snapshot & s)
+{
+	return s.getEntity(NetObject::HUMAN, m_id);
+}
+
 void Human::tick(float dt, const NetInput & input, Map & map)
 {
 	m_prevCore = m_currentCore;

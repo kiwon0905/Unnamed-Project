@@ -9,6 +9,8 @@ public:
 	Human(int id, Client & client, PlayingScreen & screen);
 	bool rollback(Snapshot & snapshot);
 
+	const void * find(const Snapshot & s);
+
 
 	void tick(float dt, const NetInput & input, Map & map);
 	sf::Vector2f getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const;

@@ -5,6 +5,11 @@ Item::Item(int id, Client & client, PlayingScreen & screen):
 {
 }
 
+const void * Item::find(const Snapshot & s)
+{
+	return nullptr;
+}
+
 sf::Vector2f Item::getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const
 {
 	return sf::Vector2f();

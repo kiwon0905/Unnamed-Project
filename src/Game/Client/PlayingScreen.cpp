@@ -620,7 +620,7 @@ void PlayingScreen::render(Client & client)
 		{
 			for (auto & e : v)
 			{
-				if (!s0->getEntity(e->getType(), e->getId()))
+				if (!e->find(*s0))
 					e->setAlive(false);
 			}
 		}

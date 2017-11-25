@@ -18,6 +18,12 @@ Projectile::~Projectile()
 	m_screen->getParticles().removeEmitter(m_emitter);
 }
 
+const void * Projectile::find(const Snapshot & s)
+{
+	return s.getEntity(NetObject::PROJECTILE, m_id);
+	
+}
+
 sf::Vector2f Projectile::getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const
 {
 	return sf::Vector2f();
