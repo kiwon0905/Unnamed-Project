@@ -93,8 +93,6 @@ private:
 	int m_startTick = -1;
 	int m_lastRecvTick = -1;
 	int m_predictedTick = -1;
-	int m_prevRenderTick = -1;
-	int m_currentRenderTick = -1;
 	bool m_repredict = false;
 
 	struct SnapInfo
@@ -102,9 +100,8 @@ private:
 		int tick = -1;
 		Snapshot * snapshot = nullptr;
 	};
-
-	SnapInfo m_prevSnapInfo;
-	SnapInfo m_currentSnapInfo;
+	SnapInfo m_currentSnap;
+	SnapInfo m_nextSnap;
 
 
 	std::unique_ptr<Graph> m_predictionGraph;

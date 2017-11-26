@@ -531,30 +531,30 @@ void PlayingScreen::render(Client & client)
 	float renderTick = currentRenderTime.asSeconds() * TICKS_PER_SEC;
 
 	const auto & s = m_snapshots.find(renderTick);
-	const Snapshot * s0 = s.first->snapshot.get();
-	const Snapshot * s1 = nullptr;
 
-	m_prevRenderTick = m_currentRenderTick;
-	m_currentRenderTick = s.first->tick;
+	SnapInfo prevSnap;
+	prevSnap.tick = m_currentSnap.tick;
+	prevSnap.snapshot = m_currentSnap.snapshot;
 
-	if (s.second)
-		s1 = s.second->snapshot.get();
-	else
-		std::cout << "!";
+	m_currentSnap.tick = s.first->tick;
+	m_currentSnap.snapshot = s.first->snapshot.get();
+
+	m_nextSnap.tick = s.second ? s.second->tick : -1;
+	m_nextSnap.snapshot = s.second ? s.second->snapshot.get() : nullptr;
 
 	
 	//calculate interp
 	float t = 0.f;
 	float predT = m_accumulator / sf::seconds(1.f / TICKS_PER_SEC);
-	if (s1)
+	if (m_nextSnap.snapshot)
 		t = (renderTick - s.first->tick) / (s.second->tick - s.first->tick);
 	
 	
 	//transit snapshot
-	if (m_currentRenderTick != m_prevRenderTick)
+	if (prevSnap.tick != m_currentSnap.tick)
 	{
 		//create entities
-		for (auto & p : s0->getEntities())
+		for (auto & p : m_currentSnap.snapshot->getEntities())
 		{
 			if (p.second->getType() == NetObject::PLAYER_INFO)
 			{
@@ -610,7 +610,7 @@ void PlayingScreen::render(Client & client)
 			
 		}
 		//handle transient entities
-		for (auto & p : s0->getTransients())
+		for (auto & p : m_currentSnap.snapshot->getTransients())
 		{
 			if (p->getType() == NetObject::EXPLOSION)
 			{
@@ -625,7 +625,7 @@ void PlayingScreen::render(Client & client)
 		{
 			for (auto & e : v)
 			{
-				if (!e->find(*s0))
+				if (!e->find(*m_currentSnap.snapshot))
 					e->setAlive(false);
 
 			}
@@ -637,7 +637,7 @@ void PlayingScreen::render(Client & client)
 		for (auto & v : m_entitiesByType)
 			v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
 
-		m_snapshots.removeUntil(m_prevRenderTick);
+		m_snapshots.removeUntil(prevSnap.tick);
 
 
 		//update scoreboard
@@ -649,7 +649,7 @@ void PlayingScreen::render(Client & client)
 	Entity * myEntity = getEntity(myInfo->entityId);
 	if (myEntity)
 	{
-		sf::Vector2f center = myEntity->getCameraPosition(s0, s1, predT, t);
+		sf::Vector2f center = myEntity->getCameraPosition(m_currentSnap.snapshot, m_nextSnap.snapshot, predT, t);
 		sf::FloatRect area{ center - m_view.getSize() / 2.f, m_view.getSize() };
 		sf::Vector2f worldSize = static_cast<sf::Vector2f>(m_map.getSize()) * static_cast<float>(m_map.getTileSize());
 		if (area.left < 0.f)
@@ -693,7 +693,7 @@ void PlayingScreen::render(Client & client)
 	{
 		for (auto & e : v)
 		{
-			e->render(s0, s1, predT, t);
+			e->render(m_currentSnap.snapshot, m_nextSnap.snapshot, predT, t);
 		}
 	}
 

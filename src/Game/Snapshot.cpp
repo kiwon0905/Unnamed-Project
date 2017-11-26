@@ -204,7 +204,6 @@ TickedSnapshot::TickedSnapshot(int tick, Snapshot * snapshot) :
 {
 }
 
-
 Snapshot * SnapshotContainer::get(int tick)
 {
 	for (auto & s : m_snapshots)

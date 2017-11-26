@@ -84,6 +84,7 @@ void Hud::draw(sf::RenderTarget & target, sf::RenderStates states) const
 
 
 	//game mode specific
+
 }
 
 void Hud::setEntity(const Entity * e)
