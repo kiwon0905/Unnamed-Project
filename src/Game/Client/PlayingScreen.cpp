@@ -1,8 +1,11 @@
 #include "PlayingScreen.h"
 #include "Game/GameConfig.h"
+
 #include "Game/Client/Entity/Human.h"
 #include "Game/Client/Entity/Zombie.h"
 #include "Game/Client/Entity/Projectile.h"
+#include "Game/Client/Entity/Cart.h"
+
 #include "Game/NetObject/NetPlayerInfo.h"
 #include "Game/NetObject/NetExplosion.h"
 
@@ -527,8 +530,6 @@ void PlayingScreen::render(Client & client)
 	sf::Time currentRenderTime = m_renderTime.getElapsedTime();
 	float renderTick = currentRenderTime.asSeconds() * TICKS_PER_SEC;
 
-
-
 	const auto & s = m_snapshots.find(renderTick);
 	const Snapshot * s0 = s.first->snapshot.get();
 	const Snapshot * s1 = nullptr;
@@ -588,6 +589,8 @@ void PlayingScreen::render(Client & client)
 					case NetObject::PROJECTILE:
 						e = new Projectile(p.first.id, client, *this);
 						break;
+					case NetObject::CART:
+						e = new Cart(p.first.id, client, *this);
 					default:
 						break;
 					}

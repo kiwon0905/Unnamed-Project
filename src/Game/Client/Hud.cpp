@@ -60,16 +60,7 @@ void Hud::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	//character info
 	if (!m_entity)
 		return;
-
-	switch (m_entity->getType())
-	{
-	case NetObject::HUMAN:
-	{
-
-	}
-		break;
-
-	case NetObject::ZOMBIE:
+	if (dynamic_cast<const Zombie*>(m_entity))
 	{
 		const Zombie * z = static_cast<const Zombie*>(m_entity);
 		const ZombieCore & core = z->getCore();
@@ -81,22 +72,18 @@ void Hud::draw(sf::RenderTarget & target, sf::RenderStates states) const
 		fuelText.setString("Fuel: " + std::to_string(netZombie.fuel));
 		fuelText.setOrigin({ fuelText.getLocalBounds().left, fuelText.getLocalBounds().top });
 		fuelText.setPosition(static_cast<sf::Vector2f>(target.getSize()) - sf::Vector2f(fuelText.getLocalBounds().width, fuelText.getLocalBounds().height));
-		
+
 		sf::Text boostCooldownText;
 		boostCooldownText.setFont(*m_font);
 		boostCooldownText.setString("Boost: " + std::to_string(netZombie.boostCooldown));
-		
+
 		target.draw(fuelText);
 		target.draw(boostCooldownText);
 	}
-		break;
-
-
-	default:
-		break;
-	}
 	target.setView(v);
 
+
+	//game mode specific
 }
 
 void Hud::setEntity(const Entity * e)

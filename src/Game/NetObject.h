@@ -16,6 +16,7 @@ public:
 		ZOMBIE,
 		PROJECTILE,
 		ITEM,
+		CART,
 		PLAYER_INFO,
 		ENTITY_COUNT,
 		//Transient

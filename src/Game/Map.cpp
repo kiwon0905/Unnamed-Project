@@ -4,12 +4,14 @@
 #include <iostream>
 #include <sstream>
 
+//TODO: add validation checks
 bool Map::loadFromFile(const std::string & s)
 {
 	tinyxml2::XMLDocument doc;
 	doc.LoadFile(s.c_str());
 	
 	tinyxml2::XMLElement * element = doc.FirstChildElement("map");
+	m_mode = element->FirstChildElement("mode")->GetText();
 	m_size.x = element->FirstChildElement("width")->IntText();
 	m_size.y = element->FirstChildElement("height")->IntText();
 	m_tilesetFile = element->FirstChildElement("tileset")->Attribute("file");
@@ -36,12 +38,25 @@ bool Map::loadFromFile(const std::string & s)
 	}
 	int slashPos = s.find_last_of("/");
 	m_name = s.substr(slashPos + 1, s.size() - 5 - slashPos);
+
+
+	tinyxml2::XMLElement * properties = element->FirstChildElement("properties");
+
+	for (tinyxml2::XMLElement * property = properties->FirstChildElement(); property != nullptr; property = property->NextSiblingElement())
+	{
+		m_properties[std::string(property->Name())] = std::string(property->GetText());
+	}
 	return true;
 }
 
 const std::string & Map::getName() const
 {
 	return m_name;
+}
+
+const std::string & Map::getMode() const
+{
+	return m_mode;
 }
 
 const sf::Vector2i & Map::getSize() const
@@ -260,4 +275,12 @@ int Map::getTile(float x, float y) const
 	int xt = static_cast<int>(std::floor(x / m_tileSize));
 	int yt = static_cast<int>(std::floor(y / m_tileSize));
 	return getTile(xt, yt);
+}
+
+bool Map::getProperty(const std::string & property, std::string & value)
+{
+	if(m_properties.count(property) == 0)
+		return false;
+	value = m_properties[property];
+	return true;
 }

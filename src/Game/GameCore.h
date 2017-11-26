@@ -6,12 +6,43 @@
 #include "NetObject/NetZombie.h"
 #include "Map.h"
 
+#include <memory>
+
+class CharacterCore;
+
 class WorldCore
 {
 public:
-
-	virtual Map & getMap() = 0;
+	Map & getMap();
+	struct CharacterInfo
+	{
+		Team team;
+		int id;
+		std::unique_ptr<CharacterCore> core;
+	};
 private:
+	Map * m_map;
+
+};
+
+class CharacterCore
+{
+public:
+	virtual void tick(float dt, const NetInput & input, const WorldCore & world) = 0;
+	virtual CharacterCore * clone();
+
+	const sf::Vector2f getPosition() const;
+	void setPosition(const sf::Vector2f & position);
+
+	const sf::Vector2f & getVelocity() const;
+	void setVelocity(const sf::Vector2f & velocity);
+
+	const sf::Vector2f & getSize() const;
+	void setSize(const sf::Vector2f & size);
+private:
+	sf::Vector2f m_position;
+	sf::Vector2f m_velocity;
+	sf::Vector2f m_size;
 };
 
 

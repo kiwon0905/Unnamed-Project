@@ -14,6 +14,7 @@ enum class EntityType
 	CHARACTER,
 	ITEM,
 	PROJECTILE,
+	CART,
 	COUNT
 };
 

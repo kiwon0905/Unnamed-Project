@@ -140,7 +140,7 @@ sf::Time GameContext::getCurrentTime() const
 
 void GameContext::loadRound()
 {
-	m_map.loadFromFile("map/grass2.xml");
+	m_map.loadFromFile("map/escort.xml");
 }
 
 void GameContext::startRound()

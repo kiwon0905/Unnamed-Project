@@ -8,5 +8,6 @@ public:
 	void onRoundStart();
 	bool checkRound(Team & team);
 private:
-
+	sf::Vector2f m_cartStartPos;
+	sf::Vector2f m_cartEndPos;
 };

@@ -97,6 +97,16 @@ private:
 	int m_currentRenderTick = -1;
 	bool m_repredict = false;
 
+	struct SnapInfo
+	{
+		int tick = -1;
+		Snapshot * snapshot = nullptr;
+	};
+
+	SnapInfo m_prevSnapInfo;
+	SnapInfo m_currentSnapInfo;
+
+
 	std::unique_ptr<Graph> m_predictionGraph;
 	std::unique_ptr<Graph> m_snapshotGraph;
 

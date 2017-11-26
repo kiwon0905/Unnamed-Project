@@ -17,6 +17,16 @@ int main()
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
+
+
+	float x;
+	float y;
+
+	std::string s = "(1203, 1344)";
+
+	sscanf_s(&s[0], "(%f, %f)", &x, &y);
+	//std::cout << x << ", " << y << "\n";
+
 	Client client;
 	client.run();
 

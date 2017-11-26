@@ -1,13 +1,13 @@
 #include "Vanilla.h"
-#include "Core/Server/Server.h"
 #include "Game/Server/Entity/Human.h"
 #include "Game/Server/Entity/Zombie.h"
+#include "Game/Server/Entity/Cart.h"
 
+#include "Core/Server/Server.h"
 
 Vanilla::Vanilla(Server * server):
 	GameContext(server)
 {
-
 }
 
 std::string Vanilla::getName()
@@ -17,6 +17,18 @@ std::string Vanilla::getName()
 
 void Vanilla::onRoundStart()
 {
+	std::string cartStartPos, cartEndPos;
+	m_map.getProperty("cart_start_position", cartStartPos);
+	m_map.getProperty("cart_end_position", cartEndPos);
+
+	sscanf_s(&cartStartPos[0], "(%f, %f)", &m_cartStartPos.x, &m_cartStartPos.y);
+	sscanf_s(&cartEndPos[0], "(%f, %f)", &m_cartEndPos.x, &m_cartEndPos.y);
+
+
+
+
+
+
 	int i = 0;
 	for (auto & p : m_players)
 	{
@@ -34,6 +46,9 @@ void Vanilla::onRoundStart()
 			p.setTeam(Team::B);
 		++i;
 	}
+
+	m_gameWorld.createEntity<Cart>(sf::Vector2f{ m_cartStartPos.x, m_cartStartPos.y }, Team::A);
+
 }
 
 bool Vanilla::checkRound(Team & team)

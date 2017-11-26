@@ -4,8 +4,10 @@
 #include "NetObject/NetHuman.h"
 #include "NetObject/NetZombie.h"
 #include "NetObject/NetProjectile.h"
+#include "NetObject/NetCart.h"
 #include "NetObject/NetPlayerInfo.h"
 #include "NetObject/NetExplosion.h"
+
 
 NetObject * NetObject::create(Type type)
 {
@@ -17,6 +19,8 @@ NetObject * NetObject::create(Type type)
 		return NetObject::create<NetZombie>();
 	case NetObject::PROJECTILE:
 		return NetObject::create<NetProjectile>();
+	case NetObject::CART:
+		return NetObject::create<NetCart>();
 	case NetObject::PLAYER_INFO:
 		return NetObject::create<NetPlayerInfo>();
 	case NetObject::EXPLOSION:
