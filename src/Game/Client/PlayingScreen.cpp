@@ -547,7 +547,7 @@ void PlayingScreen::render(Client & client)
 	float t = 0.f;
 	float predT = m_accumulator / sf::seconds(1.f / TICKS_PER_SEC);
 	if (m_nextSnap.snapshot)
-		t = (renderTick - s.first->tick) / (s.second->tick - s.first->tick);
+		t = (renderTick - m_currentSnap.tick) / (m_nextSnap.tick - m_currentSnap.tick);
 	
 	
 	//transit snapshot
