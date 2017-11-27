@@ -34,17 +34,22 @@ void Character::takeDamage(int dmg, int from, const sf::Vector2f & impulse)
 	m_health -= dmg;
 	if (m_health <= 0)
 	{
-		m_alive = false;
-
-		//remove killer from the assisters
-		m_assistingPeers.erase(from);
-
-		m_context->announceDeath(m_peerId, from, m_assistingPeers);
-		m_context->addScore(from, 5);
-
-		Player * player = m_context->getPlayer(m_peerId);
-		player->setCharacter(nullptr);
+		die(from);
 	}
+}
+
+void Character::die(int killerPeerId)
+{
+	m_alive = false;
+
+	//remove killer from the assisters
+	m_assistingPeers.erase(killerPeerId);
+
+	m_context->announceDeath(m_peerId, killerPeerId, m_assistingPeers);
+	m_context->addScore(killerPeerId, 5);
+
+	Player * player = m_context->getPlayer(m_peerId);
+	player->setCharacter(nullptr);
 }
 
 NetInput Character::getInput()

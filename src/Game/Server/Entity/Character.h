@@ -15,6 +15,7 @@ public:
 	virtual void tick(float dt);
 
 	virtual void takeDamage(int dmg, int from, const sf::Vector2f & impulse);
+	void die(int killerPeerId);
 protected:
 	NetInput getInput();
 	Player * getPlayer();

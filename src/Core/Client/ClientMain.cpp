@@ -11,7 +11,7 @@
 #endif
 
 #include "Game/Map.h"
-
+#include "Game/Client/RenderMap.h"
 int main()
 {
 #ifdef _DEBUG
@@ -21,8 +21,8 @@ int main()
 
 	Client client;
 	client.run();
-	Map map;
-	map.loadFromTmx("E:/Unnamed-Project/misc/wip/control0.tmx");
+	//RenderMap map;
+	//map.loadFromTmx("E:/Unnamed-Project/misc/wip/control0.tmx");
 }
 
 

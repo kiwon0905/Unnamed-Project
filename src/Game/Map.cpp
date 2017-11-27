@@ -1,22 +1,41 @@
 #include "Map.h"
 
-#include <tinyxml2/tinyxml2.h>
 #include <iostream>
 #include <sstream>
+
+
+tinyxml2::XMLElement * Map::getElementWithAttribute(tinyxml2::XMLElement * parent, const std::string & name, const std::string & attribute, const std::string & value)
+{
+	for (tinyxml2::XMLElement * ele = parent->FirstChildElement(name.c_str()); ele != nullptr; ele = ele->NextSiblingElement(name.c_str()))
+	{
+		if (ele->Attribute(name.c_str(), value.c_str()))
+		{
+			return ele;
+		}
+
+	}
+	return nullptr;
+}
 
 //TODO: add validation checks
 bool Map::loadFromTmx(const std::string & s)
 {
+	using namespace tinyxml2;
 	int slashPos = s.find_last_of("/");
 	m_name = s.substr(slashPos + 1, s.size() - 5 - slashPos);
 
-	tinyxml2::XMLDocument doc;
-	doc.LoadFile(s.c_str());
+	m_document.LoadFile(s.c_str());
 
-	tinyxml2::XMLElement * element = doc.FirstChildElement("map");
+
+
+
+
+	////////////////////////////////////////////////////////////////////////////////
+	tinyxml2::XMLElement * element = m_document.FirstChildElement("map");
 	m_size.x = element->IntAttribute("width");
 	m_size.y = element->IntAttribute("height");
-	m_tileSize = element->IntAttribute("tilewidth");
+	m_tileSize.x = element->IntAttribute("tilewidth");
+	m_tileSize.y = element->IntAttribute("tileheight");
 
 	m_tilesetFile = element->FirstChildElement("tileset")->FirstChildElement("image")->Attribute("source");
 	
@@ -30,6 +49,7 @@ bool Map::loadFromTmx(const std::string & s)
 		std::cout << p.first << ": " << p.second << "\n";
 
 	std::string data = element->FirstChildElement("layer")->FirstChildElement("data")->GetText();
+
 	std::istringstream ss(data);
 	std::string firstLine;
 	std::getline(ss, firstLine);
@@ -67,9 +87,14 @@ const std::string & Map::getTilesetFile() const
 	return m_tilesetFile;
 }
 
-int Map::getTileSize() const
+sf::Vector2i Map::getTileSize() const
 {
 	return m_tileSize;
+}
+
+sf::Vector2f Map::getWorldSize() const
+{
+	return sf::Vector2f(static_cast<float>(m_size.x * m_tileSize.x), static_cast<float>(m_size.y * m_tileSize.y));
 }
 
 bool Map::sweepPoints(const std::vector<sf::Vector2f>& points, const sf::Vector2f d, float & time) const
@@ -83,10 +108,10 @@ bool Map::sweepPoints(const std::vector<sf::Vector2f>& points, const sf::Vector2
 		float minY = std::min(p.y, p.y + d.y);
 		float maxY = std::max(p.y, p.y + d.y);
 
-		int startX = static_cast<int>(std::floor(minX / m_tileSize));
-		int endX = static_cast<int>(std::floor(maxX / m_tileSize));
-		int startY = static_cast<int>(std::floor(minY / m_tileSize));
-		int endY = static_cast<int>(std::floor(maxY / m_tileSize));
+		int startX = static_cast<int>(std::floor(minX / m_tileSize.x));
+		int endX = static_cast<int>(std::floor(maxX / m_tileSize.x));
+		int startY = static_cast<int>(std::floor(minY / m_tileSize.y));
+		int endY = static_cast<int>(std::floor(maxY / m_tileSize.y));
 
 
 		for (int x = startX; x <= endX; ++x)
@@ -94,7 +119,7 @@ bool Map::sweepPoints(const std::vector<sf::Vector2f>& points, const sf::Vector2
 			for (int y = startY; y <= endY; ++y)
 			{
 				int tile = getTile(x, y);
-				Aabb tileAabb(static_cast<float>(x * m_tileSize), static_cast<float>(y * m_tileSize), static_cast<float>(m_tileSize), static_cast<float>(m_tileSize));
+				Aabb tileAabb(static_cast<float>(x * m_tileSize.x), static_cast<float>(y * m_tileSize.y), static_cast<float>(m_tileSize.x), static_cast<float>(m_tileSize.y));
 
 				if (tile)
 				{
@@ -129,10 +154,10 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 		float minDistance = d.x + 1000.f;
 
 		//int startX = (aabb2.left + aabb2.width) / m_tileSize + 1;
-		int startX = static_cast<int>(aabb.x / m_tileSize);
-		int endX = static_cast<int>((aabb2.x + aabb2.w + d.x) / m_tileSize);
-		int startY = static_cast<int>(aabb2.y / m_tileSize);
-		int endY = static_cast<int>((aabb2.y + aabb2.h) / m_tileSize);
+		int startX = static_cast<int>(aabb.x / m_tileSize.x);
+		int endX = static_cast<int>((aabb2.x + aabb2.w + d.x) / m_tileSize.x);
+		int startY = static_cast<int>(aabb2.y / m_tileSize.y);
+		int endY = static_cast<int>((aabb2.y + aabb2.h) / m_tileSize.y);
 
 
 		for (int x = startX; x <= endX; ++x)
@@ -142,7 +167,7 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 				int tile = getTile(x, y);
 				if (tile > 0)
 				{
-					float distance = m_tileSize * x - (aabb2.x + aabb2.w);
+					float distance = m_tileSize.x * x - (aabb2.x + aabb2.w);
 					if (distance < minDistance)
 					{
 						minDistance = distance;
@@ -158,10 +183,10 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 	else if (d.x < 0)
 	{
 		float maxDistance = d.x - 1000.f;
-		int startX = static_cast<int>(std::floor((aabb2.x + d.x) / m_tileSize));
-		int endX = static_cast<int>((aabb2.x + aabb2.w) / m_tileSize);
-		int startY = static_cast<int>(aabb2.y / m_tileSize);
-		int endY = static_cast<int>((aabb2.y + aabb2.h) / m_tileSize);
+		int startX = static_cast<int>(std::floor((aabb2.x + d.x) / m_tileSize.x));
+		int endX = static_cast<int>((aabb2.x + aabb2.w) / m_tileSize.x);
+		int startY = static_cast<int>(aabb2.y / m_tileSize.y);
+		int endY = static_cast<int>((aabb2.y + aabb2.h) / m_tileSize.y);
 
 		for (int x = startX; x <= endX; ++x)
 		{
@@ -170,7 +195,7 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 				int tile = getTile(x, y);
 				if (tile > 0)
 				{
-					float distance = (x + 1) * m_tileSize - aabb2.x;
+					float distance = (x + 1) * m_tileSize.x - aabb2.x;
 					if (distance > maxDistance)
 					{
 						maxDistance = distance;
@@ -189,10 +214,10 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 	{
 		float minDistance = d.y + 1000.f;
 		//int startY = (aabb2.top + aabb2.height) / m_tileSize + 1;
-		int startY = static_cast<int>((aabb2.y) / m_tileSize);
-		int endY = static_cast<int>((aabb2.y + aabb2.h + d.y) / m_tileSize);
-		int startX = static_cast<int>(aabb2.x / m_tileSize);
-		int endX = static_cast<int>((aabb2.x + aabb2.w) / m_tileSize);
+		int startY = static_cast<int>((aabb2.y) / m_tileSize.y);
+		int endY = static_cast<int>((aabb2.y + aabb2.h + d.y) / m_tileSize.y);
+		int startX = static_cast<int>(aabb2.x / m_tileSize.x);
+		int endX = static_cast<int>((aabb2.x + aabb2.w) / m_tileSize.x);
 
 		for (int y = startY; y <= endY; ++y)
 		{
@@ -201,7 +226,7 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 				int tile = getTile(x, y);
 				if (tile > 0)
 				{
-					float distance = m_tileSize * y - (aabb2.y + aabb2.h);
+					float distance = m_tileSize.y * y - (aabb2.y + aabb2.h);
 					if (distance < minDistance)
 					{
 						minDistance = distance;
@@ -217,10 +242,10 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 	else if (d.y < 0)
 	{
 		float maxDistance = d.y - 1000.f;
-		int startY = static_cast<int>(std::floor((aabb2.y + d.y) / m_tileSize));
-		int endY = static_cast<int>((aabb2.y + aabb2.h) / m_tileSize);
-		int startX = static_cast<int>(aabb2.x / m_tileSize);
-		int endX = static_cast<int>((aabb2.x + aabb2.w) / m_tileSize);
+		int startY = static_cast<int>(std::floor((aabb2.y + d.y) / m_tileSize.y));
+		int endY = static_cast<int>((aabb2.y + aabb2.h) / m_tileSize.y);
+		int startX = static_cast<int>(aabb2.x / m_tileSize.x);
+		int endX = static_cast<int>((aabb2.x + aabb2.w) / m_tileSize.x);
 		for (int y = startY; y <= endY; ++y)
 		{
 
@@ -229,7 +254,7 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 				int tile = getTile(x, y);
 				if (tile > 0)
 				{
-					float distance = (y + 1) * m_tileSize - aabb2.y;
+					float distance = (y + 1) * m_tileSize.y - aabb2.y;
 					if (distance > maxDistance)
 					{
 						maxDistance = distance;
@@ -246,10 +271,10 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 
 bool Map::isGrounded(const Aabb & aabb) const
 {
-	int startX = static_cast<int>(std::floor((aabb.x)/ m_tileSize));
-	int endX = static_cast<int>(std::floor((aabb.x + aabb.w) / m_tileSize));
+	int startX = static_cast<int>(std::floor((aabb.x)/ m_tileSize.x));
+	int endX = static_cast<int>(std::floor((aabb.x + aabb.w) / m_tileSize.x));
 
-	int y = static_cast<int>(std::floor((aabb.y + aabb.h + 1) / m_tileSize));
+	int y = static_cast<int>(std::floor((aabb.y + aabb.h + 1) / m_tileSize.y));
 
 	for (int x = startX; x <= endX; ++x)
 	{
@@ -261,6 +286,12 @@ bool Map::isGrounded(const Aabb & aabb) const
 	return false;
 }
 
+bool Map::leftMap(const Aabb & aabb) const
+{
+	Aabb mapAabb{ 0.f, 0.f, static_cast<float>(m_tileSize.x * m_size.x), static_cast<float>(m_tileSize.y * m_size.y) };
+	return !mapAabb.intersects(aabb);
+}
+
 int Map::getTile(int x, int y) const
 {
 	if (0 <= x && x < m_size.x && 0 <= y && y < m_size.y)
@@ -270,8 +301,8 @@ int Map::getTile(int x, int y) const
 
 int Map::getTile(float x, float y) const
 {
-	int xt = static_cast<int>(std::floor(x / m_tileSize));
-	int yt = static_cast<int>(std::floor(y / m_tileSize));
+	int xt = static_cast<int>(std::floor(x / m_tileSize.x));
+	int yt = static_cast<int>(std::floor(y / m_tileSize.y));
 	return getTile(xt, yt);
 }
 

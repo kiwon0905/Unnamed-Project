@@ -67,7 +67,7 @@ void PlayingScreen::onEnter(Client & client)
 	packer2.pack(Msg::CL_REQUEST_GAME_INFO);
 	client.getNetwork().send(packer2, true);
 
-	float verticleCameraSize = 2000.f;
+	float verticleCameraSize = 2500.f;
 	float horizontalCameraSize = verticleCameraSize / client.getWindow().getSize().x * client.getWindow().getSize().y;
 	m_view.setSize(verticleCameraSize, horizontalCameraSize);
 	
@@ -210,10 +210,10 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			m_tileTexture->setSmooth(true);
 
 			//create tile map
-			int tileSize = m_map.getTileSize();
+			sf::Vector2i tileSize = m_map.getTileSize();
 			m_tileVertices.setPrimitiveType(sf::PrimitiveType::Quads);
-			int textureWidth = m_tileTexture->getSize().x / tileSize;
-			int textureHeight = m_tileTexture->getSize().y / tileSize;
+			int textureWidth = m_tileTexture->getSize().x / tileSize.x;
+			int textureHeight = m_tileTexture->getSize().y / tileSize.y;
 			for (int y = 0; y < m_map.getSize().y; ++y)
 			{
 				for (int x = 0; x < m_map.getSize().x; ++x)
@@ -222,17 +222,17 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					if (!m_map.getTile(x, y))
 						continue;
 					sf::Vertex a, b, c, d;
-					a.position = sf::Vector2f(static_cast<float>(x * tileSize), static_cast<float>(y * tileSize));
-					b.position = sf::Vector2f(static_cast<float>((x + 1) * tileSize), static_cast<float>(y * tileSize));
-					c.position = sf::Vector2f(static_cast<float>((x + 1) * tileSize), static_cast<float>((y + 1) * tileSize));
-					d.position = sf::Vector2f(static_cast<float>(x * tileSize), static_cast<float>((y + 1) * tileSize));
+					a.position = sf::Vector2f(static_cast<float>(x * tileSize.x), static_cast<float>(y * tileSize.y));
+					b.position = sf::Vector2f(static_cast<float>((x + 1) * tileSize.x), static_cast<float>(y * tileSize.y));
+					c.position = sf::Vector2f(static_cast<float>((x + 1) * tileSize.x), static_cast<float>((y + 1) * tileSize.y));
+					d.position = sf::Vector2f(static_cast<float>(x * tileSize.x), static_cast<float>((y + 1) * tileSize.y));
 					int tx = (tile - 1) % textureWidth;
 					int ty = (tile - 1) / textureHeight;
 
-					a.texCoords = sf::Vector2f(static_cast<float>(tx * tileSize), static_cast<float>(ty * tileSize)) + sf::Vector2f(0.5f, 0.5f);
-					b.texCoords = sf::Vector2f(static_cast<float>((tx + 1) * tileSize), static_cast<float>(ty * tileSize)) + sf::Vector2f(-0.5f, 0.5f);
-					c.texCoords = sf::Vector2f(static_cast<float>((tx + 1) * tileSize), static_cast<float>((ty + 1) * tileSize)) + sf::Vector2f(-0.5f, -0.5f);
-					d.texCoords = sf::Vector2f(static_cast<float>(tx * tileSize), static_cast<float>((ty + 1) * tileSize)) + sf::Vector2f(0.5f, -0.5f);
+					a.texCoords = sf::Vector2f(static_cast<float>(tx * tileSize.x), static_cast<float>(ty * tileSize.y)) + sf::Vector2f(0.5f, 0.5f);
+					b.texCoords = sf::Vector2f(static_cast<float>((tx + 1) * tileSize.x), static_cast<float>(ty * tileSize.y)) + sf::Vector2f(-0.5f, 0.5f);
+					c.texCoords = sf::Vector2f(static_cast<float>((tx + 1) * tileSize.x), static_cast<float>((ty + 1) * tileSize.y)) + sf::Vector2f(-0.5f, -0.5f);
+					d.texCoords = sf::Vector2f(static_cast<float>(tx * tileSize.x), static_cast<float>((ty + 1) * tileSize.y)) + sf::Vector2f(0.5f, -0.5f);
 
 					m_tileVertices.append(a);
 					m_tileVertices.append(b);
@@ -652,7 +652,7 @@ void PlayingScreen::render(Client & client)
 	{
 		sf::Vector2f center = myEntity->getCameraPosition(m_currentSnap.snapshot, m_nextSnap.snapshot, predT, t);
 		sf::FloatRect area{ center - m_view.getSize() / 2.f, m_view.getSize() };
-		sf::Vector2f worldSize = static_cast<sf::Vector2f>(m_map.getSize()) * static_cast<float>(m_map.getTileSize());
+		sf::Vector2f worldSize = m_map.getWorldSize();
 		if (area.left < 0.f)
 		{
 			center.x = m_view.getSize().x / 2.f;
@@ -680,7 +680,7 @@ void PlayingScreen::render(Client & client)
 	
 	//draw background
 	sf::RectangleShape background;
-	background.setSize(static_cast<sf::Vector2f>(m_map.getSize() * m_map.getTileSize()));
+	background.setSize(m_map.getWorldSize());
 	background.setFillColor(sf::Color(135, 206, 235));
 	window.draw(background);
 
@@ -753,8 +753,8 @@ void PlayingScreen::debugRender(Client & client, const sf::View & playerView)
 		sf::Vertex v, v2;
 		v.color = sf::Color::Black;
 		v2.color = sf::Color::Black;
-		v.position = sf::Vector2f(static_cast<float>(i * m_map.getTileSize()), 0.f);
-		v2.position = sf::Vector2f(static_cast<float>(i * m_map.getTileSize()), static_cast<float>(m_map.getTileSize() * m_map.getSize().y));
+		v.position = sf::Vector2f(static_cast<float>(i * m_map.getTileSize().x), 0.f);
+		v2.position = sf::Vector2f(static_cast<float>(i * m_map.getTileSize().x), static_cast<float>(m_map.getTileSize().y * m_map.getSize().y));
 		arr.append(v);
 		arr.append(v2);
 	}
@@ -763,8 +763,8 @@ void PlayingScreen::debugRender(Client & client, const sf::View & playerView)
 		sf::Vertex v, v2;
 		v.color = sf::Color::Black;
 		v2.color = sf::Color::Black;
-		v.position = sf::Vector2f(0.f, static_cast<float>(i * m_map.getTileSize()));
-		v2.position = sf::Vector2f(static_cast<float>(m_map.getSize().x * m_map.getTileSize()), static_cast<float>(i * m_map.getTileSize()));
+		v.position = sf::Vector2f(0.f, static_cast<float>(i * m_map.getTileSize().y));
+		v2.position = sf::Vector2f(static_cast<float>(m_map.getSize().x * m_map.getTileSize().x), static_cast<float>(i * m_map.getTileSize().y));
 		arr.append(v);
 		arr.append(v2);
 	}
@@ -774,8 +774,8 @@ void PlayingScreen::debugRender(Client & client, const sf::View & playerView)
 	sf::Vector2f mouseWorldPos = window.mapPixelToCoords(sf::Mouse::getPosition(window), playerView);
 	sf::Text text;
 	text.setFont(*client.getAssetManager().get<sf::Font>("assets/font/arial.ttf"));
-	int xt = static_cast<int>(std::floor(mouseWorldPos.x / m_map.getTileSize()));
-	int yt = static_cast<int>(std::floor(mouseWorldPos.y / m_map.getTileSize()));
+	int xt = static_cast<int>(std::floor(mouseWorldPos.x / m_map.getTileSize().x));
+	int yt = static_cast<int>(std::floor(mouseWorldPos.y / m_map.getTileSize().y));
 	std::string str = "(" + std::to_string(xt) + ", " + std::to_string(yt) + ")\n";
 	str += "(" + std::to_string(mouseWorldPos.x) + ", " + std::to_string(mouseWorldPos.y) + ")";
 	text.setString(str);

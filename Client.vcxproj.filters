@@ -153,6 +153,9 @@
     <ClInclude Include="src\Game\NetObject\NetGameDataControl.h">
       <Filter>Game\Shared\NetObject</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\Client\RenderMap.h">
+      <Filter>Game\Client</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Client\Client.cpp">
@@ -271,6 +274,9 @@
     </ClCompile>
     <ClCompile Include="src\Game\NetObject\NetGameDataControl.cpp">
       <Filter>Game\Shared\NetObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Client\RenderMap.cpp">
+      <Filter>Game\Client</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

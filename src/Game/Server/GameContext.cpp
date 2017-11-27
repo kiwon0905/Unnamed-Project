@@ -167,17 +167,22 @@ void GameContext::announceDeath(int killedPeer, int killerPeer, const std::unord
 	Player * killer = getPlayer(killerPeer);
 	if (killed)
 		killed->addDeath();
-	if (killer)
+	if (killer && killer != killed)
 		killer->addKill();
 	Packer packer;
 	packer.pack(Msg::SV_KILL_FEED);
-	for (auto & p : assisters)
+
+	if (killer != killed)
 	{
-		Player * assister = getPlayer(p.first);
-		if (assister)
-			assister->addAssist();
+		for (auto & p : assisters)
+		{
+			Player * assister = getPlayer(p.first);
+			if (assister)
+				assister->addAssist();
+		}
+
 	}
-	
+
 	//necessary??
 	int killedPeerId = killed ? killed->getPeerId() : -1;
 	int killerPeerId = killer ? killer->getPeerId() : -1;

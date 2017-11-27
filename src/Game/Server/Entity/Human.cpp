@@ -48,13 +48,18 @@ void Human::tick(float dt)
 				p->setPosition(firePos);
 				m_fireCooldown = 10;
 			}
-
 		}
 	}
 
 	m_fireCooldown--;
 	if (m_fireCooldown < 0)
 		m_fireCooldown = 0;
+	Aabb aabb{ m_position, m_size };
+
+	if (m_context->getMap().leftMap(aabb))
+	{
+		die(m_peerId);
+	}
 }
 
 void Human::snap(Snapshot & snapshot) const
