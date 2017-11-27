@@ -55,7 +55,8 @@ void Zombie::render(const Snapshot * from, const Snapshot * to, float predictedT
 	sf::Vector2f pos = getRenderPos(z0, z1, predictedT, t);
 	sf::RectangleShape body;
 	body.setSize({ 70.f, 70.f });
-	body.setFillColor(sf::Color::Blue);
+	sf::Color teamColor = info->team == Team::A ? sf::Color::Blue : sf::Color::Red;
+	body.setFillColor(teamColor);
 	body.setOutlineColor(sf::Color::Black);
 	body.setOutlineThickness(-3.f);
 	body.setPosition(pos);

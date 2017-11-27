@@ -11,9 +11,10 @@
 class Map
 {
 public:
-	bool loadFromFile(const std::string & s);
+	//bool loadFromFile(const std::string & s);
+	bool loadFromTmx(const std::string & s);
+
 	const std::string & getName() const;
-	const std::string & getMode() const;
 	const sf::Vector2i & getSize() const;
 	const std::string & getTilesetFile() const;
 	int getTileSize() const;
@@ -23,7 +24,6 @@ public:
 	int getTile(int x, int y) const;
 	int getTile(float x, float y) const;
 	bool sweepPoints(const std::vector<sf::Vector2f> & points, const sf::Vector2f d, float & time) const;
-	//int sweep(const Aabb & aabb, const sf::Vector2f & d, float & time, sf::Vector2i & norm) const;
 	bool sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f & out, sf::Vector2i & norm, sf::Vector2i & tile) const;
 	bool isGrounded(const Aabb & aabb) const;
 private:

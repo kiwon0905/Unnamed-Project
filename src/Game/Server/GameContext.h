@@ -33,12 +33,14 @@ public:
 	void startRound();
 	virtual void onRoundStart() = 0;
 
+	virtual void tick(float dt) = 0;
+	virtual void snap(Snapshot & snapshot) = 0;
 	//return true if the round needs to be continued
 	bool update();
 
 	//virtual void tick() = 0;
 	virtual bool checkRound(Team & team) = 0;
-	void reset();
+	virtual void reset();
 	
 	void announceDeath(int killedPeer, int killerPeer, const std::unordered_map<int, int> & assisters);
 	void addScore(int peerId, int score);

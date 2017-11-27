@@ -26,7 +26,7 @@ bool GameContext::update()
 		m_gameWorld.tick();
 		for (auto & p : m_players)
 			p.tick();
-
+		tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds());
 
 		//if (m_tick % 2 == 0)
 		{
@@ -35,6 +35,7 @@ bool GameContext::update()
 			for (auto & p : m_players)
 				p.snap(*snapshot);
 			m_gameWorld.snap(*snapshot);
+			snap(*snapshot);
 
 			for (auto & p : m_players)
 			{
@@ -140,7 +141,7 @@ sf::Time GameContext::getCurrentTime() const
 
 void GameContext::loadRound()
 {
-	m_map.loadFromFile("map/escort.xml");
+	m_map.loadFromTmx("map/control0.tmx");
 }
 
 void GameContext::startRound()
@@ -155,7 +156,8 @@ void GameContext::reset()
 	m_tick = 0;
 	m_prevTime = sf::Time::Zero;
 	m_accumulator = sf::Time::Zero;
-
+	for (auto & p : m_players)
+		p.reset();
 	m_snapshots.clear();
 }
 

@@ -16,8 +16,8 @@ public:
 		ZOMBIE,
 		PROJECTILE,
 		ITEM,
-		CART,
 		PLAYER_INFO,
+		GAME_DATA_CONTROL,
 		ENTITY_COUNT,
 		//Transient
 		EXPLOSION,

@@ -138,10 +138,7 @@
     <ClInclude Include="src\Game\Server\Entity\Character.h">
       <Filter>Game\Server\Entity</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\Server\Entity\Cart.h">
-      <Filter>Game\Server\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Game\NetObject\NetCart.h">
+    <ClInclude Include="src\Game\NetObject\NetGameDataControl.h">
       <Filter>Game\Shared\NetObject</Filter>
     </ClInclude>
   </ItemGroup>
@@ -245,10 +242,7 @@
     <ClCompile Include="src\Game\Server\Entity\Character.cpp">
       <Filter>Game\Server\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="src\Game\Server\Entity\Cart.cpp">
-      <Filter>Game\Server\Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Game\NetObject\NetCart.cpp">
+    <ClCompile Include="src\Game\NetObject\NetGameDataControl.cpp">
       <Filter>Game\Shared\NetObject</Filter>
     </ClCompile>
   </ItemGroup>

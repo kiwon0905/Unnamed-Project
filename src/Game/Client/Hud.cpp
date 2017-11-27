@@ -3,6 +3,7 @@
 
 #include "Entity/Zombie.h"
 #include "Entity/Human.h"
+#include "Game/NetObject/NetGameDataControl.h"
 #include "Core/Utility.h"
 
 
@@ -77,14 +78,53 @@ void Hud::draw(sf::RenderTarget & target, sf::RenderStates states) const
 		boostCooldownText.setFont(*m_font);
 		boostCooldownText.setString("Boost: " + std::to_string(netZombie.boostCooldown));
 
-		target.draw(fuelText);
-		target.draw(boostCooldownText);
+		//target.draw(fuelText);
+		//target.draw(boostCooldownText);
 	}
-	target.setView(v);
 
 
 	//game mode specific
+	Map & map = m_screen->m_map;
 
+	std::string mode;
+	map.getProperty("mode", mode);
+	if (mode == "control")
+	{
+		std::string controlPoint;
+		map.getProperty("control point", controlPoint);
+		sf::FloatRect rect;
+		sscanf_s(&controlPoint[0], "( %f, %f, %f, %f)", &rect.left, &rect.top, &rect.width, &rect.height);
+
+		target.setView(m_screen->m_view);
+		//capture area
+		sf::RectangleShape rectShape;
+		rectShape.setPosition(sf::Vector2f{ rect.left, rect.top });
+		rectShape.setSize(sf::Vector2f{ rect.width, rect.height });
+		rectShape.setFillColor(sf::Color::Yellow);
+		target.draw(rectShape);
+		
+
+		target.setView(target.getDefaultView());
+		Snapshot * current = m_screen->m_currentSnap.snapshot;
+		const NetGameDataControl * ngdc = static_cast<const NetGameDataControl *>(current->getEntity(NetObject::GAME_DATA_CONTROL, 0));
+		if (ngdc)
+		{
+			std::string s;
+			s += "Capturing team: " + toString(ngdc->capturingTeam) + "\n";
+			s += "Capture progress A: " + std::to_string(ngdc->captureProgressA) + "\n";
+			s += "Capture progress B: " + std::to_string(ngdc->captureProgressB) + "\n";
+			s += "Controlling team: " + toString(ngdc->controllingTeam) + "\n";
+			s += "Control progress A: " + std::to_string(ngdc->controlProgressA) + "\n";
+			s += "Control progress B: " + std::to_string(ngdc->controlProgressB) + "\n";
+
+			sf::Text text;
+			text.setFillColor(sf::Color::Black);
+			text.setFont(*m_font);
+			text.setString(s);
+
+			target.draw(text);
+		}
+	}
 }
 
 void Hud::setEntity(const Entity * e)

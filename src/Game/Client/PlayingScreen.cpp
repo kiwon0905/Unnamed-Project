@@ -4,7 +4,6 @@
 #include "Game/Client/Entity/Human.h"
 #include "Game/Client/Entity/Zombie.h"
 #include "Game/Client/Entity/Projectile.h"
-#include "Game/Client/Entity/Cart.h"
 
 #include "Game/NetObject/NetPlayerInfo.h"
 #include "Game/NetObject/NetExplosion.h"
@@ -206,7 +205,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			unpacker.unpack(mapName);
 
 			//load map
-			m_map.loadFromFile("map/" + mapName + ".xml");
+			m_map.loadFromTmx("map/" + mapName + ".tmx");
 			m_tileTexture = client.getAssetManager().get<sf::Texture>(m_map.getTilesetFile());
 			m_tileTexture->setSmooth(true);
 
@@ -573,6 +572,10 @@ void PlayingScreen::render(Client & client)
 				}
 
 			}
+			else if (p.second->getType() == NetObject::GAME_DATA_CONTROL)
+			{
+				continue;
+			}
 			else
 			{
 				Entity * e = getEntity(p.first.id);
@@ -589,8 +592,6 @@ void PlayingScreen::render(Client & client)
 					case NetObject::PROJECTILE:
 						e = new Projectile(p.first.id, client, *this);
 						break;
-					case NetObject::CART:
-						e = new Cart(p.first.id, client, *this);
 					default:
 						break;
 					}
@@ -859,6 +860,11 @@ void PlayingScreen::updateScoreboard()
 		grid->addWidget(line, i, 0);
 		++i;
 	}
+}
+
+Map & PlayingScreen::getMap()
+{
+	return m_map;
 }
 
 PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfo(int id)

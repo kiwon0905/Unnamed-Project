@@ -5,24 +5,35 @@
 #include <sstream>
 
 //TODO: add validation checks
-bool Map::loadFromFile(const std::string & s)
+bool Map::loadFromTmx(const std::string & s)
 {
+	int slashPos = s.find_last_of("/");
+	m_name = s.substr(slashPos + 1, s.size() - 5 - slashPos);
+
 	tinyxml2::XMLDocument doc;
 	doc.LoadFile(s.c_str());
-	
+
 	tinyxml2::XMLElement * element = doc.FirstChildElement("map");
-	m_mode = element->FirstChildElement("mode")->GetText();
-	m_size.x = element->FirstChildElement("width")->IntText();
-	m_size.y = element->FirstChildElement("height")->IntText();
-	m_tilesetFile = element->FirstChildElement("tileset")->Attribute("file");
-	m_tileSize = element->FirstChildElement("tileset")->IntAttribute("size");
-	std::string data = element->FirstChildElement("data")->GetText();
+	m_size.x = element->IntAttribute("width");
+	m_size.y = element->IntAttribute("height");
+	m_tileSize = element->IntAttribute("tilewidth");
+
+	m_tilesetFile = element->FirstChildElement("tileset")->FirstChildElement("image")->Attribute("source");
 	
+	tinyxml2::XMLElement * properties = element->FirstChildElement("properties");
+	for (tinyxml2::XMLElement * property = properties->FirstChildElement("property"); property != nullptr; property = property->NextSiblingElement("property"))
+	{
+		m_properties[std::string(property->Attribute("name"))] = property->Attribute("value");
+	}
+
+	for (auto & p : m_properties)
+		std::cout << p.first << ": " << p.second << "\n";
+
+	std::string data = element->FirstChildElement("layer")->FirstChildElement("data")->GetText();
 	std::istringstream ss(data);
-	
 	std::string firstLine;
 	std::getline(ss, firstLine);
-	for(int r = 0; r < m_size.y; ++r)
+	for (int r = 0; r < m_size.y; ++r)
 	{
 		std::string line;
 		std::getline(ss, line);
@@ -36,27 +47,14 @@ bool Map::loadFromFile(const std::string & s)
 			m_data.back().emplace_back(tile);
 		}
 	}
-	int slashPos = s.find_last_of("/");
-	m_name = s.substr(slashPos + 1, s.size() - 5 - slashPos);
 
 
-	tinyxml2::XMLElement * properties = element->FirstChildElement("properties");
-
-	for (tinyxml2::XMLElement * property = properties->FirstChildElement(); property != nullptr; property = property->NextSiblingElement())
-	{
-		m_properties[std::string(property->Name())] = std::string(property->GetText());
-	}
 	return true;
 }
 
 const std::string & Map::getName() const
 {
 	return m_name;
-}
-
-const std::string & Map::getMode() const
-{
-	return m_mode;
 }
 
 const sf::Vector2i & Map::getSize() const
@@ -142,7 +140,7 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 			for (int y = startY; y <= endY; ++y)
 			{
 				int tile = getTile(x, y);
-				if (tile)
+				if (tile > 0)
 				{
 					float distance = m_tileSize * x - (aabb2.x + aabb2.w);
 					if (distance < minDistance)
@@ -170,7 +168,7 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 			for (int y = startY; y <= endY; ++y)
 			{
 				int tile = getTile(x, y);
-				if (tile)
+				if (tile > 0)
 				{
 					float distance = (x + 1) * m_tileSize - aabb2.x;
 					if (distance > maxDistance)
@@ -201,7 +199,7 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 			for (int x = startX; x <= endX; ++x)
 			{
 				int tile = getTile(x, y);
-				if (tile)
+				if (tile > 0)
 				{
 					float distance = m_tileSize * y - (aabb2.y + aabb2.h);
 					if (distance < minDistance)
@@ -229,7 +227,7 @@ bool Map::sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f
 			for (int x = startX; x <= endX; ++x)
 			{
 				int tile = getTile(x, y);
-				if (getTile(x, y))
+				if (tile > 0)
 				{
 					float distance = (y + 1) * m_tileSize - aabb2.y;
 					if (distance > maxDistance)

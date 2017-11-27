@@ -33,7 +33,7 @@ private:
 class PlayingScreen : public Screen
 {
 public:
-
+	friend class Hud;
 	struct PlayerInfo
 	{
 		std::string name;
@@ -135,6 +135,7 @@ private:
 
 	void updateScoreboard();
 public:
+	Map & getMap();
 	PlayerInfo * getPlayerInfo(int id);
 	const PlayerInfo * getPlayerInfoByEntity(int id);
 	int getMyPlayerId();
