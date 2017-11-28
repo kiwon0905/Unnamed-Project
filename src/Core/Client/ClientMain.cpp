@@ -12,6 +12,7 @@
 
 #include "Game/Map.h"
 #include "Game/Client/RenderMap.h"
+#include "Core/Client/AssetManager.h"
 int main()
 {
 #ifdef _DEBUG
@@ -21,8 +22,11 @@ int main()
 
 	Client client;
 	client.run();
-	//RenderMap map;
-	//map.loadFromTmx("E:/Unnamed-Project/misc/wip/control0.tmx");
+	
+	/*AssetManager mgr;
+	RenderMap map;
+	map.loadFromTmx("map/control1.tmx");
+	map.loadTextures(mgr);*/
 }
 
 

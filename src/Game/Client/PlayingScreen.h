@@ -4,10 +4,11 @@
 
 #include "Game/GameCore.h"
 #include "Game/Snapshot.h"
-#include "Game/Client/Entity.h"
-#include "Game/Client/PredictedEntity.h"
 #include "Game/NetInput.h"
 
+#include "Game/Client/Entity.h"
+#include "Game/Client/PredictedEntity.h"
+#include "Game/Client/RenderMap.h"
 #include "Core/Client/Screen.h"
 #include "Core/Client/Graph.h"
 #include "Core/Client/Particles.h"
@@ -109,10 +110,7 @@ private:
 
 
 	//rendering
-	Map m_map;
-	sf::Texture * m_tileTexture;
-	sf::RenderTexture m_renderTexture;
-	sf::VertexArray m_tileVertices;
+	RenderMap m_map;
 	sf::View m_view;
 	Particles m_particles;
 	const sf::Font * m_font;

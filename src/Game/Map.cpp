@@ -8,7 +8,7 @@ tinyxml2::XMLElement * Map::getElementWithAttribute(tinyxml2::XMLElement * paren
 {
 	for (tinyxml2::XMLElement * ele = parent->FirstChildElement(name.c_str()); ele != nullptr; ele = ele->NextSiblingElement(name.c_str()))
 	{
-		if (ele->Attribute(name.c_str(), value.c_str()))
+		if (ele->Attribute(attribute.c_str(), value.c_str()))
 		{
 			return ele;
 		}
@@ -24,32 +24,26 @@ bool Map::loadFromTmx(const std::string & s)
 	int slashPos = s.find_last_of("/");
 	m_name = s.substr(slashPos + 1, s.size() - 5 - slashPos);
 
-	m_document.LoadFile(s.c_str());
+	if (m_document.LoadFile(s.c_str()) != 0)
+		return false;
 
-
-
-
-
-	////////////////////////////////////////////////////////////////////////////////
-	tinyxml2::XMLElement * element = m_document.FirstChildElement("map");
+	//metadata
+	XMLElement * element = m_document.FirstChildElement("map");
 	m_size.x = element->IntAttribute("width");
 	m_size.y = element->IntAttribute("height");
 	m_tileSize.x = element->IntAttribute("tilewidth");
 	m_tileSize.y = element->IntAttribute("tileheight");
 
-	m_tilesetFile = element->FirstChildElement("tileset")->FirstChildElement("image")->Attribute("source");
-	
-	tinyxml2::XMLElement * properties = element->FirstChildElement("properties");
+	//properties
+	XMLElement * properties = element->FirstChildElement("properties");
 	for (tinyxml2::XMLElement * property = properties->FirstChildElement("property"); property != nullptr; property = property->NextSiblingElement("property"))
 	{
-		m_properties[std::string(property->Attribute("name"))] = property->Attribute("value");
+		m_properties[std::string(property->Attribute("name"))] = std::string(property->Attribute("value"));
 	}
 
-	for (auto & p : m_properties)
-		std::cout << p.first << ": " << p.second << "\n";
-
-	std::string data = element->FirstChildElement("layer")->FirstChildElement("data")->GetText();
-
+	XMLElement * collisionLayer = getElementWithAttribute(element, "layer", "name", "Collision Layer");
+	std::string data = collisionLayer->FirstChildElement("data")->GetText();
+	
 	std::istringstream ss(data);
 	std::string firstLine;
 	std::getline(ss, firstLine);
@@ -67,8 +61,6 @@ bool Map::loadFromTmx(const std::string & s)
 			m_data.back().emplace_back(tile);
 		}
 	}
-
-
 	return true;
 }
 
@@ -80,11 +72,6 @@ const std::string & Map::getName() const
 const sf::Vector2i & Map::getSize() const
 {
 	return m_size;
-}
-
-const std::string & Map::getTilesetFile() const
-{
-	return m_tilesetFile;
 }
 
 sf::Vector2i Map::getTileSize() const

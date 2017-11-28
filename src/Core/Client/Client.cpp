@@ -10,8 +10,8 @@
 
 bool Client::initialize()
 {
-	sf::VideoMode a = sf::VideoMode::getFullscreenModes()[0];
-	m_window.create(sf::VideoMode(a.width, a.height), "", sf::Style::Fullscreen, sf::ContextSettings(0, 0, 8));
+	sf::VideoMode a = sf::VideoMode::getFullscreenModes()[10];
+	m_window.create(sf::VideoMode(a.width, a.height), "", sf::Style::Default, sf::ContextSettings(0, 0, 8));
 	m_window.resetGLStates();
 
 	if (!m_parser.loadFromFile("client-config.txt"))

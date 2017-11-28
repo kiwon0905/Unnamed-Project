@@ -141,7 +141,7 @@ sf::Time GameContext::getCurrentTime() const
 
 void GameContext::loadRound()
 {
-	m_map.loadFromTmx("map/control0.tmx");
+	m_map.loadFromTmx("map/control1.tmx");
 }
 
 void GameContext::startRound()

@@ -3,8 +3,8 @@
  <properties>
   <property name="mode" value="control"/>
  </properties>
- <tileset firstgid="1" source="../assets/tilesets/grass.tsx"/>
- <tileset firstgid="50" source="../assets/tilesets/objects.tsx"/>
+ <tileset firstgid="1" source="assets/tilesets/grass.tsx"/>
+ <tileset firstgid="50" source="assets/tilesets/objects.tsx"/>
  <objectgroup name="Background Layer"/>
  <layer name="Collision Layer" width="120" height="35">
   <data encoding="csv">

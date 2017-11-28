@@ -206,40 +206,8 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 
 			//load map
 			m_map.loadFromTmx("map/" + mapName + ".tmx");
-			m_tileTexture = client.getAssetManager().get<sf::Texture>(m_map.getTilesetFile());
-			m_tileTexture->setSmooth(true);
-
-			//create tile map
-			sf::Vector2i tileSize = m_map.getTileSize();
-			m_tileVertices.setPrimitiveType(sf::PrimitiveType::Quads);
-			int textureWidth = m_tileTexture->getSize().x / tileSize.x;
-			int textureHeight = m_tileTexture->getSize().y / tileSize.y;
-			for (int y = 0; y < m_map.getSize().y; ++y)
-			{
-				for (int x = 0; x < m_map.getSize().x; ++x)
-				{
-					int tile = m_map.getTile(x, y);
-					if (!m_map.getTile(x, y))
-						continue;
-					sf::Vertex a, b, c, d;
-					a.position = sf::Vector2f(static_cast<float>(x * tileSize.x), static_cast<float>(y * tileSize.y));
-					b.position = sf::Vector2f(static_cast<float>((x + 1) * tileSize.x), static_cast<float>(y * tileSize.y));
-					c.position = sf::Vector2f(static_cast<float>((x + 1) * tileSize.x), static_cast<float>((y + 1) * tileSize.y));
-					d.position = sf::Vector2f(static_cast<float>(x * tileSize.x), static_cast<float>((y + 1) * tileSize.y));
-					int tx = (tile - 1) % textureWidth;
-					int ty = (tile - 1) / textureHeight;
-
-					a.texCoords = sf::Vector2f(static_cast<float>(tx * tileSize.x), static_cast<float>(ty * tileSize.y)) + sf::Vector2f(0.5f, 0.5f);
-					b.texCoords = sf::Vector2f(static_cast<float>((tx + 1) * tileSize.x), static_cast<float>(ty * tileSize.y)) + sf::Vector2f(-0.5f, 0.5f);
-					c.texCoords = sf::Vector2f(static_cast<float>((tx + 1) * tileSize.x), static_cast<float>((ty + 1) * tileSize.y)) + sf::Vector2f(-0.5f, -0.5f);
-					d.texCoords = sf::Vector2f(static_cast<float>(tx * tileSize.x), static_cast<float>((ty + 1) * tileSize.y)) + sf::Vector2f(0.5f, -0.5f);
-
-					m_tileVertices.append(a);
-					m_tileVertices.append(b);
-					m_tileVertices.append(c);
-					m_tileVertices.append(d);
-				}
-			}
+			std::cout << "map name: " << mapName << "\n";
+			m_map.loadTextures(client.getAssetManager());
 
 			//send ack
 			Packer packer;
@@ -685,9 +653,7 @@ void PlayingScreen::render(Client & client)
 	window.draw(background);
 
 	//draw tile map
-	sf::RenderStates states;
-	states.texture = m_tileTexture;
-	window.draw(m_tileVertices, states);
+	m_map.drawTiles(window);
 
 	//draw entities
 	for (auto & v : m_entitiesByType)
