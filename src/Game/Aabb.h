@@ -20,10 +20,10 @@ public:
 	bool testLine(const sf::Vector2f & p, const sf::Vector2f & q, float & t);
 	bool sweepPoints(const std::vector<sf::Vector2f> & points, const sf::Vector2f & d, float & t);
 
-	float x;   ///< Left coordinate of the Aabb
-	float y;    ///< Top coordinate of the Aabb
-	float w;  ///< Width of the Aabb
-	float h; ///< Height of the Aabb
+	float x;
+	float y;
+	float w;
+	float h;
 
 private:
 	bool broadphase(const sf::Vector2f & velocity, const Aabb & aabb) const;

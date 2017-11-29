@@ -1,3 +1,4 @@
+#pragma once
 #include "Game/Client/Entity.h"
 
 class Item : public Entity

@@ -2,12 +2,13 @@
 
 
 //need to improve this
+
 bool RenderMap::loadTextures(AssetManager & assets)
 {
 	using namespace tinyxml2;
+	XMLElement * map = m_document.FirstChildElement("map");
 
 	//load tile infos
-	XMLElement * map = m_document.FirstChildElement("map");
 	for (XMLElement * tileset = map->FirstChildElement("tileset"); tileset != nullptr; tileset = tileset->NextSiblingElement("tileset"))
 	{
 		int firstGid = -1;
@@ -72,7 +73,6 @@ bool RenderMap::loadTextures(AssetManager & assets)
 				int localId;
 				ele->QueryIntAttribute("id", &localId);
 				
-				
 				std::string imageSource = ele->FirstChildElement("image")->Attribute("source");
 				int width, height;
 				ele->FirstChildElement("image")->QueryIntAttribute("width", &width);
@@ -92,14 +92,11 @@ bool RenderMap::loadTextures(AssetManager & assets)
 			}
 		}
 	}
-	for (auto & p : m_tiles)
-		std::cout << p.first << ": " << p.second.source << ": " << p.second.textureRect.left << ", " << p.second.textureRect.top << ", " << p.second.textureRect.width << ", " << p.second.textureRect.height << "\n";
 
 
 	//build vertex array
 
 	m_tileVertices.setPrimitiveType(sf::PrimitiveType::Quads);
-
 	
 	for (std::size_t y = 0; y < m_data.size(); ++y)
 	{
@@ -115,25 +112,95 @@ bool RenderMap::loadTextures(AssetManager & assets)
 			d.position = sf::Vector2f(static_cast<float>(x * m_tileSize.x), static_cast<float>((y + 1) * m_tileSize.y));
 
 
-			a.texCoords = sf::Vector2f(static_cast<float>(t.textureRect.left), static_cast<float>(t.textureRect.top)) + sf::Vector2f(0.5f, 0.5f);
-			b.texCoords = sf::Vector2f(static_cast<float>(t.textureRect.left + t.textureRect.width), static_cast<float>(t.textureRect.top)) + sf::Vector2f(-0.5f, 0.5f);
-			c.texCoords = sf::Vector2f(static_cast<float>(t.textureRect.left + t.textureRect.width), static_cast<float>(t.textureRect.top + t.textureRect.height)) + sf::Vector2f(-0.5f, -0.5f);
-			d.texCoords = sf::Vector2f(static_cast<float>(t.textureRect.left), static_cast<float>(t.textureRect.top + t.textureRect.height)) + sf::Vector2f(0.5f, -0.5f);
+			a.texCoords = sf::Vector2f(static_cast<float>(t.textureRect.left), static_cast<float>(t.textureRect.top)) + sf::Vector2f(.5f, .5f);
+			b.texCoords = sf::Vector2f(static_cast<float>(t.textureRect.left + t.textureRect.width), static_cast<float>(t.textureRect.top)) + sf::Vector2f(-.5f, 0.5f);
+			c.texCoords = sf::Vector2f(static_cast<float>(t.textureRect.left + t.textureRect.width), static_cast<float>(t.textureRect.top + t.textureRect.height)) + sf::Vector2f(-.5f, -.5f);
+			d.texCoords = sf::Vector2f(static_cast<float>(t.textureRect.left), static_cast<float>(t.textureRect.top + t.textureRect.height)) + sf::Vector2f(.5f, -.5f);
 
 			m_tileVertices.append(a);
 			m_tileVertices.append(b);
 			m_tileVertices.append(c);
 			m_tileVertices.append(d);
-
-
 		}
+	}
+	sf::FloatRect r;
+	//load background images
+	XMLElement * backgroundLayer = getElementWithAttribute(map, "objectgroup", "name", "Background Layer");
+	if (backgroundLayer)
+	{
+		for (XMLElement * object = backgroundLayer->FirstChildElement("object"); object != nullptr; object = object->NextSiblingElement("object"))
+		{
+			Object obj;
+			object->QueryIntAttribute("gid", &obj.gid);
+			object->QueryFloatAttribute("x", &obj.x);
+			object->QueryFloatAttribute("y", &obj.y);
+			object->QueryFloatAttribute("width", &obj.w);
+			object->QueryFloatAttribute("height", &obj.h);
+
+			obj.y -= obj.h;
+
+			//get properties
+			XMLElement * properties = object->FirstChildElement("properties");
+			if (properties)
+			{
+				for (XMLElement * property = properties->FirstChildElement("property"); property != nullptr; property = property->NextSiblingElement("property"))
+				{
+					if (property->Attribute("name", "Repeat Texture"))
+					{
+						if (property->Attribute("value", "true"))
+						{
+							obj.repeatTexture = true;
+							std::cout << "repeat req\n";
+						}
+					}
+				}
+			}
+
+			m_backgroundObjects.push_back(obj);
+		}
+	}
+
+	for (auto & o : m_backgroundObjects)
+	{
+		sf::Texture * texture = assets.get<sf::Texture>("assets/tilesets/" + m_tiles[o.gid].source);
+		if (o.repeatTexture)
+		{
+			texture->setRepeated(true);
+
+			//seems this adding/subtracting 1 helps to get rid of the artifacts
+			sf::IntRect r;
+			r.left = 1;
+			r.top = 1;
+			r.height = texture->getSize().y - 1;
+			r.width = m_tileSize.x * m_size.x - 1;
+			o.sprite.setTextureRect(r);
+		}
+		o.sprite.setTexture(*texture);
+		o.sprite.setPosition(o.x, o.y);
+		o.sprite.setColor(sf::Color::White);
+		float scaleFactor = static_cast<float>(o.h) / texture->getSize().y;
+		std::cout << "texture size: " << texture->getSize().x << ", " << texture->getSize().y << "\n";
+		std::cout << "Scale factor: " << scaleFactor << "\n";
+		o.sprite.setScale(scaleFactor, scaleFactor);
+		std::cout << "x: " << o.x << ", y: " << o.y << ", w: " << o.w << ", h: " << o.h << "\n";
 	}
 	return true;
 }
 
+
 void RenderMap::drawBackground(sf::RenderTarget & target) const
 {
-
+	sf::View view = target.getView();
+	sf::Vector2f center = target.getView().getCenter();
+	center *= .7f;
+	sf::View parallaxView = view;
+	parallaxView.setCenter(center);
+	target.setView(parallaxView);
+	for (auto & o : m_backgroundObjects)
+	{
+		target.draw(o.sprite);
+	}
+	target.setView(view);
 }
 
 void RenderMap::drawTiles(sf::RenderTarget & target) const

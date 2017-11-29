@@ -3,7 +3,6 @@
 #include <iostream>
 #include <sstream>
 
-
 tinyxml2::XMLElement * Map::getElementWithAttribute(tinyxml2::XMLElement * parent, const std::string & name, const std::string & attribute, const std::string & value)
 {
 	for (tinyxml2::XMLElement * ele = parent->FirstChildElement(name.c_str()); ele != nullptr; ele = ele->NextSiblingElement(name.c_str()))
@@ -12,7 +11,6 @@ tinyxml2::XMLElement * Map::getElementWithAttribute(tinyxml2::XMLElement * paren
 		{
 			return ele;
 		}
-
 	}
 	return nullptr;
 }

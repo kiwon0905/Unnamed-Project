@@ -10,9 +10,18 @@
 	#endif
 #endif
 
-#include "Game/Map.h"
 #include "Game/Client/RenderMap.h"
 #include "Core/Client/AssetManager.h"
+#include "Game/Aabb.h"
+#include <SFML/System.hpp>
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <iostream>
+#include <tinyxml2/tinyxml2.h>
+
+#include <TGUI/TGUI.hpp>
+
 int main()
 {
 #ifdef _DEBUG
@@ -22,11 +31,9 @@ int main()
 
 	Client client;
 	client.run();
-	
-	/*AssetManager mgr;
-	RenderMap map;
-	map.loadFromTmx("map/control1.tmx");
-	map.loadTextures(mgr);*/
+	sf::FloatRect r;
+	//map.loadFromTmx("map/control1.tmx");
+	//map.loadTextures(mgr);
 }
 
 

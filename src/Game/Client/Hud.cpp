@@ -84,14 +84,14 @@ void Hud::draw(sf::RenderTarget & target, sf::RenderStates states) const
 
 
 	//game mode specific
-	Map & map = m_screen->m_map;
+	//Map & map = m_screen->m_map;
 
 	std::string mode;
-	map.getProperty("mode", mode);
+	//map.getProperty("mode", mode);
 	if (mode == "control")
 	{
 		std::string controlPoint;
-		map.getProperty("control point", controlPoint);
+		//map.getProperty("control point", controlPoint);
 		sf::FloatRect rect;
 		sscanf_s(&controlPoint[0], "( %f, %f, %f, %f)", &rect.left, &rect.top, &rect.width, &rect.height);
 

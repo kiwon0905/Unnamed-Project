@@ -31,6 +31,7 @@ sf::Time SmoothClock::getElapsedTime()
 		return m_current + (m_target + m_converge - m_current) * progress;
 	}
 }
+
 void SmoothClock::reset(sf::Time target)
 {
 	m_clock.restart();
@@ -67,11 +68,10 @@ void PlayingScreen::onEnter(Client & client)
 	packer2.pack(Msg::CL_REQUEST_GAME_INFO);
 	client.getNetwork().send(packer2, true);
 
-	float verticleCameraSize = 2500.f;
-	float horizontalCameraSize = verticleCameraSize / client.getWindow().getSize().x * client.getWindow().getSize().y;
-	m_view.setSize(verticleCameraSize, horizontalCameraSize);
-	
-	sf::Vector2u windowSize = client.getWindow().getSize();
+	float aspectRatio = static_cast<float>(client.getWindow().getSize().x) / static_cast<float>(client.getWindow().getSize().y);
+	float verticalCameraSize = client.getWindow().getSize().y;
+	float horizontalCameraSize = aspectRatio * verticalCameraSize;
+	m_view.setSize(std::round(horizontalCameraSize), std::round(verticalCameraSize));
 
 	m_font = client.getAssetManager().get<sf::Font>("assets/font/arial.ttf");
 	m_predictionGraph = std::make_unique<Graph>(-150.f, 150.f, *m_font, "Prediction timing(ms)");
@@ -363,7 +363,6 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			std::string killedPeerName = killedPeerInfo ? killedPeerInfo->name : "Unknown player";
 			std::string killerPeerName = killerPeerInfo ? killerPeerInfo->name : "Unknown player";
 			std::string str = killerPeerName + " killed " + killedPeerName;
-			//m_announcer.announce(str);
 			m_hud->announce(str);
 			m_chatBox->addLine(str, sf::Color::Red);
 		}
@@ -406,7 +405,6 @@ void PlayingScreen::update(Client & client)
 		sf::Time dt = current - m_prevPredictedTime;
 		m_prevPredictedTime = current;
 		m_accumulator += dt;
-
 
 		int i = 0;
 		while (m_accumulator >= sf::seconds(1.f / TICKS_PER_SEC))
@@ -637,6 +635,8 @@ void PlayingScreen::render(Client & client)
 		{
 			center.y = worldSize.y - m_view.getSize().y / 2.f;
 		}
+		//center.x = std::round(center.x);
+		//center.y = std::round(center.y);
 		m_view.setCenter(center);
 	}
 	else
@@ -651,6 +651,8 @@ void PlayingScreen::render(Client & client)
 	background.setSize(m_map.getWorldSize());
 	background.setFillColor(sf::Color(135, 206, 235));
 	window.draw(background);
+
+	m_map.drawBackground(window);
 
 	//draw tile map
 	m_map.drawTiles(window);

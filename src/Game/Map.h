@@ -8,6 +8,7 @@
 #include <iostream>
 #include <tinyxml2/tinyxml2.h>
 
+#include <SFML/Graphics.hpp>
 
 class Map
 {

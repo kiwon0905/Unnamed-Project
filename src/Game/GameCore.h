@@ -1,11 +1,11 @@
 #pragma once
-#include <SFML/System.hpp>
 
 #include "NetInput.h"
 #include "NetObject/NetHuman.h"
 #include "NetObject/NetZombie.h"
 #include "Map.h"
 
+#include <SFML/System.hpp>
 #include <memory>
 
 class CharacterCore;

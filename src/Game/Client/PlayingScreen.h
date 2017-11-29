@@ -22,7 +22,6 @@ public:
 	sf::Time getElapsedTime();
 	void reset(sf::Time target = sf::Time::Zero);
 	void update(sf::Time target, sf::Time converge);
-
 private:
 	sf::Clock m_clock;
 	sf::Time m_snap;

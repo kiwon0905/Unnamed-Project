@@ -1,7 +1,6 @@
 #include "GameCore.h"
 #include "Core/Utility.h"
 
-
 void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 {
 	Aabb aabb(m_position.x, m_position.y, 69.f, 69.f);

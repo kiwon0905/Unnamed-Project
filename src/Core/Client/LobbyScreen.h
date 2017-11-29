@@ -3,8 +3,10 @@
 #include "Screen.h"
 
 #include <vector>
-#include <SFML/Graphics.hpp>
 #include <TGUI/TGUI.hpp>
+#include <SFML/Graphics.hpp>
+
+
 #include <SFML/Audio.hpp>
 class LobbyScreen : public Screen
 {

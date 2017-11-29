@@ -1,6 +1,7 @@
 #include "Aabb.h"
 #include "Core/Utility.h"
 #include <iostream>
+
 Aabb::Aabb():
 	x(0.f),
 	y(0.f),
