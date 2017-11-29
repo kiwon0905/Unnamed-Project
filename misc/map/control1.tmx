@@ -1,21 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="120" height="35" tilewidth="70" tileheight="70" nextobjectid="21">
+<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="120" height="35" tilewidth="70" tileheight="70" nextobjectid="43">
  <properties>
   <property name="mode" value="control"/>
  </properties>
- <tileset firstgid="1" source="assets/tilesets/grass.tsx"/>
- <tileset firstgid="50" source="assets/tilesets/objects.tsx"/>
+ <tileset firstgid="1" source="../assets/tilesets/grass.tsx"/>
+ <tileset firstgid="50" source="../assets/tilesets/objects.tsx"/>
  <objectgroup name="Background Layer">
-  <object id="15" gid="126" x="22" y="2623" width="3653" height="1030">
+  <object id="35" gid="116" x="4060" y="1260" width="512" height="512">
    <properties>
-    <property name="Repeat Texture" type="bool" value="true"/>
+    <property name="Color" type="color" value="#ffffff00"/>
    </properties>
   </object>
-  <object id="16" gid="98" x="874" y="862" width="829" height="429"/>
-  <object id="17" gid="103" x="3970" y="1155" width="620" height="390"/>
+ </objectgroup>
+ <objectgroup name="Background Layer">
+  <properties>
+   <property name="Parallax Factor" type="float" value="0.8"/>
+  </properties>
+  <object id="16" gid="98" x="840" y="910" width="829" height="429"/>
+  <object id="17" gid="103" x="3290" y="1190" width="620" height="390">
+   <properties>
+    <property name="Color" type="color" value="#7dffffff"/>
+   </properties>
+  </object>
   <object id="18" gid="99" x="6005" y="1737" width="662" height="370"/>
-  <object id="19" gid="89" x="2462" y="754" width="709" height="389"/>
-  <object id="20" gid="88" x="6893" y="737" width="742" height="418"/>
+  <object id="22" gid="97" x="5880" y="630" width="742" height="418"/>
+  <object id="24" gid="102" x="4121" y="2026" width="590" height="397"/>
+  <object id="26" gid="98" x="7442" y="930" width="829" height="429"/>
+  <object id="27" gid="102" x="1865" y="2158" width="590" height="397"/>
+ </objectgroup>
+ <objectgroup name="Background Layer">
+  <object id="39" gid="106" x="4060" y="1470" width="77" height="88"/>
+  <object id="41" gid="77" x="140" y="1540" width="187" height="336.506"/>
+  <object id="42" gid="77" x="8050" y="1540" width="187" height="336.506"/>
  </objectgroup>
  <layer name="Collision Layer" width="120" height="35">
   <data encoding="csv">

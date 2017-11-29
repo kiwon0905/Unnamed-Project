@@ -14,24 +14,23 @@ struct Tile
 
 class RenderMap : public Map
 {
-
-	struct Object
+	struct ObjectLayer
 	{
-		int gid;
-		bool repeatTexture = false;
-		float x, y, w, h;
-		sf::Sprite sprite;
+		float parallaxFactor = 1.f;
+		std::vector<sf::Sprite> objects;
 	};
-
 public:
 	bool loadTextures(AssetManager & assets);
 
 	void drawBackground(sf::RenderTarget & target) const;
+	void drawForeground(sf::RenderTarget & target) const;
 	void drawTiles(sf::RenderTarget & target) const;
 
 private:
 	sf::VertexArray m_tileVertices;
 	sf::Texture * m_tileTexture;
 	std::map<int, Tile> m_tiles;
-	std::vector<Object> m_backgroundObjects;
+
+	std::vector<ObjectLayer> m_backgroundLayers;
+	std::vector<ObjectLayer> m_foregroundLayers;
 };

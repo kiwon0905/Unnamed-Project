@@ -123,66 +123,68 @@ bool RenderMap::loadTextures(AssetManager & assets)
 			m_tileVertices.append(d);
 		}
 	}
-	sf::FloatRect r;
-	//load background images
+
+	//load objs;
+
 	XMLElement * backgroundLayer = getElementWithAttribute(map, "objectgroup", "name", "Background Layer");
-	if (backgroundLayer)
+	for (backgroundLayer; backgroundLayer != nullptr; backgroundLayer = backgroundLayer->NextSiblingElement("objectgroup"))
 	{
+		XMLElement * properties = backgroundLayer->FirstChildElement("properties");
+		ObjectLayer layer;
+		float parallaxFactor = 1.f;
+		if (properties)
+		{
+			XMLElement * parallaxFactorProperty = getElementWithAttribute(properties, "property", "name", "Parallax Factor");
+			if (parallaxFactorProperty)
+				parallaxFactorProperty->QueryFloatAttribute("value", &parallaxFactor);
+		}
+		std::cout << "Layer: " << parallaxFactor << "\n";
+		layer.parallaxFactor = parallaxFactor;
 		for (XMLElement * object = backgroundLayer->FirstChildElement("object"); object != nullptr; object = object->NextSiblingElement("object"))
 		{
-			Object obj;
-			object->QueryIntAttribute("gid", &obj.gid);
-			object->QueryFloatAttribute("x", &obj.x);
-			object->QueryFloatAttribute("y", &obj.y);
-			object->QueryFloatAttribute("width", &obj.w);
-			object->QueryFloatAttribute("height", &obj.h);
+			int gid;
+			float x, y, w, h;
+			object->QueryIntAttribute("gid", &gid);
+			object->QueryFloatAttribute("x", &x);
+			object->QueryFloatAttribute("y", &y);
+			object->QueryFloatAttribute("width", &w);
+			object->QueryFloatAttribute("height", &h);
+			y -= h;
+			
+			sf::Texture * texture = assets.get<sf::Texture>("assets/tilesets/" + m_tiles[gid].source);
+			sf::Sprite sprite;
+			sprite.setTexture(*texture);
+			sprite.setPosition(x, y);
+			float scaleX = w / texture->getSize().x;
+			float scaleY = h / texture->getSize().y;
+			sprite.setScale(scaleX, scaleY);
 
-			obj.y -= obj.h;
+			std::cout << gid << ": " << x << ", " << y << ", " << w << ", " << h << "\n";
 
-			//get properties
+			//look for color(optional)
 			XMLElement * properties = object->FirstChildElement("properties");
 			if (properties)
 			{
-				for (XMLElement * property = properties->FirstChildElement("property"); property != nullptr; property = property->NextSiblingElement("property"))
+				XMLElement * colorProperty = getElementWithAttribute(properties, "property", "name", "Color");
+				if (colorProperty)
 				{
-					if (property->Attribute("name", "Repeat Texture"))
-					{
-						if (property->Attribute("value", "true"))
-						{
-							obj.repeatTexture = true;
-							std::cout << "repeat req\n";
-						}
-					}
+					std::string color = colorProperty->Attribute("value");
+					std::cout << "color: " << color << "\n";
+					unsigned long  rgb = strtoul(color.substr(1).c_str(), nullptr, 16);
+					std::cout << "rgb: " << rgb << "\n";
+					//argb
+					unsigned a = (rgb >> 24) & 255;
+					unsigned r = (rgb >> 16) & 255;
+					unsigned g = (rgb >> 8) & 255;
+					unsigned b = (rgb >> 0) & 255;
+					std::cout << "R: " << r << ", g: " << g << " b: " << b << ", a: " << a << "\n";
+					sprite.setColor(sf::Color(r, g, b, a));
 				}
 			}
+			layer.objects.push_back(sprite);
 
-			m_backgroundObjects.push_back(obj);
 		}
-	}
-
-	for (auto & o : m_backgroundObjects)
-	{
-		sf::Texture * texture = assets.get<sf::Texture>("assets/tilesets/" + m_tiles[o.gid].source);
-		if (o.repeatTexture)
-		{
-			texture->setRepeated(true);
-
-			//seems this adding/subtracting 1 helps to get rid of the artifacts
-			sf::IntRect r;
-			r.left = 1;
-			r.top = 1;
-			r.height = texture->getSize().y - 1;
-			r.width = m_tileSize.x * m_size.x - 1;
-			o.sprite.setTextureRect(r);
-		}
-		o.sprite.setTexture(*texture);
-		o.sprite.setPosition(o.x, o.y);
-		o.sprite.setColor(sf::Color::White);
-		float scaleFactor = static_cast<float>(o.h) / texture->getSize().y;
-		std::cout << "texture size: " << texture->getSize().x << ", " << texture->getSize().y << "\n";
-		std::cout << "Scale factor: " << scaleFactor << "\n";
-		o.sprite.setScale(scaleFactor, scaleFactor);
-		std::cout << "x: " << o.x << ", y: " << o.y << ", w: " << o.w << ", h: " << o.h << "\n";
+		m_backgroundLayers.push_back(layer);
 	}
 	return true;
 }
@@ -190,17 +192,23 @@ bool RenderMap::loadTextures(AssetManager & assets)
 
 void RenderMap::drawBackground(sf::RenderTarget & target) const
 {
-	sf::View view = target.getView();
-	sf::Vector2f center = target.getView().getCenter();
-	center *= .7f;
-	sf::View parallaxView = view;
-	parallaxView.setCenter(center);
-	target.setView(parallaxView);
-	for (auto & o : m_backgroundObjects)
+	sf::View temp = target.getView();
+
+	for (auto & l : m_backgroundLayers)
 	{
-		target.draw(o.sprite);
+		sf::Vector2f center = temp.getCenter();
+		center *= l.parallaxFactor;
+		sf::View parallaxView = temp;
+		parallaxView.setCenter(center);
+		target.setView(parallaxView);
+
+		for (auto & s : l.objects)
+		{
+			target.draw(s);
+		}
 	}
-	target.setView(view);
+
+	target.setView(temp);
 }
 
 void RenderMap::drawTiles(sf::RenderTarget & target) const
