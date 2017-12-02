@@ -26,7 +26,6 @@ public:
 	void onInput(int peerId, int predictedTick, const NetInput & input, int ackTick);
 
 	int getCurrentTick() const;
-	sf::Time getCurrentTime() const;
 
 	virtual std::string getName() = 0;
 	void loadRound();
@@ -52,6 +51,7 @@ protected:
 	int m_tick = 0;
 	sf::Time m_accumulator;
 	sf::Time m_prevTime;
+	
 	std::vector<Player> m_players;
 	GameWorld m_gameWorld;
 	Map m_map;

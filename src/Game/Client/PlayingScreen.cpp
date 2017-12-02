@@ -263,7 +263,6 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 					m_predictedTime.reset(sf::seconds(static_cast<float>(m_startTick + 5) / TICKS_PER_SEC));
 					m_prevPredictedTime = sf::seconds(static_cast<float>(m_startTick + 5) / TICKS_PER_SEC);
 					m_predictedTick = m_startTick + 5;
-
 				}
 				else if(serverTick - 2 >= m_startTick) 
 				{
@@ -289,11 +288,13 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			int32_t timeLeft;
 			unpacker.unpack(inputTick);
 			unpacker.unpack(timeLeft);
+
 			for (const auto & input : m_inputs)
 			{
 				if (input.tick == inputTick)
 				{
-					sf::Time target = input.predictedTime + input.elapsed.getElapsedTime() - sf::milliseconds(timeLeft - 50);
+
+					sf::Time target = input.predictedTime + input.elapsed.getElapsedTime() - sf::milliseconds(timeLeft - 50);//try to send input 50 milliseconds earlier																									 
 					m_predictedTime.update(target, sf::seconds(1.f));
 					m_predictionGraph->addSample(static_cast<float>(timeLeft));
 				}
@@ -421,10 +422,9 @@ void PlayingScreen::update(Client & client)
 		{
 			++i;
 			m_accumulator -= sf::seconds(1 / TICKS_PER_SEC);
-
 			m_predictedTick++;
 
-
+			std::cout << "predicted tick: " << m_predictedTick << "\n";
 			//read input
 			NetInput input;
 			if(!m_editBox->isFocused())
@@ -519,10 +519,9 @@ void PlayingScreen::render(Client & client)
 
 	
 	//calculate interp
-	float t = 0.f;
+	float t = m_nextSnap.snapshot ? (renderTick - m_currentSnap.tick) / (m_nextSnap.tick - m_currentSnap.tick) : 0.f;
 	float predT = m_accumulator / sf::seconds(1.f / TICKS_PER_SEC);
-	if (m_nextSnap.snapshot)
-		t = (renderTick - m_currentSnap.tick) / (m_nextSnap.tick - m_currentSnap.tick);
+
 	
 	
 	//transit snapshot
@@ -692,7 +691,7 @@ void PlayingScreen::render(Client & client)
 			e->render(m_currentSnap.snapshot, m_nextSnap.snapshot, predT, t);
 		}
 	}
-
+	
 
 	//particles
 	window.draw(m_particles);

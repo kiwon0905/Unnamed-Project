@@ -21,6 +21,7 @@ bool GameContext::update()
 
 	while (m_accumulator >= sf::seconds(1.f / TICKS_PER_SEC))
 	{
+		std::cout << "tick: " << m_tick << "\n";
 		m_tick++;
 		m_accumulator -= sf::seconds(1.f / TICKS_PER_SEC);
 		m_gameWorld.tick();
@@ -118,7 +119,7 @@ void GameContext::onInput(int peerId, int predictedTick, const NetInput & input,
 	player->onInput(predictedTick, input);
 	player->setAckTick(ackTick);
 
-	if(m_tick % 2)
+	//if(m_tick )
 	{
 		sf::Time timeLeft = sf::seconds(predictedTick / TICKS_PER_SEC) - m_clock.getElapsedTime();
 		Packer packer;
@@ -132,11 +133,6 @@ void GameContext::onInput(int peerId, int predictedTick, const NetInput & input,
 int GameContext::getCurrentTick() const
 {
 	return m_tick;
-}
-
-sf::Time GameContext::getCurrentTime() const
-{
-	return m_clock.getElapsedTime();
 }
 
 void GameContext::loadRound()

@@ -43,8 +43,7 @@ void Hud::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	//game time
 	sf::Text timeText;
 	timeText.setFillColor(sf::Color::Blue);
-	int totalSeconds = static_cast<int>(m_time.asMicroseconds()) / 1000000;
-	timeText.setString(getStringFromTime(totalSeconds));
+	timeText.setString(getStringFromTime(static_cast<int>(m_time.asSeconds())));
 	timeText.setFont(*m_font);
 	timeText.setPosition(static_cast<float>(target.getSize().x / 2.f - timeText.getLocalBounds().width / 2.f), 0.f);
 	target.draw(timeText);
