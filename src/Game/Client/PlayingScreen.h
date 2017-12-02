@@ -70,6 +70,15 @@ private:
 	};
 	State m_state = LOADING;
 
+
+	struct PlayerJoinLeave
+	{
+		int tick;
+		int id;
+		bool joinOrLeave;//true if joined false if left
+	};
+	std::deque<PlayerJoinLeave> m_playerJoinOrLeaves;
+
 	int m_myPlayerId;
 	std::vector<PlayerInfo> m_players;
 

@@ -263,7 +263,7 @@ bool Map::isGrounded(const Aabb & aabb) const
 
 	for (int x = startX; x <= endX; ++x)
 	{
-		if (getTile(x, y) != 0)
+		if (getTile(x, y) > 0)
 		{
 			return true;
 		}

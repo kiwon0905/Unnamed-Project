@@ -339,13 +339,23 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		else if (msg == Msg::SV_PLAYER_LEFT)
 		{
 			int id;
+			int tick;
 			unpacker.unpack(id);
+			unpacker.unpack(tick);
+
+			
 			const PlayerInfo * info = getPlayerInfo(id);
 			if (info)
 			{
 				std::string line = info->name + " has left the game.";
+
+				std::cout << info->name << " left at tick: " << tick << "\n";
 				m_chatBox->addLine(line, sf::Color::Red);
-			
+				PlayerJoinLeave p;
+				p.tick = tick;
+				p.id = id;
+				p.joinOrLeave = false;
+				m_playerJoinOrLeaves.push_back(p);
 				//m_players.erase(std::remove_if(m_players.begin(), m_players.end(), [id](const PlayerInfo & info) {return info.id == id; }), m_players.end());
 			}
 		}
@@ -597,14 +607,31 @@ void PlayingScreen::render(Client & client)
 
 			}
 		}
-
 		auto isDead2 = [](Entity * e) {return !e->isAlive(); };
 		m_predictedEntities.erase(std::remove_if(m_predictedEntities.begin(), m_predictedEntities.end(), isDead2), m_predictedEntities.end());
 		auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
 		for (auto & v : m_entitiesByType)
 			v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
-
+		
+		//remove old snapshots
 		m_snapshots.removeUntil(prevSnap.tick);
+
+		//handle player leave/join
+		while (!m_playerJoinOrLeaves.empty() && m_playerJoinOrLeaves[0].tick < m_currentSnap.tick)
+		{
+			PlayerJoinLeave p = m_playerJoinOrLeaves.front();
+			m_playerJoinOrLeaves.pop_front();
+			
+			//leave
+			if (!p.joinOrLeave)
+			{
+				m_players.erase(std::remove_if(m_players.begin(), m_players.end(), [p](const PlayerInfo & info) {return info.id == p.id; }), m_players.end());
+			}
+			else
+			{
+
+			}
+		}
 
 
 		//update scoreboard
@@ -649,7 +676,7 @@ void PlayingScreen::render(Client & client)
 	//draw background
 	sf::RectangleShape background;
 	background.setSize(m_map.getWorldSize());
-	background.setFillColor(sf::Color(135, 206, 235));
+	background.setFillColor(sf::Color(0, 191, 235));
 	window.draw(background);
 
 	m_map.drawBackground(window);

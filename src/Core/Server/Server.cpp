@@ -362,6 +362,7 @@ void Server::handleNetwork()
 					Packer packer;
 					packer.pack(Msg::SV_PLAYER_LEFT);
 					packer.pack(p->getId());
+					packer.pack(m_gameContext->getCurrentTick());
 					broadcast(packer, true, p);
 					m_gameContext->onDisconnect(p->getId());
 				}
