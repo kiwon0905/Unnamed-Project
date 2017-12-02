@@ -19,15 +19,14 @@ bool GameContext::update()
 	m_prevTime = current;
 	m_accumulator += dt;
 
-	while (m_accumulator >= sf::seconds(1.f / TICKS_PER_SEC))
+	while (m_accumulator >= TIME_PER_TICK)
 	{
-		std::cout << "tick: " << m_tick << "\n";
 		m_tick++;
-		m_accumulator -= sf::seconds(1.f / TICKS_PER_SEC);
+		m_accumulator -= TIME_PER_TICK;
 		m_gameWorld.tick();
 		for (auto & p : m_players)
 			p.tick();
-		tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds());
+		tick(TIME_PER_TICK.asSeconds());
 
 		//if (m_tick % 2 == 0)
 		{
@@ -37,7 +36,6 @@ bool GameContext::update()
 				p.snap(*snapshot);
 			m_gameWorld.snap(*snapshot);
 			snap(*snapshot);
-
 			for (auto & p : m_players)
 			{
 				Packer packer;
@@ -121,7 +119,7 @@ void GameContext::onInput(int peerId, int predictedTick, const NetInput & input,
 
 	//if(m_tick )
 	{
-		sf::Time timeLeft = sf::seconds(predictedTick / TICKS_PER_SEC) - m_clock.getElapsedTime();
+		sf::Time timeLeft = TIME_PER_TICK * static_cast<sf::Int64>(predictedTick) - m_clock.getElapsedTime();
 		Packer packer;
 		packer.pack(Msg::SV_INPUT_TIMING);
 		packer.pack(predictedTick);

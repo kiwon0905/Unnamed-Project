@@ -69,7 +69,7 @@ void PlayingScreen::onEnter(Client & client)
 	client.getNetwork().send(packer2, true);
 
 	float aspectRatio = static_cast<float>(client.getWindow().getSize().x) / static_cast<float>(client.getWindow().getSize().y);
-	float verticalCameraSize = client.getWindow().getSize().y;
+	float verticalCameraSize = static_cast<float>(client.getWindow().getSize().y);
 	float horizontalCameraSize = aspectRatio * verticalCameraSize;
 	m_view.setSize(std::round(horizontalCameraSize), std::round(verticalCameraSize));
 
@@ -221,7 +221,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 		{
 			if (m_state == LOADING)
 				return;
-			
+
 
 			int serverTick;
 			unpacker.unpack(serverTick);
@@ -260,20 +260,22 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 				if (m_numReceivedSnapshots == 0)
 				{
 					m_startTick = serverTick;
-					m_predictedTime.reset(sf::seconds(static_cast<float>(m_startTick + 5) / TICKS_PER_SEC));
-					m_prevPredictedTime = sf::seconds(static_cast<float>(m_startTick + 5) / TICKS_PER_SEC);
+					m_predictedTime.reset(static_cast<sf::Int64>(m_startTick + 5) * TIME_PER_TICK);
+					m_prevPredictedTime = static_cast<sf::Int64>(m_startTick + 5) * TIME_PER_TICK;
 					m_predictedTick = m_startTick + 5;
+
+					std::cout << "predictedTick: " << m_predictedTick << "\n";
 				}
 				else if(serverTick - 2 >= m_startTick) 
 				{
 					m_state = IN_GAME;
-					m_renderTime.reset(sf::seconds(m_startTick / TICKS_PER_SEC));
+					m_renderTime.reset(TIME_PER_TICK * static_cast<sf::Int64>(m_startTick));
 				}
 			}
 			else if(m_state == IN_GAME)
 			{
-				sf::Time target = sf::seconds((serverTick - 2) / TICKS_PER_SEC);
-				sf::Time timeLeft = sf::seconds(serverTick / TICKS_PER_SEC) - m_renderTime.getElapsedTime();
+				sf::Time target = TIME_PER_TICK * static_cast<sf::Int64>(serverTick - 2);
+				sf::Time timeLeft = TIME_PER_TICK * static_cast<sf::Int64>(serverTick) - m_renderTime.getElapsedTime();
 				m_renderTime.update(target, sf::seconds(1.f));
 				m_repredict = true;
 
@@ -328,8 +330,8 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 
 			if (info)
 			{
-				float s = tick / TICKS_PER_SEC;
-				std::string time = getStringFromTime(static_cast<int>(s));
+				sf::Time s = TIME_PER_TICK * static_cast<sf::Int64>(tick);
+				std::string time = getStringFromTime(static_cast<int>(s.asSeconds()));
 				std::string line = "[" + time + "] " + info->name + ": " + msg;
 				Logger::getInstance().info("Chat", line);
 				m_chatBox->addLine(line);
@@ -396,6 +398,13 @@ void PlayingScreen::handleUdpPacket(Unpacker & unpacker, const ENetAddress & add
 
 void PlayingScreen::update(Client & client)
 {
+	if (m_state != IN_GAME)
+		return;
+
+
+	//1. adjust current and next snap
+	//2. handle transit
+	//3. predict
 	if(client.getInput().getKeyState(sf::Keyboard::Return, true))
 	{
 		if (m_editBox->isVisible())
@@ -409,92 +418,89 @@ void PlayingScreen::update(Client & client)
 		}
 	}
 
-	if (m_state == IN_GAME)
+
+	sf::Time current = m_predictedTime.getElapsedTime();
+	sf::Time dt = current - m_prevPredictedTime;
+	m_prevPredictedTime = current;
+	m_accumulator += dt;
+
+	int i = 0;
+	while (m_accumulator >= TIME_PER_TICK)
 	{
-		static sf::Clock clock;
-		sf::Time current = m_predictedTime.getElapsedTime();
-		sf::Time dt = current - m_prevPredictedTime;
-		m_prevPredictedTime = current;
-		m_accumulator += dt;
+		++i;
+		m_accumulator -= TIME_PER_TICK;
+		m_predictedTick++;
 
-		int i = 0;
-		while (m_accumulator >= sf::seconds(1.f / TICKS_PER_SEC))
-		{
-			++i;
-			m_accumulator -= sf::seconds(1 / TICKS_PER_SEC);
-			m_predictedTick++;
-
-			std::cout << "predicted tick: " << m_predictedTick << "\n";
-			//read input
-			NetInput input;
-			if(!m_editBox->isFocused())
-				input = client.getInput().getInput(client.getWindow(), m_view);
+		//read input
+		NetInput input;
+		if(!m_editBox->isFocused())
+			input = client.getInput().getInput(client.getWindow(), m_view);
 		
-			//save the input
-			m_inputs[m_currentInputIndex].tick = m_predictedTick;
-			m_inputs[m_currentInputIndex].input = input;
-			m_inputs[m_currentInputIndex].predictedTime = current;
-			m_inputs[m_currentInputIndex].elapsed.restart();
-			m_currentInputIndex++;
-			m_currentInputIndex = m_currentInputIndex % 200;
+		//save the input
+		m_inputs[m_currentInputIndex].tick = m_predictedTick;
+		m_inputs[m_currentInputIndex].input = input;
+		m_inputs[m_currentInputIndex].predictedTime = current;
+		m_inputs[m_currentInputIndex].elapsed.restart();
+		m_currentInputIndex++;
+		m_currentInputIndex = m_currentInputIndex % 200;
 
-			//send to server
-			Packer packer;
-			packer.pack(Msg::CL_INPUT);
-			packer.pack(m_predictedTick);
-			packer.pack(m_lastRecvTick);
-			input.write(packer);
+		//send to server
+		Packer packer;
+		packer.pack(Msg::CL_INPUT);
+		packer.pack(m_predictedTick);
+		packer.pack(m_lastRecvTick);
+		input.write(packer);
 
-			client.getNetwork().send(packer, false);
-			client.getNetwork().flush();
+		client.getNetwork().send(packer, false);
+		client.getNetwork().flush();
 
 
-			//TODO: improve this clusterfuck of logic
+		//TODO: improve this clusterfuck of logic
 
-			const PlayerInfo * myPlayer = getPlayerInfo(m_myPlayerId);
+		const PlayerInfo * myPlayer = getPlayerInfo(m_myPlayerId);
 
-			//Prediction
-			for (auto p : m_predictedEntities)
-			{
-				p->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), input, m_map);
+		//Prediction
+		for (auto p : m_predictedEntities)
+		{
+			p->tick(TIME_PER_TICK.asSeconds(), input, m_map);
 				
-			}
+		}
 			
 
-			if (m_repredict)
-			{
-				Snapshot * s = m_snapshots.getLast();
-
-				for (auto e : m_predictedEntities)
-				{
-					if (e->rollback(*s))
-					{
-						for (int t = m_lastRecvTick + 1; t <= m_predictedTick; ++t)
-						{
-							NetInput input;
-							for (const auto & i : m_inputs)
-								if (i.tick == t)
-									input = i.input;
-
-							e->tick(sf::seconds(1.f / TICKS_PER_SEC).asSeconds(), input, m_map);
-
-						}
-					}
-					
-					m_repredict = false;
-				}
-			}
-
-		}
-		if (i > 1)
+		if (m_repredict)
 		{
+			Snapshot * s = m_snapshots.getLast();
 
-			//std::cout << "double update!";
+			for (auto e : m_predictedEntities)
+			{
+				if (e->rollback(*s))
+				{
+					for (int t = m_lastRecvTick + 1; t <= m_predictedTick; ++t)
+					{
+						NetInput input;
+						for (const auto & i : m_inputs)
+							if (i.tick == t)
+								input = i.input;
+
+						e->tick(TIME_PER_TICK.asSeconds(), input, m_map);
+
+					}
+				}
+					
+				m_repredict = false;
+			}
 		}
-		sf::Time timeSinceLastUpdate = clock.restart();
-		m_particles.update(timeSinceLastUpdate.asSeconds());
-		m_hud->update(timeSinceLastUpdate.asSeconds());
+
 	}
+	if (i > 1)
+	{
+
+		//std::cout << "double update!";
+	}
+	sf::Time timeSinceLastUpdate = m_regularClock.restart();
+	m_particles.update(timeSinceLastUpdate.asSeconds());
+	m_hud->update(timeSinceLastUpdate.asSeconds());
+
 }
 
 void PlayingScreen::render(Client & client)
@@ -520,7 +526,7 @@ void PlayingScreen::render(Client & client)
 	
 	//calculate interp
 	float t = m_nextSnap.snapshot ? (renderTick - m_currentSnap.tick) / (m_nextSnap.tick - m_currentSnap.tick) : 0.f;
-	float predT = m_accumulator / sf::seconds(1.f / TICKS_PER_SEC);
+	float predT = m_accumulator / TIME_PER_TICK;
 
 	
 	
