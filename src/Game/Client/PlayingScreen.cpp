@@ -405,20 +405,141 @@ void PlayingScreen::update(Client & client)
 	//1. adjust current and next snap
 	//2. handle transit
 	//3. predict
-	if(client.getInput().getKeyState(sf::Keyboard::Return, true))
+
+	//find snapshots
+	sf::Time currentRenderTime = m_renderTime.getElapsedTime();
+	float renderTick = currentRenderTime.asSeconds() * TICKS_PER_SEC;
+
+	const auto & s = m_snapshots.find(renderTick);
+
+	SnapInfo prevSnap;
+	prevSnap.tick = m_currentSnap.tick;
+	prevSnap.snapshot = m_currentSnap.snapshot;
+
+	m_currentSnap.tick = s.first->tick;
+	m_currentSnap.snapshot = s.first->snapshot.get();
+
+	m_nextSnap.tick = s.second ? s.second->tick : -1;
+	m_nextSnap.snapshot = s.second ? s.second->snapshot.get() : nullptr;
+
+	//calculate interp
+	m_renderInterpTime = m_nextSnap.snapshot ? (renderTick - m_currentSnap.tick) / (m_nextSnap.tick - m_currentSnap.tick) : 0.f;
+
+	//transit snapshot
+	if (prevSnap.tick != m_currentSnap.tick)
 	{
-		if (m_editBox->isVisible())
+		//create entities
+		for (auto & p : m_currentSnap.snapshot->getEntities())
 		{
-			m_editBox->hide();
+			if (p.second->getType() == NetObject::PLAYER_INFO)
+			{
+				PlayerInfo * info = getPlayerInfo(p.first.id);
+				NetPlayerInfo * netInfo = reinterpret_cast<NetPlayerInfo*>(p.second->data.data());
+				if (info)
+				{
+					info->entityId = netInfo->id;
+					info->team = netInfo->team;
+					info->score = netInfo->score;
+					info->ping = netInfo->ping;
+					info->kills = netInfo->kills;
+					info->deaths = netInfo->deaths;
+					info->assists = netInfo->assists;
+					info->respawnTick = netInfo->respawnTick;
+				}
+
+			}
+			else if (p.second->getType() == NetObject::GAME_DATA_CONTROL)
+			{
+				continue;
+			}
+			else
+			{
+				Entity * e = getEntity(p.first.id);
+				if (!e)
+				{
+					switch (p.second->getType())
+					{
+					case NetObject::HUMAN:
+						e = new Human(p.first.id, client, *this);
+						break;
+					case NetObject::ZOMBIE:
+						e = new Zombie(p.first.id, client, *this);
+						break;
+					case NetObject::PROJECTILE:
+						e = new Projectile(p.first.id, client, *this);
+						break;
+					default:
+						break;
+					}
+					m_entitiesByType[static_cast<int>(e->getType())].emplace_back(e);
+
+
+
+					if (getPlayerInfo(m_myPlayerId) && p.first.id == getPlayerInfo(m_myPlayerId)->entityId)
+					{
+						PredictedEntity * p = static_cast<PredictedEntity*>(e);
+						p->setPrediction(true);
+						m_predictedEntities.push_back(p);
+					}
+				}
+			}
+
+
 		}
-		else
+		//handle transient entities
+		for (auto & p : m_currentSnap.snapshot->getTransients())
 		{
-			m_editBox->show();
-			m_editBox->focus();
+			if (p->getType() == NetObject::EXPLOSION)
+			{
+				NetExplosion * ne = reinterpret_cast<NetExplosion*>(p->data.data());
+				createExplosion(m_particles, static_cast<sf::Vector2f>(ne->pos) / 100.f);
+			}
 		}
+
+
+		//delete entities
+		for (auto & v : m_entitiesByType)
+		{
+			for (auto & e : v)
+			{
+				if (!e->find(*m_currentSnap.snapshot))
+					e->setAlive(false);
+
+			}
+		}
+		auto isDead2 = [](Entity * e) {return !e->isAlive(); };
+		m_predictedEntities.erase(std::remove_if(m_predictedEntities.begin(), m_predictedEntities.end(), isDead2), m_predictedEntities.end());
+		auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
+		for (auto & v : m_entitiesByType)
+			v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
+
+		//remove old snapshots
+		m_snapshots.removeUntil(prevSnap.tick);
+
+		//handle player leave/join
+		while (!m_playerJoinOrLeaves.empty() && m_playerJoinOrLeaves[0].tick < m_currentSnap.tick)
+		{
+			PlayerJoinLeave p = m_playerJoinOrLeaves.front();
+			m_playerJoinOrLeaves.pop_front();
+
+			//leave
+			if (!p.joinOrLeave)
+			{
+				m_players.erase(std::remove_if(m_players.begin(), m_players.end(), [p](const PlayerInfo & info) {return info.id == p.id; }), m_players.end());
+			}
+			else
+			{
+
+			}
+		}
+
+
+		//update scoreboard
+		updateScoreboard();
 	}
 
-
+	//Predict
+	//add time to accumulator
 	sf::Time current = m_predictedTime.getElapsedTime();
 	sf::Time dt = current - m_prevPredictedTime;
 	m_prevPredictedTime = current;
@@ -497,9 +618,10 @@ void PlayingScreen::update(Client & client)
 
 		//std::cout << "double update!";
 	}
-	sf::Time timeSinceLastUpdate = m_regularClock.restart();
-	m_particles.update(timeSinceLastUpdate.asSeconds());
-	m_hud->update(timeSinceLastUpdate.asSeconds());
+	m_predictedInterpTime = m_accumulator / TIME_PER_TICK;
+	sf::Time frameTime = m_regularClock.restart();
+	m_particles.update(frameTime.asSeconds());
+	m_hud->update(frameTime.asSeconds());
 
 }
 
@@ -507,148 +629,14 @@ void PlayingScreen::render(Client & client)
 {
 	if (m_state != IN_GAME)
 		return;
-	//find snapshots
-	sf::Time currentRenderTime = m_renderTime.getElapsedTime();
-	float renderTick = currentRenderTime.asSeconds() * TICKS_PER_SEC;
 
-	const auto & s = m_snapshots.find(renderTick);
-
-	SnapInfo prevSnap;
-	prevSnap.tick = m_currentSnap.tick;
-	prevSnap.snapshot = m_currentSnap.snapshot;
-
-	m_currentSnap.tick = s.first->tick;
-	m_currentSnap.snapshot = s.first->snapshot.get();
-
-	m_nextSnap.tick = s.second ? s.second->tick : -1;
-	m_nextSnap.snapshot = s.second ? s.second->snapshot.get() : nullptr;
-
-	
-	//calculate interp
-	float t = m_nextSnap.snapshot ? (renderTick - m_currentSnap.tick) / (m_nextSnap.tick - m_currentSnap.tick) : 0.f;
-	float predT = m_accumulator / TIME_PER_TICK;
-
-	
-	
-	//transit snapshot
-	if (prevSnap.tick != m_currentSnap.tick)
-	{
-		//create entities
-		for (auto & p : m_currentSnap.snapshot->getEntities())
-		{
-			if (p.second->getType() == NetObject::PLAYER_INFO)
-			{
-				PlayerInfo * info = getPlayerInfo(p.first.id);
-				NetPlayerInfo * netInfo = reinterpret_cast<NetPlayerInfo*>(p.second->data.data());
-				if (info)
-				{
-					info->entityId = netInfo->id;
-					info->team = netInfo->team;
-					info->score = netInfo->score;
-					info->ping = netInfo->ping;
-					info->kills = netInfo->kills;
-					info->deaths = netInfo->deaths;
-					info->assists = netInfo->assists;
-					info->respawnTick = netInfo->respawnTick;
-				}
-
-			}
-			else if (p.second->getType() == NetObject::GAME_DATA_CONTROL)
-			{
-				continue;
-			}
-			else
-			{
-				Entity * e = getEntity(p.first.id);
-				if (!e)
-				{
-					switch (p.second->getType())
-					{
-					case NetObject::HUMAN:
-						e = new Human(p.first.id, client, *this);
-						break;
-					case NetObject::ZOMBIE:
-						e = new Zombie(p.first.id, client, *this);
-						break;
-					case NetObject::PROJECTILE:
-						e = new Projectile(p.first.id, client, *this);
-						break;
-					default:
-						break;
-					}
-					m_entitiesByType[static_cast<int>(e->getType())].emplace_back(e);
-
-
-
-					if (getPlayerInfo(m_myPlayerId) && p.first.id == getPlayerInfo(m_myPlayerId)->entityId)
-					{
-						PredictedEntity * p = static_cast<PredictedEntity*>(e);
-						p->setPrediction(true);
-						m_predictedEntities.push_back(p);
-					}
-				}
-			}
-
-			
-		}
-		//handle transient entities
-		for (auto & p : m_currentSnap.snapshot->getTransients())
-		{
-			if (p->getType() == NetObject::EXPLOSION)
-			{
-				NetExplosion * ne = reinterpret_cast<NetExplosion*>(p->data.data());
-				createExplosion(m_particles, static_cast<sf::Vector2f>(ne->pos) / 100.f);
-			}
-		}
-
-
-		//delete entities
-		for (auto & v : m_entitiesByType)
-		{
-			for (auto & e : v)
-			{
-				if (!e->find(*m_currentSnap.snapshot))
-					e->setAlive(false);
-
-			}
-		}
-		auto isDead2 = [](Entity * e) {return !e->isAlive(); };
-		m_predictedEntities.erase(std::remove_if(m_predictedEntities.begin(), m_predictedEntities.end(), isDead2), m_predictedEntities.end());
-		auto isDead = [](std::unique_ptr<Entity> & e) {return !e->isAlive(); };
-		for (auto & v : m_entitiesByType)
-			v.erase(std::remove_if(v.begin(), v.end(), isDead), v.end());
-		
-		//remove old snapshots
-		m_snapshots.removeUntil(prevSnap.tick);
-
-		//handle player leave/join
-		while (!m_playerJoinOrLeaves.empty() && m_playerJoinOrLeaves[0].tick < m_currentSnap.tick)
-		{
-			PlayerJoinLeave p = m_playerJoinOrLeaves.front();
-			m_playerJoinOrLeaves.pop_front();
-			
-			//leave
-			if (!p.joinOrLeave)
-			{
-				m_players.erase(std::remove_if(m_players.begin(), m_players.end(), [p](const PlayerInfo & info) {return info.id == p.id; }), m_players.end());
-			}
-			else
-			{
-
-			}
-		}
-
-
-		//update scoreboard
-		updateScoreboard();
-	}
 
 	//camera
 	const PlayerInfo * myInfo = getPlayerInfo(m_myPlayerId);
 	Entity * myEntity = getEntity(myInfo->entityId);
 	if (myEntity)
 	{
-		sf::Vector2f center = myEntity->getCameraPosition(m_currentSnap.snapshot, m_nextSnap.snapshot, predT, t);
+		sf::Vector2f center = myEntity->getCameraPosition(m_currentSnap.snapshot, m_nextSnap.snapshot, m_predictedInterpTime, m_renderInterpTime);
 		sf::FloatRect area{ center - m_view.getSize() / 2.f, m_view.getSize() };
 		sf::Vector2f worldSize = m_map.getWorldSize();
 		if (area.left < 0.f)
@@ -694,7 +682,7 @@ void PlayingScreen::render(Client & client)
 	{
 		for (auto & e : v)
 		{
-			e->render(m_currentSnap.snapshot, m_nextSnap.snapshot, predT, t);
+			e->render(m_currentSnap.snapshot, m_nextSnap.snapshot, m_predictedInterpTime, m_renderInterpTime);
 		}
 	}
 	
@@ -706,7 +694,7 @@ void PlayingScreen::render(Client & client)
 	if(client.debugRenderEnabled())
 		debugRender(client, m_view);
 
-	m_hud->setGameTime(currentRenderTime);
+	//m_hud->setGameTime(currentRenderTime);
 	m_hud->setEntity(myEntity);
 	window.draw(*m_hud);
 }

@@ -93,11 +93,14 @@ private:
 	std::size_t m_currentInputIndex = 0;
 
 	//timing variables
+	sf::Clock m_regularClock;
 	SmoothClock m_renderTime;
+	float m_renderInterpTime;
 	sf::Time m_prevPredictedTime;
 	sf::Time m_accumulator;
 	SmoothClock m_predictedTime;
-	sf::Clock m_regularClock;
+	float m_predictedInterpTime;
+
 	SnapshotContainer m_snapshots;
 	int m_numReceivedSnapshots = 0;
 	int m_startTick = -1;
