@@ -32,5 +32,5 @@ private:
 	std::map<int, Tile> m_tiles;
 
 	std::vector<ObjectLayer> m_backgroundLayers;
-	std::vector<ObjectLayer> m_foregroundLayers;
+	std::vector<sf::Sprite> m_foregroundLayer;
 };

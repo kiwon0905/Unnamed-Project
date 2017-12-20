@@ -21,12 +21,17 @@ void Vanilla::onRoundStart()
 	m_map.getProperty("control point", controlPoint);
 	sscanf_s(&controlPoint[0], "( %f, %f, %f, %f)", &m_controlPoint.x, &m_controlPoint.y, &m_controlPoint.w, &m_controlPoint.h);
 
+	const Map::GameObject * o = m_map.getGameObject("Control Point");
+	m_controlPoint.x = o->rect.left;
+	m_controlPoint.y = o->rect.top;
+	m_controlPoint.w = o->rect.width;
+	m_controlPoint.h = o->rect.height;
 
 	int i = 0;
 	for (auto & p : m_players)
 	{
 		Character * e;
-			e = static_cast<Character*>(m_gameWorld.createEntity<Human>(p.getPeerId(), sf::Vector2f(100.f, 100.f)));
+		e = static_cast<Character*>(m_gameWorld.createEntity<Human>(p.getPeerId(), sf::Vector2f(100.f, 100.f)));
 
 		p.setCharacter(e);
 

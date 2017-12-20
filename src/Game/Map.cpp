@@ -34,7 +34,7 @@ bool Map::loadFromTmx(const std::string & s)
 
 	//properties
 	XMLElement * properties = element->FirstChildElement("properties");
-	for (tinyxml2::XMLElement * property = properties->FirstChildElement("property"); property != nullptr; property = property->NextSiblingElement("property"))
+	for (XMLElement * property = properties->FirstChildElement("property"); property != nullptr; property = property->NextSiblingElement("property"))
 	{
 		m_properties[std::string(property->Attribute("name"))] = std::string(property->Attribute("value"));
 	}
@@ -59,6 +59,25 @@ bool Map::loadFromTmx(const std::string & s)
 			m_data.back().emplace_back(tile);
 		}
 	}
+
+	XMLElement * gameObjectLayer = getElementWithAttribute(element, "objectgroup", "name", "Game Object Layer");
+	if (gameObjectLayer)
+	{
+		for (XMLElement * object = gameObjectLayer->FirstChildElement("object"); object != nullptr; object = object->NextSiblingElement("object"))
+		{
+			std::string name = object->Attribute("name");
+			GameObject o;		
+			object->QueryFloatAttribute("x", &o.rect.left);			
+			object->QueryFloatAttribute("y", &o.rect.top);
+			object->QueryFloatAttribute("width", &o.rect.width);
+			object->QueryFloatAttribute("height", &o.rect.height);
+
+			m_gameObjects[name] = o;
+		}
+	}
+
+	for (auto & o : m_gameObjects)
+		std::cout << o.first << ": " << o.second.rect.left << ", " << o.second.rect.height << ", " << o.second.rect.width << ", " << o.second.rect.height << "\n";
 	return true;
 }
 
@@ -275,6 +294,13 @@ bool Map::leftMap(const Aabb & aabb) const
 {
 	Aabb mapAabb{ 0.f, 0.f, static_cast<float>(m_tileSize.x * m_size.x), static_cast<float>(m_tileSize.y * m_size.y) };
 	return !mapAabb.intersects(aabb);
+}
+
+const Map::GameObject * Map::getGameObject(const std::string & name)
+{
+	if (m_gameObjects.count(name))
+		return &m_gameObjects[name];
+	return nullptr;
 }
 
 int Map::getTile(int x, int y) const

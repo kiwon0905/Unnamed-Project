@@ -86,23 +86,9 @@ void Hud::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	//Map & map = m_screen->m_map;
 
 	std::string mode;
-	//map.getProperty("mode", mode);
+	m_screen->getMap().getProperty("mode", mode);
 	if (mode == "control")
 	{
-		std::string controlPoint;
-		//map.getProperty("control point", controlPoint);
-		sf::FloatRect rect;
-		sscanf_s(&controlPoint[0], "( %f, %f, %f, %f)", &rect.left, &rect.top, &rect.width, &rect.height);
-
-		target.setView(m_screen->m_view);
-		//capture area
-		sf::RectangleShape rectShape;
-		rectShape.setPosition(sf::Vector2f{ rect.left, rect.top });
-		rectShape.setSize(sf::Vector2f{ rect.width, rect.height });
-		rectShape.setFillColor(sf::Color::Yellow);
-		target.draw(rectShape);
-		
-
 		target.setView(target.getDefaultView());
 		Snapshot * current = m_screen->m_currentSnap.snapshot;
 		const NetGameDataControl * ngdc = static_cast<const NetGameDataControl *>(current->getEntity(NetObject::GAME_DATA_CONTROL, 0));

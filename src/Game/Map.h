@@ -31,8 +31,14 @@ public:
 	bool sweepCharacter(const Aabb & aabb, const sf::Vector2f & d, sf::Vector2f & out, sf::Vector2i & norm, sf::Vector2i & tile) const;
 	bool isGrounded(const Aabb & aabb) const;
 	bool leftMap(const Aabb & aabb) const;
-protected:
 
+	struct GameObject
+	{
+		sf::FloatRect rect;
+	};
+
+	const GameObject * getGameObject(const std::string & name);
+protected:
 	tinyxml2::XMLDocument m_document;
 
 	std::string m_name;
@@ -41,4 +47,5 @@ protected:
 
 	std::vector<std::vector<int>> m_data;
 	std::unordered_map<std::string, std::string> m_properties;
+	std::unordered_map<std::string, GameObject> m_gameObjects;
 };

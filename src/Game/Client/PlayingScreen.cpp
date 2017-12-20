@@ -409,6 +409,7 @@ void PlayingScreen::update(Client & client)
 	//find snapshots
 	sf::Time currentRenderTime = m_renderTime.getElapsedTime();
 	float renderTick = currentRenderTime.asSeconds() * TICKS_PER_SEC;
+	m_hud->setGameTime(currentRenderTime);
 
 	const auto & s = m_snapshots.find(renderTick);
 
@@ -694,7 +695,6 @@ void PlayingScreen::render(Client & client)
 	if(client.debugRenderEnabled())
 		debugRender(client, m_view);
 
-	//m_hud->setGameTime(currentRenderTime);
 	m_hud->setEntity(myEntity);
 	window.draw(*m_hud);
 }
@@ -870,6 +870,11 @@ const PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfoByEntity(int id)
 		if (p.entityId == id)
 			return &p;
 	return nullptr;
+}
+
+const std::vector<PlayingScreen::PlayerInfo>& PlayingScreen::getPlayerInfos()
+{
+	return m_players;
 }
 
 int PlayingScreen::getMyPlayerId()

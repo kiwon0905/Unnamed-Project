@@ -148,6 +148,7 @@ public:
 	Map & getMap();
 	PlayerInfo * getPlayerInfo(int id);
 	const PlayerInfo * getPlayerInfoByEntity(int id);
+	const std::vector<PlayerInfo> & getPlayerInfos();
 	int getMyPlayerId();
 
 	Particles & getParticles();

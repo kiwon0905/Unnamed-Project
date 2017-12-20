@@ -138,7 +138,6 @@ bool RenderMap::loadTextures(AssetManager & assets)
 			if (parallaxFactorProperty)
 				parallaxFactorProperty->QueryFloatAttribute("value", &parallaxFactor);
 		}
-		std::cout << "Layer: " << parallaxFactor << "\n";
 		layer.parallaxFactor = parallaxFactor;
 		for (XMLElement * object = backgroundLayer->FirstChildElement("object"); object != nullptr; object = object->NextSiblingElement("object"))
 		{
@@ -159,7 +158,6 @@ bool RenderMap::loadTextures(AssetManager & assets)
 			float scaleY = h / texture->getSize().y;
 			sprite.setScale(scaleX, scaleY);
 
-			std::cout << gid << ": " << x << ", " << y << ", " << w << ", " << h << "\n";
 
 			//look for color(optional)
 			XMLElement * properties = object->FirstChildElement("properties");
@@ -169,15 +167,12 @@ bool RenderMap::loadTextures(AssetManager & assets)
 				if (colorProperty)
 				{
 					std::string color = colorProperty->Attribute("value");
-					std::cout << "color: " << color << "\n";
 					unsigned long  rgb = strtoul(color.substr(1).c_str(), nullptr, 16);
-					std::cout << "rgb: " << rgb << "\n";
 					//argb
 					unsigned a = (rgb >> 24) & 255;
 					unsigned r = (rgb >> 16) & 255;
 					unsigned g = (rgb >> 8) & 255;
 					unsigned b = (rgb >> 0) & 255;
-					std::cout << "R: " << r << ", g: " << g << " b: " << b << ", a: " << a << "\n";
 					sprite.setColor(sf::Color(r, g, b, a));
 				}
 			}
@@ -185,6 +180,52 @@ bool RenderMap::loadTextures(AssetManager & assets)
 
 		}
 		m_backgroundLayers.push_back(layer);
+	}
+
+	//There can be only one foreground layer
+	XMLElement * foregroundLayer = getElementWithAttribute(map, "objectgroup", "name", "Background Layer");
+	if (foregroundLayer)
+	{
+		for (XMLElement * object = foregroundLayer->FirstChildElement("object"); object != nullptr; object = object->NextSiblingElement("object"))
+		{
+			int gid;
+			float x, y, w, h;
+			object->QueryIntAttribute("gid", &gid);
+			object->QueryFloatAttribute("x", &x);
+			object->QueryFloatAttribute("y", &y);
+			object->QueryFloatAttribute("width", &w);
+			object->QueryFloatAttribute("height", &h);
+			y -= h;
+
+			sf::Texture * texture = assets.get<sf::Texture>("assets/tilesets/" + m_tiles[gid].source);
+			sf::Sprite sprite;
+			sprite.setTexture(*texture);
+			sprite.setPosition(x, y);
+			float scaleX = w / texture->getSize().x;
+			float scaleY = h / texture->getSize().y;
+			sprite.setScale(scaleX, scaleY);
+
+
+			//look for color(optional)
+			XMLElement * properties = object->FirstChildElement("properties");
+			if (properties)
+			{
+				XMLElement * colorProperty = getElementWithAttribute(properties, "property", "name", "Color");
+				if (colorProperty)
+				{
+					std::string color = colorProperty->Attribute("value");
+					unsigned long  rgb = strtoul(color.substr(1).c_str(), nullptr, 16);
+					//argb
+					unsigned a = (rgb >> 24) & 255;
+					unsigned r = (rgb >> 16) & 255;
+					unsigned g = (rgb >> 8) & 255;
+					unsigned b = (rgb >> 0) & 255;
+					sprite.setColor(sf::Color(r, g, b, a));
+				}
+			}
+			m_foregroundLayer.push_back(sprite);
+
+		}
 	}
 	return true;
 }
@@ -209,6 +250,15 @@ void RenderMap::drawBackground(sf::RenderTarget & target) const
 	}
 
 	target.setView(temp);
+
+}
+
+void RenderMap::drawForeground(sf::RenderTarget & target) const
+{
+	for (auto & s : m_foregroundLayer)
+	{
+		target.draw(s);
+	}
 }
 
 void RenderMap::drawTiles(sf::RenderTarget & target) const
