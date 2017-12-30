@@ -401,6 +401,18 @@ void PlayingScreen::update(Client & client)
 	if (m_state != IN_GAME)
 		return;
 
+	if (client.getInput().getKeyState(sf::Keyboard::Return, true))
+	{
+		if (m_editBox->isVisible())
+		{
+			m_editBox->hide();
+		}
+		else
+		{
+			m_editBox->show();
+			m_editBox->focus();
+		}
+	}
 
 	//1. adjust current and next snap
 	//2. handle transit

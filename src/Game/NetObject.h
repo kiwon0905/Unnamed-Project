@@ -18,6 +18,7 @@ public:
 		ITEM,
 		PLAYER_INFO,
 		GAME_DATA_CONTROL,
+		GAME_DATA_TDM,
 		ENTITY_COUNT,
 		//Transient
 		EXPLOSION,

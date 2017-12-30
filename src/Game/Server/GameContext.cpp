@@ -133,11 +133,6 @@ int GameContext::getCurrentTick() const
 	return m_tick;
 }
 
-void GameContext::loadRound()
-{
-	m_map.loadFromTmx("map/control1.tmx");
-}
-
 void GameContext::startRound()
 {
 	onRoundStart();

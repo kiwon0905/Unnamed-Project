@@ -141,6 +141,12 @@
     <ClInclude Include="src\Game\NetObject\NetGameDataControl.h">
       <Filter>Game\Shared\NetObject</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\Server\GameContext\Tdm.h">
+      <Filter>Game\Server\GameContext</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\NetObject\NetGameDataTdm.h">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game\Server\GameWorld.cpp">
@@ -243,6 +249,12 @@
       <Filter>Game\Server\Entity</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\NetObject\NetGameDataControl.cpp">
+      <Filter>Game\Shared\NetObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Server\GameContext\Tdm.cpp">
+      <Filter>Game\Server\GameContext</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\NetObject\NetGameDataTdm.cpp">
       <Filter>Game\Shared\NetObject</Filter>
     </ClCompile>
   </ItemGroup>

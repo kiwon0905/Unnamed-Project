@@ -1,3 +1,4 @@
-mode = private
+mode = internet
 masterAddr = localhost:12345
 gameServerAddr = localhost:0
+pingCheckAddr = localhost:12346

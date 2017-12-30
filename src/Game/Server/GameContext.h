@@ -28,7 +28,7 @@ public:
 	int getCurrentTick() const;
 
 	virtual std::string getName() = 0;
-	void loadRound();
+	virtual void loadRound() = 0;
 	void startRound();
 	virtual void onRoundStart() = 0;
 

@@ -5,7 +5,9 @@ class Vanilla : public GameContext
 public:
 	Vanilla(Server * server);
 	std::string getName();
+	void loadRound();
 	void onRoundStart();
+
 	void tick(float dt);
 	void snap(Snapshot & snapshot);
 

@@ -15,6 +15,11 @@ std::string Vanilla::getName()
 	return "Vanilla";
 }
 
+void Vanilla::loadRound()
+{
+	m_map.loadFromTmx("map/control1.tmx");
+}
+
 void Vanilla::onRoundStart()
 {
 	std::string controlPoint;

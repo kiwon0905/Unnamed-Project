@@ -7,6 +7,7 @@
 
 #include "Game/Server/GameContext/Infection.h"
 #include "Game/Server/GameContext/Vanilla.h"
+#include "Game/Server/GameContext/Tdm.h"
 #include <iostream>
 #include <string>
 
@@ -87,7 +88,7 @@ bool Server::initialize()
 		return false;
 	}
 
-	m_gameContext.reset(new Vanilla(this));
+	m_gameContext.reset(new Tdm(this));
 
 	//Register server
 	if (m_config.mode == "internet")
