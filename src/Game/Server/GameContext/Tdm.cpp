@@ -1,5 +1,5 @@
 #include "Tdm.h"
-
+#include "Game/NetObject/NetGameDataTdm.h"
 #include "Game/Server/Entity/Human.h"
 #include "Core/Server/Server.h"
 
@@ -43,6 +43,12 @@ void Tdm::tick(float dt)
 
 void Tdm::snap(Snapshot & snapshot)
 {
+	NetGameDataTdm  * ngdt = static_cast<NetGameDataTdm*>(snapshot.addEntity(NetObject::GAME_DATA_TDM, 0));
+	if (ngdt)
+	{
+		ngdt->scoreA = m_scoreA;
+		ngdt->scoreB = m_scoreB;
+	}
 }
 
 bool Tdm::checkRound(Team & team)
@@ -52,4 +58,22 @@ bool Tdm::checkRound(Team & team)
 
 void Tdm::reset()
 {
+}
+
+void Tdm::onCharacterDeath(int killedPeer, int killerPeer, const std::unordered_map<int, int>& assisters)
+{
+	GameContext::onCharacterDeath(killedPeer, killerPeer, assisters);
+	Player * killed = getPlayer(killedPeer);
+	Player * killer = getPlayer(killerPeer);
+	if (killed && killer)
+	{
+		if (killed->getTeam() == Team::A)
+		{
+			++m_scoreB;
+		}
+		else if (killed->getTeam() == Team::B)
+		{
+			++m_scoreA;
+		}
+	}
 }

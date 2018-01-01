@@ -37,11 +37,10 @@ public:
 	//return true if the round needs to be continued
 	bool update();
 
-	//virtual void tick() = 0;
 	virtual bool checkRound(Team & team) = 0;
 	virtual void reset();
 	
-	void announceDeath(int killedPeer, int killerPeer, const std::unordered_map<int, int> & assisters);
+	virtual void onCharacterDeath(int killedPeer, int killerPeer, const std::unordered_map<int, int> & assisters);
 	void addScore(int peerId, int score);
 private:
 protected:

@@ -95,12 +95,13 @@ private:
 	//timing variables
 	sf::Clock m_regularClock;
 	SmoothClock m_renderTime;
-	float m_renderInterpTime;
+	float m_renderInterTick;
 	sf::Time m_prevPredictedTime;
 	sf::Time m_accumulator;
 	SmoothClock m_predictedTime;
-	float m_predictedInterpTime;
+	float m_predictedInterTick;
 
+	//snap variables
 	SnapshotContainer m_snapshots;
 	int m_numReceivedSnapshots = 0;
 	int m_startTick = -1;
@@ -116,10 +117,9 @@ private:
 	SnapInfo m_currentSnap;
 	SnapInfo m_nextSnap;
 
-
+	//dbg graph
 	std::unique_ptr<Graph> m_predictionGraph;
 	std::unique_ptr<Graph> m_snapshotGraph;
-
 
 	//rendering
 	RenderMap m_map;
@@ -129,7 +129,6 @@ private:
 
 	//entities
 	Entity * getEntity(int id);
-	//Entity * getEntity(NetObject::Type type, int id);
 	std::vector<std::vector<std::unique_ptr<Entity>>> m_entitiesByType;
 	std::vector<PredictedEntity *> m_predictedEntities;
 
@@ -147,6 +146,13 @@ private:
 public:
 	Map & getMap();
 	PlayerInfo * getPlayerInfo(int id);
+
+	float getRenderInterTick() const;
+	float getPredictedInterTick() const;
+
+	const SnapInfo & getCurrentSnap() const;
+	const SnapInfo & getNextSnap() const;
+
 	const PlayerInfo * getPlayerInfoByEntity(int id);
 	const std::vector<PlayerInfo> & getPlayerInfos();
 	int getMyPlayerId();

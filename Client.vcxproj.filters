@@ -159,6 +159,12 @@
     <ClInclude Include="src\Game\NetObject\NetGameDataTdm.h">
       <Filter>Game\Shared\NetObject</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\Client\AnimatedSprite.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Client\Animation.h">
+      <Filter>Core\Client</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Client\Client.cpp">
@@ -283,6 +289,12 @@
     </ClCompile>
     <ClCompile Include="src\Game\NetObject\NetGameDataTdm.cpp">
       <Filter>Game\Shared\NetObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\AnimatedSprite.cpp">
+      <Filter>Core\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Client\Animation.cpp">
+      <Filter>Core\Client</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

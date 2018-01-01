@@ -7,6 +7,7 @@
 #include "NetObject/NetPlayerInfo.h"
 #include "NetObject/NetExplosion.h"
 #include "NetObject/NetGameDataControl.h"
+#include "NetObject/NetGameDataTdm.h"
 
 NetObject * NetObject::create(Type type)
 {
@@ -24,6 +25,8 @@ NetObject * NetObject::create(Type type)
 		return NetObject::create<NetExplosion>();
 	case NetObject::GAME_DATA_CONTROL:
 		return NetObject::create<NetGameDataControl>();
+	case NetObject::GAME_DATA_TDM:
+		return NetObject::create<NetGameDataTdm>();
 	default:
 		return nullptr;
 	}

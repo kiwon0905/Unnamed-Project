@@ -7,8 +7,12 @@ NetObject::Type NetGameDataTdm::getType() const
 
 void NetGameDataTdm::write(Packer & packer) const
 {
+	packer.pack(scoreA);
+	packer.pack(scoreB);
 }
 
 void NetGameDataTdm::read(Unpacker & unpacker)
 {
+	unpacker.unpack(scoreA);
+	unpacker.unpack(scoreB);
 }

@@ -436,7 +436,7 @@ void PlayingScreen::update(Client & client)
 	m_nextSnap.snapshot = s.second ? s.second->snapshot.get() : nullptr;
 
 	//calculate interp
-	m_renderInterpTime = m_nextSnap.snapshot ? (renderTick - m_currentSnap.tick) / (m_nextSnap.tick - m_currentSnap.tick) : 0.f;
+	m_renderInterTick = m_nextSnap.snapshot ? (renderTick - m_currentSnap.tick) / (m_nextSnap.tick - m_currentSnap.tick) : 0.f;
 
 	//transit snapshot
 	if (prevSnap.tick != m_currentSnap.tick)
@@ -631,7 +631,7 @@ void PlayingScreen::update(Client & client)
 
 		//std::cout << "double update!";
 	}
-	m_predictedInterpTime = m_accumulator / TIME_PER_TICK;
+	m_predictedInterTick = m_accumulator / TIME_PER_TICK;
 	sf::Time frameTime = m_regularClock.restart();
 	m_particles.update(frameTime.asSeconds());
 	m_hud->update(frameTime.asSeconds());
@@ -649,7 +649,7 @@ void PlayingScreen::render(Client & client)
 	Entity * myEntity = getEntity(myInfo->entityId);
 	if (myEntity)
 	{
-		sf::Vector2f center = myEntity->getCameraPosition(m_currentSnap.snapshot, m_nextSnap.snapshot, m_predictedInterpTime, m_renderInterpTime);
+		sf::Vector2f center = myEntity->getCameraPosition(m_currentSnap.snapshot, m_nextSnap.snapshot, m_predictedInterTick, m_renderInterTick);
 		sf::FloatRect area{ center - m_view.getSize() / 2.f, m_view.getSize() };
 		sf::Vector2f worldSize = m_map.getWorldSize();
 		if (area.left < 0.f)
@@ -674,7 +674,7 @@ void PlayingScreen::render(Client & client)
 	}
 	else
 	{
-		std::cout << "Respawning in: " << myInfo->respawnTick  << "\n";
+		//std::cout << "Respawning in: " << myInfo->respawnTick  << "\n";
 	}
 	sf::RenderWindow & window = client.getWindow();
 	window.setView(m_view);
@@ -695,7 +695,7 @@ void PlayingScreen::render(Client & client)
 	{
 		for (auto & e : v)
 		{
-			e->render(m_currentSnap.snapshot, m_nextSnap.snapshot, m_predictedInterpTime, m_renderInterpTime);
+			e->render(m_currentSnap.snapshot, m_nextSnap.snapshot, m_predictedInterTick, m_renderInterTick);
 		}
 	}
 	
@@ -722,6 +722,26 @@ void PlayingScreen::onObscure(Client & client)
 void PlayingScreen::onReveal(Client & client)
 {
 
+}
+
+float PlayingScreen::getRenderInterTick() const
+{
+	return m_renderInterTick;
+}
+
+float PlayingScreen::getPredictedInterTick() const
+{
+	return m_predictedInterTick;
+}
+
+const PlayingScreen::SnapInfo & PlayingScreen::getCurrentSnap() const
+{
+	return m_currentSnap;
+}
+
+const PlayingScreen::SnapInfo & PlayingScreen::getNextSnap() const
+{
+	return m_nextSnap;
 }
 
 Entity * PlayingScreen::getEntity(int id)

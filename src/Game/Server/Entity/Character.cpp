@@ -45,7 +45,7 @@ void Character::die(int killerPeerId)
 	//remove killer from the assisters
 	m_assistingPeers.erase(killerPeerId);
 
-	m_context->announceDeath(m_peerId, killerPeerId, m_assistingPeers);
+	m_context->onCharacterDeath(m_peerId, killerPeerId, m_assistingPeers);
 	m_context->addScore(killerPeerId, 5);
 
 	Player * player = m_context->getPlayer(m_peerId);

@@ -134,7 +134,7 @@ void Client::run()
 
 			m_window.display();
 
-			//std::this_thread::sleep_for(std::chrono::microseconds(1));
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
 			//sf::sleep(sf::microseconds(1));
 			m_screenStack.applyChanges(*this);
 		}

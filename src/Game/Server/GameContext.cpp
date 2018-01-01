@@ -150,7 +150,7 @@ void GameContext::reset()
 	m_snapshots.clear();
 }
 
-void GameContext::announceDeath(int killedPeer, int killerPeer, const std::unordered_map<int, int> & assisters)
+void GameContext::onCharacterDeath(int killedPeer, int killerPeer, const std::unordered_map<int, int> & assisters)
 {
 	Player * killed = getPlayer(killedPeer);
 	Player * killer = getPlayer(killerPeer);
