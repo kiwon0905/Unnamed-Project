@@ -94,11 +94,16 @@ private:
 
 	//timing variables
 	sf::Clock m_regularClock;
-	SmoothClock m_renderTime;
+	
+	SmoothClock m_renderClock;
+	sf::Time m_prevRenderTime;
+	sf::Time m_currentRenderTime;
 	float m_renderInterTick;
+
+	SmoothClock m_predictedClock;
 	sf::Time m_prevPredictedTime;
+	sf::Time m_currentPredictedTime;
 	sf::Time m_accumulator;
-	SmoothClock m_predictedTime;
 	float m_predictedInterTick;
 
 	//snap variables
@@ -147,7 +152,12 @@ public:
 	Map & getMap();
 	PlayerInfo * getPlayerInfo(int id);
 
+	sf::Time getPrevRenderTime() const;
+	sf::Time getCurrentRenderTime() const;
 	float getRenderInterTick() const;
+
+	sf::Time getPrevPredictedTime() const;
+	sf::Time getCurrentPredictedTime() const;
 	float getPredictedInterTick() const;
 
 	const SnapInfo & getCurrentSnap() const;

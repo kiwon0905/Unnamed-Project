@@ -10,11 +10,11 @@ const void * Item::find(const Snapshot & s)
 	return nullptr;
 }
 
-sf::Vector2f Item::getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const
+sf::Vector2f Item::getCameraPosition() const
 {
 	return sf::Vector2f();
 }
 
-void Item::render(const Snapshot * from, const Snapshot * to, float predictedT, float t)
+void Item::render()
 {
 }

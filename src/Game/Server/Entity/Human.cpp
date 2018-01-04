@@ -13,7 +13,7 @@
 Human::Human(int id, GameContext * context, int peerId, const sf::Vector2f & pos) :
 	Character(id, context, peerId, pos)
 {
-	m_size = { 69.f, 69.f };
+	m_size = { 63.f, 93.f };
 	m_core.setPosition(pos);
 }
 

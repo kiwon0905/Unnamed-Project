@@ -2,7 +2,7 @@
 
 NetObject::Type NetGameDataTdm::getType() const
 {
-	return NetObject::Type();
+	return NetObject::GAME_DATA_TDM;
 }
 
 void NetGameDataTdm::write(Packer & packer) const

@@ -21,30 +21,29 @@ Projectile::~Projectile()
 const void * Projectile::find(const Snapshot & s)
 {
 	return s.getEntity(NetObject::PROJECTILE, m_id);
-	
 }
 
-sf::Vector2f Projectile::getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const
+sf::Vector2f Projectile::getCameraPosition() const
 {
 	return sf::Vector2f();
 }
 
-void Projectile::render(const Snapshot * from, const Snapshot * to, float predictedT, float t)
+void Projectile::render()
 {
 	sf::RenderWindow & target = m_client->getWindow();
-	const NetProjectile * p0 = static_cast<const NetProjectile*>(from->getEntity(NetObject::PROJECTILE, m_id));
-	const NetProjectile * p1 = nullptr;
 
-	if (to)
-		p1 = static_cast<const NetProjectile*>(to->getEntity(NetObject::PROJECTILE, m_id));
+	const Snapshot * currentSnap = m_screen->getCurrentSnap().snapshot;
+	const Snapshot * nextSnap = m_screen->getNextSnap().snapshot;
+	const NetProjectile * p0 = static_cast<const NetProjectile*>(currentSnap->getEntity(NetObject::PROJECTILE, m_id));
+	const NetProjectile * p1 = nextSnap ? static_cast<const NetProjectile*>(nextSnap->getEntity(NetObject::PROJECTILE, m_id)) : nullptr;
 
 
 	sf::Vector2f pos = static_cast<sf::Vector2f>(p0->pos) / 100.f;
 	sf::Vector2f vel = static_cast<sf::Vector2f>(p0->vel) / 100.f;
 	if (p1)
 	{
-		pos = Math::lerp(static_cast<sf::Vector2f>(p0->pos) / 100.f, static_cast<sf::Vector2f>(p1->pos) / 100.f, t);
-		vel = Math::lerp(static_cast<sf::Vector2f>(p0->vel) / 100.f, static_cast<sf::Vector2f>(p1->vel) / 100.f, t);
+		pos = Math::lerp(static_cast<sf::Vector2f>(p0->pos) / 100.f, static_cast<sf::Vector2f>(p1->pos) / 100.f, m_screen->getRenderInterTick());
+		vel = Math::lerp(static_cast<sf::Vector2f>(p0->vel) / 100.f, static_cast<sf::Vector2f>(p1->vel) / 100.f, m_screen->getRenderInterTick());
 	}
 
 

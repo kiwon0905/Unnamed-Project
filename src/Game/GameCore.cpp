@@ -3,7 +3,7 @@
 
 void HumanCore::tick(float dt, const NetInput & input, const Map & map)
 {
-	Aabb aabb(m_position.x, m_position.y, 69.f, 69.f);
+	Aabb aabb(m_position.x, m_position.y, 63.f, 93.f);
 	bool grounded = map.isGrounded(aabb);
 
 	float accel = 10000.f;

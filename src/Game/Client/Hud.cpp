@@ -116,8 +116,8 @@ void Hud::draw(sf::RenderTarget & target, sf::RenderStates states) const
 		target.setView(target.getDefaultView());
 		Snapshot * current = m_screen->m_currentSnap.snapshot;
 		const NetGameDataTdm * ngdt = static_cast<const NetGameDataTdm*>(current->getEntity(NetObject::GAME_DATA_TDM, 0));
-		std::cout << "A: " << ngdt->scoreA << "\n";
-		std::cout << "B: " << ngdt->scoreB << "\n";
+		//std::cout << "A: " << ngdt->scoreA << "\n";
+		//std::cout << "B: " << ngdt->scoreB << "\n";
 	}
 }
 

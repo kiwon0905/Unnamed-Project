@@ -260,7 +260,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 				if (m_numReceivedSnapshots == 0)
 				{
 					m_startTick = serverTick;
-					m_predictedTime.reset(static_cast<sf::Int64>(m_startTick + 5) * TIME_PER_TICK);
+					m_predictedClock.reset(static_cast<sf::Int64>(m_startTick + 5) * TIME_PER_TICK);
 					m_prevPredictedTime = static_cast<sf::Int64>(m_startTick + 5) * TIME_PER_TICK;
 					m_predictedTick = m_startTick + 5;
 
@@ -269,14 +269,14 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 				else if(serverTick - 2 >= m_startTick) 
 				{
 					m_state = IN_GAME;
-					m_renderTime.reset(TIME_PER_TICK * static_cast<sf::Int64>(m_startTick));
+					m_renderClock.reset(TIME_PER_TICK * static_cast<sf::Int64>(m_startTick));
 				}
 			}
 			else if(m_state == IN_GAME)
 			{
 				sf::Time target = TIME_PER_TICK * static_cast<sf::Int64>(serverTick - 2);
-				sf::Time timeLeft = TIME_PER_TICK * static_cast<sf::Int64>(serverTick) - m_renderTime.getElapsedTime();
-				m_renderTime.update(target, sf::seconds(1.f));
+				sf::Time timeLeft = TIME_PER_TICK * static_cast<sf::Int64>(serverTick) - m_renderClock.getElapsedTime();
+				m_renderClock.update(target, sf::seconds(1.f));
 				m_repredict = true;
 
 				m_snapshotGraph->addSample(timeLeft.asMicroseconds() / 1000.f);
@@ -297,7 +297,7 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 				{
 
 					sf::Time target = input.predictedTime + input.elapsed.getElapsedTime() - sf::milliseconds(timeLeft - 50);//try to send input 50 milliseconds earlier																									 
-					m_predictedTime.update(target, sf::seconds(1.f));
+					m_predictedClock.update(target, sf::seconds(1.f));
 					m_predictionGraph->addSample(static_cast<float>(timeLeft));
 				}
 			}
@@ -419,9 +419,10 @@ void PlayingScreen::update(Client & client)
 	//3. predict
 
 	//find snapshots
-	sf::Time currentRenderTime = m_renderTime.getElapsedTime();
-	float renderTick = currentRenderTime.asSeconds() * TICKS_PER_SEC;
-	m_hud->setGameTime(currentRenderTime);
+	m_prevRenderTime = m_currentRenderTime;
+	m_currentRenderTime = m_renderClock.getElapsedTime();
+	float renderTick = m_currentRenderTime.asSeconds() * TICKS_PER_SEC;
+	m_hud->setGameTime(m_currentRenderTime);
 
 	const auto & s = m_snapshots.find(renderTick);
 
@@ -461,7 +462,7 @@ void PlayingScreen::update(Client & client)
 				}
 
 			}
-			else if (p.second->getType() == NetObject::GAME_DATA_CONTROL)
+			else if (p.first.type == NetObject::GAME_DATA_TDM || p.second->getType() == NetObject::GAME_DATA_TDM)
 			{
 				continue;
 			}
@@ -553,9 +554,9 @@ void PlayingScreen::update(Client & client)
 
 	//Predict
 	//add time to accumulator
-	sf::Time current = m_predictedTime.getElapsedTime();
-	sf::Time dt = current - m_prevPredictedTime;
-	m_prevPredictedTime = current;
+	m_prevPredictedTime = m_currentPredictedTime;
+	m_currentPredictedTime = m_predictedClock.getElapsedTime();
+	sf::Time dt = m_currentPredictedTime - m_prevPredictedTime;
 	m_accumulator += dt;
 
 	int i = 0;
@@ -573,7 +574,7 @@ void PlayingScreen::update(Client & client)
 		//save the input
 		m_inputs[m_currentInputIndex].tick = m_predictedTick;
 		m_inputs[m_currentInputIndex].input = input;
-		m_inputs[m_currentInputIndex].predictedTime = current;
+		m_inputs[m_currentInputIndex].predictedTime = m_currentPredictedTime;
 		m_inputs[m_currentInputIndex].elapsed.restart();
 		m_currentInputIndex++;
 		m_currentInputIndex = m_currentInputIndex % 200;
@@ -633,6 +634,7 @@ void PlayingScreen::update(Client & client)
 	}
 	m_predictedInterTick = m_accumulator / TIME_PER_TICK;
 	sf::Time frameTime = m_regularClock.restart();
+
 	m_particles.update(frameTime.asSeconds());
 	m_hud->update(frameTime.asSeconds());
 
@@ -649,7 +651,7 @@ void PlayingScreen::render(Client & client)
 	Entity * myEntity = getEntity(myInfo->entityId);
 	if (myEntity)
 	{
-		sf::Vector2f center = myEntity->getCameraPosition(m_currentSnap.snapshot, m_nextSnap.snapshot, m_predictedInterTick, m_renderInterTick);
+		sf::Vector2f center = myEntity->getCameraPosition();
 		sf::FloatRect area{ center - m_view.getSize() / 2.f, m_view.getSize() };
 		sf::Vector2f worldSize = m_map.getWorldSize();
 		if (area.left < 0.f)
@@ -695,7 +697,7 @@ void PlayingScreen::render(Client & client)
 	{
 		for (auto & e : v)
 		{
-			e->render(m_currentSnap.snapshot, m_nextSnap.snapshot, m_predictedInterTick, m_renderInterTick);
+			e->render();
 		}
 	}
 	
@@ -727,6 +729,16 @@ void PlayingScreen::onReveal(Client & client)
 float PlayingScreen::getRenderInterTick() const
 {
 	return m_renderInterTick;
+}
+
+sf::Time PlayingScreen::getPrevPredictedTime() const
+{
+	return m_prevPredictedTime;
+}
+
+sf::Time PlayingScreen::getCurrentPredictedTime() const
+{
+	return m_currentPredictedTime;
 }
 
 float PlayingScreen::getPredictedInterTick() const
@@ -894,6 +906,16 @@ PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfo(int id)
 			return &p;
 	return nullptr;
 
+}
+
+sf::Time PlayingScreen::getPrevRenderTime() const
+{
+	return m_prevRenderTime;
+}
+
+sf::Time PlayingScreen::getCurrentRenderTime() const
+{
+	return m_currentRenderTime;
 }
 
 const PlayingScreen::PlayerInfo * PlayingScreen::getPlayerInfoByEntity(int id)

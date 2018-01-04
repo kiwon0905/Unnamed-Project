@@ -30,29 +30,28 @@ const void * Zombie::find(const Snapshot & s)
 	return s.getEntity(NetObject::ZOMBIE, m_id);
 }
 
-sf::Vector2f Zombie::getCameraPosition(const Snapshot * from, const Snapshot * to, float predictedT, float t) const
+sf::Vector2f Zombie::getCameraPosition() const
 {
-	const NetZombie * z0 = static_cast<const NetZombie*>(from->getEntity(NetObject::ZOMBIE, m_id));
-	const NetZombie * z1 = nullptr;
-	if (to)
-		z1 = static_cast<const NetZombie*>(to->getEntity(NetObject::ZOMBIE, m_id));
-
-	return getRenderPos(z0, z1, predictedT, t) + sf::Vector2f{ 69.f, 69.f };
+	const Snapshot * currentSnap = m_screen->getCurrentSnap().snapshot;
+	const Snapshot * nextSnap = m_screen->getNextSnap().snapshot;
+	const NetZombie * z0 = static_cast<const NetZombie*>(currentSnap->getEntity(NetObject::ZOMBIE, m_id));
+	const NetZombie * z1 = nextSnap ? static_cast<const NetZombie*>(nextSnap->getEntity(NetObject::ZOMBIE, m_id)) : nullptr;
+	return getRenderPos(z0, z1) + sf::Vector2f{ 69.f, 69.f };
 }
 
-void Zombie::render(const Snapshot * from, const Snapshot * to, float predictedT, float t)
+void Zombie::render()
 {
 	sf::RenderTarget & target = m_client->getWindow();
 	const PlayingScreen::PlayerInfo * info = m_screen->getPlayerInfoByEntity(m_id);
 
 
-	const NetZombie * z0 = static_cast<const NetZombie*>(from->getEntity(NetObject::ZOMBIE, m_id));
-	const NetZombie * z1 = nullptr;
-	if (to)
-		z1 = static_cast<const NetZombie*>(to->getEntity(NetObject::ZOMBIE, m_id));
+	const Snapshot * currentSnap = m_screen->getCurrentSnap().snapshot;
+	const Snapshot * nextSnap = m_screen->getNextSnap().snapshot;
+	const NetZombie * z0 = static_cast<const NetZombie*>(currentSnap->getEntity(NetObject::ZOMBIE, m_id));
+	const NetZombie * z1 = nextSnap ? static_cast<const NetZombie*>(nextSnap->getEntity(NetObject::ZOMBIE, m_id)) : nullptr;
 
 	//body
-	sf::Vector2f pos = getRenderPos(z0, z1, predictedT, t);
+	sf::Vector2f pos = getRenderPos(z0, z1);
 	sf::RectangleShape body;
 	body.setSize({ 70.f, 70.f });
 	sf::Color teamColor = info->team == Team::A ? sf::Color::Blue : sf::Color::Red;
@@ -89,7 +88,7 @@ void Zombie::render(const Snapshot * from, const Snapshot * to, float predictedT
 				prevAngle += 360;
 			else if (da < -180)
 				currentAngle += 360;
-			aimAngle = Math::lerp(static_cast<float>(prevAngle), static_cast<float>(currentAngle), t);
+			aimAngle = Math::lerp(static_cast<float>(prevAngle), static_cast<float>(currentAngle), m_screen->getRenderInterTick());
 		}
 	}
 	gun.setRotation(aimAngle);
@@ -107,7 +106,7 @@ void Zombie::render(const Snapshot * from, const Snapshot * to, float predictedT
 	sf::RectangleShape health;
 	float healthVal = static_cast<float>(z0->health);
 	if (z1)
-		healthVal = Math::lerp<float>(static_cast<float>(z0->health), static_cast<float>(z1->health), t);
+		healthVal = Math::lerp<float>(static_cast<float>(z0->health), static_cast<float>(z1->health), m_screen->getRenderInterTick());
 	health.setFillColor(sf::Color::Red);
 
 
@@ -134,18 +133,18 @@ const ZombieCore & Zombie::getCore() const
 	return m_currentCore;
 }
 
-sf::Vector2f Zombie::getRenderPos(const NetZombie * z0, const NetZombie * z1, float predictedT, float t) const
+sf::Vector2f Zombie::getRenderPos(const NetZombie * z0, const NetZombie * z1) const
 {
 	if (isPredicted())
-		return Math::lerp(m_prevCore.getPosition(), m_currentCore.getPosition(), predictedT);
+		return Math::lerp(m_prevCore.getPosition(), m_currentCore.getPosition(), m_screen->getPredictedInterTick());
 	else
 	{
 		sf::Vector2f pos = static_cast<sf::Vector2f>(z0->pos) / 100.f;
 
 		if (z1)
 		{
-			pos.x = Math::lerp(z0->pos.x / 100.f, z1->pos.x / 100.f, t);
-			pos.y = Math::lerp(z0->pos.y / 100.f, z1->pos.y / 100.f, t);
+			pos.x = Math::lerp(z0->pos.x / 100.f, z1->pos.x / 100.f, m_screen->getRenderInterTick());
+			pos.y = Math::lerp(z0->pos.y / 100.f, z1->pos.y / 100.f, m_screen->getRenderInterTick());
 		}
 		return pos;
 	}

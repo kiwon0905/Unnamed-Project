@@ -50,8 +50,6 @@ bool Client::initialize()
 
 	m_screenStack.push(new LobbyScreen);
 	m_screenStack.applyChanges(*this);
-	//m_window.setVerticalSyncEnabled(true);
-	//m_window.setFramerateLimit(60);
 	//window.setMouseCursorGrabbed(true);
 
 	m_gui.setTarget(m_window);
