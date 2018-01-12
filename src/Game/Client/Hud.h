@@ -15,13 +15,10 @@ public:
 	void draw(sf::RenderTarget & target, sf::RenderStates states) const;
 
 	void setEntity(const Entity * e);
-	void setGameTime(const sf::Time & time);
 	void announce(const std::string & s, const sf::Color & fill = sf::Color::White, const sf::Color & outline = sf::Color::Black);
 private:
 	const sf::Font * m_font;
 	PlayingScreen * m_screen;
-
-	sf::Time m_time;
 
 	struct AnnouncerMsg
 	{

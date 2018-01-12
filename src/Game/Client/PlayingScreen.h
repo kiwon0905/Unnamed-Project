@@ -147,6 +147,7 @@ private:
 
 	std::unique_ptr<Hud> m_hud;
 
+	void loadUi(Client & client);
 	void updateScoreboard();
 public:
 	Map & getMap();

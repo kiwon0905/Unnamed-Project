@@ -16,7 +16,6 @@ Hud::Hud(const sf::Font & font, PlayingScreen & screen):
 
 void Hud::update(float dt)
 {
-
 	if (!m_announcerMsgs.empty())
 	{
 		m_announcerMsgs[0].time += dt;
@@ -41,14 +40,6 @@ void Hud::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	sf::View v = target.getView();
 	target.setView(target.getDefaultView());
 
-	//game time
-	sf::Text timeText;
-	timeText.setFillColor(sf::Color::Blue);
-	timeText.setString(getStringFromTime(static_cast<int>(m_time.asSeconds())));
-	timeText.setFont(*m_font);
-	timeText.setPosition(static_cast<float>(target.getSize().x / 2.f - timeText.getLocalBounds().width / 2.f), 0.f);
-	target.draw(timeText);
-
 	//announcer
 	if (!m_announcerMsgs.empty())
 	{
@@ -57,8 +48,7 @@ void Hud::draw(sf::RenderTarget & target, sf::RenderStates states) const
 		target.draw(m_announcerMsgs[0].text, states);
 	}
 
-
-	//character info
+	//character specific
 	if (!m_entity)
 		return;
 	if (dynamic_cast<const Zombie*>(m_entity))
@@ -83,9 +73,15 @@ void Hud::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	}
 
 
-	//game mode specific
-	//Map & map = m_screen->m_map;
+	//game time
+	sf::Text timeText;
+	timeText.setFillColor(sf::Color::Blue);
+	timeText.setString(getStringFromTime(static_cast<int>(m_screen->getCurrentRenderTime().asSeconds())));
+	timeText.setFont(*m_font);
+	timeText.setPosition(static_cast<float>(target.getSize().x / 2.f - timeText.getLocalBounds().width / 2.f), 0.f);
+	target.draw(timeText);
 
+	//game mode specific
 	std::string mode;
 	m_screen->getMap().getProperty("mode", mode);
 	if (mode == "control")
@@ -116,6 +112,12 @@ void Hud::draw(sf::RenderTarget & target, sf::RenderStates states) const
 		target.setView(target.getDefaultView());
 		Snapshot * current = m_screen->m_currentSnap.snapshot;
 		const NetGameDataTdm * ngdt = static_cast<const NetGameDataTdm*>(current->getEntity(NetObject::GAME_DATA_TDM, 0));
+		std::string str = "A: " + std::to_string(ngdt->scoreA) + "\n" + "B: " + std::to_string(ngdt->scoreB);
+		sf::Text text;
+		text.setFont(*m_font);
+		text.setString(str);
+		text.setPosition(static_cast<float>(target.getSize().x / 2.f - text.getLocalBounds().width / 2.f), timeText.getLocalBounds().height + 5);
+		target.draw(text);
 		//std::cout << "A: " << ngdt->scoreA << "\n";
 		//std::cout << "B: " << ngdt->scoreB << "\n";
 	}
@@ -124,11 +126,6 @@ void Hud::draw(sf::RenderTarget & target, sf::RenderStates states) const
 void Hud::setEntity(const Entity * e)
 {
 	m_entity = e;
-}
-
-void Hud::setGameTime(const sf::Time & time)
-{
-	m_time = time;
 }
 
 void Hud::announce(const std::string & s, const sf::Color & fill, const sf::Color & outline)

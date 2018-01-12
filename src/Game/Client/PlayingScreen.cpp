@@ -79,79 +79,9 @@ void PlayingScreen::onEnter(Client & client)
 	m_snapshotGraph = std::make_unique<Graph>(-50.f, 100.f, *m_font, "Snapshot timing(ms)");
 	m_snapshotGraph->setPosition({ 0.f, 300.f });
 
-
-	m_particles.setTexture(*client.getAssetManager().get<sf::Texture>("assets/Untitled.png"));
-
-	//ui
-	m_editBox = tgui::EditBox::create();
-	m_editBox->setPosition({ 0.f, client.getWindow().getSize().y - m_editBox->getSize().y });
-	m_editBox->setSize("50%", m_editBox->getSize().y);
-	m_editBox->hide();
 	m_hud.reset(new Hud(*m_font, *this));
 
-	auto sendChat = [&client, this]()
-	{
-		std::string chat = m_editBox->getText().toAnsiString();
-		if (chat != "")
-		{
-			Packer packer;
-			packer.pack(Msg::CL_CHAT);
-			packer.pack(m_editBox->getText().toAnsiString());
-			client.getNetwork().send(packer, true);
-			m_editBox->setText("");
-		}
-
-	};
-	m_editBox->onReturnKeyPress.connect(sendChat);
-	client.getGui().add(m_editBox);
-	
-
-	m_chatBox = tgui::ChatBox::create();
-	m_chatBox->getRenderer()->setBackgroundColor(sf::Color::Transparent);
-	m_chatBox->getRenderer()->setBorderColor(sf::Color::Transparent);
-	m_chatBox->setPosition({ 0.f, m_editBox->getPosition().y - m_chatBox->getSize().y });
-	m_chatBox->setSize("50%", m_chatBox->getSize().y);
-	client.getGui().add(m_chatBox);
-
-	m_scoreBoard = tgui::Panel::create({ "&.height * .7", "80%" });
-	m_scoreBoard->getRenderer()->setBackgroundColor(sf::Color(128, 128, 128, 50));
-	m_scoreBoard->setPosition({ "&.width /2 - width / 2", "&.height / 2 - height / 2" });
-
-	auto topPanel = tgui::Panel::create({ "100%", "10%" });
-	topPanel->getRenderer()->setBackgroundColor(sf::Color::Green);
-	topPanel->getRenderer()->setBorders(2);
-
-		auto name = tgui::Label::create("Name");
-		name->setSize("33%", "100%");
-		name->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-		name->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-		topPanel->add(name);
-
-		auto mode = tgui::Label::create("K/D/A");
-		mode->setPosition({ tgui::bindRight(name), tgui::bindTop(name) });
-		mode->setSize({ "33%", "100%" });
-		mode->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-		mode->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-		topPanel->add(mode);
-
-		auto status = tgui::Label::create("Ping");
-		status->setPosition({ tgui::bindRight(mode), tgui::bindTop(mode) });
-		status->setSize({ "33%", "100%" });
-		status->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-		status->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-		topPanel->add(status);
-	m_scoreBoard->add(topPanel);
-
-	auto bottomPanel = tgui::ScrollablePanel::create({ "100%", "90% - 2" });
-	bottomPanel->setPosition({ "0%", "10% + 2" });
-	bottomPanel->getRenderer()->setBorders(2);
-
-	auto grid = tgui::Grid::create();
-	bottomPanel->add(grid, "grid");
-	m_scoreBoard->add(bottomPanel, "bottomPanel");
-
-	client.getGui().add(m_scoreBoard);
-	m_scoreBoard->hide();
+	m_particles.setTexture(*client.getAssetManager().get<sf::Texture>("assets/Untitled.png"));
 }
 
 void PlayingScreen::handleEvent(const sf::Event & event, Client & client)
@@ -215,6 +145,8 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			client.getNetwork().send(packer, true);
 			Logger::getInstance().info("PlayingScreen", "Loading complete. Entering game...");
 			m_state = ENTERING;
+
+			loadUi(client);
 		}
 
 		else if (msg == Msg::SV_FULL_SNAPSHOT || msg == Msg::SV_DELTA_SNAPSHOT)
@@ -422,7 +354,6 @@ void PlayingScreen::update(Client & client)
 	m_prevRenderTime = m_currentRenderTime;
 	m_currentRenderTime = m_renderClock.getElapsedTime();
 	float renderTick = m_currentRenderTime.asSeconds() * TICKS_PER_SEC;
-	m_hud->setGameTime(m_currentRenderTime);
 
 	const auto & s = m_snapshots.find(renderTick);
 
@@ -845,53 +776,233 @@ void PlayingScreen::debugRender(Client & client, const sf::View & playerView)
 
 }
 
+void PlayingScreen::loadUi(Client & client)
+{
+	//CHatting
+	m_editBox = tgui::EditBox::create();
+	m_editBox->setPosition({ 0.f, client.getWindow().getSize().y - m_editBox->getSize().y });
+	m_editBox->setSize("50%", m_editBox->getSize().y);
+	m_editBox->hide();
+
+	auto sendChat = [&client, this]()
+	{
+		std::string chat = m_editBox->getText().toAnsiString();
+		if (chat != "")
+		{
+			Packer packer;
+			packer.pack(Msg::CL_CHAT);
+			packer.pack(m_editBox->getText().toAnsiString());
+			client.getNetwork().send(packer, true);
+			m_editBox->setText("");
+		}
+
+	};
+	m_editBox->onReturnKeyPress.connect(sendChat);
+	client.getGui().add(m_editBox);
+	m_chatBox = tgui::ChatBox::create();
+	m_chatBox->getRenderer()->setBackgroundColor(sf::Color::Transparent);
+	m_chatBox->getRenderer()->setBorderColor(sf::Color::Transparent);
+	m_chatBox->setPosition({ 0.f, m_editBox->getPosition().y - m_chatBox->getSize().y });
+	m_chatBox->setSize("50%", m_chatBox->getSize().y);
+	client.getGui().add(m_chatBox);
+
+
+	//Scoreboard
+
+	m_scoreBoard = tgui::Panel::create({ "&.height * .7", "80%" });
+	m_scoreBoard->getRenderer()->setBackgroundColor(sf::Color(128, 128, 128, 50));
+	m_scoreBoard->setPosition({ "&.width /2 - width / 2", "&.height / 2 - height / 2" });
+
+	auto topPanel = tgui::Panel::create({ "100%", "10%" });
+	topPanel->getRenderer()->setBackgroundColor(sf::Color::Green);
+	topPanel->getRenderer()->setBorders(2);
+
+	auto name = tgui::Label::create("Name");
+	name->setSize("33%", "100%");
+	name->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+	name->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+	topPanel->add(name);
+
+	auto mode = tgui::Label::create("K/D/A");
+	mode->setPosition({ tgui::bindRight(name), tgui::bindTop(name) });
+	mode->setSize({ "33%", "100%" });
+	mode->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+	mode->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+	topPanel->add(mode);
+
+	auto status = tgui::Label::create("Ping");
+	status->setPosition({ tgui::bindRight(mode), tgui::bindTop(mode) });
+	status->setSize({ "33%", "100%" });
+	status->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+	status->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+	topPanel->add(status);
+	m_scoreBoard->add(topPanel);
+
+	auto bottomPanel = tgui::ScrollablePanel::create({ "100%", "90% - 2" });
+	bottomPanel->setPosition({ "0%", "10% + 2" });
+	bottomPanel->getRenderer()->setBorders(2);
+
+	auto grid = tgui::Grid::create();
+	bottomPanel->add(grid, "grid");
+	m_scoreBoard->add(bottomPanel, "bottomPanel");
+	
+
+	client.getGui().add(m_scoreBoard);
+	m_scoreBoard->hide();
+}
+
 void PlayingScreen::updateScoreboard()
 {
+	std::string mode;
+	m_map.getProperty("mode", mode);
+	
 	auto bottomPanel = m_scoreBoard->get<tgui::Panel>("bottomPanel");
-	std::size_t i = 0;
-
 	auto grid = bottomPanel->get<tgui::Grid>("grid");
 	grid->removeAllWidgets();
+	std::size_t i = 0;
 
-	for (const auto & info : m_players)
+	if (mode == "tdm")
 	{
-		auto line = tgui::Panel::create({ tgui::bindWidth(bottomPanel) - 4, tgui::bindHeight(bottomPanel) / 10 });
-		line->getRenderer()->setOpacity(.6f);
+		std::vector<PlayerInfo> redPlayers;
+		std::vector<PlayerInfo> bluePlayers;
+		for (const auto & info : m_players)
+		{
+			if (info.team == Team::A)
+			{
+				redPlayers.push_back(info);
+			}
+			else if (info.team == Team::B)
+			{
+				bluePlayers.push_back(info);
+			}
+		}
 
-		if (i % 2)
-			line->getRenderer()->setBackgroundColor(sf::Color(173, 216, 230));
-		else
-			line->getRenderer()->setBackgroundColor(sf::Color(176, 224, 230));
+		for (const auto & info : redPlayers)
+		{
+			auto line = tgui::Panel::create({ tgui::bindWidth(bottomPanel) - 4, tgui::bindHeight(bottomPanel) / 10 });
+			line->getRenderer()->setOpacity(.6f);
 
-		auto name = tgui::Label::create(info.name);
-		name->setSize("33%", "100%");
-		name->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-		name->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-		line->add(name, "name");
-		name->setInheritedOpacity(1.f);
-		name->getRenderer()->setTextColor(sf::Color::Black);
+			if (i % 2)
+				line->getRenderer()->setBackgroundColor(sf::Color(173, 216, 230));
+			else
+				line->getRenderer()->setBackgroundColor(sf::Color(176, 224, 230));
 
-		auto score = tgui::Label::create(std::to_string(info.kills) + "/" + std::to_string(info.deaths) + "/" + std::to_string(info.assists));
-		score->setPosition({ tgui::bindRight(name), tgui::bindTop(name) });
-		score->setSize({ "33%", "100%" });
-		score->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-		score->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-		line->add(score, "mode");
-		score->setInheritedOpacity(1.f);
-		score->getRenderer()->setTextColor(sf::Color::Black);
+			auto name = tgui::Label::create(info.name);
+			name->setSize("33%", "100%");
+			name->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+			name->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+			line->add(name, "name");
+			name->setInheritedOpacity(1.f);
+			name->getRenderer()->setTextColor(sf::Color::Black);
 
-		auto ping = tgui::Label::create(std::to_string(info.ping));
-		ping->setPosition({ tgui::bindRight(score), tgui::bindTop(score) });
-		ping->setSize({ "33%", "100%" });
-		ping->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-		ping->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-		line->add(ping, "status");
-		ping->setInheritedOpacity(1.f);
-		ping->getRenderer()->setTextColor(sf::Color::Black);
+			auto score = tgui::Label::create(std::to_string(info.kills) + "/" + std::to_string(info.deaths) + "/" + std::to_string(info.assists));
+			score->setPosition({ tgui::bindRight(name), tgui::bindTop(name) });
+			score->setSize({ "33%", "100%" });
+			score->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+			score->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+			line->add(score, "mode");
+			score->setInheritedOpacity(1.f);
+			score->getRenderer()->setTextColor(sf::Color::Black);
 
-		grid->addWidget(line, i, 0);
-		++i;
+			auto ping = tgui::Label::create(std::to_string(info.ping));
+			ping->setPosition({ tgui::bindRight(score), tgui::bindTop(score) });
+			ping->setSize({ "33%", "100%" });
+			ping->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+			ping->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+			line->add(ping, "status");
+			ping->setInheritedOpacity(1.f);
+			ping->getRenderer()->setTextColor(sf::Color::Black);
+
+			grid->addWidget(line, i++, 0);
+		}
+
+		auto divider = tgui::Panel::create({ "100%", "5%" });
+		divider->getRenderer()->setBackgroundColor(sf::Color::Black);
+		grid->addWidget(divider, i++, 0);
+
+		for (const auto & info : bluePlayers)
+		{
+			auto line = tgui::Panel::create({ tgui::bindWidth(bottomPanel) - 4, tgui::bindHeight(bottomPanel) / 10 });
+			line->getRenderer()->setOpacity(.6f);
+
+			if (i % 2)
+				line->getRenderer()->setBackgroundColor(sf::Color(173, 216, 230));
+			else
+				line->getRenderer()->setBackgroundColor(sf::Color(176, 224, 230));
+
+			auto name = tgui::Label::create(info.name);
+			name->setSize("33%", "100%");
+			name->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+			name->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+			line->add(name, "name");
+			name->setInheritedOpacity(1.f);
+			name->getRenderer()->setTextColor(sf::Color::Black);
+
+			auto score = tgui::Label::create(std::to_string(info.kills) + "/" + std::to_string(info.deaths) + "/" + std::to_string(info.assists));
+			score->setPosition({ tgui::bindRight(name), tgui::bindTop(name) });
+			score->setSize({ "33%", "100%" });
+			score->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+			score->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+			line->add(score, "mode");
+			score->setInheritedOpacity(1.f);
+			score->getRenderer()->setTextColor(sf::Color::Black);
+
+			auto ping = tgui::Label::create(std::to_string(info.ping));
+			ping->setPosition({ tgui::bindRight(score), tgui::bindTop(score) });
+			ping->setSize({ "33%", "100%" });
+			ping->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+			ping->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+			line->add(ping, "status");
+			ping->setInheritedOpacity(1.f);
+			ping->getRenderer()->setTextColor(sf::Color::Black);
+
+			grid->addWidget(line, i++, 0);
+		}
 	}
+	else
+	{
+		for (const auto & info : m_players)
+		{
+			auto line = tgui::Panel::create({ tgui::bindWidth(bottomPanel) - 4, tgui::bindHeight(bottomPanel) / 10 });
+			line->getRenderer()->setOpacity(.6f);
+
+			if (i % 2)
+				line->getRenderer()->setBackgroundColor(sf::Color(173, 216, 230));
+			else
+				line->getRenderer()->setBackgroundColor(sf::Color(176, 224, 230));
+
+			auto name = tgui::Label::create(info.name);
+			name->setSize("33%", "100%");
+			name->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+			name->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+			line->add(name, "name");
+			name->setInheritedOpacity(1.f);
+			name->getRenderer()->setTextColor(sf::Color::Black);
+
+			auto score = tgui::Label::create(std::to_string(info.kills) + "/" + std::to_string(info.deaths) + "/" + std::to_string(info.assists));
+			score->setPosition({ tgui::bindRight(name), tgui::bindTop(name) });
+			score->setSize({ "33%", "100%" });
+			score->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+			score->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+			line->add(score, "mode");
+			score->setInheritedOpacity(1.f);
+			score->getRenderer()->setTextColor(sf::Color::Black);
+
+			auto ping = tgui::Label::create(std::to_string(info.ping));
+			ping->setPosition({ tgui::bindRight(score), tgui::bindTop(score) });
+			ping->setSize({ "33%", "100%" });
+			ping->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+			ping->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+			line->add(ping, "status");
+			ping->setInheritedOpacity(1.f);
+			ping->getRenderer()->setTextColor(sf::Color::Black);
+
+			grid->addWidget(line, i, 0);
+			++i;
+		}
+	}
+
+	
 }
 
 Map & PlayingScreen::getMap()

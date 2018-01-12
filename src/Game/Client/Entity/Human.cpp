@@ -8,7 +8,7 @@
 Human::Human(int id, Client & client, PlayingScreen & screen):
 	PredictedEntity(id, client, screen)
 {
-	const sf::Texture * texture = client.getAssetManager().get<sf::Texture>("assets/characters/alienBlue.png");
+	const sf::Texture * texture = client.getAssetManager().get<sf::Texture>("assets/characters/alienBeige.png");
 
 	m_restAnimation.setSpriteSheet(*texture);
 	m_restAnimation.addFrame({ 67, 378, 66, 92 });
@@ -108,8 +108,8 @@ void Human::render()
 	body.setOutlineColor(sf::Color::Black);
 	body.setOutlineThickness(-3.f);
 	body.setPosition(pos);
-	target.draw(body);
-
+	//target.draw(body);
+	m_sprite.setColor(teamColor);
 	//gun
 	sf::RectangleShape gun;
 	gun.setSize({ 60.f, 20.f });
@@ -188,7 +188,6 @@ void Human::render()
 
 	Aabb aabb{ pos.x, pos.y, 63.f, 93.f };
 	bool grounded = m_screen->getMap().isGrounded(aabb);
-	std::cout << "grnd: " << grounded << "\n";
 	if (grounded)
 	{
 		float speed = Math::length(vel);
