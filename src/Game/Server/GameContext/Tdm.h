@@ -12,8 +12,8 @@ public:
 	void snap(Snapshot & snapshot);
 	bool checkRound(Team & team);
 	void reset();
-	void onCharacterDeath(int killedPeer, int killerPeer, const std::unordered_map<int, int> & assisters);
 
+	void onCharacterDeath(int killedPeer, int killerPeer, const std::unordered_map<int, int> & assisters);
 
 private:
 	int m_scoreA = 0;

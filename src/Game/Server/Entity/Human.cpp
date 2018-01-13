@@ -58,7 +58,7 @@ void Human::tick(float dt)
 
 	if (m_context->getMap().leftMap(aabb))
 	{
-		die(m_peerId);
+		die(-1);
 	}
 }
 

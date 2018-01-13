@@ -76,4 +76,7 @@ void Tdm::onCharacterDeath(int killedPeer, int killerPeer, const std::unordered_
 			++m_scoreA;
 		}
 	}
+
+	if (killed)
+		killed->setRespawnTick(250);
 }

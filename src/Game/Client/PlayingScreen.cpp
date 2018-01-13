@@ -307,7 +307,12 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			
 			std::string killedPeerName = killedPeerInfo ? killedPeerInfo->name : "Unknown player";
 			std::string killerPeerName = killerPeerInfo ? killerPeerInfo->name : "Unknown player";
-			std::string str = killerPeerName + " killed " + killedPeerName;
+			
+			std::string str;
+			if (killerPeerId == -1)
+				str = killedPeerName + " killed themself";
+			else
+				str = killerPeerName + " killed " + killedPeerName;
 			m_hud->announce(str);
 			m_chatBox->addLine(str, sf::Color::Red);
 		}
@@ -936,7 +941,6 @@ void PlayingScreen::updateScoreboard()
 		redGrid->removeAllWidgets();
 		for (const auto & info : redPlayers)
 		{
-			std::cout << "red!\n";
 			auto line = tgui::Panel::create({ tgui::bindWidth(bottomPanel) - 4, tgui::bindHeight(bottomPanel) / 10 });
 			line->getRenderer()->setOpacity(.6f);
 
@@ -980,7 +984,6 @@ void PlayingScreen::updateScoreboard()
 		blueGrid->removeAllWidgets();
 		for (const auto & info : bluePlayers)
 		{
-			std::cout << "Blue!\n";
 			auto line = tgui::Panel::create({ tgui::bindWidth(bottomPanel) - 4, tgui::bindHeight(bottomPanel) / 10 });
 			line->getRenderer()->setOpacity(.6f);
 

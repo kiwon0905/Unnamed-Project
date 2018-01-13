@@ -152,6 +152,8 @@ void GameContext::reset()
 
 void GameContext::onCharacterDeath(int killedPeer, int killerPeer, const std::unordered_map<int, int> & assisters)
 {
+	//Announce the death
+
 	Player * killed = getPlayer(killedPeer);
 	Player * killer = getPlayer(killerPeer);
 	if (killed)
@@ -171,7 +173,6 @@ void GameContext::onCharacterDeath(int killedPeer, int killerPeer, const std::un
 		}
 
 	}
-
 	//necessary??
 	int killedPeerId = killed ? killed->getPeerId() : -1;
 	int killerPeerId = killer ? killer->getPeerId() : -1;

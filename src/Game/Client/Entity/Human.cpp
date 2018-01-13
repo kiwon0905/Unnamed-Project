@@ -8,7 +8,7 @@
 Human::Human(int id, Client & client, PlayingScreen & screen):
 	PredictedEntity(id, client, screen)
 {
-	const sf::Texture * texture = client.getAssetManager().get<sf::Texture>("assets/characters/alienBeige.png");
+	const sf::Texture * texture = client.getAssetManager().get<sf::Texture>("assets/characters/alienBlue.png");
 
 	m_restAnimation.setSpriteSheet(*texture);
 	m_restAnimation.addFrame({ 67, 378, 66, 92 });
