@@ -808,44 +808,101 @@ void PlayingScreen::loadUi(Client & client)
 
 
 	//Scoreboard
+	std::string mode;
+	m_map.getProperty("mode", mode);
 
-	m_scoreBoard = tgui::Panel::create({ "&.height * .7", "80%" });
-	m_scoreBoard->getRenderer()->setBackgroundColor(sf::Color(128, 128, 128, 50));
-	m_scoreBoard->setPosition({ "&.width /2 - width / 2", "&.height / 2 - height / 2" });
+	if (mode == "tdm")
+	{
+		m_scoreBoard = tgui::Panel::create({ "&.height * .7", "80%" });
+		m_scoreBoard->getRenderer()->setBackgroundColor(sf::Color(128, 128, 128, 50));
+		m_scoreBoard->setPosition({ "&.width /2 - width / 2", "&.height / 2 - height / 2" });
 
-	auto topPanel = tgui::Panel::create({ "100%", "10%" });
-	topPanel->getRenderer()->setBackgroundColor(sf::Color::Green);
-	topPanel->getRenderer()->setBorders(2);
+		auto topPanel = tgui::Panel::create({ "100%", "10%" });
+		topPanel->getRenderer()->setBackgroundColor(sf::Color::Green);
+		topPanel->getRenderer()->setBorders(2);
 
-	auto name = tgui::Label::create("Name");
-	name->setSize("33%", "100%");
-	name->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-	name->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-	topPanel->add(name);
+		auto name = tgui::Label::create("Name");
+		name->setSize("33%", "100%");
+		name->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		name->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		topPanel->add(name);
 
-	auto mode = tgui::Label::create("K/D/A");
-	mode->setPosition({ tgui::bindRight(name), tgui::bindTop(name) });
-	mode->setSize({ "33%", "100%" });
-	mode->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-	mode->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-	topPanel->add(mode);
+		auto mode = tgui::Label::create("K/D/A");
+		mode->setPosition({ tgui::bindRight(name), tgui::bindTop(name) });
+		mode->setSize({ "33%", "100%" });
+		mode->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		mode->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		topPanel->add(mode);
 
-	auto status = tgui::Label::create("Ping");
-	status->setPosition({ tgui::bindRight(mode), tgui::bindTop(mode) });
-	status->setSize({ "33%", "100%" });
-	status->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-	status->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-	topPanel->add(status);
-	m_scoreBoard->add(topPanel);
+		auto status = tgui::Label::create("Ping");
+		status->setPosition({ tgui::bindRight(mode), tgui::bindTop(mode) });
+		status->setSize({ "33%", "100%" });
+		status->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		status->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		topPanel->add(status);
+		m_scoreBoard->add(topPanel);
 
-	auto bottomPanel = tgui::ScrollablePanel::create({ "100%", "90% - 2" });
-	bottomPanel->setPosition({ "0%", "10% + 2" });
-	bottomPanel->getRenderer()->setBorders(2);
+		auto bottomPanel = tgui::ScrollablePanel::create({ "100%", "90% - 2" });
+		bottomPanel->setPosition({ "0%", "10%" });
+		m_scoreBoard->add(bottomPanel, "bottomPanel");
 
-	auto grid = tgui::Grid::create();
-	bottomPanel->add(grid, "grid");
-	m_scoreBoard->add(bottomPanel, "bottomPanel");
-	
+		auto redPanel = tgui::Panel::create({ "100%", "50% - 2" });
+		redPanel->setPosition({ "0%", "2" });
+		redPanel->getRenderer()->setBorderColor(sf::Color::Black);
+		redPanel->getRenderer()->setBorders(2);
+		bottomPanel->add(redPanel, "redPanel");
+
+		auto redGrid = tgui::Grid::create();
+		redPanel->add(redGrid, "grid");
+
+		auto bluePanel = tgui::Panel::create({ "100%", "50% - 2" });
+		bluePanel->setPosition({ "0%", "50% + 2" });
+		bluePanel->getRenderer()->setBorderColor(sf::Color::Black);
+		bluePanel->getRenderer()->setBorders(2);
+		bottomPanel->add(bluePanel, "bluePanel");
+
+		auto blueGrid = tgui::Grid::create();
+		bluePanel->add(blueGrid , "grid");
+	}
+	else
+	{
+		m_scoreBoard = tgui::Panel::create({ "&.height * .7", "80%" });
+		m_scoreBoard->getRenderer()->setBackgroundColor(sf::Color(128, 128, 128, 50));
+		m_scoreBoard->setPosition({ "&.width /2 - width / 2", "&.height / 2 - height / 2" });
+
+		auto topPanel = tgui::Panel::create({ "100%", "10%" });
+		topPanel->getRenderer()->setBackgroundColor(sf::Color::Green);
+		topPanel->getRenderer()->setBorders(2);
+
+		auto name = tgui::Label::create("Name");
+		name->setSize("33%", "100%");
+		name->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		name->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		topPanel->add(name);
+
+		auto mode = tgui::Label::create("K/D/A");
+		mode->setPosition({ tgui::bindRight(name), tgui::bindTop(name) });
+		mode->setSize({ "33%", "100%" });
+		mode->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		mode->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		topPanel->add(mode);
+
+		auto status = tgui::Label::create("Ping");
+		status->setPosition({ tgui::bindRight(mode), tgui::bindTop(mode) });
+		status->setSize({ "33%", "100%" });
+		status->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
+		status->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
+		topPanel->add(status);
+		m_scoreBoard->add(topPanel);
+
+		auto bottomPanel = tgui::ScrollablePanel::create({ "100%", "90% - 2" });
+		bottomPanel->setPosition({ "0%", "10% + 2" });
+		bottomPanel->getRenderer()->setBorders(2);
+
+		auto grid = tgui::Grid::create();
+		bottomPanel->add(grid, "grid");
+		m_scoreBoard->add(bottomPanel, "bottomPanel");
+	}
 
 	client.getGui().add(m_scoreBoard);
 	m_scoreBoard->hide();
@@ -856,11 +913,6 @@ void PlayingScreen::updateScoreboard()
 	std::string mode;
 	m_map.getProperty("mode", mode);
 	
-	auto bottomPanel = m_scoreBoard->get<tgui::Panel>("bottomPanel");
-	auto grid = bottomPanel->get<tgui::Grid>("grid");
-	grid->removeAllWidgets();
-	std::size_t i = 0;
-
 	if (mode == "tdm")
 	{
 		std::vector<PlayerInfo> redPlayers;
@@ -877,8 +929,14 @@ void PlayingScreen::updateScoreboard()
 			}
 		}
 
+		auto bottomPanel = m_scoreBoard->get<tgui::Panel>("bottomPanel");
+		std::size_t i = 0;
+
+		auto redGrid = bottomPanel->get<tgui::Panel>("redPanel")->get<tgui::Grid>("grid");		
+		redGrid->removeAllWidgets();
 		for (const auto & info : redPlayers)
 		{
+			std::cout << "red!\n";
 			auto line = tgui::Panel::create({ tgui::bindWidth(bottomPanel) - 4, tgui::bindHeight(bottomPanel) / 10 });
 			line->getRenderer()->setOpacity(.6f);
 
@@ -913,15 +971,16 @@ void PlayingScreen::updateScoreboard()
 			ping->setInheritedOpacity(1.f);
 			ping->getRenderer()->setTextColor(sf::Color::Black);
 
-			grid->addWidget(line, i++, 0);
+			redGrid->addWidget(line, i++, 0);
 		}
 
-		auto divider = tgui::Panel::create({ "100%", "5%" });
-		divider->getRenderer()->setBackgroundColor(sf::Color::Black);
-		grid->addWidget(divider, i++, 0);
+		i = 0;
 
+		auto blueGrid = bottomPanel->get<tgui::Panel>("bluePanel")->get<tgui::Grid>("grid");
+		blueGrid->removeAllWidgets();
 		for (const auto & info : bluePlayers)
 		{
+			std::cout << "Blue!\n";
 			auto line = tgui::Panel::create({ tgui::bindWidth(bottomPanel) - 4, tgui::bindHeight(bottomPanel) / 10 });
 			line->getRenderer()->setOpacity(.6f);
 
@@ -955,12 +1014,17 @@ void PlayingScreen::updateScoreboard()
 			line->add(ping, "status");
 			ping->setInheritedOpacity(1.f);
 			ping->getRenderer()->setTextColor(sf::Color::Black);
-
-			grid->addWidget(line, i++, 0);
+			blueGrid->addWidget(line, i++, 0);
 		}
 	}
 	else
 	{
+		auto bottomPanel = m_scoreBoard->get<tgui::Panel>("bottomPanel");
+		std::size_t i = 0;
+
+		auto grid = bottomPanel->get<tgui::Grid>("grid");
+		grid->removeAllWidgets();
+
 		for (const auto & info : m_players)
 		{
 			auto line = tgui::Panel::create({ tgui::bindWidth(bottomPanel) - 4, tgui::bindHeight(bottomPanel) / 10 });
