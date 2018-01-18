@@ -54,7 +54,7 @@ void Zombie::render()
 	sf::Vector2f pos = getRenderPos(z0, z1);
 	sf::RectangleShape body;
 	body.setSize({ 70.f, 70.f });
-	sf::Color teamColor = info->team == Team::A ? sf::Color::Blue : sf::Color::Red;
+	sf::Color teamColor = info->team == Team::BLUE ? sf::Color::Blue : sf::Color::Red;
 	body.setFillColor(teamColor);
 	body.setOutlineColor(sf::Color::Black);
 	body.setOutlineThickness(-3.f);

@@ -238,7 +238,6 @@ void Server::handleNetwork()
 			Logger::getInstance().info("Server", peerString + " connected");
 			enet_peer_timeout(event.peer, ENET_PEER_TIMEOUT_LIMIT, 500, 3000);
 		}
-
 		else if (event.type == ENET_EVENT_TYPE_RECEIVE)
 		{
 			Unpacker unpacker;
@@ -261,6 +260,12 @@ void Server::handleNetwork()
 					m_peers.emplace_back(p);
 					sendServerInfoToMasterServer();
 					m_gameContext->onJoin(p->getId());
+
+					Packer packer2;
+					packer2.pack(Msg::SV_PLAYER_JOINED);
+					packer2.pack(p->getId());
+					packer2.pack(p->getName());
+					broadcast(packer2, true, p);
 				}
 				else
 				{
@@ -272,17 +277,15 @@ void Server::handleNetwork()
 			Peer * peer = getPeer(event.peer);
 			if (!peer)
 				return;
-
+		
 
 			if (msg == Msg::CL_REQUEST_ROOM_INFO)
 			{
 
 			}
 
-			else if (msg == Msg::CL_REQUEST_PLAYER_INFO && m_state == LOADING)
+			else if (msg == Msg::CL_REQUEST_PLAYER_INFO && (m_state == PRE_GAME || m_state == LOADING))
 			{
-				peer->setState(Peer::LOADING);
-
 				Packer packer;
 				packer.pack(Msg::SV_PLAYER_INFO);
 				packer.pack(m_peers.size());

@@ -103,7 +103,7 @@ void Human::render()
 	//body
 	sf::RectangleShape body;
 	body.setSize({ 63.f, 93.f });
-	sf::Color teamColor = info->team == Team::A ? sf::Color::Blue : sf::Color::Red;
+	sf::Color teamColor = info->team == Team::BLUE ? sf::Color::Blue : sf::Color::Red;
 	body.setFillColor(teamColor);
 	body.setOutlineColor(sf::Color::Black);
 	body.setOutlineThickness(-3.f);

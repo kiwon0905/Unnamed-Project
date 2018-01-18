@@ -30,9 +30,9 @@ void Tdm::onRoundStart()
 		p.setCharacter(e);
 
 		if (i % 2 == 0)
-			p.setTeam(Team::A);
+			p.setTeam(Team::BLUE);
 		else
-			p.setTeam(Team::B);
+			p.setTeam(Team::RED);
 		++i;
 	}
 }
@@ -58,6 +58,7 @@ bool Tdm::checkRound(Team & team)
 
 void Tdm::reset()
 {
+	GameContext::reset();
 }
 
 void Tdm::onCharacterDeath(int killedPeer, int killerPeer, const std::unordered_map<int, int>& assisters)
@@ -67,11 +68,11 @@ void Tdm::onCharacterDeath(int killedPeer, int killerPeer, const std::unordered_
 	Player * killer = getPlayer(killerPeer);
 	if (killed && killer)
 	{
-		if (killed->getTeam() == Team::A)
+		if (killed->getTeam() == Team::BLUE)
 		{
 			++m_scoreB;
 		}
-		else if (killed->getTeam() == Team::B)
+		else if (killed->getTeam() == Team::RED)
 		{
 			++m_scoreA;
 		}

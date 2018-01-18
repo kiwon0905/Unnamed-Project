@@ -159,8 +159,6 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			unpacker.unpack(serverTick);
 			if (m_lastRecvTick >= serverTick)
 				return;
-
-
 			if (msg == Msg::SV_DELTA_SNAPSHOT)
 			{
 				int deltaTick;
@@ -241,9 +239,9 @@ void PlayingScreen::handleNetEvent(ENetEvent & netEv, Client & client)
 			unpacker.unpack(winner);
 			if (winner == Team::NONE)
 				std::cout << "DRAW!\n";
-			else if (winner == Team::A)
+			else if (winner == Team::BLUE)
 				std::cout << "TEAM A WIN\n";
-			else if (winner == Team::B)
+			else if (winner == Team::RED)
 				std::cout << "TEAM B WIN\n";
 
 			client.getScreenStack().pop();
@@ -924,11 +922,11 @@ void PlayingScreen::updateScoreboard()
 		std::vector<PlayerInfo> bluePlayers;
 		for (const auto & info : m_players)
 		{
-			if (info.team == Team::A)
+			if (info.team == Team::BLUE)
 			{
 				redPlayers.push_back(info);
 			}
-			else if (info.team == Team::B)
+			else if (info.team == Team::RED)
 			{
 				bluePlayers.push_back(info);
 			}

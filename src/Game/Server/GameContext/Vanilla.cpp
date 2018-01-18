@@ -41,9 +41,9 @@ void Vanilla::onRoundStart()
 		p.setCharacter(e);
 
 		if (i % 2 == 0)
-			p.setTeam(Team::A);
+			p.setTeam(Team::BLUE);
 		else
-			p.setTeam(Team::B);
+			p.setTeam(Team::RED);
 		++i;
 	}
 
@@ -61,19 +61,19 @@ void Vanilla::tick(float dt)
 		if (m_controlPoint.intersects(caabb))
 		{
 			Player * p = getPlayer(static_cast<Character*>(c)->getPeerId());
-			if (p->getTeam() == Team::A)
+			if (p->getTeam() == Team::BLUE)
 				++teamA;
-			else if (p->getTeam() == Team::B)
+			else if (p->getTeam() == Team::RED)
 				++teamB;
 		}
 	}
 	
 
 	m_capturingTeam = Team::NONE;
-	if (teamA > 0 && teamB == 0 && m_controllingTeam != Team::A)
-		m_capturingTeam = Team::A;
-	else if(teamB > 0 && teamA == 0 && m_controllingTeam != Team::B)
-		m_capturingTeam = Team::B;
+	if (teamA > 0 && teamB == 0 && m_controllingTeam != Team::BLUE)
+		m_capturingTeam = Team::BLUE;
+	else if(teamB > 0 && teamA == 0 && m_controllingTeam != Team::RED)
+		m_capturingTeam = Team::RED;
 
 
 	//capture the point if controlling team != capturing team
@@ -81,7 +81,7 @@ void Vanilla::tick(float dt)
 	{
 		if (m_capturingTeam != m_controllingTeam)
 		{
-			if (m_capturingTeam == Team::A)
+			if (m_capturingTeam == Team::BLUE)
 			{
 				m_captureProgressDecay = 100;
 
@@ -93,13 +93,13 @@ void Vanilla::tick(float dt)
 					++m_captureProgressA;
 					if (m_captureProgressA == 100)
 					{
-						m_controllingTeam = Team::A;
+						m_controllingTeam = Team::BLUE;
 						m_captureProgressA = 0;
 					}
 				}
 
 			}
-			else if (m_capturingTeam == Team::B)
+			else if (m_capturingTeam == Team::RED)
 			{
 				m_captureProgressDecay = 100;
 
@@ -111,7 +111,7 @@ void Vanilla::tick(float dt)
 					++m_captureProgressB;
 					if (m_captureProgressB == 100)
 					{
-						m_controllingTeam = Team::B;
+						m_controllingTeam = Team::RED;
 						m_captureProgressB = 0;
 					}
 				}
@@ -136,14 +136,14 @@ void Vanilla::tick(float dt)
 		
 	}
 	//control progress
-	if (m_controllingTeam == Team::A)
+	if (m_controllingTeam == Team::BLUE)
 	{
 		if (m_controlProgressA < 499)
 			++m_controlProgressA;
 		else if (m_controlProgressA == 499 && teamB == 0)
 			++m_controlProgressA;
 	}
-	else if (m_controllingTeam == Team::B)
+	else if (m_controllingTeam == Team::RED)
 	{
 		if (m_controlProgressB < 499)
 			++m_controlProgressB;
@@ -173,12 +173,12 @@ bool Vanilla::checkRound(Team & team)
 {
 	if (m_controlProgressA == 500)
 	{
-		team = Team::A;
+		team = Team::BLUE;
 		return true;
 	}
 	if (m_controlProgressB == 500)
 	{
-		team = Team::B;
+		team = Team::RED;
 		return true;
 	}
 	return false;

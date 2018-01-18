@@ -13,7 +13,6 @@ GameContext::GameContext(Server * server):
 
 bool GameContext::update()
 {
-
 	sf::Time current = m_clock.getElapsedTime();
 	sf::Time dt = current - m_prevTime;
 	m_prevTime = current;
@@ -27,7 +26,6 @@ bool GameContext::update()
 		for (auto & p : m_players)
 			p.tick();
 		tick(TIME_PER_TICK.asSeconds());
-
 		//if (m_tick % 2 == 0)
 		{
 
@@ -63,9 +61,9 @@ bool GameContext::update()
 		Team winner;
 		if (checkRound(winner))
 		{
-			if (winner == Team::A)
+			if (winner == Team::BLUE)
 				std::cout << "TEAM A WIN!\n";
-			else if (winner == Team::B)
+			else if (winner == Team::RED)
 				std::cout << "TEAM B WIN\n";
 			else if (winner == Team::NONE)
 				std::cout << "DRAW\n";

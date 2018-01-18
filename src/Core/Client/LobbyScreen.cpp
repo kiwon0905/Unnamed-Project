@@ -153,7 +153,7 @@ void LobbyScreen::onEnter(Client & client)
 	m_nextTexture.load("assets/next.png", {}, {}, true);
 
 	auto prev = tgui::Picture::create(m_prevTexture);
-	auto playPause = tgui::Picture::create(m_playTexture);
+	auto playPause = tgui::Picture::create(m_pauseTexture);
 	auto next = tgui::Picture::create(m_nextTexture);
 	
 	auto onPrevClick = [this]()
@@ -215,7 +215,7 @@ void LobbyScreen::onEnter(Client & client)
 	std::shuffle(m_musics.begin(), m_musics.end(), std::default_random_engine(static_cast<unsigned>(seed)));
 
 	loadNextMusic();
-	m_music.stop();
+	//m_music.stop();
 	requestInternetGamesInfo(client);
 }
 
@@ -361,8 +361,8 @@ void LobbyScreen::render(Client & client)
 
 void LobbyScreen::onExit(Client & client)
 {
-	if (m_fadeOutThread && m_fadeOutThread->joinable())
-		m_fadeOutThread->join();
+	//if (m_fadeOutThread && m_fadeOutThread->joinable())
+	//	m_fadeOutThread->join();
 }
 
 void LobbyScreen::onObscure(Client & client)
@@ -371,9 +371,9 @@ void LobbyScreen::onObscure(Client & client)
 	for (auto & p : m_panels)
 		p->hide();
 	m_musicPanel->hide();
-	auto fadeOut = [this]()
+	/*auto fadeOut = [this]()
 	{
-		sf::Clock clock;
+		thread_local sf::Clock clock;
 		while (m_music.getVolume() > 5)
 		{
 			float dv = clock.restart().asSeconds() * 50.f;
@@ -383,7 +383,9 @@ void LobbyScreen::onObscure(Client & client)
 		m_music.setVolume(100.f);
 
 	};
-	m_fadeOutThread = std::make_unique<std::thread>(fadeOut);
+	if (m_fadeOutThread && m_fadeOutThread->joinable())
+		m_fadeOutThread->join();	
+	m_fadeOutThread = std::make_unique<std::thread>(fadeOut);*/
 }
 
 void LobbyScreen::onReveal(Client & client)
@@ -408,6 +410,7 @@ void LobbyScreen::onReveal(Client & client)
 	{
 		m_panels[SETTINGS]->show();
 	}
+	m_musicPanel->show();
 
 }
 

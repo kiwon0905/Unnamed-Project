@@ -3,8 +3,8 @@
 
 enum class Team
 {
-	A,
-	B,
+	BLUE,
+	RED,
 	NONE,
 	COUNT
 };
@@ -27,10 +27,10 @@ inline std::string toString(Team t)
 {
 	switch (t)
 	{
-	case Team::A:
-		return "A";
-	case Team::B:
-		return "B";
+	case Team::BLUE:
+		return "BLUE";
+	case Team::RED:
+		return "RED";
 	case Team::NONE:
 		return "NONE";
 	default:

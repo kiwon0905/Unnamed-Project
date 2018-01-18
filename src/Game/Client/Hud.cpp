@@ -49,8 +49,6 @@ void Hud::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	}
 
 	//character specific
-	if (!m_entity)
-		return;
 	if (dynamic_cast<const Zombie*>(m_entity))
 	{
 		const Zombie * z = static_cast<const Zombie*>(m_entity);
@@ -112,7 +110,7 @@ void Hud::draw(sf::RenderTarget & target, sf::RenderStates states) const
 		target.setView(target.getDefaultView());
 		Snapshot * current = m_screen->m_currentSnap.snapshot;
 		const NetGameDataTdm * ngdt = static_cast<const NetGameDataTdm*>(current->getEntity(NetObject::GAME_DATA_TDM, 0));
-		std::string str = "A: " + std::to_string(ngdt->scoreA) + "\n" + "B: " + std::to_string(ngdt->scoreB);
+		std::string str = "Blue: " + std::to_string(ngdt->scoreA) + "\n" + "Red: " + std::to_string(ngdt->scoreB);
 		sf::Text text;
 		text.setFont(*m_font);
 		text.setString(str);
