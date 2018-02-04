@@ -258,7 +258,9 @@ void Server::handleNetwork()
 					Peer * p = new Peer(m_nextPeerId++, event.peer);
 					p->setName(name);
 					m_peers.emplace_back(p);
-					sendServerInfoToMasterServer();
+
+					if(m_config.mode == "internet")
+						sendServerInfoToMasterServer();
 					m_gameContext->onJoin(p->getId());
 
 					Packer packer2;
@@ -319,7 +321,8 @@ void Server::handleNetwork()
 					Logger::getInstance().info("GameContext", "Everyone has loaded");
 					m_gameContext->startRound();
 
-					sendServerInfoToMasterServer();
+					if(m_config.mode == "internet")
+						sendServerInfoToMasterServer();
 				}
 			}
 			else if (msg == Msg::CL_INPUT && m_state == IN_GAME)
@@ -383,8 +386,8 @@ void Server::handleNetwork()
 					reset();
 				}
 			}
-
-			sendServerInfoToMasterServer();
+			if(m_config.mode == "internet")
+				sendServerInfoToMasterServer();
 		}
 	}
 
