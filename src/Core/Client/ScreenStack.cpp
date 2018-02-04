@@ -26,16 +26,19 @@ void ScreenStack::render(Client & client)
 void ScreenStack::pop()
 {
 	m_changes.push_back(Change{ -1, nullptr });
+	std::cout << "POP\n";
 }
 
 void ScreenStack::push(Screen * screen)
 {
 	m_changes.push_back(Change{ 1, screen });
+	std::cout << "PUSH!\n";
 }
 
 void ScreenStack::clear()
 {
 	m_changes.push_back(Change{ 0, nullptr });
+	std::cout << "CLEAR\n";
 }
 
 bool ScreenStack::isEmpty()

@@ -120,6 +120,37 @@ void LobbyScreen::onEnter(Client & client)
 		bottomPanel->add(grid, "grid");
 	m_panels[INTERNET]->add(bottomPanel, "bottomPanel");
 
+	//PRIVATE
+	m_panels[PRIVATE]->getRenderer()->setBackgroundColor(sf::Color::Transparent);
+	m_panels[PRIVATE]->getRenderer()->setBorders(2.f);
+	m_panels[PRIVATE]->getRenderer()->setBorderColor(sf::Color::Black);
+
+	auto addrLabel = tgui::Label::create("Address:");
+	m_panels[PRIVATE]->add(addrLabel);
+
+	auto privateAddrBox = tgui::EditBox::create();
+	privateAddrBox->getRenderer()->setBackgroundColor(sf::Color::Transparent);
+	privateAddrBox->getRenderer()->setBorders(0.f);
+	privateAddrBox->setPosition({ tgui::bindRight(addrLabel) + 2, tgui::bindTop(addrLabel) });
+	privateAddrBox->setSize({ "30%", tgui::bindHeight(addrLabel) });
+	privateAddrBox->setTextSize(addrLabel->getTextSize());
+	m_panels[PRIVATE]->add(privateAddrBox, "privateAddrBox");
+
+
+	auto privateConnectButton = tgui::Button::create("Connect");
+	auto onClick = [this, &client](tgui::Widget::Ptr widget, const std::string & sigName)
+	{
+		std::string str = m_panels[PRIVATE]->get<tgui::EditBox>("privateAddrBox")->getText().toAnsiString();
+		ENetAddress addr;
+		enutil::toENetAddress(str, addr);
+		client.getNetwork().connect(addr);
+	};
+
+
+	privateConnectButton->onClick.connect(onClick);
+	privateConnectButton->setPosition({ tgui::bindRight(privateAddrBox) + 2, tgui::bindTop(privateAddrBox) });
+	m_panels[PRIVATE]->add(privateConnectButton);
+
 
 	//SETTINGS
 	m_panels[SETTINGS]->getRenderer()->setBackgroundColor(sf::Color::Transparent);
@@ -371,21 +402,7 @@ void LobbyScreen::onObscure(Client & client)
 	for (auto & p : m_panels)
 		p->hide();
 	m_musicPanel->hide();
-	/*auto fadeOut = [this]()
-	{
-		thread_local sf::Clock clock;
-		while (m_music.getVolume() > 5)
-		{
-			float dv = clock.restart().asSeconds() * 50.f;
-			m_music.setVolume(m_music.getVolume() - dv);
-		}
-		m_music.stop();
-		m_music.setVolume(100.f);
-
-	};
-	if (m_fadeOutThread && m_fadeOutThread->joinable())
-		m_fadeOutThread->join();	
-	m_fadeOutThread = std::make_unique<std::thread>(fadeOut);*/
+	m_music.stop();
 }
 
 void LobbyScreen::onReveal(Client & client)

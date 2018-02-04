@@ -148,12 +148,6 @@ void MasterServer::handlePacket(Unpacker & unpacker, ENetPeer * peer)
 		GameInfo::Status status;
 		int numPlayers;
 		
-		/*unpacker.unpack(pingCheckPort);
-		unpacker.unpack(name);
-		unpacker.unpack(modeName);
-		unpacker.unpack(status);
-		unpacker.unpack(int32_t(numPlayers));*/
-
 		unpacker.unpack(pingCheckPort);
 		unpacker.unpack(name);
 		unpacker.unpack(modeName);
@@ -193,27 +187,14 @@ void MasterServer::handlePacket(Unpacker & unpacker, const ENetAddress & addr)
 		enutil::toString(addr, stringAddr);
 		Logger::getInstance().info("MasterServer", "Received request for internet server list from: " + stringAddr);
 
-		/*Packer packer;
-		packer.pack(Msg::MSV_INTERNET_SERVER_INFO);
-		packer.pack(std::uint32_t(m_games.size()));
-
-		for (const auto & game : m_games)
-		{
-			packer.pack(game.first->address.host);
-			packer.pack(game.first->address.port);	//game server port
-			packer.pack(game.second.pingCheckPort); //ping check port
-			packer.pack(game.second.id);
-			packer.pack(game.second.name);
-			packer.pack(game.second.modeName);
-			packer.pack(game.second.status);
-			packer.pack(game.second.numPlayers);
-		}*/
-
 		Packer packer;
 		packer.pack(Msg::MSV_INTERNET_SERVER_INFO);
 		packer.pack(m_games.size());
 		for (const auto & game : m_games)
 		{
+			std::string str;
+			enutil::toString(game.first->address, str);
+			std::cout << "sending: " << str << "\n";
 			packer.pack(game.first->address.host);
 			packer.pack(game.first->address.port);	//game server port
 			packer.pack(game.second.pingCheckPort); //ping check port
