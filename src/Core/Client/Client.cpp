@@ -50,8 +50,8 @@ bool Client::initialize()
 
 	m_screenStack.push(new LobbyScreen);
 	m_screenStack.applyChanges(*this);
-	//window.setMouseCursorGrabbed(true);
-
+	m_window.setMouseCursorGrabbed(true);
+	m_window.setVerticalSyncEnabled(true);
 	m_gui.setTarget(m_window);
 	return true;
 }
@@ -130,11 +130,11 @@ void Client::run()
 			if(m_debugRender)
 				m_window.draw(frameTimeGraph);
 
+
+			sf::sleep(sf::milliseconds(1));
+			m_screenStack.applyChanges(*this);
 			m_window.display();
 
-			std::this_thread::sleep_for(std::chrono::microseconds(1));
-			//sf::sleep(sf::microseconds(1));
-			m_screenStack.applyChanges(*this);
 		}
 	}
 	finalize();
