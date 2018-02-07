@@ -3,8 +3,8 @@
  <properties>
   <property name="mode" value="tdm"/>
  </properties>
- <tileset firstgid="1" source="../assets/tilesets/grass.tsx"/>
- <tileset firstgid="50" source="../assets/tilesets/objects.tsx"/>
+ <tileset firstgid="1" source="assets/tilesets/grass.tsx"/>
+ <tileset firstgid="50" source="assets/tilesets/objects.tsx"/>
  <objectgroup name="Game Object Layer"/>
  <objectgroup name="Background Layer">
   <object id="35" gid="116" x="4060" y="1260" width="512" height="512">
